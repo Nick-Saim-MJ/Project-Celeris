@@ -30,6 +30,22 @@ jobs:
           name: validacion
           path: docs/infra/e1/validacion.md
 
+  opentofu:
+    name: OpenTofu (fmt y validate, sin desplegar)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: infra/requirements*.txt
+      - run: make deps
+      - uses: opentofu/setup-opentofu@v1
+      - run: make tofu-check
+      - name: El tfvars versionado coincide con el inventario
+        run: git diff --exit-code deploy/opentofu/envs/demo/diseno.auto.tfvars.json
+
   gitleaks:
     name: gitleaks (secretos)
     runs-on: ubuntu-latest

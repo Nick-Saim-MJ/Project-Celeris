@@ -941,6 +941,7 @@ componentes:
     ips:
       - { interfaz: eth0, ip: 10.30.10.10, zona: AWS }
     funcion: "Shield de caché"
+    instancia: { tipo_produccion: t3.medium, tipo_laboratorio: t3.small, disco_gb_gp3: 200 }
     criticidad: Media
     estado: diseño
     por_que: "Atiende solo los MISS de los nodos del campus (≈ 70 % del tráfico cacheable si el BHR local es 30 % [S-04]), en ráfagas, para no repetir la descarga por el enlace del campus."
@@ -964,6 +965,7 @@ componentes:
     ips:
       - { interfaz: eth0, ip: 10.30.11.10, zona: AWS }
     funcion: "Réplica / DR del plano de control"
+    instancia: { tipo_produccion: t3.small, tipo_laboratorio: t3.micro, disco_gb_gp3: 60 }
     criticidad: Media
     estado: diseño
     por_que: "Mantiene una réplica en espera de PostgreSQL y la API del plano de control para continuidad si el servidor del campus se pierde."
@@ -989,6 +991,7 @@ componentes:
     ips:
       - { interfaz: eth0, ip: 10.30.0.10, zona: AWS }
     funcion: "Instancia NAT"
+    instancia: { tipo_produccion: t3.micro, tipo_laboratorio: t3.micro, disco_gb_gp3: 8 }
     criticidad: Media
     estado: diseño
     por_que: "Da salida a Internet a las subredes privadas por una instancia t3.micro en lugar de un NAT Gateway, que cobra por hora y por GB; es un punto único de falla aceptado en esta fase."
@@ -1818,3 +1821,67 @@ matriz_esperada:
       BACKUP: { estado: denegado }
       AWS: { estado: no_aplica }
       INTERNET: { estado: no_aplica }
+
+# Arquitectura AWS (D2.5, F5). Los CIDR de la VPC y de las subredes salen de `componentes` (AWS-VPC, AWS-PUB-A…).
+# Aquí va lo que no cabe en un componente: rutas, Security Groups, NACL, instancias del Modo A y etiquetas.
+# Las referencias se resuelven en infra/gen/tofu.py: «zona:EDGE» → su CIDR, «componente:OBS01» → su IP /32,
+# «supernet:CAMPUS-RESUMEN» → 10.20.0.0/14. Lo que D2.5 no define y la IaC necesita se marca con `ci` (CAMBIOS-INVENTARIO.md).
+aws:
+  region: { laboratorio: us-east-1, produccion_candidata: sa-east-1, nota: "var.region de OpenTofu; la región de producción se confirma con medición [S-11]" }
+  etiquetas: { Proyecto: celeris-edge, Ttl_por_defecto: 4h, nota: "Ttl: las sesiones de AWS Academy duran 4 h (F2); el valor es una variable" }
+  presupuesto: { alarma_porcentaje: 80, referencia: RE-07 }
+  tablas_de_rutas:
+    - id: rt-public
+      subredes: [AWS-PUB-A, AWS-PUB-B]
+      rutas:
+        - { destino: 0.0.0.0/0, salto: internet_gateway }
+        - { destino: "supernet:CAMPUS-RESUMEN", salto: vgw, nota: "propagada por BGP" }
+    - id: rt-private
+      subredes: [AWS-APP-A, AWS-APP-B, AWS-DATA-A, AWS-DATA-B]
+      rutas:
+        - { destino: 0.0.0.0/0, salto: "nat:NAT01" }
+        - { destino: "supernet:CAMPUS-RESUMEN", salto: vgw, nota: "propagada" }
+        - { destino: prefijo_s3, salto: gateway_endpoint_s3, nota: "sin costo por hora" }
+  security_groups:
+    - id: sg-shield
+      componente: EC2-SHIELD
+      ingress:
+        - { proto: tcp, puerto: 8443, origen: "zona:EDGE", flujo: F9 }
+        - { proto: tcp, puerto: 9128, origen: "componente:OBS01", flujo: F12 }
+      egress: todo
+      ci: CI-11, CI-25
+    - id: sg-ctrlr
+      componente: EC2-CTRLR
+      ingress:
+        - { proto: tcp, puerto: 8443, origen: "zona:SERVERS" }
+      egress:
+        - { proto: tcp, puerto: 5432, destino: "componente:DB01", flujo: F16 }
+      ci: CI-11
+    - id: sg-nat
+      componente: NAT01
+      ingress:
+        - { proto: todo, origen: "cidr:10.30.10.0/23", nota: "app-a y app-b (D2.5)" }
+      egress: todo
+  nacl:
+    - id: nacl-private
+      subredes: [AWS-APP-A, AWS-APP-B, AWS-DATA-A, AWS-DATA-B]
+      ingress:
+        - { accion: allow, proto: tcp, puertos: [8443, 9128, 9100], origen: "supernet:CAMPUS-RESUMEN", nota: "puertos de servicio de F9 y F12" }
+        - { accion: allow, proto: tcp, puertos: [8443, 9128, 9100], origen: "componente:AWS-VPC", nota: "puertos de servicio dentro de la VPC" }
+        - { accion: allow, proto: tcp, rango: [1024, 65535], origen: "cidr:0.0.0.0/0", nota: "efímeros de retorno" }
+      egress: todo
+      ci: CI-25
+    - id: nacl-public
+      subredes: [AWS-PUB-A, AWS-PUB-B]
+      ingress:
+        - { accion: deny, proto: tcp, puertos: [22, 3389], origen: "cidr:0.0.0.0/0", nota: "D2.5: denegar SSH y RDP desde Internet" }
+        - { accion: allow, proto: tcp, rango: [1024, 65535], origen: "cidr:0.0.0.0/0", nota: "efímeros de retorno" }
+        - { accion: allow, proto: todo, origen: "componente:AWS-VPC", nota: "tráfico de las subredes privadas hacia NAT01" }
+      egress: todo
+      ci: CI-25
+  administracion: "AWS Systems Manager Session Manager por la salida de NAT01; sin bastion y sin puerto 22 abierto (D2.5)"
+  # Modo A (F5.1): la VPC que simula el campus y sus dos instancias
+  onprem_sim:
+    vpc: { nombre: onprem-sim, cidr: "supernet:SEDE-JULIACA" }
+    cgw_sim: { tipo: t3.micro, subred_cidr: 10.20.0.0/24, ip_elastica: true, source_dest_check: false, ci: CI-25 }
+    labcli_sim: { tipo: t3.micro, componente: LABCLI01, zona: LAB }

@@ -520,6 +520,27 @@
                 "minItems": 1
               }
             ]
+          },
+          "instancia": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "tipo_produccion",
+              "tipo_laboratorio",
+              "disco_gb_gp3"
+            ],
+            "properties": {
+              "tipo_produccion": {
+                "type": "string"
+              },
+              "tipo_laboratorio": {
+                "type": "string"
+              },
+              "disco_gb_gp3": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
           }
         }
       },
@@ -812,6 +833,9 @@
           }
         }
       }
+    },
+    "aws": {
+      "type": "object"
     }
   }
 }

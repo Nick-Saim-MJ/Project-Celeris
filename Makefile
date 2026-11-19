@@ -4,7 +4,7 @@
 PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
 VERSION ?= v1.0
 
-.PHONY: help entorno lab-gen image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
+.PHONY: help entorno lab-gen tofu-gen tofu-check image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
 
 help:
 	@echo "make validate        fuente única + artefactos + secretos (infra/validate.py y gitleaks si está instalado)"
@@ -15,6 +15,8 @@ help:
 	@echo "make test-gen         pruebas unitarias y snapshots de los generadores"
 	@echo "make lab-gen         genera lab/celeris.clab.yml y lab/generated desde el inventario"
 	@echo "make lab-up|lab-down laboratorio emulado con containerlab (Modo L; necesita Linux/WSL, Docker y containerlab)"
+	@echo "make tofu-gen         genera deploy/opentofu/envs/demo/diseno.auto.tfvars.json desde el inventario (Modo A)"
+	@echo "make tofu-check       tofu fmt -check y tofu validate de deploy/opentofu (no planifica ni aplica nada)"
 	@echo "make test-lab         ejecuta las pruebas T-nn del Modo L (Etapa 4)"
 	@echo "make matrices        genera las dos matrices XLSX (pendiente de P3 y P4)"
 	@echo "make diagrams-check  valida los .drawio contra el inventario (pendiente de P2)"
@@ -56,6 +58,14 @@ validate:
 
 lab-gen:
 	$(PYTHON) infra/genera.py lab
+
+tofu-gen:
+	$(PYTHON) infra/genera.py tofu
+
+# Solo formato y validación; el despliegue (tofu plan/apply) es decisión del equipo y no se ejecuta aquí.
+tofu-check: tofu-gen
+	tofu fmt -check -recursive deploy/opentofu
+	cd deploy/opentofu/envs/demo && tofu init -backend=false -input=false && tofu validate
 
 lab-up:
 	bash lab/lab.sh up

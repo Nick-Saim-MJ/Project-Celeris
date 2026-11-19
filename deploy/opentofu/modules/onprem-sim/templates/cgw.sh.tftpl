@@ -1,0 +1,120 @@
+#!/bin/bash
+# cgw-sim (cloud-init): emula a FW01 en el Modo A. strongSwan IKEv2 con una interfaz XFRM por túnel (ruteo por BGP en FRR).
+# No usa VTI: cgw-sim está detrás de la IP elástica (NAT 1:1) y las interfaces XFRM sí admiten ESP en UDP 4500 (NAT-T);
+# el Modo L, sin NAT, usa VTI como dice D1.10. Equivalencia funcional, sin verificar con `tofu apply` (ver deploy/opentofu/README.md).
+set -eu
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get install -y strongswan-charon strongswan-swanctl libcharon-extra-plugins libstrongswan-extra-plugins \
+  libstrongswan-standard-plugins frr iptables
+echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-cgw.conf
+sysctl -w net.ipv4.ip_forward=1
+
+# kernel-libipsec desvía el IKE y bypass-lan excluye las redes conectadas del IPsec: ambos se desactivan.
+cat > /etc/strongswan.conf <<'CONF'
+charon {
+  install_routes = no
+  plugins {
+    kernel-libipsec { load = no }
+    forecast { load = no }
+    bypass-lan { load = no }
+  }
+}
+CONF
+
+mkdir -p /etc/swanctl
+umask 077
+cat > /etc/swanctl/swanctl.conf <<'CONF'
+connections {
+%{ for t in tuneles ~}
+  ${t.nombre} {
+    version = 2
+    local_addrs = ${ip_privada}
+    remote_addrs = ${t.ip_aws}
+    proposals = ${ike}
+    dpd_delay = ${dpd_s}s
+    rekey_time = ${ike_vida_s}s
+    local {
+      auth = psk
+      id = ${ip_publica}
+    }
+    remote {
+      auth = psk
+      id = ${t.ip_aws}
+    }
+    children {
+      ${t.nombre} {
+        local_ts = 0.0.0.0/0
+        remote_ts = 0.0.0.0/0
+        esp_proposals = ${esp}
+        life_time = ${vida_child_s}s
+        mode = tunnel
+        if_id_in = ${t.clave}
+        if_id_out = ${t.clave}
+        dpd_action = ${dpd_accion}
+        start_action = start
+      }
+    }
+  }
+%{ endfor ~}
+}
+secrets {
+%{ for t in tuneles ~}
+  ike-${t.nombre} {
+    id-1 = ${ip_publica}
+    id-2 = ${t.ip_aws}
+    secret = "${t.psk}"
+  }
+%{ endfor ~}
+}
+CONF
+umask 022
+
+# Interfaces de túnel, MTU, MSS y NAT de la subred de laboratorio (se rehacen en cada arranque).
+cat > /usr/local/sbin/cgw-up.sh <<'CONF'
+#!/bin/bash
+set -eu
+WAN=$(ip route show default | awk '{print $5; exit}')
+%{ for t in tuneles ~}
+ip link show xfrm${t.clave} >/dev/null 2>&1 || ip link add xfrm${t.clave} type xfrm dev "$WAN" if_id ${t.clave}
+ip addr replace ${t.ip_cliente}/30 dev xfrm${t.clave}
+ip link set xfrm${t.clave} mtu ${mtu} up
+%{ endfor ~}
+iptables -t mangle -C FORWARD -o xfrm+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss ${mss} 2>/dev/null || \
+  iptables -t mangle -A FORWARD -o xfrm+ -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss ${mss}
+iptables -t nat -C POSTROUTING -s ${lab_cidr} ! -d ${aws_cidr} -o "$WAN" -j MASQUERADE 2>/dev/null || \
+  iptables -t nat -A POSTROUTING -s ${lab_cidr} ! -d ${aws_cidr} -o "$WAN" -j MASQUERADE
+CONF
+chmod 0755 /usr/local/sbin/cgw-up.sh
+
+cat > /etc/systemd/system/cgw-up.service <<'CONF'
+[Unit]
+Description=Interfaces de tunel y reglas de cgw-sim
+After=network-online.target
+Wants=network-online.target
+Before=strongswan.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/cgw-up.sh
+
+[Install]
+WantedBy=multi-user.target
+CONF
+
+# FRR: BGP con los dos vecinos de D1.10 (el mismo frr.conf que genera el Modo L desde el inventario).
+cat > /etc/frr/frr.conf <<'CONF'
+${frr_conf}
+CONF
+chown frr:frr /etc/frr/frr.conf
+chmod 0640 /etc/frr/frr.conf
+sed -i 's/^bgpd=no/bgpd=yes/; s/^staticd=no/staticd=yes/' /etc/frr/daemons
+
+systemctl daemon-reload
+systemctl enable --now cgw-up.service
+systemctl enable --now strongswan || systemctl enable --now strongswan-starter || true
+sleep 3
+swanctl --load-all --noprompt || true
+systemctl enable --now frr
+systemctl restart frr

@@ -53,6 +53,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-22 | vacío | 9 flujos sin prueba T-nn propia | abierto |
 | CI-23 | decisión de transcripción | Parámetros del laboratorio y tráfico sin F-nn en los generadores (Etapa 1) | abierto |
 | CI-24 | decisión de transcripción | Parámetros del laboratorio emulado (WAN, DNS de prueba, vgw-sim) y qué no se emula (Etapa 3) | abierto |
+| CI-25 | vacío | IaC del Modo A (OpenTofu): DPD mínimo de AWS, reglas de salida, disco de NAT01, campus simulado (Etapa 6) | abierto |
 
 ## Entradas
 
@@ -279,4 +280,27 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - Con FRR hace falta `maximum-paths 1` para cumplir «un solo túnel a la vez» de D1.10; por defecto FRR reparte entre los dos (ECMP).
   - La ruta 10.20.0.0/16 debe existir (aquí, a `Null0`) para que BGP anuncie el agregado: D1.10 dice «Redes anunciadas 10.20.0.0/16» y no dice cómo se origina.
 - **Propuesta:** dar por buenos los parámetros 1–4 para el laboratorio; incluir en el informe la nota sobre `maximum-paths` y el origen del agregado BGP en D1.10.
+- **Decide:** equipo del proyecto
+
+### CI-25 — IaC del Modo A (OpenTofu): lo que el diseño no define o AWS no admite (Etapa 6)
+- **Estado:** abierto
+- **Tipo:** vacío y contradicción
+- **Dónde:** `infra/inventory.yaml` (sección `aws`, campo `instancia` de EC2-SHIELD, EC2-CTRLR y NAT01), `infra/gen/tofu.py`, `deploy/opentofu/`
+- **Qué falta o choca y cómo se transcribió (nada se cambió en el diseño):**
+  1. **DPD.** D1.10 pide un DPD de 10 s. AWS no admite un `dpd_timeout_seconds` menor de 30. El módulo `aws-vpn` usa 30 s (`DPD_MINIMO_AWS_S` en `tofu.py`); strongSwan en cgw-sim conserva los 10 s del inventario. La detección de caída de un túnel desde el lado AWS es entonces tres veces más lenta que lo escrito en D1.10.
+  2. **Reglas de salida.** D2.5 define las reglas de entrada de los Security Groups y de las NACL, no las de salida. Se transcribe «todo permitido» en ambos (`egress: todo`). Si el diseño quiere salida restringida, hay que escribirla en D2.5.
+  3. **`sg-ctrlr` sin salida a F13 ni a SSM.** Por CI-11 se copió la regla de D2.5 tal cual (salida solo TCP 5432 hacia DB01, F16). Con esa regla EC2-CTRLR no alcanza el endpoint de Session Manager ni al plano de control de CTRL01 (F13). Se refleja el documento; la corrección es de D2.5.
+  4. **`nacl-public`.** NAT01 necesita recibir tráfico de las subredes privadas; se añadió «permitir todo desde 10.30.0.0/16» a la entrada de `nacl-public`, que D2.5 no lista. Las denegaciones de 22 y 3389 se evalúan antes.
+  5. **Disco de NAT01.** F5.2 da un rango; se tomó el extremo inferior (8 GB) como `disco_gb_gp3`. Los tipos y discos de EC2-SHIELD (t3.medium, 200 GB) y EC2-CTRLR (t3.small, 60 GB) y sus equivalentes de laboratorio (t3.small y t3.micro) vienen de D2.5, 6.3.
+  6. **Campus simulado.** La subred WAN de `cgw-sim` (10.20.0.0/24) y su IP privada (la décima de la subred) son parámetros del laboratorio, no de D1.8. La VPC 10.20.0.0/16, la subred de `labcli-sim` (zona LAB) y la IP 10.20.32.50 sí son del inventario.
+  7. **Nombres de Security Group.** AWS prohíbe que empiecen por `sg-`: el nombre real es `celeris-sg-…`; el ID del diseño se conserva en la etiqueta `Name`.
+  8. **Presupuesto (RE-07).** El inventario fija el umbral de alarma (80 %) pero no el tope en USD. Es la variable `presupuesto_usd` (sin valor por defecto: sin ella no se crea el presupuesto). El tope es un supuesto sin [S-xx] asignado.
+  9. **AMI.** Se resuelve la Debian 13 oficial por su parámetro público de SSM (`/aws/service/debian/release/13/latest/amd64`); la elección de Debian 13 es un supuesto de la IaC, sin [S-xx] asignado.
+- **Sin verificar (no se ejecutó `tofu apply` ni `tofu plan` contra AWS):**
+  - **NAT-T con interfaces XFRM.** En el Modo A `cgw-sim` queda detrás de una IP elástica (NAT 1:1). Por eso su configuración usa interfaces XFRM con `if_id` y no VTI como D1.10 y el Modo L (el kernel de WSL2 no trae XFRM, el de EC2 sí). El comportamiento es el mismo en teoría; no se comprobó con una VPN real.
+  - **AWS Academy.** No se sabe si el laboratorio permite crear un VGW y una conexión VPN con BGP. La IaC admite `perfil_de_instancia_existente` para no crear roles de IAM.
+  - **Modo A' (sin VGW)** no está implementado.
+  - AWS Emulator no está instalado: la única verificación de planificación es `tofu validate` y un plan estructural con credenciales falsas en una copia temporal (78 recursos, sin llamadas a AWS), cuya salida no es evidencia de despliegue.
+- **Secretos.** Las llaves precompartidas de los túneles las genera AWS (`tunnelN_preshared_key`) y quedan en el estado de OpenTofu y en el `user_data` de cgw-sim. El estado es local, está en `.gitignore` y no debe versionarse; es un riesgo aceptado solo para el laboratorio efímero.
+- **Propuesta:** completar D2.5 con las reglas de salida (2 y 3), corregir D1.10 o documentar el DPD de 30 s (1), fijar el tope de RE-07 (8) y decidir si se verifica en AWS Academy antes de la demostración.
 - **Decide:** equipo del proyecto

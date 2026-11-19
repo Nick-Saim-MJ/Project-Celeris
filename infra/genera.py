@@ -15,12 +15,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from celeris_infra import RAIZ, Infra  # noqa: E402
-from gen import lab, nftables, pac, vpn  # noqa: E402
+from gen import lab, nftables, pac, tofu, vpn  # noqa: E402
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("que", nargs="?", default="todo", choices=["nftables", "vpn", "pac", "todo", "lab"])
+    ap.add_argument("que", nargs="?", default="todo", choices=["nftables", "vpn", "pac", "todo", "lab", "tofu"])
     ap.add_argument("--salida", default=str(RAIZ / "lab" / "generated"))
     ap.add_argument("--secretos", default=str(RAIZ / "lab" / ".run" / "secretos"))
     ap.add_argument("--modo", default="piloto", choices=["piloto", "gestionado"])
@@ -40,6 +40,8 @@ def main(argv=None) -> int:
             print("error: --aws-peer (×2) es obligatorio para la VPN: el inventario no fija las IP públicas de AWS (CI-23)", file=sys.stderr)
             return 2
         hechos += vpn.main(x, salida, a.aws_peer, a.wan_ip, Path(a.secretos))
+    if a.que == "tofu":
+        hechos.append(tofu.main(x, RAIZ))
     if a.que == "lab":
         hechos += lab.generar_todo(x, RAIZ / "lab", RAIZ / "docs" / "AVISO.md")
     for h in hechos:

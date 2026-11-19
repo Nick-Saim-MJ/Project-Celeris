@@ -47,7 +47,7 @@ gen:
 	$(PYTHON) infra/genera.py todo $(foreach p,$(AWS_PEERS),--aws-peer $(p))
 
 test-gen:
-	$(PYTHON) -m pytest tests/gen -q
+	$(PYTHON) -m pytest tests/gen tests/network -q
 
 validate:
 	$(PYTHON) infra/validate.py
@@ -64,7 +64,7 @@ lab-down:
 	bash lab/lab.sh down
 
 test-lab:
-	@echo "pendiente de la Etapa 4: runner tests/network/run.py (lee infra/pruebas.yaml)" >&2; exit 1
+	$(PYTHON) tests/network/run.py
 
 matrices:
 	@echo "pendiente de P3 (XLSX de componentes) y P4 (XLSX de pruebas)" >&2; exit 1

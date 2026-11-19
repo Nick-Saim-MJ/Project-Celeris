@@ -402,7 +402,7 @@ pruebas:
     resultado_esperado: "Sin TLS < 1.2 ni cifrados débiles; HSTS presente; calificación ≥ A"
     criterio_aprobacion:
       - { tipo: regex, sobre: tls.json, patron: "\"id\"\\s*:\\s*\"overall_grade\"[^}]*\"finding\"\\s*:\\s*\"A[+-]?\"" }
-      - { tipo: regex, sobre: tls.json, patron: "\"id\"\\s*:\\s*\"HSTS\"[^}]*\"finding\"\\s*:\\s*\"(?!not offered)" }
+      - { tipo: regex, sobre: tls.json, patron: "\"id\"\\s*:\\s*\"HSTS_time\"[^}]*\"finding\"\\s*:\\s*\"\\d+ days", nota: "testssl.sh 3.2 informa HSTS_time; si el id cambia en otra versión, ajustar aquí" }
       - { tipo: regex, sobre: tls.json, patron: "\"id\"\\s*:\\s*\"(SSLv2|SSLv3|TLS1|TLS1_1)\"[^}]*\"finding\"\\s*:\\s*\"offered", debe_coincidir: false }
     automatizable: true
     evidencia_a_capturar: ["tls.json de testssl.sh", "Resumen de calificación"]

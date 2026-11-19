@@ -28,3 +28,7 @@ lab/.run/
 psk-*.conf
 .pytest_cache/
 lab/clab-celeris/
+
+# Evidencias de las pruebas: salidas, pcap y registros pueden contener el token de laboratorio; solo se versionan resultados.json y junit.xml
+evidencias/*/*/
+evidencias/*/*.pcap

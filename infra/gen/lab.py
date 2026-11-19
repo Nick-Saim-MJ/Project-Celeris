@@ -206,10 +206,11 @@ def _html_aviso(md_path: Path) -> str:
             '<meta name="viewport" content="width=device-width,initial-scale=1"></head><body>\n' + "\n".join(out) + "\n</body></html>\n")
 
 
-SEG_CAB = ("add_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always;\n"
-           "    add_header Content-Security-Policy \"default-src 'self'; frame-ancestors 'none'\" always;\n"
+CAB_APP = ("add_header Content-Security-Policy \"default-src 'self'; frame-ancestors 'none'\" always;\n"
            "    add_header X-Content-Type-Options nosniff always;\n"
-           "    add_header Referrer-Policy no-referrer always;\n")
+           "    add_header Referrer-Policy no-referrer always;\n")      # D1.9: cabeceras de la aplicación (WEB01)
+CAB_WAF = ("add_header Strict-Transport-Security \"max-age=31536000; includeSubDomains\" always;\n"
+           "    proxy_hide_header Strict-Transport-Security;\n")           # D1.9: HSTS en el borde TLS (WAF01), una sola vez
 
 
 def _nginx_waf(x: Infra) -> str:
@@ -241,7 +242,7 @@ http {{
     ssl_ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256;
     ssl_session_tickets off;
     server_tokens off;
-    {SEG_CAB}    limit_req zone=porip burst=40 nodelay;
+    {CAB_WAF}    limit_req zone=porip burst=40 nodelay;
     location / {{ proxy_pass http://{web}:{pt}; proxy_set_header Host $host; }}
   }}
 }}
@@ -272,7 +273,7 @@ http {{
     listen {_ip_de(x, 'WEB01')}:{pt};
     server_tokens off;
     root /lab/web;
-    {SEG_CAB}    location / {{ try_files $uri /index.html; }}
+    {CAB_APP}    location / {{ try_files $uri /index.html; }}
   }}
 }}
 """
@@ -331,8 +332,8 @@ reference-config-file: /etc/suricata/reference.config
 
 
 REGLAS_SURICATA = """# Reglas locales del laboratorio (no sustituyen a ET Open: no hay Internet en el Modo L).
-alert tcp any any -> $HOME_NET any (msg:"LAB escaneo SYN de un origen"; flags:S,12; threshold: type threshold, track by_src, count 30, seconds 5; classtype:attempted-recon; sid:9000001; rev:1;)
-alert tcp any any -> $HOME_NET [22,23] (msg:"LAB intento de acceso SSH/Telnet"; flags:S; threshold: type threshold, track by_src, count 5, seconds 30; classtype:attempted-admin; sid:9000002; rev:1;)
+alert tcp any any -> any any (msg:"LAB escaneo SYN de un origen"; flags:S,12; threshold: type threshold, track by_src, count 30, seconds 5; classtype:attempted-recon; sid:9000001; rev:1;)
+alert tcp any any -> any [22,23] (msg:"LAB intento de acceso SSH/Telnet"; flags:S; threshold: type threshold, track by_src, count 5, seconds 30; classtype:attempted-admin; sid:9000002; rev:1;)
 """
 
 CANARIO_PY = '''#!/usr/bin/env python3
@@ -390,7 +391,7 @@ def _arranque_fw(x: Infra) -> str:
           "cp /lab/frr.conf /etc/frr/frr.conf", "chown frr:frr /etc/frr/frr.conf /run/frr; chmod 640 /etc/frr/frr.conf",
           "sed -i 's/^bgpd=no/bgpd=yes/; s/^staticd=no/staticd=yes/' /etc/frr/daemons", "/usr/lib/frr/frrinit.sh start > /var/log/frr-start.log 2>&1",
           "# DNS secundario (Unbound de FW01), reglas y detección", "unbound -c /lab/unbound.conf &", "nft -f /lab/fw01sim.nft",
-          f"suricata --af-packet -c /lab/suricata.yaml -D --pidfile /run/suricata.pid", "touch /run/lab-listo", ""]
+          f"nohup suricata --af-packet -c /lab/suricata.yaml > /var/log/suricata.out 2>&1 &", "touch /run/lab-listo", ""]
     return "\n".join(L)
 
 
@@ -483,7 +484,7 @@ def archivos_nodo(x: Infra, nodo: str, aviso_md: Path) -> dict[str, str]:
         for n in range(2, 2 + len(CAPTURAS_IDS01)):
             base.append(f"ip link set eth{n} up promisc on")
         caps = [f"eth{n}" for n in range(2, 2 + len(CAPTURAS_IDS01))]
-        base += ["suricata --af-packet -c /lab/suricata.yaml -D --pidfile /run/suricata.pid", "touch /run/lab-listo", ""]
+        base += ["nohup suricata --af-packet -c /lab/suricata.yaml > /var/log/suricata.out 2>&1 &", "touch /run/lab-listo", ""]
         return {"arranque.sh": "\n".join(base), "suricata.yaml": _suricata(caps, "/lab/local.rules"), "local.rules": REGLAS_SURICATA}
     raise ValueError(nodo)
 

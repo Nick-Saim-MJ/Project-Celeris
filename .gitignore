@@ -27,3 +27,4 @@ lab/.run/
 *.psk
 psk-*.conf
 .pytest_cache/
+lab/clab-celeris/

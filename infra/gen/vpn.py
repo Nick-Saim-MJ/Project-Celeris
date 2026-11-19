@@ -113,11 +113,12 @@ def frr(x: Infra, lado: str) -> str:
     router_id = ts[0]["ip_campus"] if lado == "fw01" else ts[0]["ip_aws"]
     k, h = v["bgp"]["keepalive_s"], v["bgp"]["hold_s"]
     L = [cabecera("!").rstrip(), "frr defaults traditional", f"hostname {'fw01-sim' if lado == 'fw01' else 'vgw-sim'}",
-         "log stdout", "!", f"router bgp {mio['asn']}", f" bgp router-id {router_id}", " no bgp ebgp-requires-policy"]
+         "log stdout", "!"] + [f"ip route {r} Null0" for r in redes] + ["!", f"router bgp {mio['asn']}", f" bgp router-id {router_id}", " no bgp ebgp-requires-policy"]
     for t in ts:
         L += [f" neighbor {vecino(t)} remote-as {otro['asn']}", f" neighbor {vecino(t)} timers {k} {h}",
               f" neighbor {vecino(t)} description {t['nombre']}-{t['rol']}"]
-    L += [" !", " address-family ipv4 unicast"]
+    # D1.10: el VGW usa un solo túnel a la vez y no reparte tráfico (sin ECMP): maximum-paths 1 en ambos extremos
+    L += [" !", " address-family ipv4 unicast", "  maximum-paths 1"]
     L += [f"  network {r}" for r in redes]
     for t in ts:
         L.append(f"  neighbor {vecino(t)} activate")
@@ -134,8 +135,10 @@ def frr(x: Infra, lado: str) -> str:
 
 def strongswan_conf() -> str:
     """strongswan.conf mínimo: con VTI las rutas las pone BGP (FRR), no charon."""
-    # kernel-libipsec (IPsec en espacio de usuario) crea la interfaz ipsec0 y desvía el tráfico IKE; forecast no aplica: se usa XFRM del kernel
-    return (cabecera("#") + "charon {\n  install_routes = no\n  plugins {\n    kernel-libipsec { load = no }\n    forecast { load = no }\n  }\n}\n")
+    # kernel-libipsec (IPsec en espacio de usuario) crea la interfaz ipsec0 y desvía el tráfico IKE; forecast no aplica: se usa XFRM del kernel.
+    # bypass-lan instala políticas de exclusión para las redes conectadas, incluidos los /30 de los túneles: el tráfico BGP no entraría al túnel.
+    return (cabecera("#") + "charon {\n  install_routes = no\n  plugins {\n    kernel-libipsec { load = no }\n    forecast { load = no }\n"
+            "    bypass-lan { load = no }\n  }\n}\n")
 
 
 def vti_up(x: Infra, lado: str, aws_peers: list[str], wan_campus: str | None = None) -> str:
@@ -162,8 +165,10 @@ def escribir_psk(salida: Path, x: Infra, aws_peers: list[str], wan_campus: str |
     for lado in ("fw01", "vgw"):
         L = ["secrets {"]
         for t, peer in zip(tuneles(x), aws_peers):
-            remoto = peer if lado == "fw01" else wan
-            L += [f"  ike-{t['nombre']} {{", f"    id = {remoto}", f'    secret = "{llaves[t["nombre"]]}"', "  }"]
+            local, remoto = (wan, peer) if lado == "fw01" else (peer, wan)
+            # Dos identidades por secreto (local y remota): en el lado AWS el remoto es el mismo campus para los dos túneles
+            # y con una sola identidad strongSwan no sabría cuál de las dos llaves usar.
+            L += [f"  ike-{t['nombre']} {{", f"    id-1 = {local}", f"    id-2 = {remoto}", f'    secret = "{llaves[t["nombre"]]}"', "  }"]
         L += ["}", ""]
         ruta = salida / f"psk-{lado}.conf"
         escribir(ruta, "\n".join(L), modo=0o600)

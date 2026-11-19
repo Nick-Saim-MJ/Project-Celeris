@@ -35,6 +35,7 @@ def test_frr_asn_temporizadores_y_prepending(infra):
     assert "neighbor 169.254.10.1 activate" in f and "neighbor 169.254.11.1 activate" in f
     assert "route-map PREPEND-TUNEL2 out" in f and "PREPEND-TUNEL1" not in f   # solo el túnel 2 es el de respaldo
     assert "set as-path prepend 65020" in f and "network 10.20.0.0/16" in f
+    assert "ip route 10.20.0.0/16 Null0" in f      # sin la ruta, BGP no anuncia el agregado
     g = vpn.frr(infra, "vgw")
     assert "router bgp 64512" in g and g.count("remote-as 65020") == 2 and "network 10.30.0.0/16" in g
     assert "route-map" not in g
@@ -56,6 +57,7 @@ def test_marcas_de_strongswan_coinciden_con_la_clave_del_vti(infra):
     assert "mark_in = 1" in t and "mark_out = 1" in t and "mark_in = 2" in t and "mark_out = 2" in t
     assert "install_routes = no" in vpn.strongswan_conf()
     assert "kernel-libipsec { load = no }" in vpn.strongswan_conf()      # si no, el IKE sale por la interfaz ipsec0
+    assert "bypass-lan { load = no }" in vpn.strongswan_conf()           # si no, los /30 de los túneles quedan fuera del IPsec
 
 
 def test_un_parametro_nuevo_cambia_la_salida(infra, mutar):

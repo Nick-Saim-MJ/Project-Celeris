@@ -52,6 +52,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-21 | vacío | Nombre DNS del portal y orígenes de varias pruebas no definidos | abierto |
 | CI-22 | vacío | 9 flujos sin prueba T-nn propia | abierto |
 | CI-23 | decisión de transcripción | Parámetros del laboratorio y tráfico sin F-nn en los generadores (Etapa 1) | abierto |
+| CI-24 | decisión de transcripción | Parámetros del laboratorio emulado (WAN, DNS de prueba, vgw-sim) y qué no se emula (Etapa 3) | abierto |
 
 ## Entradas
 
@@ -259,4 +260,23 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   6. **F20 hacia FW01.** F20 usa los mismos puertos para todos los destinos («hosts listados»); la regla de entrada a FW01 hereda 22, 443, 3000, 5601 y 9128 aunque la GUI solo necesita 443. Conviene fijar el puerto por destino en D1.11.
   7. **REQ-F-26.** `infra/gen/pac.py` genera el `wpad.dat` desde el inventario (lab y entrega), pero el binario `celeris-cache` (src/) aún no genera PAC: el requisito de producto sigue pendiente en el código.
 - **Propuesta:** aceptar las convenciones 2–4 como definitivas para el laboratorio; fijar 1 en la Etapa 3; revisar 5 y 6 al corregir D1.11.
+- **Decide:** equipo del proyecto
+
+### CI-24 — Parámetros del laboratorio emulado y qué no se emula (Etapa 3)
+- **Estado:** abierto
+- **Tipo:** decisión de transcripción
+- **Dónde:** `infra/gen/lab.py` (`PARAMETROS_LAB`), `lab/celeris.clab.yml`
+- **Parámetros que el inventario no fija y el laboratorio necesita (solo Modo L, nada cambia el diseño):**
+  1. WAN del laboratorio 198.51.100.0/24 (F4.1): `fw01-sim` 198.51.100.10 (mismo último octeto que 203.0.113.10), `ext01` 198.51.100.100, extremos AWS de `vgw-sim` 198.51.100.21 y .22.
+  2. `vgw-sim` se coloca en la subred app-a con 10.30.10.1 (la VPC real no tiene ese equipo; es el router de EC2-SHIELD en la emulación).
+  3. Nombres DNS de prueba: `portal.celeris.internal` (portal, WAF01), `listado.example.com` (dominio listado de T07, interceptado por el nodo) y `example.com` (T14, T19, T22, T24). Los tres se resuelven a WAF01 o a `ext01` con Unbound. Relacionado con CI-21 (el FQDN real del portal sigue sin definirse).
+  4. Red de gestión de containerlab (172.20.20.0/24): es infraestructura del laboratorio, no del diseño; no se usa en ninguna prueba.
+- **No se emula en el Modo L (rotulado en `emulacion_lab` y en ensayo-laboratorio.md):** ESX01, SW-CORE01, SW-ACC, IPMI01, UPS01, BRK01, NAS01 y las VLAN 70 y 71 (F4.1 no las incluye; CI-16), CTRL01, DB01, PROBE01, EC2-CTRLR y NAT01. SIEM01 (Wazuh) queda como perfil opcional sin implementar en esta etapa.
+- **Equivalencias distintas de F4.2:** el WAF es nginx + ModSecurity v3 + OWASP CRS (F4.2: Caddy + Coraza); HNY01 es Cowrie oficial (SSH, puerto 2222); OpenCanary y el puerto 23 de F24 no se emulan; HNY02 es un canario propio en Python (puertos 22, 80, 445 y 3389); EDGE01/02 y shield01 usan el binario de la imagen OCI sobre la imagen base de laboratorio (la imagen mínima no trae shell para configurar la red); EC2-SHIELD solo responde conexiones de prueba hasta que exista REQ-F-29.
+- **Hallazgos del montaje (contradicen o precisan el diseño):**
+  - El kernel de WSL2 no soporta interfaces XFRM, solo VTI: coincide con D1.10 («interfaces VTI»), por eso el generador usa VTI.
+  - strongSwan necesita desactivar los plugins `kernel-libipsec`, `forecast` y `bypass-lan` para que el IKE salga por la WAN y el BGP entre al túnel: sin eso el diseño de D1.10 no funciona con VTI.
+  - Con FRR hace falta `maximum-paths 1` para cumplir «un solo túnel a la vez» de D1.10; por defecto FRR reparte entre los dos (ECMP).
+  - La ruta 10.20.0.0/16 debe existir (aquí, a `Null0`) para que BGP anuncie el agregado: D1.10 dice «Redes anunciadas 10.20.0.0/16» y no dice cómo se origina.
+- **Propuesta:** dar por buenos los parámetros 1–4 para el laboratorio; incluir en el informe la nota sobre `maximum-paths` y el origen del agregado BGP en D1.10.
 - **Decide:** equipo del proyecto

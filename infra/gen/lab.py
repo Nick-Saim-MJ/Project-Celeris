@@ -388,7 +388,7 @@ def _arranque_fw(x: Infra) -> str:
           "cp /lab/strongswan.conf /etc/strongswan.conf", "/usr/lib/ipsec/charon > /var/log/charon.log 2>&1 &",
           "for i in 1 2 3 4 5 6 7 8 9 10; do [ -S /var/run/charon.vici ] && break; sleep 0.5; done", "swanctl --load-all --noprompt > /var/log/swanctl-load.log 2>&1",
           "cp /lab/frr.conf /etc/frr/frr.conf", "chown frr:frr /etc/frr/frr.conf /run/frr; chmod 640 /etc/frr/frr.conf",
-          "sed -i 's/^bgpd=no/bgpd=yes/' /etc/frr/daemons", "/usr/lib/frr/frrinit.sh start > /var/log/frr-start.log 2>&1",
+          "sed -i 's/^bgpd=no/bgpd=yes/; s/^staticd=no/staticd=yes/' /etc/frr/daemons", "/usr/lib/frr/frrinit.sh start > /var/log/frr-start.log 2>&1",
           "# DNS secundario (Unbound de FW01), reglas y detección", "unbound -c /lab/unbound.conf &", "nft -f /lab/fw01sim.nft",
           f"suricata --af-packet -c /lab/suricata.yaml -D --pidfile /run/suricata.pid", "touch /run/lab-listo", ""]
     return "\n".join(L)
@@ -404,7 +404,7 @@ def _arranque_vgw(x: Infra) -> str:
           "cp /pki/psk-vgw.conf /etc/swanctl/psk-vgw.conf", "cp /lab/strongswan.conf /etc/strongswan.conf",
           "/usr/lib/ipsec/charon > /var/log/charon.log 2>&1 &", "for i in 1 2 3 4 5 6 7 8 9 10; do [ -S /var/run/charon.vici ] && break; sleep 0.5; done",
           "swanctl --load-all --noprompt > /var/log/swanctl-load.log 2>&1", "cp /lab/frr.conf /etc/frr/frr.conf",
-          "chown frr:frr /etc/frr/frr.conf /run/frr; chmod 640 /etc/frr/frr.conf", "sed -i 's/^bgpd=no/bgpd=yes/' /etc/frr/daemons",
+          "chown frr:frr /etc/frr/frr.conf /run/frr; chmod 640 /etc/frr/frr.conf", "sed -i 's/^bgpd=no/bgpd=yes/; s/^staticd=no/staticd=yes/' /etc/frr/daemons",
           "/usr/lib/frr/frrinit.sh start > /var/log/frr-start.log 2>&1", "touch /run/lab-listo", ""]
     return "\n".join(L)
 

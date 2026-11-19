@@ -1,0 +1,240 @@
+<mxfile host="celeris-infra-gen" type="device" version="24.7.17">
+  <diagram id="FIG-1.1" name="FIG-1.1">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1640" pageHeight="890" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <object id="FIG-1.1-1" label="&lt;b&gt;Figura 1.1 — Topología ejecutiva simplificada del diseño de red&lt;/b&gt;&lt;br&gt;FIG-1.1 · Inventario v1.0 · 2026-11-18 · commit de la fuente 328cf2c · CE0311 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="FIG-1.1" titulo="Figura 1.1 — Topología ejecutiva simplificada del diseño de red">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;align=left;spacingLeft=10;fontSize=13;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="20" y="10" width="1600" height="44" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-2" label="&lt;b&gt;Portal de transparencia (WAF01 + WEB01)&lt;/b&gt; · zona DMZ-SVC&lt;br&gt;10.20.40.0/24&lt;br&gt;&lt;i&gt;WAF con OWASP CRS delante del portal&lt;/i&gt;" celeris_id="DMZ-SVC" celeris_tipo="zona" celeris_incluye="WAF01,WEB01">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F9E8DB;strokeColor=#D55E00;strokeWidth=2;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=6;" parent="1" vertex="1">
+            <mxGeometry x="20" y="70" width="300" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-3" label="&lt;b&gt;Internet&lt;/b&gt; · zona INTERNET&lt;br&gt;&lt;i&gt;Internet pública&lt;/i&gt;" celeris_id="INTERNET" celeris_tipo="zona">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F2F2F2;strokeColor=#4D4D4D;strokeWidth=2;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=6;" parent="1" vertex="1">
+            <mxGeometry x="660" y="70" width="300" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-4" label="&lt;b&gt;Usuarios de laboratorio (LAB + LAB-TEST)&lt;/b&gt;&lt;br&gt;10.20.32.0/22&lt;br&gt;&lt;i&gt;PCs de laboratorio&lt;/i&gt;" celeris_id="LAB" celeris_tipo="zona" celeris_incluye="LAB,LAB-TEST">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FCF2DB;strokeColor=#E69F00;strokeWidth=2;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=6;" parent="1" vertex="1">
+            <mxGeometry x="20" y="240" width="240" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-5" label="&lt;b&gt;FW01 · Firewall OPNsense&lt;/b&gt; · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;WAN 203.0.113.10 · .1 en 9 VLAN&lt;br&gt;&lt;i&gt;Ruteo entre zonas, política deny-all, IPS y VPN&lt;/i&gt;" celeris_id="FW01" celeris_tipo="componente" ip="wan 203.0.113.10 · vlan10 10.20.10.1 · vlan20 10.20.20.1 · vlan30 10.20.32.1 · vlan31 10.20.31.1 · vlan40 10.20.40.1 · vlan41 10.20.41.1 · vlan50 10.20.50.1 · vlan60 10.20.60.1 · vlan71 10.20.71.1" zona="PERIMETRO, MGMT, SERVERS, LAB, LAB-TEST, DMZ-SVC, DMZ-HONEY, SECURITY, EDGE, BACKUP" criticidad="Alta" estado="diseño" por_que="Todo tráfico entre zonas pasa por FW01 (D-17), de modo que cada flujo tiene una regla y un registro. Además termina la VPN IPsec y ejecuta Suricata IPS y CrowdSec." aporta="Una subinterfaz VLAN por zona (10, 20, 30, 31, 40, 41, 50, 60, 71) en el trunk PG-FW-TRUNK; WAN por vSwitch1/vmnic2; VTI1 y VTI2 con BGP; Unbound como DNS secundario; DHCP. La VLAN 70 no existe en FW01." si_falla="Se pierde el ruteo entre VLAN, la salida a Internet y la VPN (punto único de falla, AM-12). Mitigación: BRK01 y restauración desde el XML en Git, RTO 1 h (D2.9); CARP en H3." flujos="F2, F14, F20, F26" pruebas="T01, T02, T03, T05, T06, T07, T08, T09, T10, T11, T12, T15, T16, T17, T19, T20, T21, T22, T24, T25, T26, T27, T28" placeholders="1" tooltip="FW01 · Alta&#10;Por qué: Todo tráfico entre zonas pasa por FW01 (D-17), de modo que cada flujo tiene una regla y un registro. Además termina la VPN IPsec y ejecuta Suricata IPS y CrowdSec.&#10;Aporta: Una subinterfaz VLAN por zona (10, 20, 30, 31, 40, 41, 50, 60, 71) en el trunk PG-FW-TRUNK; WAN por vSwitch1/vmnic2; VTI1 y VTI2 con BGP; Unbound como DNS secundario; DHCP. La VLAN 70 no existe en FW01.&#10;Si falla: Se pierde el ruteo entre VLAN, la salida a Internet y la VPN (punto único de falla, AM-12). Mitigación: BRK01 y restauración desde el XML en Git, RTO 1 h (D2.9); CARP en H3.">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#DBEBF4;strokeColor=#0072B2;strokeWidth=3;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=34;" parent="1" vertex="1">
+            <mxGeometry x="660" y="240" width="300" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-1.1-6" value="">
+          <mxGeometry x="666" y="246" width="26" height="26" as="geometry" />
+        </mxCell>
+        <object id="FIG-1.1-7" label="&lt;b&gt;VPN IPsec (VTI1 activo, VTI2 respaldo)&lt;/b&gt;&lt;br&gt;&lt;i&gt;IKEv2 · AES-256-GCM-16 · BGP&lt;/i&gt;" celeris_id="VPN-HIBRIDA" celeris_tipo="vpn" celeris_incluye="VTI1,VTI2">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#EFE6FF;strokeColor=#8C4FFF;strokeWidth=2;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=6;" parent="1" vertex="1">
+            <mxGeometry x="1000" y="240" width="280" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-8" label="&lt;b&gt;VGW · extremo AWS&lt;/b&gt; · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;IP públicas asignadas por AWS (1 por túnel)&lt;br&gt;&lt;i&gt;Extremo AWS de la VPN con BGP&lt;/i&gt;" celeris_id="VGW" celeris_tipo="componente" ip="IP públicas asignadas por AWS (1 por túnel)" zona="AWS" criticidad="Alta" estado="diseño" por_que="Es el extremo AWS de la VPN site-to-site: anuncia 10.30.0.0/16 por BGP (ASN 64512) y aprende 10.20.0.0/14 sin cambios manuales." aporta="Dos túneles IPsec IKEv2 (activo/pasivo) con IP asignadas por AWS; propaga rutas a rt-public y rt-private." si_falla="Se pierde la conectividad híbrida; el campus sigue funcionando (el DIRECT y los nodos no dependen de AWS). Mitigación: entorno AWS recreable desde OpenTofu, RTO 15 min (D2.9)." flujos="" pruebas="T01, T02, T05, T21, T26" placeholders="1" tooltip="VGW · Alta&#10;Por qué: Es el extremo AWS de la VPN site-to-site: anuncia 10.30.0.0/16 por BGP (ASN 64512) y aprende 10.20.0.0/14 sin cambios manuales.&#10;Aporta: Dos túneles IPsec IKEv2 (activo/pasivo) con IP asignadas por AWS; propaga rutas a rt-public y rt-private.&#10;Si falla: Se pierde la conectividad híbrida; el campus sigue funcionando (el DIRECT y los nodos no dependen de AWS). Mitigación: entorno AWS recreable desde OpenTofu, RTO 15 min (D2.9).">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F2F2F2;strokeColor=#232F3E;strokeWidth=3;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=34;" parent="1" vertex="1">
+            <mxGeometry x="1320" y="240" width="300" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpn_gateway;fillColor=#8C4FFF;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-1.1-9" value="">
+          <mxGeometry x="1326" y="246" width="26" height="26" as="geometry" />
+        </mxCell>
+        <object id="FIG-1.1-10" label="&lt;b&gt;Nodos de caché (EDGE01, EDGE02)&lt;/b&gt;&lt;br&gt;10.20.60.0/24&lt;br&gt;&lt;i&gt;Proxy de caché explícito en TCP 3128&lt;/i&gt;" celeris_id="EDGE" celeris_tipo="zona" celeris_incluye="EDGE01,EDGE02">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F2F2F2;strokeColor=#4D4D4D;strokeWidth=2;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=6;" parent="1" vertex="1">
+            <mxGeometry x="350" y="240" width="270" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-11" label="&lt;b&gt;Zonas internas: SERVERS, MGMT, STORAGE, BACKUP&lt;/b&gt;&lt;br&gt;10.20.20.0/24&lt;br&gt;&lt;i&gt;Control, DNS/PAC/NTP, gestión con MFA y respaldos&lt;/i&gt;" celeris_id="SERVERS" celeris_tipo="zona" celeris_incluye="SERVERS,MGMT,STORAGE,BACKUP">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#DBF1EB;strokeColor=#009E73;strokeWidth=2;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=6;" parent="1" vertex="1">
+            <mxGeometry x="660" y="410" width="300" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-12" label="&lt;b&gt;SIEM y detección (SIEM01, IDS01)&lt;/b&gt; · zona SECURITY&lt;br&gt;10.20.50.0/24&lt;br&gt;&lt;i&gt;Correlación de alertas de todo el diseño&lt;/i&gt;" celeris_id="SECURITY" celeris_tipo="zona" celeris_incluye="SIEM01,IDS01">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#E7F4FC;strokeColor=#56B4E9;strokeWidth=2;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=6;" parent="1" vertex="1">
+            <mxGeometry x="1000" y="410" width="280" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-13" label="&lt;b&gt;AWS · VPC 10.30.0.0/16&lt;/b&gt; · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10.30.0.0/16&lt;br&gt;&lt;i&gt;Caché de segundo nivel en AWS; réplica en espera del plano de control&lt;/i&gt;" celeris_id="AWS-VPC" celeris_tipo="componente" ip="10.30.0.0/16" zona="AWS" criticidad="Alta" estado="diseño" por_que="Aísla los recursos del proyecto en AWS; región como variable var.region de OpenTofu [S-11]." aporta="Tablas rt-public y rt-private; 10.20.0.0/14 propagada desde el VGW; Gateway Endpoint de S3; Security Groups y NACL de D2.5." si_falla="Se pierden los recursos de AWS; se recrean desde código (RTO 15 min, D2.9)." flujos="" pruebas="T04" placeholders="1" tooltip="AWS-VPC · Alta&#10;Por qué: Aísla los recursos del proyecto en AWS; región como variable var.region de OpenTofu [S-11].&#10;Aporta: Tablas rt-public y rt-private; 10.20.0.0/14 propagada desde el VGW; Gateway Endpoint de S3; Security Groups y NACL de D2.5.&#10;Si falla: Se pierden los recursos de AWS; se recrean desde código (RTO 15 min, D2.9)." celeris_incluye="AWS-VPC,EC2-SHIELD,EC2-CTRLR,NAT01">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F2F2F2;strokeColor=#232F3E;strokeWidth=3;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=6;" parent="1" vertex="1">
+            <mxGeometry x="1320" y="410" width="300" height="130" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-14" label="&lt;b&gt;Señuelos (HNY01)&lt;/b&gt; · zona DMZ-HONEY&lt;br&gt;10.20.41.0/24&lt;br&gt;&lt;i&gt;Solo envía al SIEM; nada más&lt;/i&gt;" celeris_id="DMZ-HONEY" celeris_tipo="zona" celeris_incluye="HNY01">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#F8ECF3;strokeColor=#CC79A7;strokeWidth=2;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=6;" parent="1" vertex="1">
+            <mxGeometry x="20" y="410" width="300" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-15" label="&lt;b&gt;ESX01 · Servidor ESXi&lt;/b&gt; · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;vmk0 10.20.10.10 · vmk1 10.20.70.10&lt;br&gt;&lt;i&gt;Hospeda las 17 VM planeadas de la fase F1&lt;/i&gt;" celeris_id="ESX01" celeris_tipo="componente" ip="vmk0 10.20.10.10 · vmk1 10.20.70.10" zona="MGMT, STORAGE" criticidad="Alta" estado="diseño" por_que="Aloja todas las VM del diseño en un solo servidor 2U de 16 núcleos y 128 GB [S-08]; la licencia gratuita limita cada VM a 8 vCPU." aporta="vSwitch0 (vmnic0+vmnic1, trunk), vSwitch1 (WAN, vmnic2), vSwitch2 (STORAGE, vmnic3, vmk1); port groups de captura PG-CAP-10/20/31/50 como excepción documentada." si_falla="Caen todas las VM, incluido FW01. Mitigación: UPS01 con apagado ordenado por NUT, VM reconstruibles desde plantillas e IaC, respaldos 3-2-1-1-0 (D2.9)." flujos="F19, F20" pruebas="T06, T13, T25" placeholders="1" tooltip="ESX01 · Alta&#10;Por qué: Aloja todas las VM del diseño en un solo servidor 2U de 16 núcleos y 128 GB [S-08]; la licencia gratuita limita cada VM a 8 vCPU.&#10;Aporta: vSwitch0 (vmnic0+vmnic1, trunk), vSwitch1 (WAN, vmnic2), vSwitch2 (STORAGE, vmnic3, vmk1); port groups de captura PG-CAP-10/20/31/50 como excepción documentada.&#10;Si falla: Caen todas las VM, incluido FW01. Mitigación: UPS01 con apagado ordenado por NUT, VM reconstruibles desde plantillas e IaC, respaldos 3-2-1-1-0 (D2.9).">
+          <mxCell style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#DBEBF4;strokeColor=#0072B2;strokeWidth=3;align=center;verticalAlign=middle;fontSize=13;fontColor=#1A1A1A;spacing=6;spacingLeft=34;" parent="1" vertex="1">
+            <mxGeometry x="660" y="580" width="300" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.virtual_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-1.1-16" value="">
+          <mxGeometry x="666" y="586" width="26" height="26" as="geometry" />
+        </mxCell>
+        <object id="FIG-1.1-17" label="F21 · TCP/443" celeris_id="F21" celeris_tipo="flujo" etiqueta="F21 · TCP/443 + TCP/80 · TLS">
+          <mxCell style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#FFFFFF;strokeColor=#1A1A1A;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" edge="1" source="FIG-1.1-3" target="FIG-1.1-2">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-18" label="F1 · TCP/3128" celeris_id="F1" celeris_tipo="flujo" etiqueta="F1 · TCP/3128 · TLS">
+          <mxCell style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#FFFFFF;strokeColor=#1A1A1A;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" edge="1" source="FIG-1.1-4" target="FIG-1.1-10">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-19" label="F8 · MISS" celeris_id="F8" celeris_tipo="flujo" etiqueta="F8 · TCP/80,443 · TLS">
+          <mxCell style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#FFFFFF;strokeColor=#1A1A1A;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" edge="1" source="FIG-1.1-10" target="FIG-1.1-5">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-1.1-20" label="F13 · agentes Wazuh" celeris_id="F13" celeris_tipo="flujo" etiqueta="F13 · TCP/1514,1515 · cifrado Wazuh (AES)">
+          <mxCell style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#FFFFFF;strokeColor=#1A1A1A;endArrow=block;endFill=1;strokeWidth=1.5;" parent="1" edge="1" source="FIG-1.1-11" target="FIG-1.1-12">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;strokeWidth=1.5;fontSize=11;labelBackgroundColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=2;" parent="1" edge="1" source="FIG-1.1-3" target="FIG-1.1-5" id="FIG-1.1-21" value="WAN">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell style="html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;" parent="1" edge="1" source="FIG-1.1-5" target="FIG-1.1-7" id="FIG-1.1-22" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell style="html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" edge="1" source="FIG-1.1-7" target="FIG-1.1-8" id="FIG-1.1-23" value="2 túneles">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell style="html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=2;" parent="1" edge="1" source="FIG-1.1-8" target="FIG-1.1-13" id="FIG-1.1-24" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;strokeWidth=1.5;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" edge="1" source="FIG-1.1-5" target="FIG-1.1-11" id="FIG-1.1-25" value="ruteo entre zonas">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;strokeWidth=1.5;fontSize=11;labelBackgroundColor=#FFFFFF;" parent="1" edge="1" source="FIG-1.1-15" target="FIG-1.1-11" id="FIG-1.1-26" value="hospeda las VM">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <object id="FIG-1.1-27" label="&lt;b&gt;Leyenda&lt;/b&gt;" celeris_rol="leyenda">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1000" y="580" width="620" height="290" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-28" value="&lt;b&gt;Zonas&lt;/b&gt; (color + nombre):">
+          <mxGeometry x="1008" y="606" width="300" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=0;html=1;fillColor=#F9E8DB;strokeColor=#D55E00;strokeWidth=2;" parent="1" vertex="1" id="FIG-1.1-29" value="">
+          <mxGeometry x="1008" y="624" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-30" value="DMZ-SVC (VLAN 40)">
+          <mxGeometry x="1028" y="622" width="129" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=0;html=1;fillColor=#FCF2DB;strokeColor=#E69F00;strokeWidth=2;" parent="1" vertex="1" id="FIG-1.1-31" value="">
+          <mxGeometry x="1159" y="624" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-32" value="LAB (VLAN 30)">
+          <mxGeometry x="1179" y="622" width="129" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=0;html=1;fillColor=#E6E6E6;strokeColor=#4D4D4D;strokeWidth=2;" parent="1" vertex="1" id="FIG-1.1-33" value="">
+          <mxGeometry x="1310" y="624" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-34" value="EDGE (VLAN 60)">
+          <mxGeometry x="1330" y="622" width="129" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=0;html=1;fillColor=#DBF1EB;strokeColor=#009E73;strokeWidth=2;" parent="1" vertex="1" id="FIG-1.1-35" value="">
+          <mxGeometry x="1461" y="624" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-36" value="SERVERS (VLAN 20)">
+          <mxGeometry x="1481" y="622" width="129" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=0;html=1;fillColor=#E7F4FC;strokeColor=#56B4E9;strokeWidth=2;" parent="1" vertex="1" id="FIG-1.1-37" value="">
+          <mxGeometry x="1008" y="646" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-38" value="SECURITY (VLAN 50)">
+          <mxGeometry x="1028" y="644" width="129" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=0;html=1;fillColor=#F8ECF3;strokeColor=#CC79A7;strokeWidth=2;" parent="1" vertex="1" id="FIG-1.1-39" value="">
+          <mxGeometry x="1159" y="646" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-40" value="DMZ-HONEY (VLAN 41)">
+          <mxGeometry x="1179" y="644" width="129" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-41" value="&lt;b&gt;Criticidad&lt;/b&gt; (grosor del borde + etiqueta):">
+          <mxGeometry x="1008" y="674" width="360" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-1.1-42" value="&lt;b&gt;ALTA&lt;/b&gt; · borde 3 px">
+          <mxGeometry x="1008" y="694" width="190" height="28" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-1.1-43" value="&lt;b&gt;MEDIA&lt;/b&gt; · borde 2 px">
+          <mxGeometry x="1206" y="694" width="190" height="28" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-1.1-44" value="&lt;b&gt;BAJA&lt;/b&gt; · borde 1 px">
+          <mxGeometry x="1404" y="694" width="190" height="28" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;dashed=1;dashPattern=2 2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-1.1-45" value="interfaz de un equipo en otra zona">
+          <mxGeometry x="1008" y="728" width="289" height="26" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=6 3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-1.1-46" value="existente, fuera de alcance">
+          <mxGeometry x="1305" y="728" width="289" height="26" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-47" value="&lt;b&gt;Flujos&lt;/b&gt; «F-nn · protocolo/puerto · protección»:">
+          <mxGeometry x="1008" y="762" width="604" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="html=1;strokeColor=#1A1A1A;strokeWidth=1.5;endArrow=block;endFill=1;" parent="1" edge="1" id="FIG-1.1-48" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1008" y="792" as="sourcePoint" />
+            <mxPoint x="1054" y="792" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-49" value="cifrado (TLS, mTLS, SSH, IPsec)">
+          <mxGeometry x="1060" y="784" width="147" height="18" as="geometry" />
+        </mxCell>
+        <mxCell style="html=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=1.5;endArrow=block;endFill=1;" parent="1" edge="1" id="FIG-1.1-50" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1209" y="792" as="sourcePoint" />
+            <mxPoint x="1255" y="792" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-51" value="sin cifrar, riesgo aceptado">
+          <mxGeometry x="1261" y="784" width="147" height="18" as="geometry" />
+        </mxCell>
+        <mxCell style="html=1;strokeColor=#1A1A1A;dashed=1;dashPattern=1 4;strokeWidth=2;endArrow=cross;endFill=0;" parent="1" edge="1" id="FIG-1.1-52" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1410" y="792" as="sourcePoint" />
+            <mxPoint x="1456" y="792" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-53" value="✖ BLOQUEADO">
+          <mxGeometry x="1462" y="784" width="147" height="18" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-54" value="&lt;b&gt;Íconos&lt;/b&gt; (draw.io redes / AWS4):">
+          <mxGeometry x="1008" y="814" width="300" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-1.1-55" value="">
+          <mxGeometry x="1008" y="834" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-56" value="Firewall">
+          <mxGeometry x="1032" y="834" width="125" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.networks.virtual_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-1.1-57" value="">
+          <mxGeometry x="1159" y="834" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-58" value="Hipervisor">
+          <mxGeometry x="1183" y="834" width="125" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpn_gateway;fillColor=#8C4FFF;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-1.1-59" value="">
+          <mxGeometry x="1310" y="834" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-1.1-60" value="VGW de AWS">
+          <mxGeometry x="1334" y="834" width="125" height="20" as="geometry" />
+        </mxCell>
+        <object id="FIG-1.1-61" label="&lt;b&gt;Qué aporta y qué pasa si falla&lt;/b&gt;&lt;br&gt;&lt;b&gt;FW01&lt;/b&gt; — Ruteo entre zonas, política deny-all, IPS y VPN. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde el ruteo entre VLAN, la salida a Internet y la VPN (punto único de…&lt;br&gt;&lt;b&gt;VGW&lt;/b&gt; — Extremo AWS de la VPN con BGP. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde la conectividad híbrida&lt;br&gt;&lt;b&gt;AWS-VPC&lt;/b&gt; — Aislamiento de los recursos del proyecto en AWS. &lt;i&gt;Si falla:&lt;/i&gt; Se pierden los recursos de AWS&lt;br&gt;&lt;b&gt;ESX01&lt;/b&gt; — Hospeda las 17 VM planeadas de la fase F1. &lt;i&gt;Si falla:&lt;/i&gt; Caen todas las VM, incluido FW01" celeris_rol="panel" componentes="FW01, VGW, AWS-VPC, ESX01">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="20" y="580" width="620" height="90" as="geometry" />
+          </mxCell>
+        </object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

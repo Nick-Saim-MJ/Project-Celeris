@@ -17,7 +17,7 @@ help:
 	@echo "make lab-up|lab-down laboratorio emulado con containerlab (Modo L; necesita Linux/WSL, Docker y containerlab)"
 	@echo "make test-lab         ejecuta las pruebas T-nn del Modo L (Etapa 4)"
 	@echo "make matrices        genera las dos matrices XLSX (pendiente de P3 y P4)"
-	@echo "make diagrams-check  valida los .drawio contra el inventario (pendiente de P2)"
+	@echo "make diagrams-check  genera, exporta y valida los diagramas draw.io (V-50…V-56)"
 	@echo "make informe         genera DOCX y PDF (pendiente de P5)"
 	@echo "make release-e1      copia la versión final a entregables/CE0311/vX.Y/ (pendiente de P5)"
 
@@ -69,8 +69,12 @@ test-lab:
 matrices:
 	@echo "pendiente de P3 (XLSX de componentes) y P4 (XLSX de pruebas)" >&2; exit 1
 
+# Genera los 7 .drawio desde infra/*.yaml, los exporta a PNG/PDF con el XML embebido (necesita draw.io Desktop;
+# ruta en DRAWIO si no está en el PATH) y los valida (V-50…V-56). Informe: docs/infra/e1/cobertura-figuras.md.
 diagrams-check:
-	@echo "pendiente de P2: diagramas draw.io (gancho V-50 en infra/checks/v50_diagramas.py)" >&2; exit 1
+	$(PYTHON) infra/gen/drawio.py
+	$(PYTHON) infra/gen/exportar_drawio.py
+	$(PYTHON) infra/gen/drawio_check.py
 
 informe:
 	@echo "pendiente de P5: informe DOCX y PDF desde la plantilla de 11 secciones" >&2; exit 1

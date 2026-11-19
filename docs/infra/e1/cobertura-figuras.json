@@ -1,0 +1,332 @@
+{
+  "fuente": "infra/inventory.yaml (campo figuras de cada componente)",
+  "figuras": [
+    "FIG-1.1",
+    "FIG-5.1",
+    "FIG-5.2",
+    "FIG-5.3",
+    "FIG-5.4",
+    "FIG-5.5a",
+    "FIG-5.5b"
+  ],
+  "componentes": {
+    "FW01": [
+      "FIG-1.1",
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.4",
+      "FIG-5.5a",
+      "FIG-5.5b"
+    ],
+    "SW-CORE01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "SW-ACC": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3"
+    ],
+    "BRK01": [
+      "FIG-5.1",
+      "FIG-5.3"
+    ],
+    "ESX01": [
+      "FIG-1.1",
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "IPMI01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "UPS01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "JMP01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "CTRL01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "DB01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "OBS01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "SVC01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5a",
+      "FIG-5.5b"
+    ],
+    "EDGE01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5a",
+      "FIG-5.5b"
+    ],
+    "EDGE02": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5a",
+      "FIG-5.5b"
+    ],
+    "WAF01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5a",
+      "FIG-5.5b"
+    ],
+    "WEB01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5a",
+      "FIG-5.5b"
+    ],
+    "HNY01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5a",
+      "FIG-5.5b"
+    ],
+    "SIEM01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "IDS01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "HNY02": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "PROBE01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5a"
+    ],
+    "LABCLI01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5a"
+    ],
+    "KALI01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5a"
+    ],
+    "NAS01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.3",
+      "FIG-5.5b"
+    ],
+    "VTI1": [
+      "FIG-5.1",
+      "FIG-5.3",
+      "FIG-5.4"
+    ],
+    "VTI2": [
+      "FIG-5.1",
+      "FIG-5.3",
+      "FIG-5.4"
+    ],
+    "VGW": [
+      "FIG-1.1",
+      "FIG-5.1",
+      "FIG-5.4"
+    ],
+    "EC2-SHIELD": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.4",
+      "FIG-5.5b"
+    ],
+    "EC2-CTRLR": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.4",
+      "FIG-5.5b"
+    ],
+    "NAT01": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.4"
+    ],
+    "AWS-VPC": [
+      "FIG-1.1",
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.4"
+    ],
+    "AWS-PUB-A": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.4"
+    ],
+    "AWS-PUB-B": [
+      "FIG-5.1",
+      "FIG-5.2"
+    ],
+    "AWS-APP-A": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.4"
+    ],
+    "AWS-APP-B": [
+      "FIG-5.1",
+      "FIG-5.2",
+      "FIG-5.4"
+    ],
+    "AWS-DATA-A": [
+      "FIG-5.1",
+      "FIG-5.2"
+    ],
+    "AWS-DATA-B": [
+      "FIG-5.1",
+      "FIG-5.2"
+    ]
+  },
+  "flujos": {
+    "F1": [
+      "FIG-1.1",
+      "FIG-5.5a"
+    ],
+    "F2": [
+      "FIG-5.5a"
+    ],
+    "F3": [
+      "FIG-5.5a"
+    ],
+    "F4": [],
+    "F5": [
+      "FIG-5.5a"
+    ],
+    "F6": [
+      "FIG-5.5a"
+    ],
+    "F7": [
+      "FIG-5.5a"
+    ],
+    "F8": [
+      "FIG-1.1",
+      "FIG-5.5a"
+    ],
+    "F9": [
+      "FIG-5.5b"
+    ],
+    "F10": [
+      "FIG-5.5b"
+    ],
+    "F11": [
+      "FIG-5.5b"
+    ],
+    "F12": [
+      "FIG-5.5b"
+    ],
+    "F13": [
+      "FIG-1.1",
+      "FIG-5.5b"
+    ],
+    "F14": [
+      "FIG-5.5b"
+    ],
+    "F15": [
+      "FIG-5.5b"
+    ],
+    "F16": [
+      "FIG-5.5b"
+    ],
+    "F17": [
+      "FIG-5.5b"
+    ],
+    "F18": [
+      "FIG-5.5b"
+    ],
+    "F19": [
+      "FIG-5.5b"
+    ],
+    "F20": [
+      "FIG-5.5b"
+    ],
+    "F21": [
+      "FIG-1.1",
+      "FIG-5.5a"
+    ],
+    "F22": [
+      "FIG-5.5a"
+    ],
+    "F23": [
+      "FIG-5.5a"
+    ],
+    "F24": [
+      "FIG-5.5a"
+    ],
+    "F25": [
+      "FIG-5.5a"
+    ],
+    "F26": [
+      "FIG-5.5b"
+    ]
+  },
+  "agrupados": {
+    "FIG-1.1": [
+      "AWS-VPC",
+      "EC2-CTRLR",
+      "EC2-SHIELD",
+      "EDGE01",
+      "EDGE02",
+      "HNY01",
+      "IDS01",
+      "NAT01",
+      "SIEM01",
+      "VTI1",
+      "VTI2",
+      "WAF01",
+      "WEB01"
+    ]
+  },
+  "flujos_sin_figura": [
+    "F4"
+  ]
+}

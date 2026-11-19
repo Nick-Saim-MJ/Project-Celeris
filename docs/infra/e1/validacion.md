@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.0 · fecha 2026-11-18
 - Contenido cargado: **14 zonas**, **37 componentes**, **26 flujos** (F1–F26, F4 reservado), **28 pruebas** (T01–T28), 10 objetivos OD, 13 amenazas AM, 9 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **0 FALLA**, 6 con advertencias, 28 PASA, 4 pendientes de P2–P5.
+- Resultado: **0 FALLA**, 6 con advertencias, 35 PASA, 3 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -44,7 +44,13 @@
 | V-32 | Servicios base (DHCP, DNS, PAC, NTP, IPv6, DNS cifrado) consistentes con el inventario | PASA | — |
 | V-33 | Lo emulado se rotula como emulado: pruebas en Modo L solo con componentes emulados (F4.2) | PASA con advertencias | 0 errores, 3 advertencias |
 | V-34 | La rúbrica coincide con el XLSX oficial (nombre, peso y descriptor de nivel 4) | PASA | — |
-| V-50 | Diagramas draw.io: componentes, IP, zonas, colores (Okabe-Ito), flujos F-nn y criticidad contra el inventario | PENDIENTE | pendiente de P2 |
+| V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA | Detalle y matriz componente × figura en docs/infra/e1/cobertura-figuras.md |
+| V-51 | Cobertura componente × figura igual al campo `figuras` del inventario | PASA | — |
+| V-52 | Todo celeris_id es un ID del contrato | PASA | — |
+| V-53 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | PASA | — |
+| V-54 | Flujos F-nn: FIG-5.5a ∪ FIG-5.5b completas y etiquetas derivadas del inventario | PASA | — |
+| V-55 | Título, leyenda y panel «Qué aporta y qué pasa si falla» en cada figura | PASA | — |
+| V-56 | Criticidad (borde + texto) y color de zona según CLAUDE.md | PASA | — |
 | V-60 | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | PENDIENTE | pendiente de P3 |
 | V-70 | XLSX de pruebas: T01–T28, comandos, criterios y trazabilidad contra pruebas.yaml | PENDIENTE | pendiente de P4 |
 | V-80 | Informe DOCX: 11 secciones, tablas generadas del inventario, figuras y leyendas | PENDIENTE | pendiente de P5 |
@@ -84,7 +90,7 @@ Ninguno.
 - **V-16** — F25: sin prueba T-nn en D1.16 (justificado)
 - **V-16** — F26: sin prueba T-nn en D1.16 (justificado)
 - **V-27** — 8 de 92 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 36 elementos pendientes en los YAML; 23 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-22', 'CI-23']
+- **V-29** — 36 elementos pendientes en los YAML; 25 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-22', 'CI-23', 'CI-24', 'CI-25']
 
 ## Cobertura
 
@@ -103,7 +109,6 @@ Ninguno.
 
 | Gancho | Qué validará | Estado |
 | --- | --- | --- |
-| V-50+ | Diagramas draw.io: componentes, IP, zonas, colores (Okabe-Ito), flujos F-nn y criticidad contra el inventario | pendiente de P2 |
 | V-60+ | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | pendiente de P3 |
 | V-70+ | XLSX de pruebas: T01–T28, comandos, criterios y trazabilidad contra pruebas.yaml | pendiente de P4 |
 | V-80+ | Informe DOCX: 11 secciones, tablas generadas del inventario, figuras y leyendas | pendiente de P5 |

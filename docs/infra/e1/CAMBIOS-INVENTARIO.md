@@ -45,16 +45,17 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-14 | contradicción | EC2-CTRLR en «app-c» (D1.12) o «app-b» (D2.5) | abierto |
 | CI-15 | contradicción | Criticidad de UPS01: Media (D1.12) vs Alta (D2.7) | abierto |
 | CI-16 | contradicción | T12 y T25 en Modo L, pero NAS01, ESXi e IPMI no se emulan | abierto |
-| CI-17 | vacío | Detecciones DET-02, DET-05, DET-07 y DET-08 sin T-nn | abierto |
-| CI-18 | vacío | AM-13 «Revisión de logs» no es una prueba T-nn | abierto |
+| CI-17 | vacío | Detecciones DET-02, DET-05, DET-07 y DET-08 sin T-nn | resuelto con T29–T32 (CI-27) |
+| CI-18 | vacío | AM-13 «Revisión de logs» no es una prueba T-nn | resuelto con T33 (CI-27) |
 | CI-19 | contradicción | T24 usa 1.1.1.1 (IP pública real) contra la regla RFC 5737 | abierto |
 | CI-20 | decisión de transcripción | IDs OD/AM/DET/FIG asignados por posición; FIG-5.5a/5.5b | abierto |
 | CI-21 | vacío | Nombre DNS del portal y orígenes de varias pruebas no definidos | abierto |
-| CI-22 | vacío | 9 flujos sin prueba T-nn propia | abierto |
+| CI-22 | vacío | 9 flujos sin prueba T-nn propia | resuelto con T34, T36–T43 y T49 (CI-27) |
 | CI-23 | decisión de transcripción | Parámetros del laboratorio y tráfico sin F-nn en los generadores (Etapa 1) | abierto |
 | CI-24 | decisión de transcripción | Parámetros del laboratorio emulado (WAN, DNS de prueba, vgw-sim) y qué no se emula (Etapa 3) | abierto |
 | CI-25 | vacío | IaC del Modo A (OpenTofu): DPD mínimo de AWS, reglas de salida, disco de NAT01, campus simulado (Etapa 6) | abierto |
 | CI-26 | decisión de transcripción | Qué pruebas son críticas (`critica` en pruebas.yaml) y qué hace V-42 con ellas (Etapa 7) | abierto |
+| CI-27 | vacío | Ampliación de la matriz de pruebas: T29–T49, polaridad y celdas críticas (P4) | abierto |
 
 ## Entradas
 
@@ -202,7 +203,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Efecto al resolver:** ajustar `modos` o F4.1; quitar `pendiente`. V-33 deja de advertir.
 
 ### CI-17 — Detecciones DET-02, DET-05, DET-07 y DET-08 sin T-nn
-- **Estado:** abierto
+- **Estado:** resuelto en CI-27 (pruebas agregadas a pruebas.yaml)
 - **Tipo:** vacío
 - **Dónde:** D1.14 (líneas 1778–1788) vs D1.16; `trazabilidad.yaml` → `detecciones`
 - **Qué dice cada fuente:** la columna «Validación en S2» de D1.14 describe escenarios (escaneo desde KALI01, barrido desde LAB, honey-URL, escenario de prueba de CrowdSec), pero D1.16 no tiene pruebas T-nn para ellos. OD-09 exige ≥ 90 % de escenarios detectados.
@@ -211,7 +212,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Efecto al resolver:** agregar las pruebas o quitar `pendiente`.
 
 ### CI-18 — AM-13 «Revisión de logs»
-- **Estado:** abierto
+- **Estado:** resuelto en CI-27 (pruebas agregadas a pruebas.yaml)
 - **Tipo:** vacío
 - **Dónde:** D1.9 STRIDE fila 13 (línea 1649)
 - **Propuesta:** definir la revisión como procedimiento de S2 (muestreo de denegaciones de FW01 y verificación de NTS) o asignar un T-nn.
@@ -243,7 +244,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Efecto al resolver:** reemplazar `portal` en T16–T18 y quitar `pendiente`.
 
 ### CI-22 — 9 flujos sin prueba T-nn propia
-- **Estado:** abierto
+- **Estado:** resuelto en CI-27 (pruebas agregadas a pruebas.yaml)
 - **Tipo:** vacío
 - **Dónde:** D1.16 vs D1.11: F10, F11, F15, F17, F18, F19, F20, F25, F26. F23 solo tiene la prueba negativa T19 (WEB01 no sale a Internet); la renovación ACME no tiene prueba.
 - **Propuesta:** mantener `sin_prueba_justificacion` (cada una dice cómo se valida en S2) o ampliar D1.16 con T29+. Los demás flujos tienen al menos un T-nn.
@@ -314,4 +315,30 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Qué hace V-42:** FALLA en una prueba crítica = FALLA del validador. Una crítica que aplica al modo y no está en PASA (PARCIAL, NO_APLICA, ausente), o una FALLA no crítica, = advertencia: PARCIAL y NO_APLICA no cuentan como PASA.
 - **Límites de V-40 y V-41:** comprueban los artefactos generados contra el inventario (puertos, acciones, modos, algoritmos, temporizadores, ASN, MTU/MSS), no el comportamiento del firewall; eso lo mide `make test-lab`. V-40 trata como correctas las reglas «sin F-nn» de CI-23 (VPN, NAT, anti-spoofing, MSS).
 - **Propuesta:** confirmar o cambiar la regla de criticidad; en particular, si T15 (WAF) y T17 (inyección) deben ser críticas.
+- **Decide:** equipo del proyecto
+
+
+### CI-27 — Ampliación de la matriz de pruebas: T29 a T49 (P4)
+- **Estado:** abierto
+- **Tipo:** vacío (resuelve CI-17, CI-18 y CI-22; la regla de celdas críticas es una decisión de transcripción)
+- **Dónde:** `infra/pruebas.yaml` (T29–T49, `polaridad`, `ampliacion`), `infra/trazabilidad.yaml` (`elementos_evaluados` de R3 y R4), `infra/celeris_infra.py` (`cobertura_de_pruebas`), V-70+ en `infra/checks/v70_xlsx_pruebas.py`
+- **Qué faltaba:** D1.16 define T01–T28 y deja sin prueba positiva 10 flujos permitidos (F10, F11, F15, F17, F18, F19, F20, F23, F25, F26), 4 detecciones (DET-02, DET-05, DET-07, DET-08), la amenaza AM-13 y casi todas las celdas denegadas críticas de la matriz zona × zona. Se agregaron 21 pruebas que no sustituyen a ninguna de D1.16 y llevan `ampliacion: true`:
+  - **Detección y rastro (cierra CI-17 y CI-18):** T29 escaneo lateral (DET-02), T30 canary interno (DET-05), T31 honey-URL (DET-07), T32 CrowdSec (DET-08), T33 rastro de las denegaciones (AM-13).
+  - **Flujos permitidos sin prueba (cierra CI-22):** T34 administración desde JMP01 (F20), T36 mTLS del nodo (F10), T37 OTLP (F11), T38 base de datos (F15), T39 respaldo en NAS01 (F17), T40 respaldo en S3 (F18), T41 NFS (F19), T42 NTS (F25), T43 reglas de seguridad (F26), T49 ACME (F23).
+  - **Celdas permitidas sin F-nn:** T35 MGMT → Internet (CI-05), T44 peering entre nodos de borde (CI-06).
+  - **Celdas denegadas críticas:** T45 Internet → zonas internas, T46 DMZ-SVC → zonas internas, T47 DMZ-HONEY → cualquier zona, T48 cualquier zona → STORAGE.
+- **Regla de «celda denegada crítica»** (la del encargo, aplicada por `celdas_denegadas_criticas()`): Internet → interna o AWS, LAB → MGMT, DMZ-SVC → interna o AWS, DMZ-HONEY → cualquiera y cualquiera → STORAGE. «Interna» = MGMT, SERVERS, LAB, LAB-TEST, SECURITY, EDGE, STORAGE y BACKUP. Son 35 celdas y las 35 tienen prueba negativa. Las otras 56 celdas denegadas (por ejemplo, SERVERS → LAB-TEST) no son críticas y siguen sin prueba dedicada: las cubre la política deny-all y se miden en la hoja «Cobertura».
+- **Polaridad.** Cada prueba lleva `polaridad`: positiva (se espera tráfico permitido), negativa (se espera denegación) o mixta. «Prueba positiva de un flujo» = positiva o mixta que lo cita.
+- **Modos.** T29–T49 son del Modo H (T48, también A). El runner del Modo L (`tests/network`) no tiene casos para ellas: el ensayo las muestra como NO_APLICA, nunca como PASA. Llevarlas a L (nodos `ext01`, `fw01-sim`, `hny01`, `labcli01`) es trabajo pendiente.
+- **Valores que el diseño no fija y las pruebas necesitan (no son del inventario):**
+  1. T31: la ruta de la honey-URL (REQ-F-27 está pendiente); T31 queda `pendiente: true`.
+  2. T32: la IP externa de pruebas; la pone el equipo al ejecutar.
+  3. T39: usuario y repositorio de restic en NAS01.
+  4. T49: el endpoint ACME; se usa el directorio de Let's Encrypt como ejemplo.
+  5. T33: el desfase de reloj máximo entre FW01 y SIEM01 (menos de 1 s) es el supuesto [S-16].
+  6. Los umbrales «alerta de Wazuh de nivel ≥ 10 en menos de 60 s» siguen D1.14 (nivel ≥ 10) y el criterio de T18; los 60 s son una elección de esta ampliación, no un dato de D1.
+  7. T29: la categoría `Detection of a Network Scan` de ET Open no se comprobó contra la versión de reglas de S2.
+- **Contradicción hallada:** la matriz D1.8 dice que LAB-TEST → SERVERS está permitido por F2, pero F2 no incluye a LAB-TEST (CI-04). T29 escanea CTRL01 y DB01, que ningún flujo alcanza desde LAB-TEST, y no cuenta esa celda.
+- **R1 y R7** no tienen pruebas: son criterios documentales (contexto y alcance; calidad documental y trazabilidad). La cobertura de rúbrica por pruebas se mide sobre R2–R6 y R8.
+- **Propuesta:** aceptar T29–T49 como ampliación de D1.16 (o descartar las que el equipo considere fuera de alcance), confirmar la regla de celdas críticas y resolver los valores 1 a 4.
 - **Decide:** equipo del proyecto

@@ -31,7 +31,7 @@ Flujos: cifrado = línea continua; sin cifrar con riesgo aceptado = discontinua;
 ## Comandos
 make validate        # todo: fuente única + artefactos + secretos
 make lab-up / lab-down / test-lab
-make matrices        # genera las dos matrices XLSX
+make matrices        # genera el XLSX de pruebas (P4); el de componentes es de P3
 make diagrams-check  # valida los .drawio contra el inventario
 make informe         # genera DOCX y PDF
 make release-e1      # copia la versión final a entregables/CE0311/vX.Y/
@@ -40,7 +40,7 @@ make release-e1      # copia la versión final a entregables/CE0311/vX.Y/
 - `infra/inventory.yaml`, `infra/pruebas.yaml`, `infra/trazabilidad.yaml` + `infra/schema/*.json`: los datos y su esquema.
 - `infra/celeris_infra.py`: librería de carga y derivación (matriz zona × zona, coberturas). Los generadores (diagramas, XLSX,
   DOCX) la importan; no leen los YAML por su cuenta.
-- `infra/validate.py` (V-01…V-43) y `infra/checks/v50_…v80_` (ganchos para P2–P5). Resultado en `docs/infra/e1/validacion.md`.
+- `infra/validate.py` (V-01…V-43), `infra/checks/v70_xlsx_pruebas.py` (V-70…V-75: XLSX de pruebas) y `infra/checks/v50_…v80_` (ganchos para P2–P5; P4 ya está). Resultado en `docs/infra/e1/validacion.md`.
 - `docs/infra/e1/CAMBIOS-INVENTARIO.md`: contradicciones y vacíos del documento maestro (CI-nn). Léelo antes de tocar un dato
   marcado `pendiente: true`.
 - Dependencias: `pip install -r infra/requirements.txt` (`make deps`). En Windows sin GNU make, `python infra/validate.py` es
@@ -52,4 +52,4 @@ make release-e1      # copia la versión final a entregables/CE0311/vX.Y/
 - El DOCX tiene **11 secciones** (la plantilla es el contrato, no las «15» que menciona el documento maestro; CI-02).
 - El documento maestro está en v0.2 en su cabecera; la v0.2.1 de estas reglas está sin confirmar (CI-01).
 - Lo emulado en el Modo L se rotula con `emulacion_lab` (F4.2) y nunca se presenta como implementado.
-- Los objetivos de `make` que aún no existen fallan con «pendiente de P#»: P2 diagramas, P3/P4 XLSX, P5 DOCX, P6 laboratorio.
+- Los objetivos de `make` que aún no existen fallan con «pendiente de P#»: P2 diagramas, P3 XLSX de componentes, P5 DOCX, P6 laboratorio.

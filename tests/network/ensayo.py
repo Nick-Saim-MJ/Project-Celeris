@@ -37,7 +37,7 @@ def escribir(infra, meta: dict, resultados: list[dict], raiz: Path) -> Path:
          "> **El laboratorio es emulado** (Parte F4.2 del documento maestro). Lo que pasa aquí demuestra que el *diseño* se comporta como "
          "está descrito en una emulación funcional; no es la validación del producto real (OPNsense, VGW de AWS) ni del campus.\n",
          f"- Fecha: {meta['fecha']} · commit: `{meta['commit'][:12]}`",
-         f"- Resultado: **{c['PASA']} PASA**, **{c['FALLA']} FALLA**, **{c['PARCIAL']} PARCIAL**, **{c['NO_APLICA']} NO_APLICA** (de {len(resultados)} pruebas T01–T28)",
+         f"- Resultado: **{c['PASA']} PASA**, **{c['FALLA']} FALLA**, **{c['PARCIAL']} PARCIAL**, **{c['NO_APLICA']} NO_APLICA** (de {len(resultados)} pruebas, {len(resultados) - 28} de ellas ampliaciones T29+ que aún no tienen caso en el Modo L)",
          "- `PARCIAL` = parte de los criterios no se pudo evaluar en el Modo L (navegador real, Wazuh…) o la medición no ejercitó lo que la prueba valida. **No cuenta como PASA.**",
          "- `NO_APLICA` = la prueba no se puede ejecutar en L; se indica el modo en que sí se ejecutará. **Nunca cuenta como PASA.**\n",
          "## Resultados\n", "| Prueba | Resultado | Medido | Motivo o nota |", "| --- | --- | --- | --- |"]

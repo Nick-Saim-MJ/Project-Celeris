@@ -1376,7 +1376,6 @@ flujos:
     objetivos: [OD-07]
     adr: [D-11]
     req: [REQ-F-16, REQ-F-17]
-    sin_prueba_justificacion: "Sin T-nn en D1.16. Se verifica en la implementación del plano de control (S2): enrolamiento con mTLS y rechazo de bundle sin firma (REQ-RN-08)"
 
   - id: F11
     estado: activo
@@ -1394,7 +1393,6 @@ flujos:
     objetivos: [OD-07]
     adr: []
     req: [REQ-F-13]
-    sin_prueba_justificacion: "Sin T-nn en D1.16. Se verifica al implementar REQ-F-13 (OTLP) en S2"
 
   - id: F12
     estado: activo
@@ -1463,7 +1461,6 @@ flujos:
     objetivos: [OD-07]
     adr: [D-12]
     req: []
-    sin_prueba_justificacion: "Sin T-nn en D1.16. Se verifica al implementar el plano de control (S2): conexión TLS con scram-sha-256"
 
   - id: F16
     estado: activo
@@ -1498,7 +1495,6 @@ flujos:
     objetivos: [OD-07]
     adr: []
     req: []
-    sin_prueba_justificacion: "Sin T-nn en D1.16. La prueba de restauración mensual con RTO cronometrado (regla 3-2-1-1-0, D2.9) valida este flujo en S2"
 
   - id: F18
     estado: activo
@@ -1516,7 +1512,6 @@ flujos:
     objetivos: [OD-07]
     adr: []
     req: []
-    sin_prueba_justificacion: "Sin T-nn en D1.16. La prueba de restauración mensual desde S3 (D2.9) valida este flujo en S2"
 
   - id: F19
     estado: activo
@@ -1534,7 +1529,6 @@ flujos:
     objetivos: [OD-01]
     adr: []
     req: []
-    sin_prueba_justificacion: "Sin T-nn en D1.16. T12 verifica que la VLAN 70 no se alcanza desde otras zonas; el montaje NFS se valida al instalar ESXi (S2)"
 
   - id: F20
     estado: activo
@@ -1552,7 +1546,6 @@ flujos:
     objetivos: [OD-02]
     adr: []
     req: []
-    sin_prueba_justificacion: "Sin T-nn en D1.16. La administración desde JMP01 se ejerce en la ejecución de las demás pruebas; T06 verifica el sentido contrario (LAB → MGMT)"
 
   - id: F21
     estado: activo
@@ -1604,7 +1597,6 @@ flujos:
     objetivos: [OD-08]
     adr: [D-15]
     req: []
-    sin_prueba_justificacion: "Sin T-nn en D1.16. La renovación ACME real se prueba en Modo A o H (F4.2); en Modo L se usa una CA de laboratorio"
 
   - id: F24
     estado: activo
@@ -1639,7 +1631,6 @@ flujos:
     objetivos: [OD-04, OD-07]
     adr: []
     req: []
-    sin_prueba_justificacion: "Sin T-nn en D1.16. Se verifica en S2 con chronyc sources (NTS) y la resolución upstream desde SVC01"
 
   - id: F26
     estado: activo
@@ -1657,7 +1648,6 @@ flujos:
     objetivos: [OD-09]
     adr: []
     req: []
-    sin_prueba_justificacion: "Sin T-nn en D1.16. La actualización de reglas se verifica en S2 en los registros de Suricata y Wazuh"
 
 # Matriz zona × zona esperada (D1.8), transcrita celda por celda. Fila = origen; columna = destino.
 # estado: permitido | denegado | no_aplica ("—" del documento). `bloqueados` = flujos bloqueados explícitos (✖ Fn).

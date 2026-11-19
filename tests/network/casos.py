@@ -449,7 +449,10 @@ def t22(c: Contexto) -> Medicion:
         L.ex("labcli01", f"printf '%s\\noptions timeout:2 attempts:1\\n' \"$(cat /etc/resolv.conf)\" > /tmp/r && cat /tmp/r > /etc/resolv.conf")
         L.enlace("svc01", False)
         rc_dns, dns = L.ex("labcli01", f"kdig +short +time=2 +retry=1 @{c.puerta('LABCLI01')} {c.P['dominio_generico']}")
-        rc_pac, pac = L.ex("labcli01", "curl -s -m14 --connect-timeout 3 -o /dev/null -w '%{http_code}' http://pac.celeris.internal/wpad.dat", timeout=30)
+        # El connect-timeout incluye la resolución: con SVC01 caído el cliente espera el timeout del resolvedor (2 s) antes de usar FW01.
+        inicio = time.time()
+        rc_pac, pac = L.ex("labcli01", "curl -s -m14 --connect-timeout 10 -o /dev/null -w '%{http_code}' http://pac.celeris.internal/wpad.dat", timeout=30)
+        m.medidas["tiempo_hasta_el_pac_s"] = round(time.time() - inicio, 1)
         _, quien = L.ex("edge01", "tail -n 2 /var/log/nginx/pac.log 2>/dev/null")
     finally:
         L.enlace("svc01", True, puerta_svc)

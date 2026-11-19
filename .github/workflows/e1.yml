@@ -20,6 +20,8 @@ jobs:
           cache: pip
           cache-dependency-path: infra/requirements*.txt
       - run: make deps-dev
+      - name: LibreOffice (V-74 recalcula las fórmulas del XLSX de pruebas)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-calc
       - run: make validate
       - run: make test-gen
       - name: El informe de validación versionado está al día

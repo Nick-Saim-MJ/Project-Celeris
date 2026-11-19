@@ -18,7 +18,7 @@ help:
 	@echo "make tofu-gen         genera deploy/opentofu/envs/demo/diseno.auto.tfvars.json desde el inventario (Modo A)"
 	@echo "make tofu-check       tofu fmt -check y tofu validate de deploy/opentofu (no planifica ni aplica nada)"
 	@echo "make test-lab         ejecuta las pruebas T-nn del Modo L (Etapa 4)"
-	@echo "make matrices        genera las dos matrices XLSX (pendiente de P3 y P4)"
+	@echo "make matrices        genera el XLSX de pruebas (P4); el de componentes está pendiente de P3"
 	@echo "make diagrams-check  valida los .drawio contra el inventario (pendiente de P2)"
 	@echo "make informe         genera DOCX y PDF (pendiente de P5)"
 	@echo "make release-e1      copia la versión final a entregables/CE0311/vX.Y/ (pendiente de P5)"
@@ -76,8 +76,10 @@ lab-down:
 test-lab:
 	$(PYTHON) tests/network/run.py
 
+# Matriz de pruebas (P4): entregables/CE0311/Matriz_Pruebas_Conectividad_v<versión>.xlsx. La matriz de componentes es de P3 y aún no existe.
 matrices:
-	@echo "pendiente de P3 (XLSX de componentes) y P4 (XLSX de pruebas)" >&2; exit 1
+	$(PYTHON) infra/genera.py xlsx-pruebas
+	@echo "matriz de componentes: pendiente de P3" >&2
 
 diagrams-check:
 	@echo "pendiente de P2: diagramas draw.io (gancho V-50 en infra/checks/v50_diagramas.py)" >&2; exit 1

@@ -6,6 +6,8 @@
 #   y F4.3 (T05 se demuestra también en L).
 # criterio_aprobacion: lista de verificaciones. tipo ∈ exit_code | regex | umbral | contador | manual.
 #   `automatizable: false` cuando alguna verificación requiere intervención humana.
+# polaridad: positiva (se espera tráfico o resultado permitido), negativa (se espera denegación) o mixta (ambas).
+# ampliacion: true en T29+ (CI-27): pruebas que D1.16 no define; T01–T28 son el contrato.
 # critica: true si un FALLA invalida un límite de seguridad del diseño (V-42 lo exige en resultados.json). Regla adoptada: categoría
 #   segmentacion, vpn o cifrado (CI-26); el equipo puede cambiarla marcando la prueba a mano.
 # Los comandos son los «comandos sugeridos» de D1.16; los argumentos añadidos solo hacen que terminen
@@ -13,8 +15,8 @@
 # `pendiente: true` = vacío o contradicción registrado en docs/infra/e1/CAMBIOS-INVENTARIO.md.
 
 meta:
-  version: "1.0"
-  fecha: "2026-11-18"
+  version: "1.1"
+  fecha: "2026-11-19"
   documento_base: "docs/Celeris-Edge-Documento-Maestro.md, D1.16"
   evidencias_ruta: "evidencias/<fecha>-<modo>/"
 
@@ -36,6 +38,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?m)\\b0% packet loss" }
     automatizable: true
     critica: true
+    polaridad: positiva
     evidencia_a_capturar: ["Salida de ping", "swanctl --list-sas", "Resumen BGP (vtysh -c 'show bgp summary')"]
     modos: [A, H]
     semestre: S2
@@ -63,6 +66,7 @@ pruebas:
       - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "nc -zv -w 3 10.20.20.11 22", nota: "cualquier otro puerto (22 como ejemplo negativo)" }
     automatizable: true
     critica: true
+    polaridad: positiva
     evidencia_a_capturar: ["Salida de nc para 5432 y para el puerto negativo", "Contador de la regla F16 en FW01"]
     modos: [A, H]
     semestre: S2
@@ -89,6 +93,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?m)\\b100% packet loss" }
     automatizable: true
     critica: true
+    polaridad: negativa
     evidencia_a_capturar: ["Salida de ping desde HNY01 y desde WEB01", "Registro de denegación en FW01 (log de la regla por defecto)"]
     modos: [A, H]
     semestre: S2
@@ -115,6 +120,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?m)^\\d+/tcp\\s+open", debe_coincidir: false }
     automatizable: true
     critica: true
+    polaridad: negativa
     evidencia_a_capturar: ["Salida de nmap", "Tablas de rutas rt-private (captura de la consola o tofu show)"]
     modos: [A, H]
     semestre: S2
@@ -122,7 +128,7 @@ pruebas:
     objetivos: [OD-06]
     amenazas: []
     detecciones: []
-    celdas_matriz: []
+    celdas_matriz: ["INTERNET>AWS"]
 
   - id: T05
     categoria: vpn
@@ -140,6 +146,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?i)ESTABLISHED", comando_adicional: "swanctl --list-sas", nota: "túnel 2 en ESTABLISHED tras la caída" }
     automatizable: true
     critica: true
+    polaridad: positiva
     evidencia_a_capturar: ["Marca de tiempo de la caída y de la primera respuesta", "swanctl --list-sas antes y después", "vtysh -c 'show bgp summary' antes y después"]
     modos: [L, A, H]
     nota_modos: "F3 asigna T05 al Modo A; F4.3 la incluye en la demostración en vivo del Modo L"
@@ -167,6 +174,7 @@ pruebas:
       - { tipo: contador, metrica: puertos_open, operador: "==", valor: 0 }
     automatizable: true
     critica: true
+    polaridad: negativa
     evidencia_a_capturar: ["Salida de nmap", "Contadores y registros de la regla de denegación LAB → MGMT en FW01"]
     modos: [L, H]
     semestre: S2
@@ -192,6 +200,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?im)^cache-status:" }
     automatizable: true
     critica: false
+    polaridad: positiva
     evidencia_a_capturar: ["Cabeceras de respuesta (primera petición MISS y segunda HIT)", "Registro de acceso de Celeris"]
     modos: [L, H]
     semestre: S2
@@ -218,6 +227,7 @@ pruebas:
       - { tipo: manual, descripcion: "El navegador carga la página por HTTP/2 sobre TCP" }
     automatizable: false
     critica: true
+    polaridad: negativa
     evidencia_a_capturar: ["Contador de la regla F7 en FW01", "Pestaña de red del navegador con el protocolo usado"]
     modos: [L, H]
     semestre: S2
@@ -244,6 +254,7 @@ pruebas:
       - { tipo: umbral, metrica: tiempo_de_cambio_s, operador: ">=", valor: 0, nota: "D1.16 no fija umbral: se reporta el valor medido" }
     automatizable: false
     critica: false
+    polaridad: positiva
     evidencia_a_capturar: ["Cronometraje del cambio de nodo", "Registros de acceso de EDGE01 y EDGE02", "Captura del navegador"]
     modos: [L, H]
     semestre: S2
@@ -269,6 +280,7 @@ pruebas:
       - { tipo: exit_code, valor: distinto_de_0 }
     automatizable: true
     critica: true
+    polaridad: negativa
     evidencia_a_capturar: ["Salida de nc desde WEB01 y desde HNY01", "Registro de denegación en FW01"]
     modos: [L, H]
     semestre: S2
@@ -294,6 +306,7 @@ pruebas:
       - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])", nota: "alerta de nivel ≥ 10 en SIEM01" }
     automatizable: true
     critica: false
+    polaridad: positiva
     evidencia_a_capturar: ["Salida de nc", "Evento de Cowrie/OpenCanary", "Alerta de Wazuh (JSON)"]
     modos: [L, H]
     semestre: S2
@@ -320,6 +333,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?m)\\b100% packet loss" }
     automatizable: true
     critica: true
+    polaridad: negativa
     evidencia_a_capturar: ["Salida de ping desde LAB y desde SERVERS", "Tabla de interfaces de FW01 sin VLAN 70"]
     modos: [L, H]
     semestre: S2
@@ -347,6 +361,7 @@ pruebas:
       - { tipo: regex, sobre: registro_celeris, patron: "destination_blocked" }
     automatizable: true
     critica: false
+    polaridad: negativa
     evidencia_a_capturar: ["Código HTTP devuelto", "Línea del registro de seguridad de Celeris con destination_blocked", "Alerta en Wazuh"]
     modos: [L, H]
     semestre: S2
@@ -372,6 +387,7 @@ pruebas:
       - { tipo: regex, sobre: registro_celeris, patron: "port_blocked" }
     automatizable: true
     critica: false
+    polaridad: negativa
     evidencia_a_capturar: ["Código HTTP devuelto", "Línea del registro de seguridad de Celeris con port_blocked"]
     modos: [L, H]
     semestre: S2
@@ -397,6 +413,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?m)^443/tcp\\s+open" }
     automatizable: true
     critica: false
+    polaridad: mixta
     evidencia_a_capturar: ["Salida de nmap", "Alertas de Suricata IPS y CrowdSec por el escaneo", "Alerta en Wazuh"]
     modos: [L, H]
     semestre: S2
@@ -423,6 +440,7 @@ pruebas:
       - { tipo: regex, sobre: tls.json, patron: "\"id\"\\s*:\\s*\"(SSLv2|SSLv3|TLS1|TLS1_1)\"[^}]*\"finding\"\\s*:\\s*\"offered", debe_coincidir: false }
     automatizable: true
     critica: false
+    polaridad: positiva
     evidencia_a_capturar: ["tls.json de testssl.sh", "Resumen de calificación"]
     modos: [L, H]
     semestre: S2
@@ -449,6 +467,7 @@ pruebas:
       - { tipo: regex, sobre: zap.json, patron: "\"riskcode\"\\s*:\\s*\"3\"", debe_coincidir: false }
     automatizable: true
     critica: false
+    polaridad: positiva
     evidencia_a_capturar: ["zap.json", "Resumen HTML de ZAP"]
     modos: [L, H]
     semestre: S2
@@ -476,6 +495,7 @@ pruebas:
       - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
     automatizable: true
     critica: false
+    polaridad: negativa
     evidencia_a_capturar: ["Código HTTP", "Registro de auditoría del WAF", "Alerta de Wazuh (JSON)"]
     modos: [L, H]
     semestre: S2
@@ -502,6 +522,7 @@ pruebas:
       - { tipo: exit_code, valor: distinto_de_0 }
     automatizable: true
     critica: true
+    polaridad: negativa
     evidencia_a_capturar: ["Salida de curl", "Registro de denegación en FW01"]
     modos: [L, H]
     semestre: S2
@@ -527,6 +548,7 @@ pruebas:
       - { tipo: exit_code, valor: distinto_de_0 }
     automatizable: true
     critica: true
+    polaridad: negativa
     evidencia_a_capturar: ["Salida de nc desde HNY01", "Registro de denegación en FW01"]
     modos: [L, H]
     semestre: S2
@@ -553,6 +575,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?i)(message too long|frag needed)", comando_adicional: "ping -M do -s 1400 -c 3 10.30.10.10" }
     automatizable: true
     critica: true
+    polaridad: positiva
     evidencia_a_capturar: ["Salida de ambos ping", "Sesión TCP sostenida durante la prueba (sin reinicios)"]
     modos: [A, H]
     semestre: S2
@@ -581,6 +604,7 @@ pruebas:
       - { tipo: manual, descripcion: "La navegación del usuario continúa sin intervención" }
     automatizable: false
     critica: false
+    polaridad: positiva
     evidencia_a_capturar: ["Salida de nslookup y curl", "Registro de acceso de EDGE01 con la petición del PAC"]
     modos: [L, H]
     semestre: S2
@@ -606,6 +630,7 @@ pruebas:
       - { tipo: contador, metrica: ra_descartados_en_puerto, operador: ">", valor: 0 }
     automatizable: true
     critica: true
+    polaridad: negativa
     evidencia_a_capturar: ["Salida de ip -6 route show default", "Contador de RA guard del puerto"]
     modos: [L, H]
     semestre: S2
@@ -631,6 +656,7 @@ pruebas:
       - { tipo: contador, metrica: paquetes_bloqueados_regla_F7, operador: ">", valor: 0 }
     automatizable: true
     critica: true
+    polaridad: negativa
     evidencia_a_capturar: ["Salida de kdig", "Contador de la regla F7"]
     modos: [L, H]
     semestre: S2
@@ -661,6 +687,7 @@ pruebas:
       - { tipo: manual, descripcion: "FW01 restaurado desde el XML en Git y reglas operativas" }
     automatizable: false
     critica: false
+    polaridad: positiva
     evidencia_a_capturar: ["Salida de nc", "Cronometraje de la restauración", "Commit del XML restaurado"]
     modos: [L, H]
     semestre: S2
@@ -688,6 +715,7 @@ pruebas:
       - { tipo: regex, sobre: captura, patron: "\\b10\\.20\\.(3[2-5])\\.\\d{1,3}\\b", debe_coincidir: false, nota: "ninguna IP de LAB (10.20.32.0/22)" }
     automatizable: true
     critica: false
+    polaridad: positiva
     evidencia_a_capturar: ["Captura .pcap de la VTI", "Resultado de las búsquedas de cabeceras e IP"]
     modos: [L, A, H]
     semestre: S2
@@ -715,6 +743,7 @@ pruebas:
       - { tipo: contador, metrica: respuestas_http_en_claro_del_servidor, operador: "==", valor: 0, nota: "una petición HTTP en claro al 9128 (sin token) no recibe respuesta" }
     automatizable: true
     critica: true
+    polaridad: positiva
     evidencia_a_capturar: ["scrape.pcap", "Salida de tshark"]
     modos: [L, H]
     semestre: S2
@@ -740,6 +769,7 @@ pruebas:
       - { tipo: contador, metrica: handshakes_tls_6514, operador: ">", valor: 0, comando_adicional: "tshark -r syslog.pcap -Y 'tcp.port == 6514 && tls.handshake'" }
     automatizable: true
     critica: true
+    polaridad: positiva
     evidencia_a_capturar: ["syslog.pcap", "Salida de tshark"]
     modos: [L, H]
     semestre: S2
@@ -748,3 +778,627 @@ pruebas:
     amenazas: [AM-09]
     detecciones: []
     celdas_matriz: []
+
+  # ---------------------------------------------------------------------------------------------------------------
+  # Ampliación T29+ (CI-27): pruebas que D1.16 no define y que la cobertura de la matriz exige. Ninguna sustituye a
+  # T01–T28. `ampliacion: true` las distingue; `polaridad` dice si la prueba espera tráfico permitido o denegado.
+  # Los modos son H (y A donde interviene AWS): el runner del Modo L (tests/network) aún no tiene casos para ellas.
+  # ---------------------------------------------------------------------------------------------------------------
+
+  - id: T29
+    categoria: deteccion
+    nombre: "Escaneo lateral detectado por IDS01"
+    origen: KALI01
+    destino: CTRL01
+    flujos: []
+    flujos_justificacion: "Prueba de detección con tráfico denegado: ningún F-nn alcanza CTRL01 ni DB01 desde LAB-TEST (F2 solo abre DNS hacia SVC01, CI-04); IDS01 observa la VLAN 31 por su port group de captura"
+    componentes: [KALI01, FW01, IDS01, SIEM01, CTRL01]
+    objetivo_que_valida: "Suricata IDS (DET-02) detecta el escaneo de red desde LAB-TEST hacia SERVERS aunque FW01 lo deniegue, y Wazuh lo correlaciona"
+    precondicion: "KALI01 en 10.20.31.60; IDS01 con captura en las VLAN 20 y 31 y reglas ET Open al día; agente Wazuh en IDS01"
+    comando: "nmap -Pn -sS -p 1-1024 --max-rate 100 10.20.20.10 10.20.20.11"
+    resultado_esperado: "Sin puertos abiertos; alerta de Suricata en IDS01 y alerta de Wazuh de nivel ≥ 10 en menos de 60 s"
+    criterio_aprobacion:
+      - { tipo: contador, metrica: puertos_open, operador: "==", valor: 0, nota: "FW01 deniega LAB-TEST → CTRL01 y DB01" }
+      - { tipo: regex, sobre: eve_json_ids01, patron: "\"category\":\\s*\"Detection of a Network Scan\"", nota: "categoría de ET Open para un barrido; sin verificar contra la versión de reglas de S2" }
+      - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
+      - { tipo: umbral, metrica: latencia_alerta_wazuh_s, operador: "<", valor: 60, nota: "desde el primer SYN hasta la alerta en Wazuh" }
+    automatizable: true
+    critica: false
+    polaridad: negativa
+    evidencia_a_capturar: ["Salida de nmap", "Línea de eve.json de IDS01 con la alerta", "Alerta de Wazuh (JSON) con marca de tiempo", "Contador de las reglas de denegación de LAB-TEST hacia SERVERS en FW01"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4, R5]
+    objetivos: [OD-01, OD-09]
+    amenazas: []
+    detecciones: [DET-02]
+    celdas_matriz: []
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T30
+    categoria: deteccion
+    nombre: "Canary interno detecta un barrido en LAB"
+    origen: LABCLI01
+    destino: HNY02
+    flujos: [F13]
+    componentes: [LABCLI01, HNY02, SIEM01, FW01]
+    objetivo_que_valida: "HNY02 (DET-05) detecta un barrido dentro de LAB, tráfico que FW01 no ve, y lo envía al SIEM por F13"
+    precondicion: "HNY02 en 10.20.35.250 con agente Wazuh; LABCLI01 en 10.20.32.50 (misma VLAN 30, sin pasar por FW01)"
+    comando: "nmap -Pn -sS -p 1-1024 10.20.35.250"
+    resultado_esperado: "HNY02 registra el barrido y Wazuh genera una alerta de nivel ≥ 10 en menos de 60 s; FW01 no cuenta ningún paquete de ese tráfico"
+    criterio_aprobacion:
+      - { tipo: contador, metrica: conexiones_registradas_en_hny02, operador: ">=", valor: 1 }
+      - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
+      - { tipo: umbral, metrica: latencia_alerta_wazuh_s, operador: "<", valor: 60 }
+      - { tipo: contador, metrica: paquetes_vistos_por_fw01, operador: "==", valor: 0, nota: "el tráfico dentro de la VLAN no cruza FW01" }
+    automatizable: true
+    critica: false
+    polaridad: positiva
+    evidencia_a_capturar: ["Salida de nmap", "Registro del canary en HNY02", "Alerta de Wazuh (JSON)", "Contadores de FW01 antes y después"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4, R5]
+    objetivos: [OD-09]
+    amenazas: []
+    detecciones: [DET-05]
+    celdas_matriz: []
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T31
+    categoria: deteccion
+    nombre: "Honey-URL en el nodo de borde"
+    origen: LABCLI01
+    destino: EDGE01
+    flujos: [F1, F13]
+    componentes: [LABCLI01, EDGE01, SIEM01]
+    objetivo_que_valida: "Pedir una URL señuelo al proxy genera una alerta (DET-07, REQ-F-27)"
+    precondicion: "REQ-F-27 implementado en EDGE01; la ruta señuelo se define con él y no está en el inventario (CI-27)"
+    comando: "curl -sS -o /dev/null -w \"%{http_code}\" -x http://10.20.60.10:3128 <URL_SEÑUELO>"
+    resultado_esperado: "El nodo registra el evento de honey-URL y Wazuh genera una alerta de nivel ≥ 10 en menos de 60 s"
+    criterio_aprobacion:
+      - { tipo: regex, sobre: registro_celeris, patron: "honey_url", nota: "nombre del evento a confirmar al implementar REQ-F-27" }
+      - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
+      - { tipo: umbral, metrica: latencia_alerta_wazuh_s, operador: "<", valor: 60 }
+    automatizable: true
+    critica: false
+    polaridad: positiva
+    evidencia_a_capturar: ["Petición y código devuelto", "Línea del registro de seguridad de Celeris", "Alerta de Wazuh (JSON)"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4, R5]
+    objetivos: [OD-09]
+    amenazas: []
+    detecciones: [DET-07]
+    celdas_matriz: []
+    ampliacion: true
+    pendiente: true
+    cambio: CI-27
+
+  - id: T32
+    categoria: deteccion
+    nombre: "CrowdSec bloquea una IP abusiva en la WAN"
+    origen: INTERNET
+    destino: FW01
+    flujos: [F26]
+    componentes: [FW01, SIEM01]
+    objetivo_que_valida: "CrowdSec en FW01 (DET-08) bloquea una IP con comportamiento abusivo y recibe sus escenarios por F26"
+    precondicion: "CrowdSec activo en FW01 con acceso a su API central por F26; un host externo de pruebas del equipo (<IP_EXTERNA_DE_PRUEBA>, no se fija en el inventario)"
+    comando: "for i in $(seq 1 60); do nc -zv -w1 203.0.113.10 22; done   # desde <IP_EXTERNA_DE_PRUEBA>; después: cscli decisions list"
+    resultado_esperado: "CrowdSec crea una decisión de bloqueo para la IP de prueba y FW01 descarta sus paquetes siguientes; alerta en Wazuh de nivel ≥ 10"
+    criterio_aprobacion:
+      - { tipo: regex, sobre: stdout, patron: "(?m)<IP_EXTERNA_DE_PRUEBA>.*ban", comando_adicional: "cscli decisions list", nota: "sustituir por la IP real al ejecutar" }
+      - { tipo: contador, metrica: paquetes_descartados_tras_la_decision, operador: ">=", valor: 1 }
+      - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
+    automatizable: true
+    critica: false
+    polaridad: negativa
+    evidencia_a_capturar: ["Salida de cscli decisions list", "Contador de la lista de bloqueo en FW01", "Alerta de Wazuh (JSON)"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4, R5]
+    objetivos: [OD-09]
+    amenazas: [AM-06]
+    detecciones: [DET-08]
+    celdas_matriz: []
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T33
+    categoria: deteccion
+    nombre: "Toda denegación deja rastro con hora fiable"
+    origen: LABCLI01
+    destino: SIEM01
+    flujos: [F14]
+    componentes: [LABCLI01, FW01, SIEM01, SVC01]
+    objetivo_que_valida: "Cada denegación de FW01 llega a Wazuh con hora sincronizada por NTS (AM-13)"
+    precondicion: "Registro de denegaciones activo en FW01 y syslog sobre TLS (F14); SVC01 sincronizado por NTS (F25)"
+    comando: "for i in $(seq 1 10); do nc -zv -w1 10.20.10.10 22; done   # 10 denegaciones LAB → MGMT; después: chronyc tracking en SVC01 y consulta de Wazuh"
+    resultado_esperado: "Las 10 denegaciones aparecen en Wazuh en menos de 60 s y el desfase de reloj entre FW01 y SIEM01 es menor de 1 s"
+    criterio_aprobacion:
+      - { tipo: contador, metrica: denegaciones_en_wazuh, operador: "==", valor: 10, nota: "iguala los intentos generados" }
+      - { tipo: umbral, metrica: latencia_denegacion_en_wazuh_s, operador: "<", valor: 60 }
+      - { tipo: umbral, metrica: desfase_de_reloj_s, operador: "<", valor: 1, nota: "umbral supuesto [S-16]" }
+      - { tipo: regex, sobre: stdout, patron: "Leap status\\s*:\\s*Normal", comando_adicional: "chronyc tracking", nota: "en SVC01" }
+    automatizable: true
+    critica: false
+    polaridad: negativa
+    evidencia_a_capturar: ["Salida de los 10 intentos", "Consulta de Wazuh con las 10 denegaciones y sus marcas de tiempo", "chronyc tracking y chronyc authdata de SVC01"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4, R5]
+    objetivos: [OD-06]
+    amenazas: [AM-13]
+    detecciones: []
+    celdas_matriz: ["LAB>MGMT"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T34
+    categoria: conectividad
+    nombre: "Administración desde JMP01"
+    origen: JMP01
+    destino: ["ESX01:vmk0", IPMI01, SW-CORE01, UPS01, "NAS01:gestion", FW01, CTRL01, LABCLI01, KALI01, WAF01, HNY01, SIEM01, EDGE01, "NAS01:respaldo"]
+    flujos: [F20]
+    componentes: [JMP01, FW01, ESX01, IPMI01, SW-CORE01, UPS01, NAS01, CTRL01, LABCLI01, KALI01, WAF01, HNY01, SIEM01, EDGE01]
+    objetivo_que_valida: "JMP01 alcanza la interfaz de gestión de cada destino de F20 y solo por los puertos permitidos (OD-02)"
+    precondicion: "JMP01 en 10.20.10.20; un destino por zona y los equipos de MGMT; el puerto probado es uno de 22, 443, 3000, 5601 y 9128"
+    comando: "for t in 10.20.10.10:443 10.20.10.11:443 10.20.10.2:22 10.20.10.40:443 10.20.10.30:443 10.20.10.1:443 10.20.20.10:22 10.20.32.50:22 10.20.31.60:22 10.20.40.10:22 10.20.41.20:22 10.20.50.10:443 10.20.60.10:22 10.20.71.20:22; do nc -zv -w3 ${t%:*} ${t#*:}; done; nc -zv -w3 10.20.20.10 3389"
+    resultado_esperado: "Los 14 destinos responden en su puerto; 3389 (fuera de F20) no abre"
+    criterio_aprobacion:
+      - { tipo: contador, metrica: destinos_alcanzados, operador: "==", valor: 14 }
+      - { tipo: contador, metrica: puertos_fuera_de_F20_abiertos, operador: "==", valor: 0 }
+      - { tipo: contador, metrica: paquetes_regla_F20, operador: ">", valor: 0, nota: "contador de la regla F20 en FW01 tras la prueba" }
+    automatizable: true
+    critica: false
+    polaridad: mixta
+    evidencia_a_capturar: ["Salida del bucle", "Contador de la regla F20 en FW01 antes y después"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R2, R4]
+    objetivos: [OD-02]
+    amenazas: [AM-11]
+    detecciones: []
+    celdas_matriz: ["MGMT>SERVERS", "MGMT>LAB", "MGMT>LAB-TEST", "MGMT>DMZ-SVC", "MGMT>DMZ-HONEY", "MGMT>SECURITY", "MGMT>EDGE", "MGMT>BACKUP"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T35
+    categoria: conectividad
+    nombre: "MGMT → Internet solo por 443"
+    origen: JMP01
+    destino: INTERNET
+    flujos: []
+    flujos_justificacion: "La matriz D1.8 permite MGMT → Internet por TCP 443 (actualizaciones) sin F-nn (CI-05)"
+    componentes: [JMP01, FW01]
+    objetivo_que_valida: "MGMT sale a Internet solo por TCP 443 para actualizaciones"
+    precondicion: "JMP01 en 10.20.10.20; destino de ejemplo example.com (el repositorio de actualizaciones no está fijado en el inventario)"
+    comando: "curl -sS -o /dev/null -w \"%{http_code}\" https://example.com ; nc -zv -w5 example.com 22 ; curl -sS -m5 http://example.com"
+    resultado_esperado: "HTTPS responde; el puerto 22 y HTTP en claro no abren"
+    criterio_aprobacion:
+      - { tipo: regex, sobre: stdout, patron: "^[23]\\d\\d$", comando_adicional: "curl -sS -o /dev/null -w \"%{http_code}\" https://example.com" }
+      - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "nc -zv -w5 example.com 22" }
+      - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "curl -sS -m5 http://example.com" }
+    automatizable: true
+    critica: false
+    polaridad: mixta
+    evidencia_a_capturar: ["Código HTTP", "Salida de nc y de curl", "Contadores de FW01"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4]
+    objetivos: [OD-06]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["MGMT>INTERNET"]
+    ampliacion: true
+    pendiente: true
+    cambio: CI-05
+
+  - id: T36
+    categoria: cifrado
+    nombre: "Enrolamiento del nodo por mTLS"
+    origen: EDGE01
+    destino: CTRL01
+    flujos: [F10]
+    componentes: [EDGE01, FW01, CTRL01]
+    objetivo_que_valida: "El plano de control solo acepta nodos con certificado de cliente válido (F10, mTLS)"
+    precondicion: "CTRL01 en 10.20.20.10:8443 con la CA de la organización; certificado de EDGE01 emitido por ella"
+    comando: "openssl s_client -connect 10.20.20.10:8443 -cert edge01.crt -key edge01.key -CAfile ca.crt </dev/null ; openssl s_client -connect 10.20.20.10:8443 -CAfile ca.crt </dev/null"
+    resultado_esperado: "Con certificado de cliente, el handshake termina bien; sin él, CTRL01 lo rechaza"
+    criterio_aprobacion:
+      - { tipo: regex, sobre: stdout, patron: "Verify return code: 0 \\(ok\\)", comando_adicional: "openssl s_client -connect 10.20.20.10:8443 -cert edge01.crt -key edge01.key -CAfile ca.crt </dev/null" }
+      - { tipo: regex, sobre: stdout, patron: "(?i)(certificate required|handshake failure|bad certificate)", comando_adicional: "openssl s_client -connect 10.20.20.10:8443 -CAfile ca.crt </dev/null", nota: "sin certificado de cliente" }
+    automatizable: true
+    critica: true
+    polaridad: mixta
+    evidencia_a_capturar: ["Salida de ambos openssl s_client", "Registro de CTRL01 con el rechazo"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4, R6]
+    objetivos: [OD-07]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["EDGE>SERVERS"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T37
+    categoria: cifrado
+    nombre: "Telemetría OTLP por TLS"
+    origen: EDGE01
+    destino: OBS01
+    flujos: [F11]
+    componentes: [EDGE01, CTRL01, FW01, OBS01]
+    objetivo_que_valida: "Los nodos y CTRL01 envían telemetría a OBS01 solo por TLS en 4317 y 4318 (REQ-F-13)"
+    precondicion: "OBS01 en 10.20.20.20 con los receptores OTLP gRPC (4317) y HTTP (4318) con TLS"
+    comando: "for p in 4317 4318; do openssl s_client -connect 10.20.20.20:$p -CAfile ca.crt </dev/null; done"
+    resultado_esperado: "Ambos puertos completan TLS con certificado válido; ninguno acepta texto en claro"
+    criterio_aprobacion:
+      - { tipo: contador, metrica: puertos_otlp_con_tls_valido, operador: "==", valor: 2 }
+      - { tipo: regex, sobre: stdout, patron: "Verify return code: 0 \\(ok\\)", comando_adicional: "openssl s_client -connect 10.20.20.20:4317 -CAfile ca.crt </dev/null" }
+      - { tipo: contador, metrica: paquetes_otlp_en_claro, operador: "==", valor: 0, nota: "tcpdump en OBS01 durante la prueba" }
+    automatizable: true
+    critica: true
+    polaridad: positiva
+    evidencia_a_capturar: ["Salida de openssl s_client por puerto", "Captura de tráfico en OBS01"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R6]
+    objetivos: [OD-07]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["EDGE>SERVERS"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T38
+    categoria: cifrado
+    nombre: "CTRL01 → base de datos por TLS"
+    origen: CTRL01
+    destino: DB01
+    flujos: [F15]
+    componentes: [CTRL01, FW01, DB01]
+    objetivo_que_valida: "El plano de control llega a PostgreSQL por 5432 con TLS (F15)"
+    precondicion: "DB01 en 10.20.20.11 con TLS y scram-sha-256; CTRL01 en 10.20.20.10 (misma VLAN: el tráfico no cruza FW01)"
+    comando: "pg_isready -h 10.20.20.11 -p 5432 ; openssl s_client -starttls postgres -connect 10.20.20.11:5432 -CAfile ca.crt </dev/null"
+    resultado_esperado: "PostgreSQL acepta conexiones y negocia TLS con certificado válido"
+    criterio_aprobacion:
+      - { tipo: exit_code, valor: 0, comando_adicional: "pg_isready -h 10.20.20.11 -p 5432" }
+      - { tipo: regex, sobre: stdout, patron: "Verify return code: 0 \\(ok\\)", comando_adicional: "openssl s_client -starttls postgres -connect 10.20.20.11:5432 -CAfile ca.crt </dev/null" }
+    automatizable: true
+    critica: true
+    polaridad: positiva
+    evidencia_a_capturar: ["Salida de pg_isready", "Salida de openssl s_client"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R6]
+    objetivos: [OD-07]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: []
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T39
+    categoria: disponibilidad
+    nombre: "Respaldo y restauración en NAS01"
+    origen: DB01
+    destino: "NAS01:respaldo"
+    flujos: [F17]
+    componentes: [DB01, CTRL01, SVC01, OBS01, FW01, NAS01, LABCLI01]
+    objetivo_que_valida: "Los servidores respaldan por SSH hacia la VLAN 71, la restauración es íntegra y su tiempo cumple el RTO del plano de control (D2.9)"
+    precondicion: "NAS01 en 10.20.71.20:22 con repositorio restic; <USUARIO_DE_RESPALDO> y <REPOSITORIO> no están en el inventario"
+    comando: "restic -r sftp:<USUARIO_DE_RESPALDO>@10.20.71.20:<REPOSITORIO> backup /var/lib/postgresql ; restic check ; time restic restore latest --target /restauracion ; desde LABCLI01: nc -zv -w3 10.20.71.20 22"
+    resultado_esperado: "Respaldo y comprobación sin errores; restauración en ≤ 2 h (RTO del plano de control); LABCLI01 no llega a la VLAN 71"
+    criterio_aprobacion:
+      - { tipo: exit_code, valor: 0, comando_adicional: "restic backup" }
+      - { tipo: regex, sobre: stdout, patron: "no errors were found", comando_adicional: "restic check" }
+      - { tipo: umbral, metrica: tiempo_restauracion_s, operador: "<=", valor: 7200, nota: "RTO 2 h del plano de control, D2.9" }
+      - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "nc -zv -w3 10.20.71.20 22", nota: "desde LABCLI01: LAB → BACKUP denegado" }
+    automatizable: true
+    critica: false
+    polaridad: mixta
+    evidencia_a_capturar: ["Salida de restic backup, check y restore con tiempos", "Salida de nc desde LABCLI01"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R6, R8]
+    objetivos: [OD-06, OD-07]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["SERVERS>BACKUP", "LAB>BACKUP"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T40
+    categoria: disponibilidad
+    nombre: "Respaldo en S3 con Object Lock"
+    origen: DB01
+    destino: INTERNET
+    flujos: [F18]
+    componentes: [DB01, NAS01, FW01]
+    objetivo_que_valida: "El respaldo externo sale por TCP 443 hacia el bucket celeris-backups, que es inmutable por 30 días y solo acepta la IP pública del campus (D2.9)"
+    precondicion: "Bucket celeris-backups con Object Lock y política limitada a la IP pública del campus; credenciales fuera del repositorio"
+    comando: "aws s3 ls s3://celeris-backups ; aws s3api get-object-lock-configuration --bucket celeris-backups ; desde una IP que no es del campus: aws s3 ls s3://celeris-backups"
+    resultado_esperado: "Desde el campus lista el bucket; la retención es de 30 días; desde otra IP responde AccessDenied"
+    criterio_aprobacion:
+      - { tipo: exit_code, valor: 0, comando_adicional: "aws s3 ls s3://celeris-backups" }
+      - { tipo: regex, sobre: stdout, patron: "\"Days\":\\s*30", comando_adicional: "aws s3api get-object-lock-configuration --bucket celeris-backups" }
+      - { tipo: regex, sobre: stderr, patron: "AccessDenied", comando_adicional: "aws s3 ls s3://celeris-backups   # desde una IP ajena al campus" }
+    automatizable: true
+    critica: false
+    polaridad: mixta
+    evidencia_a_capturar: ["Salida de los tres comandos", "Política del bucket (JSON)"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R6, R8]
+    objetivos: [OD-07]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["SERVERS>INTERNET", "BACKUP>INTERNET"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T41
+    categoria: disponibilidad
+    nombre: "Montaje NFS de almacenamiento"
+    origen: "ESX01:vmk1"
+    destino: "NAS01:almacenamiento"
+    flujos: [F19]
+    componentes: [ESX01, NAS01]
+    objetivo_que_valida: "ESXi monta el datastore NFS por la VLAN 70 (F19, sin cifrar con riesgo aceptado)"
+    precondicion: "ESX01 con vmk1 en 10.20.70.10; NAS01 en 10.20.70.20 exportando el datastore (misma VLAN: no cruza FW01)"
+    comando: "esxcli network ip connection list | grep 2049 ; nc -z 10.20.70.20 2049 ; esxcli storage nfs list"
+    resultado_esperado: "El puerto 2049 de NAS01 abre y el datastore figura montado y accesible"
+    criterio_aprobacion:
+      - { tipo: exit_code, valor: 0, comando_adicional: "nc -z 10.20.70.20 2049", nota: "desde ESX01 por vmk1" }
+      - { tipo: regex, sobre: stdout, patron: "(?m)true\\s+true", comando_adicional: "esxcli storage nfs list", nota: "columnas Mounted y Accessible" }
+    automatizable: true
+    critica: false
+    polaridad: positiva
+    evidencia_a_capturar: ["Salida de esxcli storage nfs list", "Salida de nc"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R2, R6]
+    objetivos: [OD-07]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: []
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T42
+    categoria: conectividad
+    nombre: "Hora NTS y DNS cifrado desde SVC01"
+    origen: SVC01
+    destino: INTERNET
+    flujos: [F25]
+    componentes: [SVC01, FW01]
+    objetivo_que_valida: "SVC01 sincroniza la hora con NTS (TCP 4460, UDP 123) y no sale a Internet por otros puertos"
+    precondicion: "SVC01 en 10.20.20.30 con chrony y servidores públicos NTS; el DNS upstream por DoT (853) es opcional"
+    comando: "chronyc -n authdata ; chronyc tracking ; curl -sS -m5 http://example.com"
+    resultado_esperado: "chrony autentica con NTS y su estado es normal; HTTP en claro hacia Internet no sale"
+    criterio_aprobacion:
+      - { tipo: regex, sobre: stdout, patron: "(?m)NTS\\s+\\d+", comando_adicional: "chronyc -n authdata", nota: "al menos una fuente con NTS" }
+      - { tipo: regex, sobre: stdout, patron: "Leap status\\s*:\\s*Normal", comando_adicional: "chronyc tracking" }
+      - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "curl -sS -m5 http://example.com", nota: "SERVERS → Internet no permite el puerto 80" }
+    automatizable: true
+    critica: false
+    polaridad: mixta
+    evidencia_a_capturar: ["Salida de chronyc authdata y tracking", "Salida de curl"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4, R6]
+    objetivos: [OD-04, OD-07]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["SERVERS>INTERNET"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T43
+    categoria: conectividad
+    nombre: "Actualización de reglas de seguridad"
+    origen: IDS01
+    destino: INTERNET
+    flujos: [F26]
+    componentes: [SIEM01, IDS01, FW01]
+    objetivo_que_valida: "SIEM01, IDS01 y FW01 descargan reglas y feeds solo por TCP 443 (F26)"
+    precondicion: "IDS01 en 10.20.50.20 con suricata-update configurado con ET Open"
+    comando: "suricata-update ; curl -sS -m5 http://example.com"
+    resultado_esperado: "La actualización termina sin error; HTTP en claro hacia Internet no sale"
+    criterio_aprobacion:
+      - { tipo: exit_code, valor: 0, comando_adicional: "suricata-update" }
+      - { tipo: regex, sobre: stdout, patron: "(?i)(done|no changes)", comando_adicional: "suricata-update" }
+      - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "curl -sS -m5 http://example.com", nota: "SECURITY → Internet no permite el puerto 80" }
+    automatizable: true
+    critica: false
+    polaridad: mixta
+    evidencia_a_capturar: ["Salida de suricata-update", "Contador de la regla F26 en FW01"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4, R5]
+    objetivos: [OD-09]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["SECURITY>INTERNET"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T44
+    categoria: disponibilidad
+    nombre: "Peering entre nodos de borde"
+    origen: EDGE01
+    destino: EDGE02
+    flujos: []
+    flujos_justificacion: "La matriz D1.8 permite EDGE → EDGE (peering entre nodos) sin F-nn ni puerto (CI-06)"
+    componentes: [EDGE01, EDGE02]
+    objetivo_que_valida: "Los dos nodos de borde se alcanzan entre sí dentro de la VLAN 60; el protocolo y puerto del peering no están definidos"
+    precondicion: "EDGE01 en 10.20.60.10 y EDGE02 en 10.20.60.11 (misma VLAN: no cruza FW01); solo se prueba alcance IP, no un puerto"
+    comando: "ping -c 3 10.20.60.11   # en EDGE01; y ping -c 3 10.20.60.10 en EDGE02"
+    resultado_esperado: "Respuesta en ambos sentidos; el puerto del peering se prueba cuando CI-06 lo defina"
+    criterio_aprobacion:
+      - { tipo: exit_code, valor: 0, comando_adicional: "ping -c 3 10.20.60.11" }
+      - { tipo: exit_code, valor: 0, comando_adicional: "ping -c 3 10.20.60.10" }
+    automatizable: true
+    critica: false
+    polaridad: positiva
+    evidencia_a_capturar: ["Salida de ambos ping"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R2, R6]
+    objetivos: [OD-03]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["EDGE>EDGE"]
+    ampliacion: true
+    pendiente: true
+    cambio: CI-06
+
+  - id: T45
+    categoria: segmentacion
+    nombre: "Internet → zonas internas"
+    origen: INTERNET
+    destino: [MGMT, SERVERS, LAB, LAB-TEST, SECURITY, EDGE, STORAGE, BACKUP]
+    flujos: []
+    flujos_justificacion: "Prueba de denegación: los únicos flujos de Internet hacia el campus son F21 (WAF01) y F24 (HNY01)"
+    componentes: [FW01, ESX01, CTRL01, LABCLI01, KALI01, SIEM01, EDGE01, NAS01]
+    objetivo_que_valida: "Nada de lo que viene de Internet alcanza las zonas internas, ni siquiera con una ruta estática hacia FW01 (OD-06)"
+    precondicion: "Host de pruebas en el segmento de la WAN con ruta 10.20.0.0/16 vía 203.0.113.10; objetivos: ESX01 10.20.10.10, CTRL01 10.20.20.10, LABCLI01 10.20.32.50, KALI01 10.20.31.60, SIEM01 10.20.50.10, EDGE01 10.20.60.10, NAS01 10.20.70.20 y 10.20.71.20"
+    comando: "nmap -Pn -sS -p 22,443,3128,5432,8443,9128,2049 10.20.10.10 10.20.20.10 10.20.32.50 10.20.31.60 10.20.50.10 10.20.60.10 10.20.70.20 10.20.71.20"
+    resultado_esperado: "Ningún puerto abierto en ninguna zona interna; FW01 cuenta los paquetes denegados"
+    criterio_aprobacion:
+      - { tipo: contador, metrica: puertos_open, operador: "==", valor: 0 }
+      - { tipo: regex, sobre: stdout, patron: "(?m)^\\d+/tcp\\s+open", debe_coincidir: false }
+      - { tipo: contador, metrica: paquetes_denegados_por_fw01, operador: ">", valor: 0 }
+    automatizable: true
+    critica: true
+    polaridad: negativa
+    evidencia_a_capturar: ["Salida de nmap", "Contadores de las reglas de denegación de FW01 antes y después", "Ruta estática usada"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4]
+    objetivos: [OD-01, OD-06]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["INTERNET>MGMT", "INTERNET>SERVERS", "INTERNET>LAB", "INTERNET>LAB-TEST", "INTERNET>SECURITY", "INTERNET>EDGE", "INTERNET>STORAGE", "INTERNET>BACKUP"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T46
+    categoria: segmentacion
+    nombre: "DMZ-SVC → zonas internas"
+    origen: WEB01
+    destino: [MGMT, SERVERS, LAB-TEST, EDGE, STORAGE, BACKUP]
+    flujos: []
+    flujos_justificacion: "Prueba de denegación: WEB01 solo recibe F22 desde WAF01 y no inicia ningún flujo hacia el campus"
+    componentes: [WEB01, WAF01, FW01, ESX01, CTRL01, KALI01, EDGE01, NAS01]
+    objetivo_que_valida: "Un servidor de la DMZ comprometido no alcanza las zonas internas (OD-01)"
+    precondicion: "WEB01 en 10.20.40.20; objetivos: ESX01 10.20.10.10, CTRL01 10.20.20.10, KALI01 10.20.31.60, EDGE01 10.20.60.10, NAS01 10.20.70.20 y 10.20.71.20"
+    comando: "nmap -Pn -sS -p 22,443,3128,5432,8443,9128,2049 10.20.10.10 10.20.20.10 10.20.31.60 10.20.60.10 10.20.70.20 10.20.71.20"
+    resultado_esperado: "Ningún puerto abierto; FW01 cuenta los paquetes denegados (la VLAN 70 no tiene gateway: sin ruta)"
+    criterio_aprobacion:
+      - { tipo: contador, metrica: puertos_open, operador: "==", valor: 0 }
+      - { tipo: regex, sobre: stdout, patron: "(?m)^\\d+/tcp\\s+open", debe_coincidir: false }
+      - { tipo: contador, metrica: paquetes_denegados_por_fw01, operador: ">", valor: 0 }
+    automatizable: true
+    critica: true
+    polaridad: negativa
+    evidencia_a_capturar: ["Salida de nmap", "Contadores de las reglas de denegación DMZ-SVC → interna en FW01"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4]
+    objetivos: [OD-01, OD-06]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["DMZ-SVC>MGMT", "DMZ-SVC>SERVERS", "DMZ-SVC>LAB-TEST", "DMZ-SVC>EDGE", "DMZ-SVC>STORAGE", "DMZ-SVC>BACKUP"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T47
+    categoria: segmentacion
+    nombre: "DMZ-HONEY → cualquier zona"
+    origen: HNY01
+    destino: [MGMT, SERVERS, LAB-TEST, EDGE, STORAGE, BACKUP, INTERNET]
+    flujos: [F13]
+    componentes: [HNY01, FW01, SIEM01, ESX01, CTRL01, KALI01, EDGE01, NAS01]
+    objetivo_que_valida: "El honeypot comprometido no sale a ninguna zona ni a Internet; solo su agente llega a SIEM01 por F13 (AM-10)"
+    precondicion: "HNY01 en 10.20.41.20; objetivos: ESX01 10.20.10.10, CTRL01 10.20.20.10, KALI01 10.20.31.60, EDGE01 10.20.60.10, NAS01 10.20.70.20 y 10.20.71.20; control positivo: SIEM01 10.20.50.10:1514"
+    comando: "nmap -Pn -sS -p 22,443,3128,5432,8443,9128,2049 10.20.10.10 10.20.20.10 10.20.31.60 10.20.60.10 10.20.70.20 10.20.71.20 ; curl -sS -m5 https://example.com ; nc -zv -w3 10.20.50.10 1514"
+    resultado_esperado: "Ningún puerto abierto y Internet inalcanzable; el control positivo hacia SIEM01:1514 sí abre"
+    criterio_aprobacion:
+      - { tipo: contador, metrica: puertos_open, operador: "==", valor: 0 }
+      - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "curl -sS -m5 https://example.com" }
+      - { tipo: exit_code, valor: 0, comando_adicional: "nc -zv -w3 10.20.50.10 1514", nota: "control positivo: sin él, la denegación no demuestra nada" }
+      - { tipo: contador, metrica: paquetes_denegados_por_fw01, operador: ">", valor: 0 }
+    automatizable: true
+    critica: true
+    polaridad: mixta
+    evidencia_a_capturar: ["Salida de nmap, curl y nc", "Contadores de las reglas de denegación DMZ-HONEY en FW01"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4]
+    objetivos: [OD-01, OD-06]
+    amenazas: [AM-10]
+    detecciones: []
+    celdas_matriz: ["DMZ-HONEY>MGMT", "DMZ-HONEY>SERVERS", "DMZ-HONEY>LAB-TEST", "DMZ-HONEY>EDGE", "DMZ-HONEY>STORAGE", "DMZ-HONEY>BACKUP", "DMZ-HONEY>INTERNET"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T48
+    categoria: segmentacion
+    nombre: "Cualquier zona → STORAGE"
+    origen: [JMP01, KALI01, IDS01, EDGE01, EC2-CTRLR]
+    destino: "NAS01:almacenamiento"
+    flujos: []
+    flujos_justificacion: "Prueba de denegación: el único flujo hacia STORAGE es F19, que solo parte de ESX01:vmk1 y no cruza FW01 (la VLAN 70 no tiene gateway)"
+    componentes: [JMP01, KALI01, IDS01, EDGE01, EC2-CTRLR, FW01, NAS01]
+    objetivo_que_valida: "La VLAN 70 no es alcanzable desde ninguna zona: sin gateway, sin ruta y sin reenvío en NAS01"
+    precondicion: "NAS01 en 10.20.70.20 (STORAGE) y 10.20.71.20 (BACKUP); el reenvío IP de NAS01 está desactivado"
+    comando: "en cada origen: nc -zv -w3 10.20.70.20 2049 ; ip route get 10.20.70.20 ; en NAS01: sysctl net.ipv4.ip_forward"
+    resultado_esperado: "Sin respuesta desde ningún origen; NAS01 no reenvía entre sus interfaces"
+    criterio_aprobacion:
+      - { tipo: contador, metrica: origenes_con_respuesta, operador: "==", valor: 0 }
+      - { tipo: regex, sobre: stdout, patron: "net\\.ipv4\\.ip_forward = 0", comando_adicional: "sysctl net.ipv4.ip_forward", nota: "en NAS01" }
+    automatizable: true
+    critica: true
+    polaridad: negativa
+    evidencia_a_capturar: ["Salida de nc por origen", "ip route get por origen", "sysctl en NAS01"]
+    modos: [A, H]
+    nota_modos: "EC2-CTRLR solo existe en el Modo A y en el entorno real"
+    semestre: S2
+    criterios_rubrica: [R2, R4]
+    objetivos: [OD-01, OD-06]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["MGMT>STORAGE", "LAB-TEST>STORAGE", "SECURITY>STORAGE", "EDGE>STORAGE", "BACKUP>STORAGE", "AWS>STORAGE"]
+    ampliacion: true
+    cambio: CI-27
+
+  - id: T49
+    categoria: conectividad
+    nombre: "Renovación ACME desde WAF01"
+    origen: WAF01
+    destino: INTERNET
+    flujos: [F23]
+    componentes: [WAF01, FW01]
+    objetivo_que_valida: "WAF01 alcanza los endpoints ACME por TCP 443 para renovar el certificado del portal y no sale por otros puertos (F23)"
+    precondicion: "WAF01 en 10.20.40.10; CA ACME elegida por el equipo (se usa el directorio de Let's Encrypt como ejemplo; el inventario no fija el endpoint)"
+    comando: "curl -sS -o /dev/null -w \"%{http_code}\" https://acme-v02.api.letsencrypt.org/directory ; curl -sS -m5 http://example.com"
+    resultado_esperado: "El directorio ACME responde 200; HTTP en claro hacia Internet no sale"
+    criterio_aprobacion:
+      - { tipo: regex, sobre: stdout, patron: "^200$", comando_adicional: "curl -sS -o /dev/null -w \"%{http_code}\" https://acme-v02.api.letsencrypt.org/directory" }
+      - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "curl -sS -m5 http://example.com", nota: "DMZ-SVC → Internet solo permite TCP 443 desde WAF01" }
+    automatizable: true
+    critica: false
+    polaridad: mixta
+    evidencia_a_capturar: ["Código HTTP del directorio ACME", "Salida de curl hacia el puerto 80", "Contador de la regla F23 en FW01"]
+    modos: [H]
+    semestre: S2
+    criterios_rubrica: [R4, R6]
+    objetivos: [OD-08]
+    amenazas: []
+    detecciones: []
+    celdas_matriz: ["DMZ-SVC>INTERNET"]
+    ampliacion: true
+    cambio: CI-27

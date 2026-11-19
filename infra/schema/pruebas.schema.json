@@ -36,6 +36,7 @@
           "criterio_aprobacion",
           "automatizable",
           "critica",
+          "polaridad",
           "evidencia_a_capturar",
           "modos",
           "semestre",
@@ -46,7 +47,7 @@
         "properties": {
           "id": {
             "type": "string",
-            "pattern": "^T(0[1-9]|1[0-9]|2[0-8])$"
+            "pattern": "^T(0[1-9]|[1-9][0-9])$"
           },
           "categoria": {
             "enum": [
@@ -158,6 +159,24 @@
           "critica": {
             "type": "boolean",
             "description": "true si un FALLA de esta prueba invalida un límite de seguridad del diseño (V-42). Regla: categoría segmentacion, vpn o cifrado (CI-26)."
+          },
+          "polaridad": {
+            "enum": ["positiva", "negativa", "mixta"],
+            "description": "positiva: se espera tráfico permitido; negativa: se espera denegación; mixta: ambas."
+          },
+          "observacion_ensayo": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["causa", "accion"],
+            "description": "Causa y acción de una FALLA en el ensayo del Modo L; V-73 la exige mientras la prueba falle.",
+            "properties": {
+              "causa": {"type": "string", "minLength": 1},
+              "accion": {"type": "string", "minLength": 1}
+            }
+          },
+          "ampliacion": {
+            "type": "boolean",
+            "description": "true en T29+: pruebas que D1.16 no define y se agregan para cerrar la cobertura (CI-27)."
           },
           "evidencia_a_capturar": {
             "type": "array",

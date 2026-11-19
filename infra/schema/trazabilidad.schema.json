@@ -123,7 +123,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "pattern": "^T(0[1-9]|1[0-9]|2[0-8])$"
+              "pattern": "^T(0[1-9]|[1-9][0-9])$"
             }
           },
           "prueba_justificacion": {
@@ -209,7 +209,7 @@
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "pattern": "^T(0[1-9]|1[0-9]|2[0-8])$"
+                  "pattern": "^T(0[1-9]|[1-9][0-9])$"
                 }
               }
             }
@@ -351,6 +351,20 @@
             "descriptor_nivel_4": {
               "type": "string",
               "minLength": 1
+            },
+            "elementos_evaluados": {
+              "type": "array",
+              "description": "Elementos del criterio que la matriz de pruebas debe cubrir (cada uno con ≥ 1 prueba).",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "elemento", "pruebas"],
+                "properties": {
+                  "id": {"type": "string", "pattern": "^R[1-8]-\\d{2}$"},
+                  "elemento": {"type": "string", "minLength": 1},
+                  "pruebas": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^T(0[1-9]|[1-9][0-9])$"}}
+                }
+              }
             },
             "evidencias": {
               "type": "array",

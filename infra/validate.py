@@ -552,12 +552,21 @@ def v19(x: Infra):
 # --------------------------------------------------------------------------------------------------
 
 
-@chequeo("V-20", "Pruebas T01–T28 completas, con criterio verificable y modos válidos")
+@chequeo("V-20", "Pruebas T01–T28 de D1.16 completas, ampliaciones T29+ registradas, con criterio verificable y modos válidos")
 def v20(x: Infra):
     r = []
     ids = sorted(x.pruebas)
-    if ids != ci.PRUEBAS_ESPERADAS:
-        r.append(E(f"Pruebas distintas de T01–T28 (faltan {sorted(set(ci.PRUEBAS_ESPERADAS) - set(ids))})", "Transcriba las 28 pruebas de D1.16"))
+    faltan = sorted(set(ci.PRUEBAS_ESPERADAS) - set(ids))
+    if faltan:
+        r.append(E(f"Faltan pruebas de D1.16 (T01–T28): {faltan}", "Transcriba las 28 pruebas de D1.16"))
+    for t in x.pruebas.values():
+        extra = t["id"] not in ci.PRUEBAS_ESPERADAS
+        if extra and not (t.get("ampliacion") and t.get("cambio")):
+            r.append(E(f"{t['id']}: no es de D1.16; debe llevar `ampliacion: true` y `cambio` (CI-nn)", "Registre la ampliación en CAMBIOS-INVENTARIO.md"))
+        if not extra and t.get("ampliacion"):
+            r.append(E(f"{t['id']}: es de D1.16 y no puede marcarse como ampliación", "Quite `ampliacion`"))
+    if ids != sorted(ids, key=lambda s: int(s[1:])) or [int(i[1:]) for i in ids] != list(range(1, len(ids) + 1)):
+        r.append(E(f"Los IDs de prueba deben ser consecutivos desde T01 (hay {ids[0]}…{ids[-1]}, {len(ids)} pruebas)", "Numere sin huecos"))
     for t in x.pruebas.values():
         manual = any(c["tipo"] == "manual" for c in t["criterio_aprobacion"])
         if manual == t["automatizable"]:
@@ -1067,14 +1076,6 @@ def v41(x: Infra):
     return r
 
 
-def resultados_mas_recientes(raiz: Path) -> tuple[Path | None, dict | None]:
-    import json
-    candidatos = sorted(raiz.glob("evidencias/*/resultados.json"), key=lambda p: p.parent.name)
-    if not candidatos:
-        return None, None
-    return candidatos[-1], json.loads(candidatos[-1].read_text(encoding="utf-8"))
-
-
 def evaluar_resultados(x: Infra, datos: dict, origen: str) -> list[Hallazgo]:
     """FALLA en una prueba crítica = error. Crítica que aplica al modo y no está en PASA, o FALLA no crítico = advertencia."""
     r = []
@@ -1106,11 +1107,11 @@ def evaluar_resultados(x: Infra, datos: dict, origen: str) -> list[Hallazgo]:
 
 @chequeo("V-42", "Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas")
 def v42(x: Infra):
-    ruta, datos = resultados_mas_recientes(x.raiz)
+    carpeta, datos = ci.resultados_mas_recientes(x.raiz)
     if datos is None:
         return [W("No hay evidencias/*/resultados.json: no se ha ejecutado make test-lab", "Ejecute make lab-up && make test-lab y versione resultados.json")]
     meta = datos.get("meta", {})
-    return [I(f"Resultados de {ruta.parent.name} (commit {str(meta.get('commit', '—'))[:7]}): {meta.get('resumen', {})}")] + evaluar_resultados(x, datos, ruta.parent.name)
+    return [I(f"Resultados de {carpeta.name} (commit {str(meta.get('commit', '—'))[:7]}): {meta.get('resumen', {})}")] + evaluar_resultados(x, datos, carpeta.name)
 
 
 @chequeo("V-43", "Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario")
@@ -1189,7 +1190,7 @@ def informe_md(x: Infra, res: list[Resultado]) -> str:
     L.append("> Generado por `infra/validate.py` (`make validate`). No editar a mano.\n")
     L.append(f"- Inventario: versión {inv['meta']['inventario_version']} · fecha {inv['meta']['fecha']}")
     L.append(f"- Contenido cargado: **{len(x.zonas)} zonas**, **{len(x.componentes)} componentes**, "
-             f"**{len(x.flujos)} flujos** (F1–F26, F4 reservado), **{len(x.pruebas)} pruebas** (T01–T28), "
+             f"**{len(x.flujos)} flujos** (F1–F26, F4 reservado), **{len(x.pruebas)} pruebas** (T01–T28 de D1.16 y {len(x.pruebas) - 28} ampliaciones), "
              f"{len(x.objetivos)} objetivos OD, {len(x.amenazas)} amenazas AM, {len(x.detecciones)} detecciones DET, "
              f"{len(x.figuras)} figuras, {len(x.rubrica)} criterios de rúbrica.")
     n = {k: sum(r.estado == k for r in res) for k in ("PASA", "ADVERTENCIA", "FALLA", "PENDIENTE")}

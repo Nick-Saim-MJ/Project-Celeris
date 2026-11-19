@@ -31,12 +31,12 @@ amenazas:
   - { id: AM-03, zona_activo: LAB, stride: [T], amenaza: "DHCP o RA falso", control: "DHCP snooping, RA guard", iso_27002: ["8.20"], componentes: [SW-ACC, SW-CORE01], pruebas: [T23] }
   - { id: AM-04, zona_activo: Proxy, stride: [E], amenaza: "Usar el proxy para alcanzar redes internas (SSRF)", control: "allowed_internal_networks, puertos limitados", iso_27002: ["8.22"], componentes: [EDGE01, EDGE02], pruebas: [T13, T14] }
   - { id: AM-05, zona_activo: Portal, stride: [T], amenaza: "Desfiguración o inyección", control: "WAF + sitio estático firmado + FS solo lectura", iso_27002: ["8.23", "8.26"], componentes: [WAF01, WEB01], pruebas: [T17, T18] }
-  - { id: AM-06, zona_activo: Portal, stride: [D], amenaza: "Saturación de peticiones", control: "Límite por IP en WAF, CrowdSec", iso_27002: ["8.20"], componentes: [WAF01, FW01], pruebas: [T15] }
+  - { id: AM-06, zona_activo: Portal, stride: [D], amenaza: "Saturación de peticiones", control: "Límite por IP en WAF, CrowdSec", iso_27002: ["8.20"], componentes: [WAF01, FW01], pruebas: [T15, T32] }
   - { id: AM-07, zona_activo: "Túnel AWS", stride: [I], amenaza: "Datos personales hacia la nube", control: "Quitar cabeceras del cliente (REQ-F-28) + IPsec", iso_27002: ["5.14", "8.24"], componentes: [EDGE01, EDGE02, VTI1, VTI2, VGW, EC2-SHIELD], pruebas: [T26] }
   - { id: AM-08, zona_activo: Métricas, stride: [I], amenaza: "Token de administración en claro", control: "TLS en 9128 (REQ-NF-14)", iso_27002: ["8.24"], componentes: [OBS01, EDGE01, EDGE02], pruebas: [T27] }
   - { id: AM-09, zona_activo: Syslog, stride: [I, T], amenaza: "Logs del firewall leídos o alterados en tránsito", control: "Syslog sobre TLS 6514", iso_27002: ["8.15", "8.24"], componentes: [FW01, SIEM01], pruebas: [T28] }
-  - { id: AM-10, zona_activo: DMZ-HONEY, stride: [E], amenaza: "Honeypot comprometido como trampolín", control: "VLAN propia, sin salida", iso_27002: ["8.22"], componentes: [HNY01, FW01], pruebas: [T20] }
-  - { id: AM-11, zona_activo: MGMT, stride: [E], amenaza: "Acceso administrativo desde LAB", control: "MGMT solo desde JMP01 + MFA", iso_27002: ["8.2", "8.22"], componentes: [JMP01, FW01], pruebas: [T06] }
+  - { id: AM-10, zona_activo: DMZ-HONEY, stride: [E], amenaza: "Honeypot comprometido como trampolín", control: "VLAN propia, sin salida", iso_27002: ["8.22"], componentes: [HNY01, FW01], pruebas: [T20, T47] }
+  - { id: AM-11, zona_activo: MGMT, stride: [E], amenaza: "Acceso administrativo desde LAB", control: "MGMT solo desde JMP01 + MFA", iso_27002: ["8.2", "8.22"], componentes: [JMP01, FW01], pruebas: [T06, T34] }
   - { id: AM-12, zona_activo: FW01, stride: [D], amenaza: "Caída del firewall virtual", control: "Break-glass, XML en Git, CARP en H3", iso_27002: ["8.14"], componentes: [FW01, BRK01], pruebas: [T25] }
   - id: AM-13
     zona_activo: Cualquiera
@@ -45,10 +45,7 @@ amenazas:
     control: "Registro en todas las denegaciones, auditoría de cambios, NTP/NTS"
     iso_27002: ["8.15", "8.17"]
     componentes: [FW01, SIEM01, SVC01]
-    pruebas: []
-    prueba_justificacion: "D1.9 indica «Revisión de logs», no un T-nn; se revisa el registro de denegaciones de FW01 y la sincronización NTS en S2"
-    pendiente: true
-    cambio: CI-18
+    pruebas: [T33]
 
 # Detecciones (D1.14). `ubicacion` es el componente donde reside el sensor o control.
 detecciones:
@@ -65,9 +62,7 @@ detecciones:
     ubicacion_detalle: "Interfaces de captura en las VLAN 10, 20, 31 y 50 (no en 30/60)"
     que_detecta: "Movimiento lateral, C2, DNS sospechoso, acceso a gestión"
     attack: [T1046, T1021, T1071]
-    validacion: { escenario: "Escaneo desde KALI01 hacia SERVERS", pruebas: [] }
-    pendiente: true
-    cambio: CI-17
+    validacion: { escenario: "Escaneo desde KALI01 hacia SERVERS", pruebas: [T29] }
   - id: DET-03
     tecnologia: "WAF (WAF01)"
     ubicacion: WAF01
@@ -88,9 +83,7 @@ detecciones:
     ubicacion_detalle: "LAB"
     que_detecta: "Cualquier escaneo dentro de LAB (tráfico que el firewall no ve)"
     attack: [T1046]
-    validacion: { escenario: "Barrido de puertos desde un equipo de LAB", pruebas: [] }
-    pendiente: true
-    cambio: CI-17
+    validacion: { escenario: "Barrido de puertos desde un equipo de LAB", pruebas: [T30] }
   - id: DET-06
     tecnologia: "Detecciones Celeris"
     ubicacion: EDGE01
@@ -104,18 +97,14 @@ detecciones:
     ubicacion_detalle: "EDGE (EDGE01 y EDGE02)"
     que_detecta: "Herramientas que recorren rutas que ningún usuario visita"
     attack: [T1595.003]
-    validacion: { escenario: "Pedir la URL señuelo", pruebas: [] }
-    pendiente: true
-    cambio: CI-17
+    validacion: { escenario: "Pedir la URL señuelo", pruebas: [T31] }
   - id: DET-08
     tecnologia: "CrowdSec (FW01)"
     ubicacion: FW01
     ubicacion_detalle: "WAN"
     que_detecta: "IP con comportamiento abusivo conocido"
     attack: [T1110, T1595]
-    validacion: { escenario: "Simulación con su escenario de prueba", pruebas: [] }
-    pendiente: true
-    cambio: CI-17
+    validacion: { escenario: "Simulación con su escenario de prueba", pruebas: [T32] }
   - id: DET-09
     tecnologia: Wazuh
     ubicacion: SIEM01
@@ -233,10 +222,23 @@ rubrica:
       - { tipo: prueba, ref: T12 }
       - { tipo: prueba, ref: T22 }
       - { tipo: prueba, ref: T23 }
+      - { tipo: prueba, ref: T34 }
+      - { tipo: prueba, ref: T41 }
+      - { tipo: prueba, ref: T44 }
+      - { tipo: prueba, ref: T48 }
   R3:
     nombre: "Diseño de conectividad híbrida (VPN)"
     peso: 15
     descriptor_nivel_4: "Especifica ambos extremos, redes anunciadas, tipo de túnel y cifrado previsto, con matriz de pruebas de conectividad planeadas coherente con el diseño."
+    elementos_evaluados:
+      - { id: R3-01, elemento: "Ida: ON-PREM → AWS por la VPN", pruebas: [T01] }
+      - { id: R3-02, elemento: "Vuelta: AWS → ON-PREM por la VPN, solo lo permitido (F16)", pruebas: [T02] }
+      - { id: R3-03, elemento: "Redundancia: falla de un túnel y convergencia BGP medida", pruebas: [T05] }
+      - { id: R3-04, elemento: "MTU 1400 y MSS 1360 sin fragmentación", pruebas: [T21] }
+      - { id: R3-05, elemento: "Privacidad: sin cabeceras ni IP de clientes en el túnel", pruebas: [T26] }
+      - { id: R3-06, elemento: "Sin exposición pública del lado AWS", pruebas: [T04] }
+      - { id: R3-07, elemento: "Zonas no autorizadas (DMZ) no cruzan hacia AWS", pruebas: [T03] }
+      - { id: R3-08, elemento: "Protección de F9 y F16 en tránsito", pruebas: [T05, T26, T36] }
     evidencias:
       - { tipo: seccion_docx, ref: "5.4", detalle: "D1.10 completa: activo/pasivo, MTU/MSS, BGP" }
       - { tipo: seccion_docx, ref: "6" }
@@ -252,6 +254,17 @@ rubrica:
     nombre: "Diseño de seguridad perimetral: firewall, DMZ y segmentación"
     peso: 20
     descriptor_nivel_4: "Firewall, DMZ y segmentación diseñados con política por defecto, criterio de reglas y matriz completa de comunicación permitida/denegada, justificados técnicamente."
+    elementos_evaluados:
+      - { id: R4-01, elemento: "Política deny-all y aislamiento de la gestión (MGMT)", pruebas: [T06, T34, T45] }
+      - { id: R4-02, elemento: "DMZ: el servicio web no alcanza el campus", pruebas: [T10, T46] }
+      - { id: R4-03, elemento: "Honeypot sin salida", pruebas: [T20, T47] }
+      - { id: R4-04, elemento: "Exposición a Internet: solo 80 y 443; nada hacia las zonas internas", pruebas: [T15, T45] }
+      - { id: R4-05, elemento: "Almacenamiento (VLAN 70) inalcanzable", pruebas: [T12, T48] }
+      - { id: R4-06, elemento: "Evasión de controles: QUIC, DNS cifrado e IPv6", pruebas: [T08, T23, T24] }
+      - { id: R4-07, elemento: "Servicio expuesto: WAF e inyección", pruebas: [T17, T18] }
+      - { id: R4-08, elemento: "Detección: IDS, canary, honeypot, honey-URL y CrowdSec", pruebas: [T11, T13, T14, T29, T30, T31, T32] }
+      - { id: R4-09, elemento: "Rastro de las denegaciones y registros cifrados", pruebas: [T28, T33] }
+      - { id: R4-10, elemento: "Recuperación del firewall", pruebas: [T25] }
     evidencias:
       - { tipo: seccion_docx, ref: "5.3" }
       - { tipo: seccion_docx, ref: "7.1", detalle: "Producto, interfaces, política por defecto y criterio de reglas (D1.13)" }
@@ -274,6 +287,21 @@ rubrica:
       - { tipo: prueba, ref: T23 }
       - { tipo: prueba, ref: T24 }
       - { tipo: prueba, ref: T25 }
+      - { tipo: prueba, ref: T29 }
+      - { tipo: prueba, ref: T30 }
+      - { tipo: prueba, ref: T31 }
+      - { tipo: prueba, ref: T32 }
+      - { tipo: prueba, ref: T33 }
+      - { tipo: prueba, ref: T34 }
+      - { tipo: prueba, ref: T35 }
+      - { tipo: prueba, ref: T36 }
+      - { tipo: prueba, ref: T42 }
+      - { tipo: prueba, ref: T43 }
+      - { tipo: prueba, ref: T45 }
+      - { tipo: prueba, ref: T46 }
+      - { tipo: prueba, ref: T47 }
+      - { tipo: prueba, ref: T48 }
+      - { tipo: prueba, ref: T49 }
   R5:
     nombre: "Diseño de detección: IDS/IPS y honeypot (planificación)"
     peso: 10
@@ -288,6 +316,12 @@ rubrica:
       - { tipo: prueba, ref: T16 }
       - { tipo: prueba, ref: T17 }
       - { tipo: prueba, ref: T18 }
+      - { tipo: prueba, ref: T29 }
+      - { tipo: prueba, ref: T30 }
+      - { tipo: prueba, ref: T31 }
+      - { tipo: prueba, ref: T32 }
+      - { tipo: prueba, ref: T33 }
+      - { tipo: prueba, ref: T43 }
   R6:
     nombre: "Diagrama de flujo de información y matriz de componentes"
     peso: 10
@@ -304,6 +338,15 @@ rubrica:
       - { tipo: prueba, ref: T22 }
       - { tipo: prueba, ref: T27 }
       - { tipo: prueba, ref: T28 }
+      - { tipo: prueba, ref: T36 }
+      - { tipo: prueba, ref: T37 }
+      - { tipo: prueba, ref: T38 }
+      - { tipo: prueba, ref: T39 }
+      - { tipo: prueba, ref: T40 }
+      - { tipo: prueba, ref: T41 }
+      - { tipo: prueba, ref: T42 }
+      - { tipo: prueba, ref: T44 }
+      - { tipo: prueba, ref: T49 }
   R7:
     nombre: "Calidad documental y trazabilidad del diseño"
     peso: 8
@@ -323,6 +366,8 @@ rubrica:
       - { tipo: prueba, ref: T06 }
       - { tipo: prueba, ref: T18 }
       - { tipo: prueba, ref: T26 }
+      - { tipo: prueba, ref: T39 }
+      - { tipo: prueba, ref: T40 }
 
 # Correspondencia de los 15 contenidos mínimos de D1 con las secciones del DOCX.
 # El documento maestro no incluye la «tabla del inicio de D1» (CI-02): esta es la propuesta, por orden de contenido.
@@ -427,6 +472,11 @@ supuestos:
     valor: 1 IP estática en el firewall perimetral
     validacion: Contrato con el ISP
     responsable: Henyelrey
+  S-16:
+    supuesto: Desfase máximo de reloj entre FW01 y SIEM01 al correlacionar denegaciones (T33)
+    valor: menos de 1 s
+    validacion: Medición con chronyc tracking en la prueba T33; el documento maestro no fija un umbral
+    responsable: Equipo del proyecto
 
 decisiones:
   D-01:

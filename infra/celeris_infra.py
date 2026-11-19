@@ -38,7 +38,11 @@ COMPONENTES_D112 = [
     "NAS01", "VTI1", "VTI2", "VGW", "EC2-SHIELD", "EC2-CTRLR", "NAT01",
 ]
 FLUJOS_ESPERADOS = [f"F{n}" for n in range(1, 27)]
-PRUEBAS_ESPERADAS = [f"T{n:02d}" for n in range(1, 29)]
+PRUEBAS_ESPERADAS = [f"T{n:02d}" for n in range(1, 29)]       # D1.16; T29+ son ampliaciones registradas (CI-27)
+# «Interna» en la regla de celdas críticas de la matriz de pruebas: toda zona del campus salvo las DMZ y Perímetro.
+# Criterios de la rúbrica que se evalúan con el informe y no con pruebas (R1 contexto y alcance; R7 calidad documental).
+RUBRICA_SIN_PRUEBAS = ("R1", "R7")
+ZONAS_INTERNAS = ["MGMT", "SERVERS", "LAB", "LAB-TEST", "SECURITY", "EDGE", "STORAGE", "BACKUP"]
 
 
 def red(cidr: str):
@@ -95,6 +99,22 @@ def ids_en_cambios() -> set[str]:
     if not CAMBIOS_MD.exists():
         return set()
     return set(re.findall(r"^#{2,4}\s+(CI-\d{2})\b", CAMBIOS_MD.read_text(encoding="utf-8"), flags=re.M))
+
+
+def titulos_de_cambios() -> dict[str, str]:
+    """{CI-nn: título} de los encabezados `### CI-nn — título` de CAMBIOS-INVENTARIO.md."""
+    if not CAMBIOS_MD.exists():
+        return {}
+    return {m.group(1): m.group(2).strip() for m in re.finditer(r"^#{2,4}\s+(CI-\d{2})\s+—\s+(.+)$", CAMBIOS_MD.read_text(encoding="utf-8"), flags=re.M)}
+
+
+def resultados_mas_recientes(raiz: Path = RAIZ) -> tuple[Path | None, dict | None]:
+    """(carpeta, contenido) del evidencias/<fecha>-<modo>/resultados.json más reciente; (None, None) si no hay."""
+    import json
+    candidatos = sorted(raiz.glob("evidencias/*/resultados.json"), key=lambda p: p.parent.name)
+    if not candidatos:
+        return None, None
+    return candidatos[-1].parent, json.loads(candidatos[-1].read_text(encoding="utf-8"))
 
 
 class Infra:
@@ -268,6 +288,72 @@ class Infra:
 
     def pruebas_de_objetivo(self, od: str) -> list[str]:
         return [t["id"] for t in self.pruebas.values() if od in t["objetivos"]]
+
+    # ------------------------------------------------- cobertura de la matriz de pruebas
+    def celdas_denegadas_criticas(self) -> dict[str, str]:
+        """Celdas «denegado» de la matriz cuya falla expone un límite del diseño, con el grupo al que pertenecen:
+        Internet → interna (y AWS), LAB → MGMT, DMZ → interna, DMZ-HONEY → cualquiera y cualquiera → STORAGE."""
+        out = {}
+        for (o, d), c in self.matriz_esperada().items():
+            if c["estado"] != "denegado":
+                continue
+            celda = f"{o}>{d}"
+            if d == "STORAGE":
+                out[celda] = "cualquiera → STORAGE"
+            elif o == "DMZ-HONEY":
+                out[celda] = "DMZ-HONEY → cualquiera"
+            elif o == "INTERNET" and d in ZONAS_INTERNAS + ["AWS"]:
+                out[celda] = "Internet → interna"
+            elif (o, d) == ("LAB", "MGMT"):
+                out[celda] = "LAB → MGMT"
+            elif o == "DMZ-SVC" and d in ZONAS_INTERNAS + ["AWS"]:
+                out[celda] = "DMZ → interna"
+        return out
+
+    def celdas_permitidas(self) -> dict[str, list[str]]:
+        """Celdas «permitido» de la matriz con los flujos que las abren (puede ser vacío: celda sin F-nn)."""
+        return {f"{o}>{d}": list(c.get("flujos", [])) for (o, d), c in self.matriz_esperada().items() if c["estado"] == "permitido"}
+
+    def pruebas_por_polaridad(self, *polaridades: str) -> list[dict]:
+        return [t for t in self.pruebas.values() if t.get("polaridad") in polaridades]
+
+    def pruebas_positivas_de_celda(self, celda: str, flujos: list[str]) -> list[str]:
+        """Pruebas positivas o mixtas que verifican una celda permitida: la citan o prueban alguno de sus flujos."""
+        return [t["id"] for t in self.pruebas_por_polaridad("positiva", "mixta")
+                if celda in t.get("celdas_matriz", []) or set(flujos) & set(t["flujos"])]
+
+    def pruebas_negativas_de_celda(self, celda: str) -> list[str]:
+        return [t["id"] for t in self.pruebas_por_polaridad("negativa", "mixta") if celda in t.get("celdas_matriz", [])]
+
+    def cobertura_de_pruebas(self) -> dict[str, dict]:
+        """Cobertura por dimensión: {nombre: {cubiertos, total, faltan: [...]}}. Es la que muestra la hoja «Cobertura»
+        del XLSX y la que exige V-70+."""
+        act = [f for f in self.flujos.values() if f["estado"] == "activo"]
+        permitidos = [f["id"] for f in act if f["accion"] == "permitir"]
+        bloqueados = [f["id"] for f in act if f["accion"] == "bloquear"]
+
+        def dim(elementos, tiene):
+            faltan = [e for e in elementos if not tiene(e)]
+            return {"cubiertos": len(elementos) - len(faltan), "total": len(elementos), "faltan": faltan}
+
+        positivas = {f: [t["id"] for t in self.pruebas_por_polaridad("positiva", "mixta") if f in t["flujos"]] for f in permitidos}
+        negativas_flujo = {f: [t["id"] for t in self.pruebas_por_polaridad("negativa", "mixta") if f in t["flujos"]] for f in bloqueados}
+        permit = self.celdas_permitidas()
+        criticas = self.celdas_denegadas_criticas()
+        denegadas = [f"{o}>{d}" for (o, d), c in self.matriz_esperada().items() if c["estado"] == "denegado"]
+        elementos = {eid: e for rid in ("R3", "R4") for e in self.rubrica[rid].get("elementos_evaluados", []) for eid in [e["id"]]}
+        return {
+            "Flujos permitidos con prueba positiva": dim(permitidos, lambda f: positivas[f]),
+            "Flujos bloqueados con prueba negativa": dim(bloqueados, lambda f: negativas_flujo[f]),
+            "Celdas permitidas con prueba positiva": dim(list(permit), lambda c: self.pruebas_positivas_de_celda(c, permit[c])),
+            "Celdas denegadas críticas con prueba negativa": dim(list(criticas), lambda c: self.pruebas_negativas_de_celda(c)),
+            "Celdas denegadas (todas) con prueba negativa": dim(denegadas, lambda c: self.pruebas_negativas_de_celda(c)),
+            "Objetivos OD con ≥ 1 prueba": dim(list(self.objetivos), lambda o: self.pruebas_de_objetivo(o)),
+            "Amenazas AM con ≥ 1 prueba": dim(list(self.amenazas), lambda a: [t for t in self.pruebas.values() if a in t["amenazas"]]),
+            "Detecciones DET con ≥ 1 prueba": dim(list(self.detecciones), lambda d: [t for t in self.pruebas.values() if d in t["detecciones"]]),
+            "Criterios de rúbrica con ≥ 1 prueba": dim([r for r in self.rubrica if r not in RUBRICA_SIN_PRUEBAS], lambda r: [t for t in self.pruebas.values() if r in t["criterios_rubrica"]]),
+            "Elementos evaluados de R3 y R4 con ≥ 1 prueba": dim(list(elementos), lambda e: [p for p in elementos[e]["pruebas"] if p in self.pruebas]),
+        }
 
     # ------------------------------------------------------------ coberturas
     def coberturas(self) -> dict[str, tuple[int, int]]:

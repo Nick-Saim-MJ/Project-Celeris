@@ -3,6 +3,7 @@ import copy
 
 import pytest
 
+import celeris_infra as ci
 import validate as v
 from celeris_infra import Infra
 from gen import nftables, vpn
@@ -179,9 +180,9 @@ def test_v42_cambiar_la_marca_critica_cambia_el_veredicto(infra):
 
 
 def test_v42_sobre_los_ultimos_resultados_versionados(infra):
-    ruta, datos = v.resultados_mas_recientes(infra.raiz)
+    carpeta, datos = ci.resultados_mas_recientes(infra.raiz)
     assert datos is not None, "no hay evidencias/*/resultados.json versionado"
-    assert errores(v.evaluar_resultados(infra, datos, ruta.parent.name)) == []
+    assert errores(v.evaluar_resultados(infra, datos, carpeta.name)) == []
 
 
 # ------------------------------------------------------------------------------------------ V-43

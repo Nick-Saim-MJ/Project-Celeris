@@ -54,6 +54,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-23 | decisión de transcripción | Parámetros del laboratorio y tráfico sin F-nn en los generadores (Etapa 1) | abierto |
 | CI-24 | vacío | Capas de defensa en profundidad (D1.9) y salto de la ruta por defecto hacia el ISP fuera de infra/*.yaml | abierto |
 | CI-25 | contradicción | FIG-5.4: FW01 anuncia 10.20.0.0/16 por BGP, las tablas de rutas de la VPC citan 10.20.0.0/14 | abierto |
+| CI-26 | texto genérico | 17 textos de componentes (por qué / aporta / si falla) sin dato verificable (V-66) | abierto |
 
 ## Entradas
 
@@ -290,3 +291,33 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Propuesta:** que VGW, AWS-PUB-A y AWS-APP-A digan «10.20.0.0/16 (10.20.0.0/14 cuando se anuncie el resumen)», o anunciar ya el /14.
   Al resolverlo, quitar la observación de FIG-5.4 (`fig_5_4` en `infra/gen/drawio.py`).
 - **Decide:** equipo del proyecto
+
+### CI-26 — Textos de componentes sin dato verificable (P4, V-66)
+- **Estado:** abierto
+- **Tipo:** texto genérico
+- **Dónde:** `infra/inventory.yaml` → `componentes[].por_que | aporta | si_falla`. Lo detecta V-66 (advertencia): el texto no cita
+  ningún ID, flujo, zona, IP, puerto ni cifra. La matriz XLSX copia el texto del inventario tal cual; no se corrige en el artefacto.
+- **Propuesta** (solo con datos que ya están en `infra/*.yaml`; aplicar en el YAML por PR revisado por el responsable de P0):
+
+| Componente | Campo | Texto propuesto |
+|---|---|---|
+| CTRL01 | por_que | Enrola EDGE01 y EDGE02 por TCP 8443 (F10), distribuye bundles firmados y emite las CA intermedias por nodo; sin él los nodos conservan su última configuración firmada. |
+| OBS01 | si_falla | Se pierden las trazas OTLP (F11, TCP 4317/4318) y el scraping de métricas (F12, TCP 9128/9100), no el servicio. Mitigación: los registros de acceso de Celeris y SIEM01 (F13) siguen disponibles. |
+| HNY01 | si_falla | Se pierde la detección de fuerza bruta por señuelo SSH/Telnet (F24, DET-04); DMZ-SVC y el resto de la red no se afectan porque HNY01 vive en la VLAN 41 (D-16). |
+| PROBE01 | si_falla | Se pierde la medición de disponibilidad de REQ-NF-03 (≥ 99,5 %) desde la VLAN 30, no el servicio. |
+| KALI01 | si_falla | No hay generador de ataques para las pruebas desde la VLAN 31 (LAB-TEST); la red de producción no se afecta. |
+| EC2-CTRLR | por_que | Mantiene una réplica en espera de PostgreSQL (F16: el standby se conecta a DB01 por TCP 5432, TLS en IPsec) y la API del plano de control, con RPO 15 min, para continuidad si se pierde el servidor del campus. |
+| AWS-PUB-A | si_falla | NAT01 queda sin subred: AWS-APP-A y AWS-APP-B pierden la salida a Internet (rt-private 0.0.0.0/0 → NAT01) y SSM. |
+| AWS-PUB-B | por_que | Reserva 10.30.1.0/24 en la AZ b para un segundo NAT si se quiere salida redundante (hoy NAT01 solo está en AWS-PUB-A). |
+| AWS-PUB-B | aporta | Sin recursos en esta fase; deja reservado el /24 de la AZ b para no renumerar la VPC 10.30.0.0/16. |
+| AWS-PUB-B | si_falla | Sin impacto: no aloja recursos y ningún flujo F-nn la usa. |
+| AWS-APP-B | aporta | Subred privada 10.30.11.0/24 (AZ b) de EC2-CTRLR, con las mismas rutas que AWS-APP-A (rt-private: 0.0.0.0/0 → NAT01, prefijo del campus → VGW; ver CI-25). |
+| AWS-DATA-A | por_que | Reserva 10.30.20.0/24 (AZ a) para una base de datos gestionada si el plano de control crece más allá de DB01 + EC2-CTRLR. |
+| AWS-DATA-A | aporta | Sin recursos en esta fase; reserva el rango para no renumerar la VPC 10.30.0.0/16. |
+| AWS-DATA-A | si_falla | Sin impacto: no aloja recursos y ningún flujo F-nn la usa. |
+| AWS-DATA-B | por_que | Reserva 10.30.21.0/24 (AZ b) para la segunda zona de disponibilidad de esa base gestionada (alta disponibilidad). |
+| AWS-DATA-B | aporta | Sin recursos en esta fase; reserva el rango para no renumerar la VPC 10.30.0.0/16. |
+| AWS-DATA-B | si_falla | Sin impacto: no aloja recursos y ningún flujo F-nn la usa. |
+
+- **Efecto al resolver:** V-66 pasa sin advertencias; `make matrices` regenera la matriz con los textos nuevos.
+- **Decide:** responsable de P0 (dueño de `infra/inventory.yaml`) y equipo del proyecto

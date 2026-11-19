@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.0 · fecha 2026-11-18
 - Contenido cargado: **14 zonas**, **37 componentes**, **26 flujos** (F1–F26, F4 reservado), **28 pruebas** (T01–T28), 10 objetivos OD, 13 amenazas AM, 9 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **0 FALLA**, 6 con advertencias, 35 PASA, 3 pendientes de P2–P5.
+- Resultado: **0 FALLA**, 7 con advertencias, 41 PASA, 2 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -51,7 +51,13 @@
 | V-54 | Flujos F-nn: FIG-5.5a ∪ FIG-5.5b completas y etiquetas derivadas del inventario | PASA | — |
 | V-55 | Título, leyenda y panel «Qué aporta y qué pasa si falla» en cada figura | PASA | — |
 | V-56 | Criticidad (borde + texto) y color de zona según CLAUDE.md | PASA | — |
-| V-60 | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | PENDIENTE | pendiente de P3 |
+| V-60 | Matriz de componentes: archivo y hojas | PASA | entregables/CE0311/Matriz_Componentes_Red_v1.0.xlsx |
+| V-61 | Matriz 1 a 1 con el inventario (ID, nombre, IP, zona, criticidad, estado) | PASA | 37 filas · 37 componentes en el inventario |
+| V-62 | Componentes dibujados en los .drawio = 100 % en la matriz | PASA | — |
+| V-63 | Ninguna celda obligatoria vacía en la hoja Matriz | PASA | — |
+| V-64 | Ningún «Por qué existe» repetido | PASA | — |
+| V-65 | Las fórmulas recalculan sin errores | PASA | Microsoft Excel (COM) · 195 fórmulas · 0 errores |
+| V-66 | «Por qué», «Qué aporta» y «Si falla» citan algo verificable | PASA con advertencias | 0 errores, 17 advertencias |
 | V-70 | XLSX de pruebas: T01–T28, comandos, criterios y trazabilidad contra pruebas.yaml | PENDIENTE | pendiente de P4 |
 | V-80 | Informe DOCX: 11 secciones, tablas generadas del inventario, figuras y leyendas | PENDIENTE | pendiente de P5 |
 
@@ -77,6 +83,23 @@ Ninguno.
 - **V-33** — T12 (Modo L): destino NAS01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
 - **V-33** — T25 (Modo L): origen BRK01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
 - **V-33** — T25 (Modo L): destino ESX01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
+- **V-66** — CTRL01: «Por qué existe» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — OBS01: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — HNY01: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — PROBE01: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — KALI01: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — EC2-CTRLR: «Por qué existe» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-PUB-A: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-PUB-B: «Por qué existe» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-PUB-B: «Qué aporta al diseño» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-PUB-B: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-APP-B: «Qué aporta al diseño» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-A: «Por qué existe» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-A: «Qué aporta al diseño» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-A: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-B: «Por qué existe» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-B: «Qué aporta al diseño» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-B: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
 
 ## Información
 
@@ -90,7 +113,7 @@ Ninguno.
 - **V-16** — F25: sin prueba T-nn en D1.16 (justificado)
 - **V-16** — F26: sin prueba T-nn en D1.16 (justificado)
 - **V-27** — 8 de 92 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 36 elementos pendientes en los YAML; 25 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-22', 'CI-23', 'CI-24', 'CI-25']
+- **V-29** — 36 elementos pendientes en los YAML; 26 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26']
 
 ## Cobertura
 
@@ -109,6 +132,5 @@ Ninguno.
 
 | Gancho | Qué validará | Estado |
 | --- | --- | --- |
-| V-60+ | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | pendiente de P3 |
 | V-70+ | XLSX de pruebas: T01–T28, comandos, criterios y trazabilidad contra pruebas.yaml | pendiente de P4 |
 | V-80+ | Informe DOCX: 11 secciones, tablas generadas del inventario, figuras y leyendas | pendiente de P5 |

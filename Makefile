@@ -16,7 +16,7 @@ help:
 	@echo "make lab-gen         genera lab/celeris.clab.yml y lab/generated desde el inventario"
 	@echo "make lab-up|lab-down laboratorio emulado con containerlab (Modo L; necesita Linux/WSL, Docker y containerlab)"
 	@echo "make test-lab         ejecuta las pruebas T-nn del Modo L (Etapa 4)"
-	@echo "make matrices        genera las dos matrices XLSX (pendiente de P3 y P4)"
+	@echo "make matrices        genera las dos matrices XLSX (componentes listo; pruebas pendiente)"
 	@echo "make diagrams-check  genera, exporta y valida los diagramas draw.io (V-50…V-56)"
 	@echo "make informe         genera DOCX y PDF (pendiente de P5)"
 	@echo "make release-e1      copia la versión final a entregables/CE0311/vX.Y/ (pendiente de P5)"
@@ -66,8 +66,11 @@ lab-down:
 test-lab:
 	@echo "pendiente de la Etapa 4: runner tests/network/run.py (lee infra/pruebas.yaml)" >&2; exit 1
 
+# Matriz de componentes (P4 del plan; gancho V-60): genera el XLSX y recalcula una copia en LibreOffice o Excel (V-65).
+# La matriz de pruebas (gancho V-70) es de otro prompt: se genera aquí cuando exista infra/gen/xlsx_pruebas.py.
 matrices:
-	@echo "pendiente de P3 (XLSX de componentes) y P4 (XLSX de pruebas)" >&2; exit 1
+	$(PYTHON) infra/gen/xlsx_componentes.py --verificar
+	@if [ -f infra/gen/xlsx_pruebas.py ]; then $(PYTHON) infra/gen/xlsx_pruebas.py; else echo "aviso: matriz de pruebas XLSX pendiente (gancho V-70, infra/gen/xlsx_pruebas.py)" >&2; fi
 
 # Genera los 7 .drawio desde infra/*.yaml, los exporta a PNG/PDF con el XML embebido (necesita draw.io Desktop;
 # ruta en DRAWIO si no está en el PATH) y los valida (V-50…V-56). Informe: docs/infra/e1/cobertura-figuras.md.

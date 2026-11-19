@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel de celeris-cache</title>
+<link rel="stylesheet" href="/panel.css">
+<script src="/panel.js" defer></script>
+</head>
+<body>
+<div class="shell">
+<aside id="sidebar" class="sidebar" hidden>
+  <p class="brand">celeris-cache</p>
+  <nav aria-label="Secciones del panel">
+    <a class="nav-link" href="#resumen" data-view="resumen">Resumen <span id="alert-badge" class="badge" hidden></span></a>
+    <a class="nav-link" href="#registro" data-view="registro">Registro en vivo</a>
+  </nav>
+  <p class="service"><span id="service-dot" class="dot"></span><span id="service-text"></span></p>
+</aside>
+<div class="content">
+<header class="top">
+  <h1 id="page-title">Panel de celeris-cache</h1>
+  <p id="freshness" class="muted" aria-live="polite"></p>
+  <button id="logout" type="button" class="ghost" hidden>Salir</button>
+</header>
+
+<form id="login" class="card login" hidden>
+  <h2>Token de administración</h2>
+  <p class="muted">Está en el archivo <code>admin_token_file</code> de la configuración, por defecto <code>ca/admin.token</code>. Solo se guarda en esta pestaña.</p>
+  <label for="token">Token</label>
+  <input id="token" type="password" autocomplete="off" spellcheck="false" required>
+  <p id="login-error" class="error" role="alert" hidden></p>
+  <button type="submit">Entrar</button>
+</form>
+
+<main id="dashboard" hidden>
+  <section id="alerts" aria-label="Alertas"></section>
+
+  <section class="card hero">
+    <p class="label">Descarga evitada gracias a las copias</p>
+    <p id="saved" class="hero-value"></p>
+    <p id="saved-note" class="muted"></p>
+  </section>
+
+  <section class="tiles" aria-label="Resumen">
+    <div class="card tile"><p class="label">Bytes servidos desde copia</p><p id="byte-ratio" class="value"></p></div>
+    <div class="card tile"><p class="label">Peticiones servidas desde copia</p><p id="request-ratio" class="value"></p></div>
+    <div class="card tile"><p class="label">Peticiones</p><p id="requests" class="value"></p></div>
+    <div class="card tile"><p class="label">La CA vence</p><p id="ca-expiry" class="value"></p></div>
+  </section>
+
+  <section class="card">
+    <h2>Cómo se atendieron las peticiones</h2>
+    <p id="results-empty" class="muted" hidden>Todavía no hay peticiones.</p>
+    <div id="results-bar" class="segments" role="group" aria-label="Reparto de las peticiones por resultado"></div>
+    <ul id="results-legend" class="legend"></ul>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th scope="col">Resultado</th><th scope="col" class="num">Peticiones</th><th scope="col" class="num">Parte</th><th scope="col" class="num">Tiempo medio</th></tr></thead>
+        <tbody id="results-table"></tbody>
+      </table>
+    </div>
+    <p class="muted note">El tiempo medio es hasta tener lista la respuesta, desde el último arranque. En “Sin caché” no incluye la descarga.</p>
+  </section>
+
+  <div class="columns">
+    <section class="card">
+      <h2>Disco</h2>
+      <div class="meter-block">
+        <p class="meter-label"><span>Caché</span><span id="cache-usage"></span></p>
+        <div class="meter" id="cache-meter" role="img"><div class="fill"></div></div>
+      </div>
+      <div class="meter-block">
+        <p class="meter-label"><span>Volumen</span><span id="volume-usage"></span></p>
+        <div class="meter" id="volume-meter" role="img"><div class="fill"></div></div>
+      </div>
+      <dl id="disk-details"></dl>
+    </section>
+
+    <section class="card">
+      <h2>Tráfico y estado</h2>
+      <dl id="health"></dl>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Actividad inusual</h2>
+    <p id="detections-off" class="muted" hidden>Desactivado. Se activa con <code>detections_enabled = true</code>, y el aviso a los usuarios lo indicará.</p>
+    <p id="detections-empty" class="muted" hidden>Sin avisos en el último día.</p>
+    <div id="detections-wrap" class="table-scroll" tabindex="0" role="region" aria-label="Avisos de actividad inusual" hidden>
+      <table>
+        <thead><tr><th scope="col">Aviso</th><th scope="col">IP</th><th scope="col" class="num">Veces</th><th scope="col">Último</th><th scope="col">Detalle</th></tr></thead>
+        <tbody id="detections-table"></tbody>
+      </table>
+    </div>
+    <p id="detections-note" class="muted note" hidden>Una IP señala un equipo, no a una persona, y un volumen alto puede ser una actualización legítima. Estos avisos no bloquean nada; solo se rechazan los túneles a puertos no permitidos. Se olvidan tras un día o al reiniciar.</p>
+  </section>
+
+  <section class="card">
+    <h2>Por cliente</h2>
+    <p id="clients-off" class="muted" hidden>Desactivado. Se activa con <code>client_stats_enabled = true</code>, y el aviso a los usuarios lo indicará.</p>
+    <p id="clients-empty" class="muted" hidden>Todavía no hay actividad.</p>
+    <div id="clients-wrap" class="table-scroll" tabindex="0" role="region" aria-label="Detalle por cliente" hidden>
+      <table>
+        <thead><tr><th scope="col">IP</th><th scope="col" class="num">Peticiones</th><th scope="col" class="num">Desde copia</th><th scope="col" class="num">Bytes</th><th scope="col" class="num">Túneles</th><th scope="col" class="num">Rechazos</th><th scope="col">Última actividad</th></tr></thead>
+        <tbody id="clients-table"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<main id="log-view" hidden>
+  <section class="card">
+    <h2>Tráfico de los últimos 5 minutos</h2>
+    <ul id="traffic-legend" class="legend"></ul>
+    <p id="traffic-empty" class="muted">Reuniendo datos. La primera muestra tarda unos segundos.</p>
+    <div id="traffic-chart" class="chart" role="img"></div>
+    <p class="muted note">No incluye las conexiones sin descifrar: el proxy no conoce su tamaño.</p>
+  </section>
+
+  <section class="card">
+    <h2>Últimas peticiones</h2>
+    <p id="live-off" class="muted" hidden>Desactivado. Se activa con <code>live_log_enabled = true</code>, y el aviso a los usuarios lo indicará.</p>
+    <div id="live-controls" class="log-controls" hidden>
+      <label>Resultado<select id="live-result"></select></label>
+      <label>Registros
+        <select id="live-limit">
+          <option>20</option>
+          <option selected>50</option>
+          <option>100</option>
+          <option>200</option>
+          <option>500</option>
+          <option>1000</option>
+        </select>
+      </label>
+      <label class="grow">Filtro<input id="live-filter" type="search" autocomplete="off" spellcheck="false" placeholder="Dominio, objeto o cliente"></label>
+      <button id="live-pause" type="button" class="ghost" aria-pressed="false">Pausar</button>
+    </div>
+    <p id="live-empty" class="muted" hidden></p>
+    <div id="live-wrap" class="table-scroll" tabindex="0" role="region" aria-label="Últimas peticiones" hidden>
+      <table>
+        <thead><tr><th scope="col">Fecha y hora</th><th scope="col" id="live-client-head">Cliente</th><th scope="col">Resultado</th><th scope="col">Dominio</th><th scope="col">Objeto</th><th scope="col" class="num">Tamaño</th><th scope="col" class="num">Tiempo</th></tr></thead>
+        <tbody id="live-table"></tbody>
+      </table>
+    </div>
+    <p id="live-count" class="muted note" aria-live="polite" hidden></p>
+    <p id="live-note" class="muted note" hidden>Solo está en memoria y se olvida tras un día o al reiniciar. Nunca incluye parámetros de la dirección, y la ruta solo aparece en contenido servido desde una copia o guardado.</p>
+  </section>
+</main>
+</div>
+</div>
+<div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+</body>
+</html>

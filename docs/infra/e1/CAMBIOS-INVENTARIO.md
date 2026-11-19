@@ -329,7 +329,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - **Celdas denegadas críticas:** T45 Internet → zonas internas, T46 DMZ-SVC → zonas internas, T47 DMZ-HONEY → cualquier zona, T48 cualquier zona → STORAGE.
 - **Regla de «celda denegada crítica»** (la del encargo, aplicada por `celdas_denegadas_criticas()`): Internet → interna o AWS, LAB → MGMT, DMZ-SVC → interna o AWS, DMZ-HONEY → cualquiera y cualquiera → STORAGE. «Interna» = MGMT, SERVERS, LAB, LAB-TEST, SECURITY, EDGE, STORAGE y BACKUP. Son 35 celdas y las 35 tienen prueba negativa. Las otras 56 celdas denegadas (por ejemplo, SERVERS → LAB-TEST) no son críticas y siguen sin prueba dedicada: las cubre la política deny-all y se miden en la hoja «Cobertura».
 - **Polaridad.** Cada prueba lleva `polaridad`: positiva (se espera tráfico permitido), negativa (se espera denegación) o mixta. «Prueba positiva de un flujo» = positiva o mixta que lo cita.
-- **Modos.** T29–T49 son del Modo H (T48, también A). El runner del Modo L (`tests/network`) no tiene casos para ellas: el ensayo las muestra como NO_APLICA, nunca como PASA. Llevarlas a L (nodos `ext01`, `fw01-sim`, `hny01`, `labcli01`) es trabajo pendiente.
+- **Modos.** T29, T30 y T44–T47 son de los modos L y H y tienen caso en el laboratorio emulado (`tests/network/casos.py`); T48 es de A y H; el resto (T31–T43 y T49) es del Modo H porque el laboratorio no tiene Wazuh, CrowdSec, restic, S3, NTS ni ESXi: el ensayo las muestra como NO_APLICA, nunca como PASA. T45–T47 quedan PARCIAL en L porque STORAGE y BACKUP no se emulan (CI-16).
 - **Valores que el diseño no fija y las pruebas necesitan (no son del inventario):**
   1. T31: la ruta de la honey-URL (REQ-F-27 está pendiente); T31 queda `pendiente: true`.
   2. T32: la IP externa de pruebas; la pone el equipo al ejecutar.
@@ -337,8 +337,11 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   4. T49: el endpoint ACME; se usa el directorio de Let's Encrypt como ejemplo.
   5. T33: el desfase de reloj máximo entre FW01 y SIEM01 (menos de 1 s) es el supuesto [S-16].
   6. Los umbrales «alerta de Wazuh de nivel ≥ 10 en menos de 60 s» siguen D1.14 (nivel ≥ 10) y el criterio de T18; los 60 s son una elección de esta ampliación, no un dato de D1.
-  7. T29: la categoría `Detection of a Network Scan` de ET Open no se comprobó contra la versión de reglas de S2.
-- **Contradicción hallada:** la matriz D1.8 dice que LAB-TEST → SERVERS está permitido por F2, pero F2 no incluye a LAB-TEST (CI-04). T29 escanea CTRL01 y DB01, que ningún flujo alcanza desde LAB-TEST, y no cuenta esa celda.
+  7. T29: la firma que debe aparecer en IDS01 se pide por patrón (`scan` o `escaneo`) y por el origen KALI01: en S2 será una firma ET SCAN de ET Open; en el Modo L es la regla local sid 9000001. No se comprobó contra la versión de reglas de S2.
+- **Contradicción hallada:** la matriz D1.8 dice que LAB-TEST → SERVERS está permitido por F2, pero F2 no incluye a LAB-TEST (CI-04). T29 escanea OBS01, que ningún flujo alcanza desde LAB-TEST, y no cuenta esa celda. SVC01 no sirve de destino: F3 abre su puerto 80 a LAB-TEST y un primer ensayo lo mostró abierto.
+- **Hallazgos del ensayo en el laboratorio emulado:**
+  - DET-05: un canario de aplicación (HNY02) solo registra conexiones completas. Un barrido SYN (`nmap -sS`) no lo activa y IDS01 no captura la VLAN 30 (D1.14, nota sobre la captura). T30 usa `-sT`; un barrido SYN dentro de LAB queda sin detección. Conviene decidirlo en D1.14.
+  - T22 era intermitente por el tiempo de espera del caso, no por el diseño; con SVC01 caído el cliente espera el tiempo de espera del resolvedor (2 s) antes de usar FW01.
 - **R1 y R7** no tienen pruebas: son criterios documentales (contexto y alcance; calidad documental y trazabilidad). La cobertura de rúbrica por pruebas se mide sobre R2–R6 y R8.
 - **Propuesta:** aceptar T29–T49 como ampliación de D1.16 (o descartar las que el equipo considere fuera de alcance), confirmar la regla de celdas críticas y resolver los valores 1 a 4.
 - **Decide:** equipo del proyecto

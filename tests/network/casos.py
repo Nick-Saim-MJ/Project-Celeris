@@ -547,8 +547,166 @@ def t27(c: Contexto) -> Medicion:
     return m
 
 
+
+# ---------------------------------------------------------------------------------------------------------------
+# Ampliación T29+ (CI-27): las que tienen nodos en el laboratorio. Las demás son del Modo H.
+# ---------------------------------------------------------------------------------------------------------------
+PUERTOS_SONDA = "22,443"
+NO_EMULADAS = "STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L"
+
+
+def _escuchas(nodos: dict[str, str], segundos: int = 90) -> None:
+    """Abre los puertos 22 y 443 en cada nodo (control: sin un puerto abierto, que nmap no lo vea no demuestra nada)."""
+    for nodo, ip in nodos.items():
+        L.enviar(nodo, "/tmp/escucha.py", TCP_ESCUCHA_PY)
+        L.fondo(nodo, f"python3 /tmp/escucha.py {ip} 22 {segundos} & python3 /tmp/escucha.py {ip} 443 {segundos} & wait")
+    time.sleep(1)
+
+
+def _escaneo_denegado(c: Contexto, origen: str, destinos: dict[str, str], previo: str = "") -> Medicion:
+    """nmap desde `origen` hacia un nodo de cada zona: ninguno debe tener un puerto abierto y FW01 debe contar denegaciones."""
+    m = Medicion()
+    _escuchas(destinos)
+    controles = [L.ex(nodo, f"nc -zv -w2 {ip} 22")[0] for nodo, ip in destinos.items()]
+    antes = L.contador_nft("DENEGADO", "forward")
+    rc, out = L.ex(origen, f"nmap -n -Pn -sS -p{PUERTOS_SONDA} --max-retries 1 --max-rtt-timeout 300ms {' '.join(destinos.values())}", timeout=180)
+    despues = L.contador_nft("DENEGADO", "forward")
+    c.ev.guardar("nmap.txt", out)
+    m.codigos["principal"] = rc
+    m.salidas["stdout"] = out
+    m.medidas["puertos_open"] = len(re.findall(r"(?m)^\d+/tcp\s+open", out))
+    m.medidas["paquetes_denegados_por_fw01"] = despues - antes
+    if any(controles):
+        m.vacia = f"el control positivo falló: algún destino no abre el puerto 22 ni desde su propio nodo ({controles})"
+    return m
+
+
+def _destinos_de_zonas(c: Contexto, zonas: list[str]) -> dict[str, str]:
+    nodos = {"MGMT": ("jmp01", "JMP01"), "SERVERS": ("obs01", "OBS01"), "LAB": ("labcli01", "LABCLI01"), "LAB-TEST": ("kali01", "KALI01"),
+             "SECURITY": ("ids01", "IDS01"), "EDGE": ("edge01", "EDGE01")}
+    return {nodos[z][0]: c.ip(nodos[z][1], z) for z in zonas if z in nodos}
+
+
+def t29(c: Contexto) -> Medicion:
+    """Escaneo desde KALI01 hacia SERVERS: FW01 lo deniega e IDS01 lo detecta en su captura de la VLAN 31."""
+    m = Medicion()
+    destinos = [c.ip("OBS01")]
+    previas = int(L.ex("ids01", "grep -c '\"event_type\":\"alert\"' /var/log/suricata/eve.json")[1].strip() or 0)
+    antes = L.contador_nft("DENEGADO", "forward")
+    rc, out = L.ex("kali01", f"nmap -n -Pn -sS -p 1-1024 --max-rate 100 --max-retries 1 --max-rtt-timeout 300ms --host-timeout 150s {' '.join(destinos)}", timeout=400)
+    time.sleep(5)
+    despues = L.contador_nft("DENEGADO", "forward")
+    eve = L.ex("ids01", f"grep '\"event_type\":\"alert\"' /var/log/suricata/eve.json | tail -n +{previas + 1} | tail -5")[1]
+    c.ev.guardar("nmap.txt", out)
+    c.ev.guardar("eve_ids01.json", eve)
+    m.codigos["principal"] = rc
+    m.salidas["stdout"] = out
+    m.salidas["eve_json_ids01"] = eve
+    m.medidas["puertos_open"] = len(re.findall(r"(?m)^\d+/tcp\s+open", out))
+    m.medidas["paquetes_denegados_por_fw01"] = despues - antes
+    _sin_wazuh(m)
+    m.no_evaluable["latencia_alerta_wazuh_s"] = SIN_WAZUH
+    m.hallazgos.append("las reglas del laboratorio son locales (sid 9000001, escaneo SYN por origen): ET Open no está disponible en el Modo L")
+    m.hallazgos.append("el destino es OBS01, el nodo de SERVERS que existe en el laboratorio y que ningún flujo alcanza desde LAB-TEST (SVC01 no sirve: F3 le abre el puerto 80)")
+    return m
+
+
+def t30(c: Contexto) -> Medicion:
+    """Barrido de LABCLI01 hacia HNY02, en la misma VLAN: el canario lo registra y FW01 no ve ese tráfico."""
+    m = Medicion()
+    canario = c.ip("HNY02")
+    L.ex("hny02", "truncate -s 0 /var/log/canary.json")
+    L.enviar("fw01-sim", "/tmp/rx30.sh", f"timeout 40 tcpdump -ni vlan30 -c 1 'tcp and host {canario}' > /tmp/rx30.txt 2>&1\n")
+    L.fondo("fw01-sim", "sh /tmp/rx30.sh")
+    time.sleep(1)
+    _, syn = L.ex("labcli01", f"nmap -n -Pn -sS -p 22,80,445,3389 --max-retries 1 {canario}", timeout=120)
+    time.sleep(1)
+    con_syn = len([linea for linea in L.leer("hny02", "/var/log/canary.json").splitlines() if "conexion" in linea])
+    rc, out = L.ex("labcli01", f"nmap -n -Pn -sT -p 22,80,445,3389 --max-retries 1 {canario}", timeout=120)
+    time.sleep(2)
+    registro = L.leer("hny02", "/var/log/canary.json")
+    visto = L.leer("fw01-sim", "/tmp/rx30.txt")
+    L.ex("fw01-sim", "pkill tcpdump; true")
+    c.ev.guardar("nmap.txt", out)
+    c.ev.guardar("canary.json", registro)
+    c.ev.guardar("tcpdump_fw01_vlan30.txt", visto)
+    m.codigos["principal"] = rc
+    m.salidas["stdout"] = out
+    m.medidas["conexiones_registradas_en_hny02"] = len([linea for linea in registro.splitlines() if '"evento": "conexion"' in linea or '"evento":"conexion"' in linea])
+    m.medidas["paquetes_vistos_por_fw01"] = len(re.findall(r"(?m)^\d\d:\d\d:\d\d", visto))
+    _sin_wazuh(m)
+    m.no_evaluable["latencia_alerta_wazuh_s"] = SIN_WAZUH
+    m.hallazgos.append(f"el canario registró {con_syn} eventos con un barrido SYN (-sS) y {m.medidas['conexiones_registradas_en_hny02']} con uno de conexión completa (-sT): un canario de aplicación no ve los SYN sin respuesta; IDS01 no captura la VLAN 30 (D1.14)")
+    m.hallazgos.append("el canario es un equivalente funcional de OpenCanary (F4.2): registra la conexión en un archivo, sin enviarla a un agente de Wazuh")
+    return m
+
+
+def t44(c: Contexto) -> Medicion:
+    """Alcance IP entre EDGE01 y EDGE02 (VLAN 60). El puerto del peering no está definido (CI-06): no se prueba ninguno."""
+    m = Medicion()
+    uno, dos = c.ip("EDGE01"), c.ip("EDGE02")
+    rc1, o1 = L.ex("edge01", f"ping -c 3 -W 2 {dos}")
+    rc2, o2 = L.ex("edge02", f"ping -c 3 -W 2 {uno}")
+    c.ev.guardar("ping.txt", o1 + "\n---\n" + o2)
+    m.codigos[f"ping -c 3 {dos}"] = rc1
+    m.codigos[f"ping -c 3 {uno}"] = rc2
+    m.vacia = "el protocolo y el puerto del peering no están definidos (CI-06): solo se probó el alcance IP"
+    return m
+
+
+def t45(c: Contexto) -> Medicion:
+    """Internet → zonas internas: ext01 enruta 10.20.0.0/16 por la WAN de FW01 y escanea un nodo de cada zona emulada."""
+    wan = c.P["fw01_wan"]
+    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB", "LAB-TEST", "SECURITY", "EDGE"])
+    try:
+        L.ex("ext01", f"ip route replace 10.20.0.0/16 via {wan}")
+        m = _escaneo_denegado(c, "ext01", destinos)
+        rc_f21, _ = L.ex("ext01", f"nc -zv -w3 {wan} 443")
+        if rc_f21 != 0 and not m.vacia:
+            m.vacia = "el control positivo falló: ext01 no llega al puerto 443 publicado (F21), así que la ruta de prueba no es válida"
+    finally:
+        L.ex("ext01", "ip route del 10.20.0.0/16 via " + wan + "; true")
+    m.hallazgos.append(NO_EMULADAS)
+    m.vacia = m.vacia or NO_EMULADAS
+    return m
+
+
+def t46(c: Contexto) -> Medicion:
+    """DMZ-SVC → zonas internas: WEB01 «comprometido» (sin su cortafuegos de host) escanea un nodo de cada zona interna emulada."""
+    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB-TEST", "EDGE"])
+    try:
+        L.ex("web01", "nft flush ruleset")      # el cortafuegos de host de WEB01 bloquearía la salida por sí solo: no sería FW01 quien deniega
+        m = _escaneo_denegado(c, "web01", destinos)
+    finally:
+        L.ex("web01", "nft -f /lab/web01.nft")
+    m.hallazgos.append("WEB01 se probó como equipo comprometido, sin su nftables de host: con él, WEB01 ya no puede iniciar conexiones (D1.9, «Salida») y no sería FW01 quien deniega")
+    m.hallazgos.append(NO_EMULADAS)
+    m.vacia = m.vacia or NO_EMULADAS
+    return m
+
+
+def t47(c: Contexto) -> Medicion:
+    """DMZ-HONEY → cualquier zona: HNY01 escanea un nodo de cada zona y no llega a Internet (ext01)."""
+    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB-TEST", "EDGE"])
+    ext = c.P["ext01"]
+    L.enviar("ext01", "/tmp/escucha.py", TCP_ESCUCHA_PY)
+    L.fondo("ext01", f"python3 /tmp/escucha.py {ext} 443 60")
+    m = _escaneo_denegado(c, "hny01", destinos)
+    rc_ctrl, _ = L.ex("ext01", f"nc -zv -w2 {ext} 443")
+    rc_ext, _ = L.ex("hny01", f"nc -zv -w3 {ext} 443")
+    m.codigos["curl -sS -m5 https://example.com"] = rc_ext
+    if rc_ctrl != 0 and not m.vacia:
+        m.vacia = "el control positivo falló: ext01 no escucha en 443 ni desde su propio nodo"
+    m.no_evaluable["nc -zv -w3 10.20.50.10 1514"] = "SIEM01 (Wazuh) no está desplegado: no hay control positivo hacia el puerto 1514 de F13"
+    m.hallazgos.append("«Internet» es ext01 (198.51.100.100): el laboratorio no tiene DNS ni salida a Internet real")
+    m.hallazgos.append(NO_EMULADAS)
+    m.vacia = m.vacia or NO_EMULADAS
+    return m
+
+
 CASOS = {"T05": t05, "T06": t06, "T07": t07, "T08": t08, "T09": t09, "T10": t10, "T11": t11, "T13": t13, "T14": t14, "T15": t15,
-         "T16": t16, "T17": t17, "T18": t18, "T19": t19, "T20": t20, "T22": t22, "T24": t24, "T26": t26, "T27": t27}
+         "T16": t16, "T17": t17, "T18": t18, "T19": t19, "T20": t20, "T22": t22, "T24": t24, "T26": t26, "T27": t27,
+         "T29": t29, "T30": t30, "T44": t44, "T45": t45, "T46": t46, "T47": t47}
 
 TESTSSL_IMAGEN = "drwetter/testssl.sh@sha256:64bab3c1fd8eee440f68d5e020dd633c1f2d375fe0ae593bdfec2725110a7e29"   # 3.2
 ZAP_IMAGEN = "ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af"   # stable

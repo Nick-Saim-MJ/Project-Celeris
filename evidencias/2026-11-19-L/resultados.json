@@ -2,7 +2,7 @@
   "meta": {
     "modo": "L (emulación local con containerlab)",
     "fecha": "2026-11-19",
-    "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+    "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
     "imagenes": [
       "celeris-node:dev 01927d4faeb0"
     ],
@@ -10,8 +10,8 @@
     "resumen": {
       "PASA": 13,
       "FALLA": 0,
-      "PARCIAL": 6,
-      "NO_APLICA": 30
+      "PARCIAL": 12,
+      "NO_APLICA": 24
     }
   },
   "resultados": [
@@ -32,7 +32,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -54,7 +54,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -74,7 +74,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -94,7 +94,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -114,15 +114,15 @@
       "resultado": "PASA",
       "motivo": "",
       "valor_medido": {
-        "convergencia_s": 21.1,
-        "interrupcion_s": 20.9
+        "convergencia_s": 22.2,
+        "interrupcion_s": 21.9
       },
       "criterios": [
         {
           "descripcion": "convergencia_s <= 60",
           "estado": "PASA",
-          "medido": 21.1,
-          "detalle": "convergencia_s = 21.1"
+          "medido": 22.2,
+          "detalle": "convergencia_s = 22.2"
         },
         {
           "descripcion": "/(?i)ESTABLISHED/ sobre swanctl --list-sas",
@@ -141,8 +141,8 @@
         "T05/despues.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 118.9,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 121.5,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -159,7 +159,7 @@
       "motivo": "",
       "valor_medido": {
         "puertos_open": 0,
-        "paquetes_denegados_por_fw01": 665
+        "paquetes_denegados_por_fw01": 664
       },
       "criterios": [
         {
@@ -181,8 +181,8 @@
         "T06/nmap.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 33.6,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 34.3,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -201,8 +201,8 @@
       "resultado": "PASA",
       "motivo": "",
       "valor_medido": {
-        "x_celeris_cache_primera": 2,
-        "cache_status_primera_miss": 0,
+        "x_celeris_cache_primera": 1,
+        "cache_status_primera_miss": 1,
         "cache_status_segunda_hit": 1,
         "codigos_de_salida": {
           "principal": 0
@@ -222,16 +222,14 @@
           "detalle": "coincide"
         }
       ],
-      "hallazgos": [
-        "Cache-Status presente pero distinto de lo esperado: primera = ['celeris; hit; ttl=3219'], segunda = ['celeris; hit; ttl=3218']"
-      ],
+      "hallazgos": [],
       "evidencia": [
         "T07/salida.txt",
         "T07/cabeceras.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 0.6,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 0.7,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -282,8 +280,8 @@
         "T08/salida.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 10.1,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 10.2,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -303,7 +301,7 @@
       "resultado": "PARCIAL",
       "motivo": "sin evaluar: Con EDGE01 apagado la navegación continúa por EDGE02 (registro de acceso de EDGE02) (requiere navegar con un navegador real (Modo H); aquí se imita la lógica del PAC con curl); Con ambos apagados la navegación continúa por DIRECT (F6, solo piloto) (requiere navegar con un navegador real (Modo H); aquí se imita la lógica del PAC con curl)",
       "valor_medido": {
-        "tiempo_de_cambio_s": 2.1,
+        "tiempo_de_cambio_s": 2.2,
         "tiempo_hasta_direct_s": 4.2
       },
       "criterios": [
@@ -322,8 +320,8 @@
         {
           "descripcion": "tiempo_de_cambio_s >= 0",
           "estado": "PASA",
-          "medido": 2.1,
-          "detalle": "tiempo_de_cambio_s = 2.1"
+          "medido": 2.2,
+          "detalle": "tiempo_de_cambio_s = 2.2"
         }
       ],
       "hallazgos": [],
@@ -332,8 +330,8 @@
         "T09/conmutacion.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 7.0,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 7.2,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -367,7 +365,7 @@
       ],
       "error_de_ejecucion": false,
       "duracion_s": 7.7,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -386,7 +384,7 @@
       "resultado": "PARCIAL",
       "motivo": "sin evaluar: /\"level\":\\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L)",
       "valor_medido": {
-        "conexiones_en_cowrie": 18,
+        "conexiones_en_cowrie": 6,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -413,8 +411,8 @@
         "T11/cowrie.log"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 3.2,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 3.4,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -437,7 +435,7 @@
       "modo_en_que_si_se_ejecuta": [
         "H"
       ],
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -479,8 +477,8 @@
         "T13/registro_seguridad.jsonl"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 1.8,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 1.9,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -523,7 +521,7 @@
       ],
       "error_de_ejecucion": false,
       "duracion_s": 1.8,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -543,7 +541,7 @@
       "motivo": "",
       "valor_medido": {
         "puertos_abiertos": 2,
-        "alertas_suricata_fw01": 207,
+        "alertas_suricata_fw01": 69,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -569,8 +567,8 @@
         "T15/suricata_alertas.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 7.3,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 7.2,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -623,7 +621,7 @@
       ],
       "error_de_ejecucion": false,
       "duracion_s": 0.5,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -662,8 +660,8 @@
         "T17/zap.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 49.3,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 62.5,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -682,7 +680,7 @@
       "resultado": "PARCIAL",
       "motivo": "sin evaluar: /\"level\":\\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L)",
       "valor_medido": {
-        "eventos_modsecurity": 15,
+        "eventos_modsecurity": 5,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -708,7 +706,7 @@
       ],
       "error_de_ejecucion": false,
       "duracion_s": 1.4,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -743,8 +741,8 @@
         "T19/salida.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 6.4,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 6.3,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -778,7 +776,7 @@
       ],
       "error_de_ejecucion": false,
       "duracion_s": 3.3,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -800,7 +798,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -820,7 +818,7 @@
       "resultado": "PARCIAL",
       "motivo": "sin evaluar: La navegación del usuario continúa sin intervención (requiere comprobar la navegación del usuario con un navegador real (Modo H))",
       "valor_medido": {
-        "tiempo_hasta_el_pac_s": 7.1,
+        "tiempo_hasta_el_pac_s": 2.1,
         "codigos_de_salida": {
           "nslookup example.com 10.20.32.1": 0
         }
@@ -853,8 +851,8 @@
         "T22/conmutacion.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 8.1,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 3.2,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -879,7 +877,7 @@
       "modo_en_que_si_se_ejecuta": [
         "H"
       ],
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -924,7 +922,7 @@
       ],
       "error_de_ejecucion": false,
       "duracion_s": 4.8,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -947,7 +945,7 @@
       "modo_en_que_si_se_ejecuta": [
         "H"
       ],
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -966,7 +964,7 @@
       "resultado": "PARCIAL",
       "motivo": "medición vacía: durante el MISS no cruzó nada por la VPN: el nodo no tiene ruta al shield (REQ-F-29 pendiente), así que la ausencia de cabeceras no demuestra nada",
       "valor_medido": {
-        "paquetes_en_la_vpn": 14
+        "paquetes_en_la_vpn": 11
       },
       "criterios": [
         {
@@ -991,8 +989,8 @@
         "T26/captura.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 13.6,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 13.3,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1051,8 +1049,8 @@
         "T27/captura.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 13.3,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 13.7,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1077,7 +1075,7 @@
       "modo_en_que_si_se_ejecuta": [
         "H"
       ],
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1085,18 +1083,64 @@
       "nombre": "Escaneo lateral detectado por IDS01",
       "categoria": "deteccion",
       "modos": [
+        "L",
         "H"
       ],
       "flujos": [],
-      "comando_de_referencia": "nmap -Pn -sS -p 1-1024 --max-rate 100 10.20.20.10 10.20.20.11",
-      "resultado": "NO_APLICA",
-      "motivo": "el Modo L no ejecuta T29 (modos de la prueba: H); se ejecuta en H",
-      "valor_medido": {},
-      "criterios": [],
-      "hallazgos": [],
-      "evidencia": [],
+      "comando_de_referencia": "nmap -Pn -sS -p 1-1024 --max-rate 100 10.20.20.20",
+      "resultado": "PARCIAL",
+      "motivo": "sin evaluar: /\"level\":\\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L); latencia_alerta_wazuh_s < 60 (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L)",
+      "valor_medido": {
+        "puertos_open": 0,
+        "paquetes_denegados_por_fw01": 1281,
+        "codigos_de_salida": {
+          "principal": 0
+        }
+      },
+      "criterios": [
+        {
+          "descripcion": "puertos_open == 0",
+          "estado": "PASA",
+          "medido": 0,
+          "detalle": "puertos_open = 0"
+        },
+        {
+          "descripcion": "/\"signature\":\\s*\"[^\"]*([Ss][Cc][Aa][Nn]|escaneo)/ sobre eve_json_ids01",
+          "estado": "PASA",
+          "medido": "\"signature\":\"LAB escan",
+          "detalle": "coincide"
+        },
+        {
+          "descripcion": "/\"src_ip\":\\s*\"10\\.20\\.31\\.60\"/ sobre eve_json_ids01",
+          "estado": "PASA",
+          "medido": "\"src_ip\":\"10.20.31.60\"",
+          "detalle": "coincide"
+        },
+        {
+          "descripcion": "/\"level\":\\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh",
+          "estado": "NO_EVALUADO",
+          "medido": null,
+          "detalle": "Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L"
+        },
+        {
+          "descripcion": "latencia_alerta_wazuh_s < 60",
+          "estado": "NO_EVALUADO",
+          "medido": null,
+          "detalle": "Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L"
+        }
+      ],
+      "hallazgos": [
+        "las reglas del laboratorio son locales (sid 9000001, escaneo SYN por origen): ET Open no está disponible en el Modo L",
+        "el destino es OBS01, el nodo de SERVERS que existe en el laboratorio y que ningún flujo alcanza desde LAB-TEST (SVC01 no sirve: F3 le abre el puerto 80)"
+      ],
+      "evidencia": [
+        "T29/salida.txt",
+        "T29/nmap.txt",
+        "T29/eve_ids01.json"
+      ],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 68.8,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1104,20 +1148,61 @@
       "nombre": "Canary interno detecta un barrido en LAB",
       "categoria": "deteccion",
       "modos": [
+        "L",
         "H"
       ],
       "flujos": [
         "F13"
       ],
-      "comando_de_referencia": "nmap -Pn -sS -p 1-1024 10.20.35.250",
-      "resultado": "NO_APLICA",
-      "motivo": "el Modo L no ejecuta T30 (modos de la prueba: H); se ejecuta en H",
-      "valor_medido": {},
-      "criterios": [],
-      "hallazgos": [],
-      "evidencia": [],
+      "comando_de_referencia": "nmap -Pn -sT -p 22,80,445,3389 10.20.35.250",
+      "resultado": "PARCIAL",
+      "motivo": "sin evaluar: /\"level\":\\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L); latencia_alerta_wazuh_s < 60 (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L)",
+      "valor_medido": {
+        "conexiones_registradas_en_hny02": 4,
+        "paquetes_vistos_por_fw01": 0,
+        "codigos_de_salida": {
+          "principal": 0
+        }
+      },
+      "criterios": [
+        {
+          "descripcion": "conexiones_registradas_en_hny02 >= 1",
+          "estado": "PASA",
+          "medido": 4,
+          "detalle": "conexiones_registradas_en_hny02 = 4"
+        },
+        {
+          "descripcion": "/\"level\":\\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh",
+          "estado": "NO_EVALUADO",
+          "medido": null,
+          "detalle": "Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L"
+        },
+        {
+          "descripcion": "latencia_alerta_wazuh_s < 60",
+          "estado": "NO_EVALUADO",
+          "medido": null,
+          "detalle": "Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L"
+        },
+        {
+          "descripcion": "paquetes_vistos_por_fw01 == 0",
+          "estado": "PASA",
+          "medido": 0,
+          "detalle": "paquetes_vistos_por_fw01 = 0"
+        }
+      ],
+      "hallazgos": [
+        "el canario registró 0 eventos con un barrido SYN (-sS) y 4 con uno de conexión completa (-sT): un canario de aplicación no ve los SYN sin respuesta; IDS01 no captura la VLAN 30 (D1.14)",
+        "el canario es un equivalente funcional de OpenCanary (F4.2): registra la conexión en un archivo, sin enviarla a un agente de Wazuh"
+      ],
+      "evidencia": [
+        "T30/salida.txt",
+        "T30/nmap.txt",
+        "T30/canary.json",
+        "T30/tcpdump_fw01_vlan30.txt"
+      ],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 5.5,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1139,7 +1224,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1160,7 +1245,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1181,7 +1266,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1202,7 +1287,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1221,7 +1306,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1242,7 +1327,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1263,7 +1348,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1284,7 +1369,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1305,7 +1390,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1326,7 +1411,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1347,7 +1432,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1368,7 +1453,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1389,7 +1474,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1397,18 +1482,41 @@
       "nombre": "Peering entre nodos de borde",
       "categoria": "disponibilidad",
       "modos": [
+        "L",
         "H"
       ],
       "flujos": [],
       "comando_de_referencia": "ping -c 3 10.20.60.11   # en EDGE01; y ping -c 3 10.20.60.10 en EDGE02",
-      "resultado": "NO_APLICA",
-      "motivo": "el Modo L no ejecuta T44 (modos de la prueba: H); se ejecuta en H",
-      "valor_medido": {},
-      "criterios": [],
+      "resultado": "PARCIAL",
+      "motivo": "medición vacía: el protocolo y el puerto del peering no están definidos (CI-06): solo se probó el alcance IP",
+      "valor_medido": {
+        "codigos_de_salida": {
+          "ping -c 3 10.20.60.11": 0,
+          "ping -c 3 10.20.60.10": 0
+        }
+      },
+      "criterios": [
+        {
+          "descripcion": "código de salida = 0 (ping -c 3 10.20.60.11)",
+          "estado": "PASA",
+          "medido": 0,
+          "detalle": "salida 0"
+        },
+        {
+          "descripcion": "código de salida = 0 (ping -c 3 10.20.60.10)",
+          "estado": "PASA",
+          "medido": 0,
+          "detalle": "salida 0"
+        }
+      ],
       "hallazgos": [],
-      "evidencia": [],
+      "evidencia": [
+        "T44/salida.txt",
+        "T44/ping.txt"
+      ],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 4.4,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1416,18 +1524,50 @@
       "nombre": "Internet → zonas internas",
       "categoria": "segmentacion",
       "modos": [
+        "L",
         "H"
       ],
       "flujos": [],
       "comando_de_referencia": "nmap -Pn -sS -p 22,443,3128,5432,8443,9128,2049 10.20.10.10 10.20.20.10 10.20.32.50 10.20.31.60 10.20.50.10 10.20.60.10 10.20.70.20 10.20.71.20",
-      "resultado": "NO_APLICA",
-      "motivo": "el Modo L no ejecuta T45 (modos de la prueba: H); se ejecuta en H",
-      "valor_medido": {},
-      "criterios": [],
-      "hallazgos": [],
-      "evidencia": [],
+      "resultado": "PARCIAL",
+      "motivo": "medición vacía: STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L",
+      "valor_medido": {
+        "puertos_open": 0,
+        "paquetes_denegados_por_fw01": 24,
+        "codigos_de_salida": {
+          "principal": 0
+        }
+      },
+      "criterios": [
+        {
+          "descripcion": "puertos_open == 0",
+          "estado": "PASA",
+          "medido": 0,
+          "detalle": "puertos_open = 0"
+        },
+        {
+          "descripcion": "sin coincidencia con /(?m)^\\d+/tcp\\s+open/ sobre stdout",
+          "estado": "PASA",
+          "medido": null,
+          "detalle": "no coincide"
+        },
+        {
+          "descripcion": "paquetes_denegados_por_fw01 > 0",
+          "estado": "PASA",
+          "medido": 24,
+          "detalle": "paquetes_denegados_por_fw01 = 24"
+        }
+      ],
+      "hallazgos": [
+        "STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L"
+      ],
+      "evidencia": [
+        "T45/salida.txt",
+        "T45/nmap.txt"
+      ],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 6.7,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1435,18 +1575,51 @@
       "nombre": "DMZ-SVC → zonas internas",
       "categoria": "segmentacion",
       "modos": [
+        "L",
         "H"
       ],
       "flujos": [],
       "comando_de_referencia": "nmap -Pn -sS -p 22,443,3128,5432,8443,9128,2049 10.20.10.10 10.20.20.10 10.20.31.60 10.20.60.10 10.20.70.20 10.20.71.20",
-      "resultado": "NO_APLICA",
-      "motivo": "el Modo L no ejecuta T46 (modos de la prueba: H); se ejecuta en H",
-      "valor_medido": {},
-      "criterios": [],
-      "hallazgos": [],
-      "evidencia": [],
+      "resultado": "PARCIAL",
+      "motivo": "medición vacía: STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L",
+      "valor_medido": {
+        "puertos_open": 0,
+        "paquetes_denegados_por_fw01": 16,
+        "codigos_de_salida": {
+          "principal": 0
+        }
+      },
+      "criterios": [
+        {
+          "descripcion": "puertos_open == 0",
+          "estado": "PASA",
+          "medido": 0,
+          "detalle": "puertos_open = 0"
+        },
+        {
+          "descripcion": "sin coincidencia con /(?m)^\\d+/tcp\\s+open/ sobre stdout",
+          "estado": "PASA",
+          "medido": null,
+          "detalle": "no coincide"
+        },
+        {
+          "descripcion": "paquetes_denegados_por_fw01 > 0",
+          "estado": "PASA",
+          "medido": 16,
+          "detalle": "paquetes_denegados_por_fw01 = 16"
+        }
+      ],
+      "hallazgos": [
+        "WEB01 se probó como equipo comprometido, sin su nftables de host: con él, WEB01 ya no puede iniciar conexiones (D1.9, «Salida») y no sería FW01 quien deniega",
+        "STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L"
+      ],
+      "evidencia": [
+        "T46/salida.txt",
+        "T46/nmap.txt"
+      ],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 5.2,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1454,20 +1627,60 @@
       "nombre": "DMZ-HONEY → cualquier zona",
       "categoria": "segmentacion",
       "modos": [
+        "L",
         "H"
       ],
       "flujos": [
         "F13"
       ],
       "comando_de_referencia": "nmap -Pn -sS -p 22,443,3128,5432,8443,9128,2049 10.20.10.10 10.20.20.10 10.20.31.60 10.20.60.10 10.20.70.20 10.20.71.20 ; curl -sS -m5 https://example.com ; nc -zv -w3 10.20.50.10 1514",
-      "resultado": "NO_APLICA",
-      "motivo": "el Modo L no ejecuta T47 (modos de la prueba: H); se ejecuta en H",
-      "valor_medido": {},
-      "criterios": [],
-      "hallazgos": [],
-      "evidencia": [],
+      "resultado": "PARCIAL",
+      "motivo": "sin evaluar: código de salida = 0 (nc -zv -w3 10.20.50.10 1514) (SIEM01 (Wazuh) no está desplegado: no hay control positivo hacia el puerto 1514 de F13)",
+      "valor_medido": {
+        "puertos_open": 0,
+        "paquetes_denegados_por_fw01": 16,
+        "codigos_de_salida": {
+          "principal": 0,
+          "curl -sS -m5 https://example.com": 1
+        }
+      },
+      "criterios": [
+        {
+          "descripcion": "puertos_open == 0",
+          "estado": "PASA",
+          "medido": 0,
+          "detalle": "puertos_open = 0"
+        },
+        {
+          "descripcion": "código de salida ≠ 0 (curl -sS -m5 https://example.com)",
+          "estado": "PASA",
+          "medido": 1,
+          "detalle": "salida 1"
+        },
+        {
+          "descripcion": "código de salida = 0 (nc -zv -w3 10.20.50.10 1514)",
+          "estado": "NO_EVALUADO",
+          "medido": null,
+          "detalle": "SIEM01 (Wazuh) no está desplegado: no hay control positivo hacia el puerto 1514 de F13"
+        },
+        {
+          "descripcion": "paquetes_denegados_por_fw01 > 0",
+          "estado": "PASA",
+          "medido": 16,
+          "detalle": "paquetes_denegados_por_fw01 = 16"
+        }
+      ],
+      "hallazgos": [
+        "«Internet» es ext01 (198.51.100.100): el laboratorio no tiene DNS ni salida a Internet real",
+        "STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L"
+      ],
+      "evidencia": [
+        "T47/salida.txt",
+        "T47/nmap.txt"
+      ],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "duracion_s": 8.5,
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1487,7 +1700,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     },
     {
@@ -1508,7 +1721,7 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "999764472abd4f63dc9d8ace29c959d6bc9bb70f",
+      "commit": "f68cb8011e2008422ce9030d4f31eb4095461db6",
       "fecha": "2026-11-19"
     }
   ]

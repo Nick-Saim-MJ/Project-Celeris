@@ -46,7 +46,7 @@
 | V-34 | La rúbrica coincide con el XLSX oficial (nombre, peso y descriptor de nivel 4) | PASA | — |
 | V-40 | El ruleset generado de fw01-sim contiene exactamente los flujos permitidos (y los bloqueos) del inventario | PASA | — |
 | V-41 | swanctl, FRR y VTI generados coinciden con la sección vpn del inventario (cifrado, DPD, vidas, ASN, BGP, MTU, MSS) | PASA | — |
-| V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 4 advertencias |
+| V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 7 advertencias |
 | V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA | — |
 | V-50 | Diagramas draw.io: componentes, IP, zonas, colores (Okabe-Ito), flujos F-nn y criticidad contra el inventario | PENDIENTE | pendiente de P2 |
 | V-60 | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | PENDIENTE | pendiente de P3 |
@@ -78,12 +78,15 @@ Ninguno.
 - **V-42** — 2026-11-19-L: la prueba crítica T12 (STORAGE no enrutada) está en NO_APLICA, no en PASA
 - **V-42** — 2026-11-19-L: la prueba crítica T23 (Fuga IPv6) está en NO_APLICA, no en PASA
 - **V-42** — 2026-11-19-L: la prueba crítica T28 (Syslog cifrado) está en NO_APLICA, no en PASA
+- **V-42** — 2026-11-19-L: la prueba crítica T45 (Internet → zonas internas) está en PARCIAL, no en PASA
+- **V-42** — 2026-11-19-L: la prueba crítica T46 (DMZ-SVC → zonas internas) está en PARCIAL, no en PASA
+- **V-42** — 2026-11-19-L: la prueba crítica T47 (DMZ-HONEY → cualquier zona) está en PARCIAL, no en PASA
 
 ## Información
 
 - **V-27** — 36 de 92 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
 - **V-29** — 34 elementos pendientes en los YAML; 27 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26']
-- **V-42** — Resultados de 2026-11-19-L (commit 9997644): {'PASA': 13, 'FALLA': 0, 'PARCIAL': 6, 'NO_APLICA': 30}
+- **V-42** — Resultados de 2026-11-19-L (commit f68cb80): {'PASA': 13, 'FALLA': 0, 'PARCIAL': 12, 'NO_APLICA': 24}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 56 de 92 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 765 fórmulas recalculadas con LibreOffice sin errores
 

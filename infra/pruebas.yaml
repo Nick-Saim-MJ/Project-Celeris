@@ -789,24 +789,25 @@ pruebas:
     categoria: deteccion
     nombre: "Escaneo lateral detectado por IDS01"
     origen: KALI01
-    destino: CTRL01
+    destino: OBS01
     flujos: []
-    flujos_justificacion: "Prueba de detección con tráfico denegado: ningún F-nn alcanza CTRL01 ni DB01 desde LAB-TEST (F2 solo abre DNS hacia SVC01, CI-04); IDS01 observa la VLAN 31 por su port group de captura"
-    componentes: [KALI01, FW01, IDS01, SIEM01, CTRL01]
+    flujos_justificacion: "Prueba de detección con tráfico denegado: ningún F-nn alcanza OBS01 desde LAB-TEST (SVC01 no sirve: F3 le abre el puerto 80 a LAB-TEST; F2, CI-04); IDS01 observa la VLAN 31 por su port group de captura"
+    componentes: [KALI01, FW01, IDS01, SIEM01, OBS01]
     objetivo_que_valida: "Suricata IDS (DET-02) detecta el escaneo de red desde LAB-TEST hacia SERVERS aunque FW01 lo deniegue, y Wazuh lo correlaciona"
     precondicion: "KALI01 en 10.20.31.60; IDS01 con captura en las VLAN 20 y 31 y reglas ET Open al día; agente Wazuh en IDS01"
-    comando: "nmap -Pn -sS -p 1-1024 --max-rate 100 10.20.20.10 10.20.20.11"
+    comando: "nmap -Pn -sS -p 1-1024 --max-rate 100 10.20.20.20"
     resultado_esperado: "Sin puertos abiertos; alerta de Suricata en IDS01 y alerta de Wazuh de nivel ≥ 10 en menos de 60 s"
     criterio_aprobacion:
-      - { tipo: contador, metrica: puertos_open, operador: "==", valor: 0, nota: "FW01 deniega LAB-TEST → CTRL01 y DB01" }
-      - { tipo: regex, sobre: eve_json_ids01, patron: "\"category\":\\s*\"Detection of a Network Scan\"", nota: "categoría de ET Open para un barrido; sin verificar contra la versión de reglas de S2" }
+      - { tipo: contador, metrica: puertos_open, operador: "==", valor: 0, nota: "FW01 deniega LAB-TEST → OBS01" }
+      - { tipo: regex, sobre: eve_json_ids01, patron: "\"signature\":\\s*\"[^\"]*([Ss][Cc][Aa][Nn]|escaneo)", nota: "firma de un barrido: ET SCAN en S2, regla local sid 9000001 en el Modo L" }
+      - { tipo: regex, sobre: eve_json_ids01, patron: "\"src_ip\":\\s*\"10\\.20\\.31\\.60\"", nota: "la alerta nombra a KALI01 como origen" }
       - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
       - { tipo: umbral, metrica: latencia_alerta_wazuh_s, operador: "<", valor: 60, nota: "desde el primer SYN hasta la alerta en Wazuh" }
     automatizable: true
     critica: false
     polaridad: negativa
     evidencia_a_capturar: ["Salida de nmap", "Línea de eve.json de IDS01 con la alerta", "Alerta de Wazuh (JSON) con marca de tiempo", "Contador de las reglas de denegación de LAB-TEST hacia SERVERS en FW01"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R4, R5]
     objetivos: [OD-01, OD-09]
@@ -823,9 +824,9 @@ pruebas:
     destino: HNY02
     flujos: [F13]
     componentes: [LABCLI01, HNY02, SIEM01, FW01]
-    objetivo_que_valida: "HNY02 (DET-05) detecta un barrido dentro de LAB, tráfico que FW01 no ve, y lo envía al SIEM por F13"
+    objetivo_que_valida: "HNY02 (DET-05) registra un barrido de conexiones completas (-sT) dentro de LAB, tráfico que FW01 no ve, y lo envía al SIEM por F13; un barrido SYN (-sS) no completa la conexión y el canario no lo ve (CI-27)"
     precondicion: "HNY02 en 10.20.35.250 con agente Wazuh; LABCLI01 en 10.20.32.50 (misma VLAN 30, sin pasar por FW01)"
-    comando: "nmap -Pn -sS -p 1-1024 10.20.35.250"
+    comando: "nmap -Pn -sT -p 22,80,445,3389 10.20.35.250"
     resultado_esperado: "HNY02 registra el barrido y Wazuh genera una alerta de nivel ≥ 10 en menos de 60 s; FW01 no cuenta ningún paquete de ese tráfico"
     criterio_aprobacion:
       - { tipo: contador, metrica: conexiones_registradas_en_hny02, operador: ">=", valor: 1 }
@@ -836,7 +837,7 @@ pruebas:
     critica: false
     polaridad: positiva
     evidencia_a_capturar: ["Salida de nmap", "Registro del canary en HNY02", "Alerta de Wazuh (JSON)", "Contadores de FW01 antes y después"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R4, R5]
     objetivos: [OD-09]
@@ -1244,7 +1245,7 @@ pruebas:
     critica: false
     polaridad: positiva
     evidencia_a_capturar: ["Salida de ambos ping"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R2, R6]
     objetivos: [OD-03]
@@ -1275,7 +1276,7 @@ pruebas:
     critica: true
     polaridad: negativa
     evidencia_a_capturar: ["Salida de nmap", "Contadores de las reglas de denegación de FW01 antes y después", "Ruta estática usada"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R4]
     objetivos: [OD-01, OD-06]
@@ -1305,7 +1306,7 @@ pruebas:
     critica: true
     polaridad: negativa
     evidencia_a_capturar: ["Salida de nmap", "Contadores de las reglas de denegación DMZ-SVC → interna en FW01"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R4]
     objetivos: [OD-01, OD-06]
@@ -1335,7 +1336,7 @@ pruebas:
     critica: true
     polaridad: mixta
     evidencia_a_capturar: ["Salida de nmap, curl y nc", "Contadores de las reglas de denegación DMZ-HONEY en FW01"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R4]
     objetivos: [OD-01, OD-06]

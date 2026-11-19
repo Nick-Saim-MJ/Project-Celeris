@@ -5,6 +5,7 @@ el último evidencias/*/resultados.json. Cada función de chequeo recibe el libr
 """
 from __future__ import annotations
 
+import os
 import re
 import shutil
 import subprocess
@@ -147,11 +148,24 @@ def chequeo_ensayo(x: ci.Infra, wb, datos: dict | None) -> list[tuple[str, str, 
 
 
 def _soffice() -> str | None:
+    """Ruta de LibreOffice, o «wsl» en Windows si está instalado dentro de WSL; None si no hay ninguno."""
     for nombre in ("soffice", "libreoffice"):
         ruta = shutil.which(nombre)
         if ruta:
             return ruta
+    if os.name == "nt" and shutil.which("wsl"):
+        try:
+            r = subprocess.run(["wsl", "-u", "root", "--", "sh", "-c", "command -v soffice"], capture_output=True, timeout=60)
+            if r.returncode == 0 and r.stdout.strip():
+                return "wsl"
+        except (subprocess.SubprocessError, OSError):
+            pass
     return None
+
+
+def _ruta_wsl(ruta: Path) -> str:
+    p = ruta.resolve()
+    return f"/mnt/{p.drive[0].lower()}/" + "/".join(p.parts[1:])
 
 
 def recalcular(ruta: Path, salida: Path) -> Path | None:
@@ -161,8 +175,12 @@ def recalcular(ruta: Path, salida: Path) -> Path | None:
         return None
     perfil = Path(tempfile.mkdtemp(prefix="lo-perfil-"))
     try:
-        subprocess.run([exe, f"-env:UserInstallation={perfil.as_uri()}", "--headless", "--calc", "--convert-to", "xlsx", "--outdir", str(salida), str(ruta)],
-                       check=True, capture_output=True, timeout=180)
+        if exe == "wsl":       # Windows: LibreOffice vive en WSL; las rutas se pasan como /mnt/<unidad>/…
+            orden = ["wsl", "-u", "root", "--", "env", "HOME=/root", "soffice", "-env:UserInstallation=file:///tmp/lo-perfil-celeris", "--headless", "--calc",
+                     "--convert-to", "xlsx", "--outdir", _ruta_wsl(salida), _ruta_wsl(ruta)]
+        else:
+            orden = [exe, f"-env:UserInstallation={perfil.as_uri()}", "--headless", "--calc", "--convert-to", "xlsx", "--outdir", str(salida), str(ruta)]
+        subprocess.run(orden, check=True, capture_output=True, timeout=240)
     except (subprocess.SubprocessError, OSError):
         return None
     finally:

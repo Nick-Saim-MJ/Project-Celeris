@@ -1,0 +1,310 @@
+# GENERADO por infra/gen/lab.py desde infra/inventory.yaml — no editar a mano (make lab-gen).
+# Laboratorio EMULADO (Modo L, Parte F4): no es el producto real. Las IP de cada nodo están en lab/generated/<nodo>/arranque.sh.
+name: celeris
+topology:
+  nodes:
+    br-vlan10:
+      kind: bridge
+    br-vlan20:
+      kind: bridge
+    br-vlan30:
+      kind: bridge
+    br-vlan31:
+      kind: bridge
+    br-vlan40:
+      kind: bridge
+    br-vlan41:
+      kind: bridge
+    br-vlan50:
+      kind: bridge
+    br-vlan60:
+      kind: bridge
+    br-wan:
+      kind: bridge
+    fw01-sim:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/fw01-sim:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+      sysctls:
+        net.ipv4.ip_forward: 1
+        net.ipv4.conf.all.rp_filter: 0
+    jmp01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/jmp01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    svc01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/svc01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    obs01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/obs01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    labcli01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/labcli01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    hny02:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/hny02:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    kali01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/kali01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    waf01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/waf01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    web01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/web01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    hny01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/hny01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    ids01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/ids01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1 eth2 eth3 eth4 eth5
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    edge01:
+      kind: linux
+      image: celeris-lab/node:dev
+      binds:
+      - generated/edge01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    edge02:
+      kind: linux
+      image: celeris-lab/node:dev
+      binds:
+      - generated/edge02:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    hny01-cowrie:
+      kind: linux
+      image: cowrie/cowrie@sha256:e7c4b4fe5fbb874e682c6c0c7a1daf1c3183c622d5cc2d281f453c1c4d9f97ac
+      network-mode: container:hny01
+    ext01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/ext01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+    vgw-sim:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/vgw-sim:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1 eth2
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+      sysctls:
+        net.ipv4.ip_forward: 1
+        net.ipv4.conf.all.rp_filter: 0
+    shield01:
+      kind: linux
+      image: celeris-lab/node:dev
+      binds:
+      - generated/shield01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
+  links:
+  - endpoints:
+    - fw01-sim:eth1
+    - br-wan:fw01-wan
+  - endpoints:
+    - fw01-sim:eth2
+    - br-vlan10:fw01-10
+  - endpoints:
+    - fw01-sim:eth3
+    - br-vlan20:fw01-20
+  - endpoints:
+    - fw01-sim:eth4
+    - br-vlan30:fw01-30
+  - endpoints:
+    - fw01-sim:eth5
+    - br-vlan31:fw01-31
+  - endpoints:
+    - fw01-sim:eth6
+    - br-vlan40:fw01-40
+  - endpoints:
+    - fw01-sim:eth7
+    - br-vlan41:fw01-41
+  - endpoints:
+    - fw01-sim:eth8
+    - br-vlan50:fw01-50
+  - endpoints:
+    - fw01-sim:eth9
+    - br-vlan60:fw01-60
+  - endpoints:
+    - jmp01:eth1
+    - br-vlan10:jmp01-10
+  - endpoints:
+    - svc01:eth1
+    - br-vlan20:svc01-20
+  - endpoints:
+    - obs01:eth1
+    - br-vlan20:obs01-20
+  - endpoints:
+    - labcli01:eth1
+    - br-vlan30:labcli01-30
+  - endpoints:
+    - hny02:eth1
+    - br-vlan30:hny02-30
+  - endpoints:
+    - kali01:eth1
+    - br-vlan31:kali01-31
+  - endpoints:
+    - waf01:eth1
+    - br-vlan40:waf01-40
+  - endpoints:
+    - web01:eth1
+    - br-vlan40:web01-40
+  - endpoints:
+    - hny01:eth1
+    - br-vlan41:hny01-41
+  - endpoints:
+    - ids01:eth1
+    - br-vlan50:ids01-50
+  - endpoints:
+    - ids01:eth2
+    - br-vlan10:ids01-c10
+  - endpoints:
+    - ids01:eth3
+    - br-vlan20:ids01-c20
+  - endpoints:
+    - ids01:eth4
+    - br-vlan31:ids01-c31
+  - endpoints:
+    - ids01:eth5
+    - br-vlan50:ids01-c50
+  - endpoints:
+    - edge01:eth1
+    - br-vlan60:edge01-60
+  - endpoints:
+    - edge02:eth1
+    - br-vlan60:edge02-60
+  - endpoints:
+    - ext01:eth1
+    - br-wan:ext01-wan
+  - endpoints:
+    - vgw-sim:eth1
+    - br-wan:vgw-wan
+  - endpoints:
+    - vgw-sim:eth2
+    - shield01:eth1

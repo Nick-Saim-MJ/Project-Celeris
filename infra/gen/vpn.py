@@ -134,7 +134,8 @@ def frr(x: Infra, lado: str) -> str:
 
 def strongswan_conf() -> str:
     """strongswan.conf mínimo: con VTI las rutas las pone BGP (FRR), no charon."""
-    return cabecera("#") + "charon {\n  install_routes = no\n}\n"
+    # kernel-libipsec (IPsec en espacio de usuario) crea la interfaz ipsec0 y desvía el tráfico IKE; forecast no aplica: se usa XFRM del kernel
+    return (cabecera("#") + "charon {\n  install_routes = no\n  plugins {\n    kernel-libipsec { load = no }\n    forecast { load = no }\n  }\n}\n")
 
 
 def vti_up(x: Infra, lado: str, aws_peers: list[str], wan_campus: str | None = None) -> str:

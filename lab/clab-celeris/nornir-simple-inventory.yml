@@ -1,0 +1,131 @@
+---
+br-vlan10:
+    username: 
+    password: 
+    platform: bridge
+    hostname: 
+br-vlan20:
+    username: 
+    password: 
+    platform: bridge
+    hostname: 
+br-vlan30:
+    username: 
+    password: 
+    platform: bridge
+    hostname: 
+br-vlan31:
+    username: 
+    password: 
+    platform: bridge
+    hostname: 
+br-vlan40:
+    username: 
+    password: 
+    platform: bridge
+    hostname: 
+br-vlan41:
+    username: 
+    password: 
+    platform: bridge
+    hostname: 
+br-vlan50:
+    username: 
+    password: 
+    platform: bridge
+    hostname: 
+br-vlan60:
+    username: 
+    password: 
+    platform: bridge
+    hostname: 
+br-wan:
+    username: 
+    password: 
+    platform: bridge
+    hostname: 
+edge01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.8
+edge02:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.9
+ext01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.2
+fw01-sim:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.3
+hny01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.4
+hny01-cowrie:
+    username: 
+    password: 
+    platform: linux
+    hostname: 
+hny02:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.5
+ids01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.12
+jmp01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.10
+kali01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.15
+labcli01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.6
+obs01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.7
+shield01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.16
+svc01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.13
+vgw-sim:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.11
+waf01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.17
+web01:
+    username: 
+    password: 
+    platform: linux
+    hostname: 172.20.20.14

@@ -4,7 +4,7 @@
 PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
 VERSION ?= v1.0
 
-.PHONY: help entorno image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
+.PHONY: help entorno lab-gen image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
 
 help:
 	@echo "make validate        fuente única + artefactos + secretos (infra/validate.py y gitleaks si está instalado)"
@@ -13,7 +13,9 @@ help:
 	@echo "make image            construye la imagen OCI celeris-node (deploy/image/Dockerfile; necesita Docker)"
 	@echo "make test-imagen      ejecuta e2e/run.sh contra el binario dentro de la imagen"
 	@echo "make test-gen         pruebas unitarias y snapshots de los generadores"
-	@echo "make lab-up|lab-down|test-lab   laboratorio containerlab (pendiente de P6)"
+	@echo "make lab-gen         genera lab/celeris.clab.yml y lab/generated desde el inventario"
+	@echo "make lab-up|lab-down laboratorio emulado con containerlab (Modo L; necesita Linux/WSL, Docker y containerlab)"
+	@echo "make test-lab         ejecuta las pruebas T-nn del Modo L (Etapa 4)"
 	@echo "make matrices        genera las dos matrices XLSX (pendiente de P3 y P4)"
 	@echo "make diagrams-check  valida los .drawio contra el inventario (pendiente de P2)"
 	@echo "make informe         genera DOCX y PDF (pendiente de P5)"
@@ -52,14 +54,17 @@ validate:
 	@if command -v gitleaks >/dev/null 2>&1; then gitleaks detect --source . --no-banner --redact; \
 	else echo "gitleaks no está instalado: lo ejecuta el CI (.github/workflows/e1.yml). V-30 ya revisó infra/ y docs/infra/."; fi
 
+lab-gen:
+	$(PYTHON) infra/genera.py lab
+
 lab-up:
-	@echo "pendiente de P6: laboratorio containerlab (lab/celeris.clab.yml, Parte F4)" >&2; exit 1
+	bash lab/lab.sh up
 
 lab-down:
-	@echo "pendiente de P6: laboratorio containerlab (lab/celeris.clab.yml, Parte F4)" >&2; exit 1
+	bash lab/lab.sh down
 
 test-lab:
-	@echo "pendiente de P6: ejecuta tests/network/*.yaml generados de infra/pruebas.yaml (Parte F4.3)" >&2; exit 1
+	@echo "pendiente de la Etapa 4: runner tests/network/run.py (lee infra/pruebas.yaml)" >&2; exit 1
 
 matrices:
 	@echo "pendiente de P3 (XLSX de componentes) y P4 (XLSX de pruebas)" >&2; exit 1

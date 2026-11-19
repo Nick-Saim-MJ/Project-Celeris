@@ -4,7 +4,7 @@
     python infra/genera.py [nftables|vpn|pac|todo] [--salida lab/generated] [--modo piloto|gestionado]
                            [--ventana] [--wan-ip IP] [--aws-peer IP --aws-peer IP] [--secretos DIR]
 
-`vpn` y `todo` necesitan las IP públicas de los dos extremos AWS (--aws-peer ×2): el inventario solo dice
+`lab` genera lab/celeris.clab.yml, lab/generated/ y la PKI de laboratorio (lab/.run/, fuera de git). `vpn` y `todo` necesitan las IP públicas de los dos extremos AWS (--aws-peer ×2): el inventario solo dice
 «asignadas por AWS» (CI-23). Las llaves precompartidas se generan al vuelo en --secretos (fuera del control de versiones).
 """
 from __future__ import annotations
@@ -15,12 +15,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from celeris_infra import RAIZ, Infra  # noqa: E402
-from gen import nftables, pac, vpn  # noqa: E402
+from gen import lab, nftables, pac, vpn  # noqa: E402
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("que", nargs="?", default="todo", choices=["nftables", "vpn", "pac", "todo"])
+    ap.add_argument("que", nargs="?", default="todo", choices=["nftables", "vpn", "pac", "todo", "lab"])
     ap.add_argument("--salida", default=str(RAIZ / "lab" / "generated"))
     ap.add_argument("--secretos", default=str(RAIZ / "lab" / ".run" / "secretos"))
     ap.add_argument("--modo", default="piloto", choices=["piloto", "gestionado"])
@@ -40,6 +40,8 @@ def main(argv=None) -> int:
             print("error: --aws-peer (×2) es obligatorio para la VPN: el inventario no fija las IP públicas de AWS (CI-23)", file=sys.stderr)
             return 2
         hechos += vpn.main(x, salida, a.aws_peer, a.wan_ip, Path(a.secretos))
+    if a.que == "lab":
+        hechos += lab.generar_todo(x, RAIZ / "lab", RAIZ / "docs" / "AVISO.md")
     for h in hechos:
         print(h)
     return 0

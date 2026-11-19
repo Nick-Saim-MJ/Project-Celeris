@@ -55,6 +55,7 @@ def test_marcas_de_strongswan_coinciden_con_la_clave_del_vti(infra):
     t = vpn.swanctl(infra, "fw01", AWS_PEERS)
     assert "mark_in = 1" in t and "mark_out = 1" in t and "mark_in = 2" in t and "mark_out = 2" in t
     assert "install_routes = no" in vpn.strongswan_conf()
+    assert "kernel-libipsec { load = no }" in vpn.strongswan_conf()      # si no, el IKE sale por la interfaz ipsec0
 
 
 def test_un_parametro_nuevo_cambia_la_salida(infra, mutar):

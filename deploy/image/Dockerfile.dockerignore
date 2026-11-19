@@ -1,0 +1,5 @@
+# Lista de permitidos: el contexto solo lleva lo necesario para compilar (sin secretos, datos ni historial).
+*
+!Cargo.toml
+!Cargo.lock
+!src

@@ -4,11 +4,14 @@
 PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
 VERSION ?= v1.0
 
-.PHONY: help deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
+.PHONY: help entorno image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
 
 help:
 	@echo "make validate        fuente única + artefactos + secretos (infra/validate.py y gitleaks si está instalado)"
+	@echo "make entorno          comprueba Docker, containerlab, cargo y tofu (lab/entorno.sh)"
 	@echo "make gen              genera ruleset, VPN y PAC del laboratorio en lab/generated (Etapa 1; --aws-peer en AWS_PEERS)"
+	@echo "make image            construye la imagen OCI celeris-node (deploy/image/Dockerfile; necesita Docker)"
+	@echo "make test-imagen      ejecuta e2e/run.sh contra el binario dentro de la imagen"
 	@echo "make test-gen         pruebas unitarias y snapshots de los generadores"
 	@echo "make lab-up|lab-down|test-lab   laboratorio containerlab (pendiente de P6)"
 	@echo "make matrices        genera las dos matrices XLSX (pendiente de P3 y P4)"
@@ -16,8 +19,21 @@ help:
 	@echo "make informe         genera DOCX y PDF (pendiente de P5)"
 	@echo "make release-e1      copia la versión final a entregables/CE0311/vX.Y/ (pendiente de P5)"
 
+entorno:
+	@bash lab/entorno.sh
+
 deps:
 	$(PYTHON) -m pip install -r infra/requirements.txt
+
+IMAGE ?= celeris-node:dev
+GIT_COMMIT ?= $(shell git rev-parse HEAD 2>/dev/null || echo desconocido)$(shell git diff --quiet HEAD 2>/dev/null || echo -dirty)
+
+image:
+	docker build -f deploy/image/Dockerfile --build-arg GIT_COMMIT=$(GIT_COMMIT) --build-arg CREATED=$(shell date -u +%Y-%m-%dT%H:%M:%SZ) -t $(IMAGE) .
+
+test-imagen:
+	IMAGE=$(IMAGE) bash deploy/image/verificar-imagen.sh
+	IMAGE=$(IMAGE) bash deploy/image/e2e-en-contenedor.sh
 
 deps-dev:
 	$(PYTHON) -m pip install -r infra/requirements-dev.txt

@@ -1,0 +1,12 @@
+# Configuración de ejemplo de celeris-node dentro del contenedor. Monte este archivo en /config/config.toml (solo lectura)
+# y un volumen en /data. Es un EJEMPLO de laboratorio: las subredes salen del inventario (infra/inventory.yaml) cuando
+# el laboratorio genera la configuración real de cada nodo (Etapa 3); aquí se usa una red de documentación (RFC 5737).
+listen = "0.0.0.0:3128"
+allowed_clients = ["192.0.2.0/24"]
+operator_contact = "redes@example.invalid"
+data_dir = "/data/store"
+ca_cert = "/data/ca/celeris-ca.crt"
+ca_key = "/data/ca/celeris-ca.key"
+intercept_domains = []
+# Administración y métricas (puerto 9128, F12): vacío = desactivado. REQ-NF-14 pide TLS en este puerto (Etapa 5).
+admin_listen = ""

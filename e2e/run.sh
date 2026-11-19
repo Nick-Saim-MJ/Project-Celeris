@@ -24,7 +24,7 @@ openssl x509 -req -in origin.csr -CA origin-ca.pem -CAkey origin-ca.key -CAcreat
 
 # Escribe config.<nombre>.toml. Se puede ajustar con LISTEN, CLIENTS, RATE, INTERNAL, BUDGET, DOMAINS, CONTACT,
 # ADMIN, ADMIN_TOKEN, LOG_ENABLED, LOG_DAYS, LOG_IP, MAX_DISK, ALERT_DISK_FREE, ALERT_CA_DAYS, CLIENT_STATS, PORTS,
-# DETECT, DETECT_REQUESTS, DETECT_BYTES, DETECT_DENIED, LIVE, LIVE_CLIENT y SECURITY.
+# DETECT, DETECT_REQUESTS, DETECT_BYTES, DETECT_DENIED, LIVE, LIVE_CLIENT y SECURITY. EXTRA agrega líneas TOML al final.
 write_config() {
   local listen="${LISTEN:-127.0.0.1:$2}" clients="${CLIENTS:-[\"127.0.0.1/32\", \"::1/128\"]}"
   local internal="${INTERNAL:-[\"127.0.0.0/8\", \"::1/128\"]}" domains="${DOMAINS:-[\"localhost\"]}"
@@ -73,6 +73,7 @@ access_log_enabled = ${LOG_ENABLED:-false}
 access_log_dir = "./logs-$1"
 access_log_retention_days = ${LOG_DAYS:-7}
 access_log_client_ip = "${LOG_IP:-pseudonym}"
+${EXTRA:-}
 EOF
 }
 
@@ -132,7 +133,7 @@ curlx() { curl -s -g --ssl-no-revoke --noproxy "" -x "$PX" --cacert ca/celeris-c
 px() { curlx -o /dev/null -D - "$@" | tr -d '\r' | awk '/^HTTP/{s=$2} tolower($1)=="x-celeris-cache:"{c=$2} END{print s, (c?c:"-")}'; }
 body() { curlx "$@"; }
 # Valor de todas las cabeceras Cache-Status (RFC 9211) de la respuesta, unidas con " | ", o "-" si no hay.
-cstatus() { curlx -o /dev/null -D - "$@" | tr -d '' | awk 'tolower($1)=="cache-status:"{sub(/^[^:]*: */, ""); v=(v?v " | ":"") $0} END{print (v?v:"-")}'; }
+cstatus() { curlx -o /dev/null -D - "$@" | tr -d '\r' | awk 'tolower($1)=="cache-status:"{sub(/^[^:]*: */, ""); v=(v?v " | ":"") $0} END{print (v?v:"-")}'; }
 metric() { curl -s --noproxy "" -x "$PX" http://celeris.stats/ | python3 -c "import json,sys; print(json.load(sys.stdin).get(sys.argv[1], 'ausente'))" "$1"; }
 sha() { sha256sum | cut -d' ' -f1; }
 # Ruta en disco del objeto cuyo contenido es el que el origen entrega hoy en esa URL.
@@ -800,6 +801,86 @@ expect "HIT con vida restante"                "si" "$(cstatus $L/blob/cache-stat
 expect "la cabecera propia sigue presente"    "200 HIT" "$(px $L/blob/cache-status)"
 expect "no pasó por la caché: sin Cache-Status" "-" "$(cstatus $L/private)"
 expect "el Cache-Status no lleva la URL ni la clave" "0" "$(cstatus $L/blob/cache-status | grep -c -E 'key=|detail=|blob')"
+
+section "32. Proxy padre con mTLS (REQ-F-29)"
+# Certificados desechables: el shield (con IP 127.0.0.1) lo firma la CA del origen de prueba, en la que el nodo ya confía; los nodos
+# se presentan con certificados de una CA propia de nodos, y un intruso con uno de otra CA.
+openssl_literal req -x509 -newkey rsa:2048 -nodes -keyout nodos-ca.key -out nodos-ca.pem -days 2 -subj "/CN=CA de nodos e2e" \
+  -addext "basicConstraints=critical,CA:TRUE" -addext "keyUsage=critical,keyCertSign,cRLSign" 2>/dev/null
+openssl_literal req -x509 -newkey rsa:2048 -nodes -keyout intruso-ca.key -out intruso-ca.pem -days 2 -subj "/CN=CA intrusa" \
+  -addext "basicConstraints=critical,CA:TRUE" -addext "keyUsage=critical,keyCertSign,cRLSign" 2>/dev/null
+emitir() { # nombre, CA (prefijo), asunto, SAN opcional, uso
+  openssl_literal req -newkey rsa:2048 -nodes -keyout "$1.key" -out "$1.csr" -subj "/CN=$3" 2>/dev/null
+  { [ -n "$4" ] && echo "subjectAltName=$4"; echo "basicConstraints=CA:FALSE"; echo "extendedKeyUsage=$5"; } > "$1.cnf"
+  openssl x509 -req -in "$1.csr" -CA "$2.pem" -CAkey "$2.key" -CAcreateserial -out "$1.crt" -days 2 -extfile "$1.cnf" 2>/dev/null
+}
+emitir shield-e2e origin-ca "shield-e2e" "IP:127.0.0.1" serverAuth
+emitir nodo-e2e nodos-ca "nodo-e2e" "" clientAuth
+emitir intruso-e2e intruso-ca "intruso-e2e" "" clientAuth
+SHIELD_EXTRA='shield_listen = "127.0.0.1:3191"
+shield_cert = "./shield-e2e.crt"
+shield_key = "./shield-e2e.key"
+shield_client_ca = "./nodos-ca.pem"'
+NODO_EXTRA='upstream_parent = "127.0.0.1:3191"
+upstream_parent_cert = "./nodo-e2e.crt"
+upstream_parent_key = "./nodo-e2e.key"'
+EXTRA="$SHIELD_EXTRA" start_proxy shield 3190
+EXTRA="$NODO_EXTRA" start_proxy nodo 3192
+shield_metric() { curl -s --noproxy "" -x http://127.0.0.1:3190 http://celeris.stats/ | python3 -c "import json,sys; print(json.load(sys.stdin).get(sys.argv[1], 'ausente'))" "$1"; }
+pxn() { PX=http://127.0.0.1:3192 px "$@"; }
+expect "el nodo atiende el primer pedido (MISS)"          "200 MISS" "$(pxn $L/blob/padre1)"
+expect "el shield recibió ese MISS"                        "1" "$(shield_metric misses)"
+expect "el origen lo recibió una sola vez"                  "1" "$(origin_hits blob/padre1)"
+expect "la segunda vez el nodo responde sin ir al shield"  "200 HIT" "$(pxn $L/blob/padre1)"
+expect "el shield no recibió un segundo pedido"            "1" "$(shield_metric misses)"
+expect "otro objeto también pasa por el shield"            "200 MISS" "$(pxn $L/blob/padre2)"
+expect "y suma otro MISS en el shield"                     "2" "$(shield_metric misses)"
+expect "HTTP plano por el shield"                           "200 MISS" "$(pxn http://localhost:8080/blob/padre3)"
+VISTAS_PADRE=$(curlx -x http://127.0.0.1:3192 -H X-Forwarded-For:203.0.113.7 -H Via:1.1-cliente-lab -H Forwarded:for=203.0.113.7 $L/echo | python3 -c "
+import json,sys
+h=json.load(sys.stdin); print(','.join(k for k in ('x-forwarded-for','via','forwarded') if k in h) or 'ninguna')")
+expect "el origen no ve la identidad del cliente a través del shield" "ninguna" "$VISTAS_PADRE"
+TLS_SHIELD="openssl s_client -connect 127.0.0.1:3191 -CAfile origin-ca.pem -verify_return_error"
+expect "con el certificado de un nodo, el shield completa el TLS" "1" "$(echo Q | $TLS_SHIELD -cert nodo-e2e.crt -key nodo-e2e.key 2>&1 | grep -c 'Verify return code: 0 (ok)')"
+expect "sin certificado de cliente no llega ni una petición"    "no" "$(echo -e 'GET http://localhost:8080/blob/intruso HTTP/1.1\r\nHost: localhost:8080\r\n\r\n' | $TLS_SHIELD 2>&1 | grep -q 'HTTP/1.1 200' && echo si || echo no)"
+expect "con un certificado de otra CA, el shield lo rechaza"   "no" "$(echo -e 'GET http://localhost:8080/blob/intruso HTTP/1.1\r\nHost: localhost:8080\r\n\r\n' | $TLS_SHIELD -cert intruso-e2e.crt -key intruso-e2e.key 2>&1 | grep -q 'HTTP/1.1 200' && echo si || echo no)"
+expect "el origen nunca recibió el pedido del intruso"          "0" "$(origin_hits blob/intruso)"
+write_config nodo-sin-cert 3193
+printf 'upstream_parent = "127.0.0.1:3191"\nupstream_parent_cert = "./no-existe.crt"\nupstream_parent_key = "./no-existe.key"\n' >> config.nodo-sin-cert.toml
+expect "un nodo sin su certificado de cliente no arranca"       "1" "$(startup_exit nodo-sin-cert)"
+expect "y dice por qué"                                          "1" "$(grep -c 'REQ-F-29' nodo-sin-cert.log)"
+write_config shield-abierto 3195
+printf 'shield_listen = "127.0.0.1:3197"\nshield_cert = "./shield-e2e.crt"\nshield_key = "./shield-e2e.key"\nshield_client_ca = "./nodos-ca.pem"\n' >> config.shield-abierto.toml
+sed -i 's|^listen = .*|listen = "0.0.0.0:3195"|; s|^allowed_clients = .*|allowed_clients = ["127.0.0.1/32", "0.0.0.0/0"]|' config.shield-abierto.toml
+expect "un shield con el puerto sin TLS abierto a la red no arranca" "1" "$(startup_exit shield-abierto)"
+
+section "33. Honey-URL (REQ-F-27)"
+EXTRA='honey_urls = ["/admin-backup.zip", "/wp-login-trampa/"]' SECURITY=true start_proxy honey 3194
+expect "una ruta normal sigue funcionando"                "200 MISS" "$(PX=http://127.0.0.1:3194 px $L/static.js)"
+expect "la honey-URL devuelve 404"                         "404 -" "$(PX=http://127.0.0.1:3194 px $L/admin-backup.zip)"
+expect "y lo que cuelga de una ruta señuelo también"       "404 -" "$(PX=http://127.0.0.1:3194 px $L/wp-login-trampa/entrar)"
+PX=http://127.0.0.1:3194 px $L/wp-login-trampa-otra > /dev/null
+expect "un nombre parecido no es una honey-URL (llega al origen)" "1" "$(origin_hits wp-login-trampa-otra)"
+expect "el origen nunca recibió la ruta señuelo"           "0" "$(origin_hits admin-backup.zip)"
+sleep 1
+expect "el log de seguridad registra el evento honey_url"  "si" "$(grep -q '"event":"honey_url"' logs-honey/security-*.jsonl && echo si || echo no)"
+expect "con la ruta y sin parámetros"                       "si" "$(grep honey_url logs-honey/security-*.jsonl | grep -q '"path":"/admin-backup.zip"' && echo si || echo no)"
+expect "sin honey_urls configuradas no se bloquea nada"    "200 MISS" "$(px $L/blob/sin-senuelo)"
+
+section "34. PAC generado por el nodo (REQ-F-26)"
+write_config pac 3198
+printf 'pac_nodes = ["10.20.60.10:3128", "10.20.60.11:3128"]\npac_direct_networks = ["10.20.0.0/14", "10.30.0.0/16"]\npac_host = "wpad.celeris.internal"\npac_listen = "127.0.0.1:3199"\n' >> config.pac.toml
+"$BIN" pac config.pac.toml > pac.generado 2> pac.err
+expect "el subcomando pac termina bien"                    "0" "$?"
+expect "lista los nodos en orden y termina en DIRECT"      "1" "$(grep -c 'return "PROXY 10.20.60.10:3128; PROXY 10.20.60.11:3128; DIRECT";' pac.generado)"
+expect "las redes internas van directas con su máscara"    "1" "$(grep -c 'isInNet(host, "10.20.0.0", "255.252.0.0")' pac.generado)"
+expect "el nombre del PAC va directo"                       "1" "$(grep -c 'host === "wpad.celeris.internal"' pac.generado)"
+write_config pac-vacio 3200
+expect "sin pac_nodes no se genera un PAC"                 "1" "$("$BIN" pac config.pac-vacio.toml >/dev/null 2>&1; echo $?)"
+launch_proxy pac 3198
+expect "el nodo sirve /wpad.dat con su tipo"               "application/x-ns-proxy-autoconfig" "$(curl -s --noproxy '*' -o /dev/null -w '%{content_type}' http://127.0.0.1:3199/wpad.dat)"
+expect "y es el mismo archivo que genera el subcomando"    "si" "$(curl -s --noproxy '*' http://127.0.0.1:3199/wpad.dat | cmp -s - pac.generado && echo si || echo no)"
+expect "otra ruta devuelve 404"                             "404" "$(curl -s --noproxy '*' -o /dev/null -w '%{http_code}' http://127.0.0.1:3199/otra)"
 
 echo
 if [ "$FAILS" -eq 0 ]; then

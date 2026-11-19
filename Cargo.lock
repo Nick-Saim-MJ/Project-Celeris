@@ -244,6 +244,7 @@ dependencies = [
  "hyper-util",
  "libc",
  "moka",
+ "pin-project-lite",
  "rcgen",
  "regex",
  "serde",

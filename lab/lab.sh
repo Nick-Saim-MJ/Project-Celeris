@@ -6,6 +6,7 @@
 # Si el anfitrión no tiene Docker o containerlab, se detiene: no simula nada.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+. lab/docker-env.sh
 TOPO=lab/celeris.clab.yml
 PREFIJO=clab-celeris
 
@@ -24,15 +25,65 @@ construir() {
   docker image inspect celeris-lab/node:dev >/dev/null 2>&1 || docker build -q -f lab/images/node/Dockerfile -t celeris-lab/node:dev lab/images/node
 }
 
+# Configuración del manager de Wazuh (siem01): se parte de la del propio imagen fijada por digest y se le agrega el syslog TCP de bucle local
+# que usa el receptor TLS de siem01 (F14, 6514). Queda en lab/.run/ (fuera de git) y se rehace si falta.
+wazuh_config() {
+  local destino=lab/.run/wazuh/ossec.conf imagen
+  mkdir -p lab/.run/wazuh lab/.run/cowrie-log
+  chmod 777 lab/.run/cowrie-log
+  touch lab/.run/cowrie-log/cowrie.json; chmod 666 lab/.run/cowrie-log/cowrie.json   # el agente de hny01 lo lee desde el arranque
+  [ -s "$destino" ] && return 0
+  imagen=$(grep -oE 'wazuh/wazuh-manager@sha256:[0-9a-f]{64}' "$TOPO" | head -1)
+  [ -n "$imagen" ] || { echo "ERROR: la topología no trae la imagen del manager de Wazuh" >&2; return 1; }
+  docker run --rm --entrypoint cat "$imagen" /var/ossec/data_tmp/permanent/var/ossec/etc/ossec.conf > "$destino"
+  cat >> "$destino" <<'XML'
+
+<ossec_config>
+  <!-- Laboratorio (F14): syslog solo por TCP y solo desde el receptor TLS de siem01, que escucha en 6514; sin UDP 514 -->
+  <remote>
+    <connection>syslog</connection>
+    <port>514</port>
+    <protocol>tcp</protocol>
+    <allowed-ips>127.0.0.1</allowed-ips>
+    <local_ip>127.0.0.1</local_ip>
+  </remote>
+</ossec_config>
+XML
+}
+
+# El manager tarda en arrancar (varios servicios): hasta que acepta altas de agentes (1515) no se da el laboratorio por listo.
+esperar_manager() {
+  for _ in $(seq 1 240); do
+    docker exec "$PREFIJO-siem01" nc -z 127.0.0.1 1515 2>/dev/null && { echo "manager de Wazuh listo"; return 0; }
+    sleep 1
+  done
+  echo "ERROR: el manager de Wazuh no aceptó altas en 240 s (docker logs $PREFIJO-siem01-wazuh)" >&2
+  return 1
+}
+
+# Los agentes se enrolan al arrancar y reintentan con espera: se da el laboratorio por listo cuando todos están activos en el manager.
+esperar_agentes() {
+  local esperados activos
+  esperados=$(ls lab/generated/*/agente.sh 2>/dev/null | wc -l)
+  for _ in $(seq 1 180); do
+    activos=$(docker exec "$PREFIJO-siem01-wazuh" /var/ossec/bin/agent_control -l 2>/dev/null | grep -c "Active$")
+    [ "$activos" -ge $((esperados + 1)) ] && { echo "agentes de Wazuh activos: $esperados"; return 0; }
+    sleep 2
+  done
+  echo "aviso: solo $((activos - 1)) de $esperados agentes de Wazuh están activos" >&2
+  return 0
+}
+
 esperar() {
   local pendientes n
   for _ in $(seq 1 90); do
     pendientes=""
     for n in $(nodos); do
       [ "$n" = hny01-cowrie ] && continue
+      [ "$n" = siem01-wazuh ] && continue
       docker exec "$PREFIJO-$n" test -f /run/lab-listo 2>/dev/null || pendientes="$pendientes $n"
     done
-    [ -z "$pendientes" ] && { echo "laboratorio listo"; return 0; }
+    [ -z "$pendientes" ] && { esperar_manager && esperar_agentes && echo "laboratorio listo"; return $?; }
     sleep 1
   done
   echo "ERROR: nodos que no terminaron su arranque:$pendientes (revise docker exec $PREFIJO-<nodo> cat /var/log/arranque.log)" >&2
@@ -44,6 +95,7 @@ case "${1:-}" in
     requisitos
     python3 infra/genera.py lab >/dev/null
     construir
+    wazuh_config
     sh lab/generated/puentes.sh up
     containerlab deploy -t "$TOPO" --reconfigure
     sh lab/generated/espejo.sh || echo "aviso: el espejo hacia ids01 no se pudo configurar" >&2

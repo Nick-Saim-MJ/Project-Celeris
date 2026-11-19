@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="celeris-modo-L" tests="49" failures="0" skipped="36" timestamp="2026-11-19">
+<testsuite name="celeris-modo-L" tests="49" failures="1" skipped="19" timestamp="2026-11-19">
   <testcase classname="CE0311.vpn" name="T01 ON-PREM → AWS" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T01 (modos de la prueba: A, H); se ejecuta en A y H"/>
   </testcase>
@@ -12,38 +12,33 @@
   <testcase classname="CE0311.segmentacion" name="T04 Internet → subred privada AWS" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T04 (modos de la prueba: A, H); se ejecuta en A y H"/>
   </testcase>
-  <testcase classname="CE0311.vpn" name="T05 Falla de un túnel" time="121.5">
+  <testcase classname="CE0311.vpn" name="T05 Falla de un túnel" time="123.4">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T06 LAB → MGMT" time="34.3">
+  <testcase classname="CE0311.segmentacion" name="T06 LAB → MGMT" time="33.6">
   </testcase>
   <testcase classname="CE0311.conectividad" name="T07 LAB → EDGE 3128" time="0.7">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T08 LAB → UDP 443" time="10.2">
-    <skipped message="PARCIAL: sin evaluar: El navegador carga la página por HTTP/2 sobre TCP (requiere un navegador real con QUIC activado (Modo H))"/>
+  <testcase classname="CE0311.segmentacion" name="T08 LAB → UDP 443" time="12.2">
   </testcase>
-  <testcase classname="CE0311.disponibilidad" name="T09 Caída de EDGE01" time="7.2">
-    <skipped message="PARCIAL: sin evaluar: Con EDGE01 apagado la navegación continúa por EDGE02 (registro de acceso de EDGE02) (requiere navegar con un navegador real (Modo H); aquí se imita la lógica del PAC con curl); Con ambos apagados la navegación continúa por DIRECT (F6, solo piloto) (requiere navegar con un navegador real"/>
+  <testcase classname="CE0311.disponibilidad" name="T09 Caída de EDGE01" time="34.1">
   </testcase>
   <testcase classname="CE0311.segmentacion" name="T10 DMZ → LAN" time="7.7">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T11 Internet → DMZ-HONEY" time="3.4">
-    <skipped message="PARCIAL: sin evaluar: /&quot;level&quot;:\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L)"/>
+  <testcase classname="CE0311.deteccion" name="T11 Internet → DMZ-HONEY" time="3.5">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T12 STORAGE no enrutada" time="0">
-    <skipped message="NO_APLICA: NAS01 y la VLAN 70 no se emulan (F4.1 no tiene br-vlan70, CI-16): que 10.20.70.20 no responda no demuestra que la VLAN no tenga ruta; se ejecuta en Modo H"/>
+  <testcase classname="CE0311.segmentacion" name="T12 STORAGE no enrutada" time="16.9">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T13 Abuso del proxy" time="1.9">
+  <testcase classname="CE0311.deteccion" name="T13 Abuso del proxy" time="1.8">
   </testcase>
   <testcase classname="CE0311.deteccion" name="T14 Puerto no permitido" time="1.8">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T15 Exposición del portal" time="7.2">
+  <testcase classname="CE0311.seguridad_web" name="T15 Exposición del portal" time="7.5">
   </testcase>
   <testcase classname="CE0311.seguridad_web" name="T16 TLS del portal" time="0.5">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T17 Escaneo web" time="62.5">
+  <testcase classname="CE0311.seguridad_web" name="T17 Escaneo web" time="47.4">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T18 WAF" time="1.4">
-    <skipped message="PARCIAL: sin evaluar: /&quot;level&quot;:\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L)"/>
+  <testcase classname="CE0311.seguridad_web" name="T18 WAF" time="4.7">
   </testcase>
   <testcase classname="CE0311.segmentacion" name="T19 Salida del portal" time="6.3">
   </testcase>
@@ -52,8 +47,7 @@
   <testcase classname="CE0311.vpn" name="T21 MTU del túnel" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T21 (modos de la prueba: A, H); se ejecuta en A y H"/>
   </testcase>
-  <testcase classname="CE0311.disponibilidad" name="T22 Caída de SVC01" time="3.2">
-    <skipped message="PARCIAL: sin evaluar: La navegación del usuario continúa sin intervención (requiere comprobar la navegación del usuario con un navegador real (Modo H))"/>
+  <testcase classname="CE0311.disponibilidad" name="T22 Caída de SVC01" time="14.9">
   </testcase>
   <testcase classname="CE0311.segmentacion" name="T23 Fuga IPv6" time="0">
     <skipped message="NO_APLICA: RA guard es un control del switch de acceso (SW-ACC, S-14); los puentes Linux del laboratorio no lo emulan; se ejecuta en Modo H"/>
@@ -63,22 +57,17 @@
   <testcase classname="CE0311.disponibilidad" name="T25 Break-glass" time="0">
     <skipped message="NO_APLICA: ESX01, IPMI01, BRK01 y SW-CORE01 no se emulan: el puerto break-glass no existe en F4.1 (CI-16); se ejecuta en Modo H"/>
   </testcase>
-  <testcase classname="CE0311.privacidad" name="T26 Privacidad del túnel" time="13.3">
-    <skipped message="PARCIAL: medición vacía: durante el MISS no cruzó nada por la VPN: el nodo no tiene ruta al shield (REQ-F-29 pendiente), así que la ausencia de cabeceras no demuestra nada"/>
+  <testcase classname="CE0311.privacidad" name="T26 Privacidad del túnel" time="13.7">
   </testcase>
-  <testcase classname="CE0311.cifrado" name="T27 Métricas cifradas" time="13.7">
+  <testcase classname="CE0311.cifrado" name="T27 Métricas cifradas" time="13.5">
   </testcase>
-  <testcase classname="CE0311.cifrado" name="T28 Syslog cifrado" time="0">
-    <skipped message="NO_APLICA: siem01 (Wazuh) no está desplegado y fw01-sim no tiene syslog sobre TLS configurado: no hay flujo F14 que capturar; se ejecuta en Modo H"/>
+  <testcase classname="CE0311.cifrado" name="T28 Syslog cifrado" time="15.5">
   </testcase>
   <testcase classname="CE0311.deteccion" name="T29 Escaneo lateral detectado por IDS01" time="68.8">
-    <skipped message="PARCIAL: sin evaluar: /&quot;level&quot;:\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L); latencia_alerta_wazuh_s &lt; 60 (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el"/>
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T30 Canary interno detecta un barrido en LAB" time="5.5">
-    <skipped message="PARCIAL: sin evaluar: /&quot;level&quot;:\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo L); latencia_alerta_wazuh_s &lt; 60 (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el"/>
+  <testcase classname="CE0311.deteccion" name="T30 Canary interno detecta un barrido en LAB" time="5.7">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T31 Honey-URL en el nodo de borde" time="0">
-    <skipped message="NO_APLICA: el Modo L no ejecuta T31 (modos de la prueba: H); se ejecuta en H"/>
+  <testcase classname="CE0311.deteccion" name="T31 Honey-URL en el nodo de borde" time="3.4">
   </testcase>
   <testcase classname="CE0311.deteccion" name="T32 CrowdSec bloquea una IP abusiva en la WAN" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T32 (modos de la prueba: H); se ejecuta en H"/>
@@ -89,8 +78,8 @@
   <testcase classname="CE0311.conectividad" name="T34 Administración desde JMP01" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T34 (modos de la prueba: H); se ejecuta en H"/>
   </testcase>
-  <testcase classname="CE0311.conectividad" name="T35 MGMT → Internet solo por 443" time="0">
-    <skipped message="NO_APLICA: el Modo L no ejecuta T35 (modos de la prueba: H); se ejecuta en H"/>
+  <testcase classname="CE0311.conectividad" name="T35 MGMT → Internet solo por 443" time="33.4">
+    <failure message="/^[23]\d\d$/ sobre curl -sS -o /dev/null -w &quot;%{http_code}&quot; https://example.com: no coincide"/>
   </testcase>
   <testcase classname="CE0311.cifrado" name="T36 Enrolamiento del nodo por mTLS" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T36 (modos de la prueba: H); se ejecuta en H"/>
@@ -101,8 +90,7 @@
   <testcase classname="CE0311.cifrado" name="T38 CTRL01 → base de datos por TLS" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T38 (modos de la prueba: H); se ejecuta en H"/>
   </testcase>
-  <testcase classname="CE0311.disponibilidad" name="T39 Respaldo y restauración en NAS01" time="0">
-    <skipped message="NO_APLICA: el Modo L no ejecuta T39 (modos de la prueba: H); se ejecuta en H"/>
+  <testcase classname="CE0311.disponibilidad" name="T39 Respaldo y restauración en NAS01" time="10.4">
   </testcase>
   <testcase classname="CE0311.disponibilidad" name="T40 Respaldo en S3 con Object Lock" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T40 (modos de la prueba: H); se ejecuta en H"/>
@@ -119,19 +107,15 @@
   <testcase classname="CE0311.disponibilidad" name="T44 Peering entre nodos de borde" time="4.4">
     <skipped message="PARCIAL: medición vacía: el protocolo y el puerto del peering no están definidos (CI-06): solo se probó el alcance IP"/>
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T45 Internet → zonas internas" time="6.7">
-    <skipped message="PARCIAL: medición vacía: STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L"/>
+  <testcase classname="CE0311.segmentacion" name="T45 Internet → zonas internas" time="7.6">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T46 DMZ-SVC → zonas internas" time="5.2">
-    <skipped message="PARCIAL: medición vacía: STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L"/>
+  <testcase classname="CE0311.segmentacion" name="T46 DMZ-SVC → zonas internas" time="6.4">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T47 DMZ-HONEY → cualquier zona" time="8.5">
-    <skipped message="PARCIAL: sin evaluar: código de salida = 0 (nc -zv -w3 10.20.50.10 1514) (SIEM01 (Wazuh) no está desplegado: no hay control positivo hacia el puerto 1514 de F13)"/>
+  <testcase classname="CE0311.segmentacion" name="T47 DMZ-HONEY → cualquier zona" time="11.3">
   </testcase>
   <testcase classname="CE0311.segmentacion" name="T48 Cualquier zona → STORAGE" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T48 (modos de la prueba: A, H); se ejecuta en A y H"/>
   </testcase>
-  <testcase classname="CE0311.conectividad" name="T49 Renovación ACME desde WAF01" time="0">
-    <skipped message="NO_APLICA: el Modo L no ejecuta T49 (modos de la prueba: H); se ejecuta en H"/>
+  <testcase classname="CE0311.conectividad" name="T49 Renovación ACME desde WAF01" time="5.3">
   </testcase>
 </testsuite>

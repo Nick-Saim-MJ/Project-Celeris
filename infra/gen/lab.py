@@ -24,6 +24,7 @@ from gen.comun import cabecera, escribir, fw01_interfaces  # noqa: E402
 IMAGEN_BASE = "celeris-lab/base:dev"
 IMAGEN_NODO = "celeris-lab/node:dev"        # base + el binario de celeris-node (misma compilación que la imagen OCI)
 IMAGEN_COWRIE = "cowrie/cowrie@sha256:e7c4b4fe5fbb874e682c6c0c7a1daf1c3183c622d5cc2d281f453c1c4d9f97ac"  # oficial, sin shell: va como acompañante de hny01
+IMAGEN_WAZUH = "wazuh/wazuh-manager@sha256:b906ebfc77d78446e9b676e1a0b3cd78e2bf3ac2341688f1726b09c29e0aa826"  # 4.9.2; sin shell ni herramientas de red: acompañante de siem01
 
 # CI-24: valores del laboratorio que el inventario no fija.
 PARAMETROS_LAB = {
@@ -35,6 +36,10 @@ PARAMETROS_LAB = {
     "dominio_portal": "portal.celeris.internal",
     "dominio_origen": "listado.example.com",    # dominio «listado» de T07: el nodo descifra su TLS
     "dominio_generico": "example.com",          # T14, T19, T22, T24
+    "dominio_acme": "acme.example.com",         # T49: directorio ACME de laboratorio en ext01 (no es Let's Encrypt)
+    "honey_url": "/admin-backup.zip",           # T31 (REQ-F-27): ruta señuelo de los nodos EDGE [S-17]
+    "restic_usuario": "respaldo",               # T39: usuario SFTP de NAS01 en la VLAN 71 [S-18]
+    "restic_repositorio": "/srv/respaldo",      # T39: carpeta de los repositorios restic en NAS01 [S-18]
 }
 P = PARAMETROS_LAB
 
@@ -52,9 +57,13 @@ NODOS = {
     "ids01": ("IDS01", "SECURITY", "ids"),
     "edge01": ("EDGE01", "EDGE", "edge"),
     "edge02": ("EDGE02", "EDGE", "edge"),
+    "siem01": ("SIEM01", "SECURITY", "siem"),
 }
-# Zonas con puente en F4.1 (no hay br-vlan70 ni br-vlan71: STORAGE y BACKUP no se emulan, CI-16)
-ZONAS_PUENTE = ["MGMT", "SERVERS", "LAB", "LAB-TEST", "DMZ-SVC", "DMZ-HONEY", "SECURITY", "EDGE"]
+NAS = "nas01"                       # NAS01 tiene tres interfaces (STORAGE, BACKUP y MGMT): no encaja en NODOS, que es de un nodo por zona
+SIEM_IP_ZONA = "SECURITY"
+# Zonas con puente. STORAGE (VLAN 70) no tiene interfaz en FW01: no hay gateway (D1.4) y solo la usan ESX01 y NAS01; BACKUP (VLAN 71) sí.
+ZONAS_PUENTE = ["MGMT", "SERVERS", "LAB", "LAB-TEST", "DMZ-SVC", "DMZ-HONEY", "SECURITY", "EDGE", "STORAGE", "BACKUP"]
+ZONAS_FW01 = [z for z in ZONAS_PUENTE if z != "STORAGE"]
 CAPTURAS_IDS01 = ["MGMT", "SERVERS", "LAB-TEST", "SECURITY"]      # D1.14: VLAN 10, 20, 31 y 50
 
 
@@ -99,7 +108,7 @@ def topologia(x: Infra) -> dict:
         nodes[nombre] = d
 
     # fw01-sim: wan + una interfaz por zona con puente
-    zf = ZONAS_PUENTE
+    zf = ZONAS_FW01
     ifs = [f"eth{n}" for n in range(1, len(zf) + 2)]
     linux("fw01-sim", IMAGEN_BASE, ifs, {"sysctls": {"net.ipv4.ip_forward": 1, "net.ipv4.conf.all.rp_filter": 0}})
     links.append({"endpoints": ["fw01-sim:eth1", f"br-wan:{_veth('fw01-sim', 'wan')}"]})
@@ -112,6 +121,8 @@ def topologia(x: Infra) -> dict:
             imagen = IMAGEN_NODO
         else:
             imagen = IMAGEN_BASE
+        if nombre == "hny01":        # los registros de Cowrie (acompañante) los lee el agente de Wazuh de hny01
+            extra = {"binds": [f"generated/{nombre}:/lab:ro", ".run/pki:/pki:ro", ".run/cowrie-log:/var/log/cowrie:ro"]}
         if rol == "ids":
             ifaces = ["eth1"] + [f"eth{n}" for n in range(2, 2 + len(CAPTURAS_IDS01))]
         linux(nombre, imagen, ifaces, extra)
@@ -121,7 +132,16 @@ def topologia(x: Infra) -> dict:
                 links.append({"endpoints": [f"{nombre}:eth{n}", f"{puente(x, zc)}:{_veth(nombre, 'c' + str(x.zonas[zc]['vlan']))}"]})
 
     # Cowrie (SSH 2222, F24) comparte la red de hny01: su imagen oficial no trae shell para configurar interfaces
-    nodes["hny01-cowrie"] = {"kind": "linux", "image": IMAGEN_COWRIE, "network-mode": "container:hny01"}
+    nodes["hny01-cowrie"] = {"kind": "linux", "image": IMAGEN_COWRIE, "network-mode": "container:hny01",
+                             "binds": [".run/cowrie-log:/cowrie/cowrie-git/var/log/cowrie"]}
+    # Wazuh manager (SIEM01): comparte la red de siem01 porque su imagen no trae herramientas para configurarla. Config y reglas por montaje.
+    nodes["siem01-wazuh"] = {"kind": "linux", "image": IMAGEN_WAZUH, "network-mode": "container:siem01",
+                             "binds": [".run/wazuh/ossec.conf:/wazuh-config-mount/etc/ossec.conf:ro",
+                                       "../siem/wazuh/local_rules.xml:/wazuh-config-mount/etc/rules/local_rules.xml:ro"]}
+    # NAS01: STORAGE (VLAN 70, sin gateway), BACKUP (VLAN 71) y MGMT. Equivalente funcional (F4.2): sshd + restic y un puerto 2049; no es un NAS.
+    linux(NAS, IMAGEN_BASE, ["eth1", "eth2", "eth3"])
+    for n, z in enumerate(("STORAGE", "BACKUP", "MGMT"), start=1):
+        links.append({"endpoints": [f"{NAS}:eth{n}", f"{puente(x, z)}:{_veth(NAS, str(x.zonas[z]['vlan']))}"]})
 
     # WAN simulada y nube emulada
     linux("ext01", IMAGEN_BASE, ["eth1"])
@@ -130,7 +150,9 @@ def topologia(x: Infra) -> dict:
     links.append({"endpoints": ["vgw-sim:eth1", f"br-wan:{_veth('vgw-sim', 'wan')}"]})
     linux("shield01", IMAGEN_NODO, ["eth1"])
     links.append({"endpoints": ["vgw-sim:eth2", "shield01:eth1"]})
-    return {"name": "celeris", "topology": {"nodes": nodes, "links": links}}
+    # Red de gestión de containerlab: fuera de 172.16.0.0/12 bajo 172.17-172.24 (las usan otros proyectos de Docker) y de las redes del diseño (CI-24).
+    return {"name": "celeris", "mgmt": {"network": "celeris-mgmt", "ipv4-subnet": "172.30.250.0/24"},
+            "topology": {"nodes": nodes, "links": links}}
 
 
 def topologia_yaml(x: Infra) -> str:
@@ -160,7 +182,7 @@ def _zona_dns(x: Infra) -> str:
     for r in x.inv["servicios_base"]["pac"]["registros_a"]:
         lineas.append(f'  local-data: "{pac_host}. A {r["ip"]}"')
     lineas.append(f'  local-data: "{P["dominio_portal"]}. A {_ip_de(x, "WAF01")}"')
-    for d in (P["dominio_origen"], P["dominio_generico"]):
+    for d in (P["dominio_origen"], P["dominio_generico"], P["dominio_acme"]):
         lineas.append(f'  local-zone: "{d}." redirect')
         lineas.append(f'  local-data: "{d}. A {P["ext01"]}"')
     return "\n".join(lineas) + "\n"
@@ -306,12 +328,37 @@ def _config_edge(x: Infra, nodo: str) -> str:
     f12 = x.flujos["F12"]
     admin = next(p for pr in f12["protocolos"] for p in pr["puertos"] if p == 9128)
     ip = _ip_de(x, comp)
+    f9 = x.flujos["F9"]
+    shield = f"{_ip_de(x, 'EC2-SHIELD')}:{f9['protocolos'][0]['puertos'][0]}"
+    nodos_pac = [f"{n[1]}:{n[2]}" for n in pac.nodos_proxy(x)]
+    directas = [f"{n}" for n in pac.redes_internas(x)]
+    pac_host = x.inv["servicios_base"]["pac"]["url"].split("/")[2]
     return (f'{cabecera("#")}listen = "{ip}:{puerto}"\n'
             f"allowed_clients = {clientes!r}\n".replace("'", '"') +
             f'operator_contact = "redes@example.invalid"\ndata_dir = "/data/store"\nca_cert = "/data/ca/celeris-ca.crt"\nca_key = "/data/ca/celeris-ca.key"\n'
             f'intercept_domains = ["{P["dominio_origen"]}"]\nupstream_extra_ca = ["/pki/ca.pem"]\n'
             f'admin_listen = "{ip}:{admin}"\nadmin_token_file = "/data/admin.token"\n'
             # REQ-NF-14: el puerto de administración solo por TLS (certificado autofirmado de laboratorio, generado por el nodo al arrancar)
+            'admin_tls = true\nadmin_tls_cert = "/data/ca/admin-tls.crt"\nadmin_tls_key = "/data/ca/admin-tls.key"\n'
+            'security_log_enabled = true\nsecurity_log_dir = "/data/logs"\n'
+            # REQ-F-29 (F9): los MISS salen hacia el shield por la VPN, con mTLS; la CA del shield es la de laboratorio (upstream_extra_ca)
+            f'upstream_parent = "{shield}"\nupstream_parent_cert = "/pki/{nodo}.pem"\nupstream_parent_key = "/pki/{nodo}.key"\n'
+            # REQ-F-27: ruta señuelo de laboratorio [S-17]
+            f'honey_urls = ["{P["honey_url"]}"]\n'
+            # REQ-F-26: el PAC lo genera el binario desde estos valores (`celeris-cache pac`); nginx lo sirve por F3
+            f'pac_nodes = {nodos_pac!r}\npac_direct_networks = {directas!r}\npac_host = "{pac_host}"\n'.replace("'", '"'))
+
+
+def _config_shield(x: Infra) -> str:
+    """EC2-SHIELD en modo shield (REQ-F-29): mTLS en F9 y el proxy local de bucle local; métricas por TLS para OBS01 (F12)."""
+    ip = _ip_de(x, "EC2-SHIELD")
+    f9 = x.flujos["F9"]["protocolos"][0]["puertos"][0]
+    admin = next(p for pr in x.flujos["F12"]["protocolos"] for p in pr["puertos"] if p == 9128)
+    return (f'{cabecera("#")}listen = "127.0.0.1:3128"\nallowed_clients = ["127.0.0.1/32"]\nrate_limit_per_minute = 0\n'
+            'operator_contact = "redes@example.invalid"\ndata_dir = "/data/store"\nca_cert = "/data/ca/celeris-ca.crt"\nca_key = "/data/ca/celeris-ca.key"\n'
+            'upstream_extra_ca = ["/pki/ca.pem"]\n'
+            f'shield_listen = "{ip}:{f9}"\nshield_cert = "/pki/shield.pem"\nshield_key = "/pki/shield.key"\nshield_client_ca = "/pki/nodos-ca.pem"\n'
+            f'admin_listen = "{ip}:{admin}"\nadmin_token_file = "/data/admin.token"\n'
             'admin_tls = true\nadmin_tls_cert = "/data/ca/admin-tls.crt"\nadmin_tls_key = "/data/ca/admin-tls.key"\n'
             'security_log_enabled = true\nsecurity_log_dir = "/data/logs"\n')
 
@@ -359,8 +406,12 @@ ORIGEN_PY = '''#!/usr/bin/env python3
 import http.server, ssl, sys, threading
 class H(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
+        if self.path == "/directory":        # ACME de laboratorio (T49): responde como un directorio; no emite certificados
+            cuerpo = b'{"newNonce": "/acme/new-nonce", "newAccount": "/acme/new-acct", "newOrder": "/acme/new-order", "meta": {"nota": "ACME de laboratorio"}}'
+            self.send_response(200); self.send_header("Content-Type", "application/json"); self.send_header("Content-Length", str(len(cuerpo)))
+            self.end_headers(); self.wfile.write(cuerpo); return
         cuerpo = ("origen " + self.headers.get("Host", "?") + " " + self.path + "\\n").encode() + b"x" * 2048
-        self.send_response(200); self.send_header("Content-Type", "text/plain")
+        self.send_response(200); self.send_header("Content-Type", "text/plain"); self.send_header("Alt-Svc", 'h3=":443"; ma=3600')
         self.send_header("Cache-Control", "public, max-age=3600"); self.send_header("Content-Length", str(len(cuerpo)))
         self.end_headers(); self.wfile.write(cuerpo)
     def log_message(self, *a): sys.stderr.write("origen %s %s\\n" % (self.client_address[0], self.requestline))
@@ -379,7 +430,7 @@ def _arranque_fw(x: Infra) -> str:
     fw = fw01_interfaces(x)
     L = ["#!/bin/sh", cabecera("#").rstrip(), "set -u", "mount -o remount,rw /proc/sys 2>/dev/null || true",
          "sysctl -qw net.ipv4.ip_forward=1 net.ipv4.conf.all.rp_filter=0 net.ipv4.conf.default.rp_filter=0 || true"]
-    orden = ["PERIMETRO"] + ZONAS_PUENTE
+    orden = ["PERIMETRO"] + ZONAS_FW01
     for n, zona in enumerate(orden, start=1):
         nombre = fw[zona]["interfaz"]
         L += [f"ip link set eth{n} down", f"ip link set eth{n} name {nombre}", f"ip link set {nombre} up"]
@@ -402,6 +453,10 @@ def _arranque_vgw(x: Infra) -> str:
          "sysctl -qw net.ipv4.ip_forward=1 net.ipv4.conf.all.rp_filter=0 net.ipv4.conf.default.rp_filter=0 || true",
          "ip link set eth1 up"]
     L += [f"ip addr add {p}/{ipaddress.ip_network(P['wan_red']).prefixlen} dev eth1" for p in P["aws_peers"]]
+    vpc = x.componentes["AWS-VPC"]["cidr"]
+    # Hace el papel de NAT01 (D2.5): lo que sale de la VPC hacia «Internet» (ext01) lo hace con la IP de vgw-sim; sin esto ext01 no sabría responder.
+    L += ["nft add table ip nat", "nft 'add chain ip nat post { type nat hook postrouting priority srcnat ; }'",
+          f"nft add rule ip nat post ip saddr {vpc} oifname eth1 masquerade"]
     L += ["ip link set eth2 up", f"ip addr add {P['vgw_lan']}/{ipaddress.ip_network(x.componentes['AWS-APP-A']['cidr']).prefixlen} dev eth2",
           "sh /lab/vti-up.sh", "mkdir -p /etc/swanctl /run/frr", "cp /lab/swanctl.conf /etc/swanctl/swanctl.conf",
           "cp /pki/psk-vgw.conf /etc/swanctl/psk-vgw.conf", "cp /lab/strongswan.conf /etc/strongswan.conf",
@@ -412,12 +467,33 @@ def _arranque_vgw(x: Infra) -> str:
     return "\n".join(L)
 
 
+AGENTES = {   # nodo → archivos JSON que su agente de Wazuh lee (F13)
+    "waf01": ["/var/log/modsec_audit.log"], "hny01": ["/var/log/cowrie/cowrie.json"], "hny02": ["/var/log/canary.json"],
+    "ids01": ["/var/log/suricata/eve.json"], "edge01": ["/data/logs/security-*.jsonl"], "edge02": ["/data/logs/security-*.jsonl"],
+    "obs01": [], "svc01": [], "web01": [], NAS: [],
+}
+
+
+def _agente_sh(x: Infra, nodo: str) -> str:
+    """Enrola el agente de Wazuh del nodo en siem01 (F13: 1515 para el alta y 1514 para los eventos) y le indica sus archivos."""
+    siem = _ip_de(x, "SIEM01")
+    nombre = nodo.upper()
+    localfiles = "".join(f"<localfile><log_format>json</log_format><location>{ruta}</location></localfile>" for ruta in AGENTES[nodo])
+    return "\n".join([
+        "#!/bin/sh", cabecera("#").rstrip(), "# Agente de Wazuh: espera al manager, se enrola y lee los archivos del nodo. Corre en segundo plano.",
+        f"for i in $(seq 1 180); do nc -z -w1 {siem} 1515 && break; sleep 1; done",
+        f"sed -i 's|<address>.*</address>|<address>{siem}</address>|' /var/ossec/etc/ossec.conf",
+        f"sed -i ':a;N;$!ba;s|\\(.*\\)</ossec_config>|\\1{localfiles}</ossec_config>|' /var/ossec/etc/ossec.conf" if localfiles else ":",
+        f"for i in 1 2 3 4 5; do /var/ossec/bin/agent-auth -m {siem} -A {nombre} && break; sleep 3; done > /var/log/agent-auth.log 2>&1",
+        "/var/ossec/bin/wazuh-control start > /var/log/wazuh-agent.log 2>&1", ""])
+
+
 def archivos_nodo(x: Infra, nodo: str, aviso_md: Path) -> dict[str, str]:
     """Contenido de lab/generated/<nodo>/: {nombre de archivo: texto}."""
     pac_txt = pac.generar(x)
     if nodo == "fw01-sim":
         fw = fw01_interfaces(x)
-        ifaces_dns = [fw[z]["ip"] for z in ZONAS_PUENTE]
+        ifaces_dns = [fw[z]["ip"] for z in ZONAS_FW01]
         aws = P["aws_peers"]
         return {
             "arranque.sh": _arranque_fw(x),
@@ -442,30 +518,47 @@ def archivos_nodo(x: Infra, nodo: str, aviso_md: Path) -> dict[str, str]:
         ip = _ip_de(x, "EC2-SHIELD")
         pref = ipaddress.ip_network(x.componentes["AWS-APP-A"]["cidr"]).prefixlen
         return {"arranque.sh": "\n".join(["#!/bin/sh", cabecera("#").rstrip(), "ip link set eth1 up", f"ip addr add {ip}/{pref} dev eth1",
-                                          f"ip route replace default via {P['vgw_lan']}", "touch /run/lab-listo", ""])}
+                                          f"ip route replace default via {P['vgw_lan']}", "mkdir -p /data/store /data/ca /data/logs",
+                                          f"printf '%s\\n' '{P['ext01']} {P['dominio_origen']} {P['dominio_generico']} {P['dominio_acme']}' >> /etc/hosts   # sustituye al DNS de la VPC",
+                                          "RUST_LOG=celeris_cache=info celeris-cache /lab/config.toml > /var/log/celeris.log 2>&1 &",
+                                          "touch /run/lab-listo", ""]), "config.toml": _config_shield(x)}
+    if nodo == NAS:
+        return _archivos_nas(x)
     comp, zona, rol = NODOS[nodo]
     base = ["#!/bin/sh", cabecera("#").rstrip(), "set -u"] + _red_host(x, comp, zona)
+    agente = nodo in AGENTES
+    if agente:
+        base += ["sh /lab/agente.sh &"]
+    extra_agente = {"agente.sh": _agente_sh(x, nodo)} if agente else {}
     if rol == "host":
         base += ["touch /run/lab-listo", ""]
+        return {"arranque.sh": "\n".join(base)} | extra_agente
+    if rol == "siem":
+        ip = _ip_de(x, comp)
+        # F14: syslog por TLS en 6514, hacia el syslog TCP de bucle local del manager (sin UDP 514, REQ-NF-14 análogo). Servidor TLS sin certificado de cliente.
+        base += [f"socat -d OPENSSL-LISTEN:6514,bind={ip},reuseaddr,fork,cert=/pki/siem01.pem,key=/pki/siem01.key,verify=0 TCP:127.0.0.1:514 > /var/log/syslog-tls.log 2>&1 &",
+                 "touch /run/lab-listo", ""]
         return {"arranque.sh": "\n".join(base)}
     if rol == "svc":
         ip = _ip_de(x, comp)
         base += [f"unbound -c /lab/unbound.conf &", "chronyd -f /lab/chrony.conf -x &", "nginx -c /lab/nginx.conf", "touch /run/lab-listo", ""]
         return {"arranque.sh": "\n".join(base), "unbound.conf": _unbound(x, [ip]), "chrony.conf": _chrony(x),
-                "nginx.conf": _nginx_pac(ip).replace("root /lab/pac", "root /lab"), "wpad.dat": pac_txt}
+                "nginx.conf": _nginx_pac(ip).replace("root /lab/pac", "root /lab"), "wpad.dat": pac_txt} | extra_agente
     if rol == "edge":
         ip = _ip_de(x, comp)
         base += ["mkdir -p /data/store /data/ca /data/logs", "RUST_LOG=celeris_cache=info celeris-cache /lab/config.toml > /var/log/celeris.log 2>&1 &"]
         if nodo == "edge01":                                      # D1.12: EDGE01 sirve además una copia del PAC (F3)
-            base += ["nginx -c /lab/nginx.conf"]
+            # REQ-F-26: el PAC lo genera el binario (`celeris-cache pac`) desde la configuración del nodo, y nginx lo sirve
+            base += ["mkdir -p /pac", "celeris-cache pac /lab/config.toml > /pac/wpad.dat", "nginx -c /lab/nginx.conf"]
         base += ["touch /run/lab-listo", ""]
-        out = {"arranque.sh": "\n".join(base), "config.toml": _config_edge(x, nodo)}
+        out = {"arranque.sh": "\n".join(base), "config.toml": _config_edge(x, nodo)} | extra_agente
         if nodo == "edge01":
-            out |= {"nginx.conf": _nginx_pac(ip).replace("root /lab/pac", "root /lab"), "wpad.dat": pac_txt}
+            out |= {"nginx.conf": _nginx_pac(ip).replace("root /lab/pac", "root /pac")}
         return out
     if rol == "waf":
-        base += ["mkdir -p /var/log/nginx", "mkdir -p /etc/modsecurity; cp /lab/lab-main.conf /etc/modsecurity/lab-main.conf", "nginx -c /lab/nginx.conf", "touch /run/lab-listo", ""]
-        return {"arranque.sh": "\n".join(base), "nginx.conf": _nginx_waf(x), "lab-main.conf": _modsec_main()}
+        base += ["mkdir -p /var/log/nginx", "touch /var/log/modsec_audit.log; chmod 666 /var/log/modsec_audit.log",
+                 "mkdir -p /etc/modsecurity; cp /lab/lab-main.conf /etc/modsecurity/lab-main.conf", "nginx -c /lab/nginx.conf", "touch /run/lab-listo", ""]
+        return {"arranque.sh": "\n".join(base), "nginx.conf": _nginx_waf(x), "lab-main.conf": _modsec_main()} | extra_agente
     if rol == "web":
         ip = _ip_de(x, comp)
         waf = _ip_de(x, "WAF01")
@@ -476,23 +569,47 @@ def archivos_nodo(x: Infra, nodo: str, aviso_md: Path) -> dict[str, str]:
                f"    ip saddr {waf} ip daddr {ip} tcp dport {pt} counter accept comment \"F22 WAF01 > WEB01\"\n  }}\n"
                f"  chain output {{ type filter hook output priority 0; policy drop;\n    ct state established,related accept\n    oifname \"lo\" accept\n  }}\n}}\n")
         base += ["mkdir -p /var/log/nginx", "nft -f /lab/web01.nft", "nginx -c /lab/nginx.conf", "touch /run/lab-listo", ""]
-        return {"arranque.sh": "\n".join(base), "nginx.conf": _nginx_web(x), "web01.nft": nft, "web/index.html": _html_aviso(aviso_md)}
+        return {"arranque.sh": "\n".join(base), "nginx.conf": _nginx_web(x), "web01.nft": nft, "web/index.html": _html_aviso(aviso_md)} | extra_agente
     if rol == "canary":
         ip = _ip_de(x, comp)
-        base += [f"python3 /lab/canario.py {ip} 22,80,445,3389 &", "touch /run/lab-listo", ""]
-        return {"arranque.sh": "\n".join(base), "canario.py": CANARIO_PY}
+        base += ["touch /var/log/canary.json; chmod 666 /var/log/canary.json", f"python3 /lab/canario.py {ip} 22,80,445,3389 &", "touch /run/lab-listo", ""]
+        return {"arranque.sh": "\n".join(base), "canario.py": CANARIO_PY} | extra_agente
     if rol == "ids":
         base += ["# eth2..eth5 son las interfaces de captura (D1.14); sin IP, en modo promiscuo"]
         for n in range(2, 2 + len(CAPTURAS_IDS01)):
             base.append(f"ip link set eth{n} up promisc on")
         caps = [f"eth{n}" for n in range(2, 2 + len(CAPTURAS_IDS01))]
         base += ["nohup suricata --af-packet -c /lab/suricata.yaml > /var/log/suricata.out 2>&1 &", "touch /run/lab-listo", ""]
-        return {"arranque.sh": "\n".join(base), "suricata.yaml": _suricata(caps, "/lab/local.rules"), "local.rules": REGLAS_SURICATA}
+        return {"arranque.sh": "\n".join(base), "suricata.yaml": _suricata(caps, "/lab/local.rules"), "local.rules": REGLAS_SURICATA} | extra_agente
     raise ValueError(nodo)
 
 
+def _archivos_nas(x: Infra) -> dict[str, str]:
+    """NAS01 (F4.2: equivalente funcional): sshd para restic por SFTP en BACKUP (F17), un puerto 2049 en STORAGE (no es NFS) y gestión en MGMT.
+    No reenvía entre sus interfaces: STORAGE no tiene gateway (D1.4) y no debe ser una ruta hacia ninguna otra zona."""
+    alm, resp, ges = (_ip_de(x, "NAS01", z) for z in ("STORAGE", "BACKUP", "MGMT"))
+    pref = {z: _pref(x, z) for z in ("STORAGE", "BACKUP", "MGMT")}
+    usr, repo = P["restic_usuario"], P["restic_repositorio"]
+    L = ["#!/bin/sh", cabecera("#").rstrip(), "set -u", "mount -o remount,rw /proc/sys 2>/dev/null || true",
+         "sysctl -qw net.ipv4.ip_forward=0 || true",
+         f"ip link set eth1 up", f"ip addr add {alm}/{pref['STORAGE']} dev eth1          # STORAGE: sin gateway",
+         f"ip link set eth2 up", f"ip addr add {resp}/{pref['BACKUP']} dev eth2          # BACKUP",
+         f"ip route replace default via {_gw(x, 'BACKUP')}",
+         f"ip link set eth3 up", f"ip addr add {ges}/{pref['MGMT']} dev eth3             # MGMT: gestión desde JMP01 (F20)",
+         _resolv(x, "BACKUP"),
+         f"id {usr} >/dev/null 2>&1 || useradd -m -s /bin/sh {usr}", f"mkdir -p {repo} /home/{usr}/.ssh /run/sshd", f"chown {usr} {repo}",
+         f"cp /pki/respaldo.pub /home/{usr}/.ssh/authorized_keys && chown -R {usr} /home/{usr}/.ssh && chmod 700 /home/{usr}/.ssh && chmod 600 /home/{usr}/.ssh/authorized_keys",
+         f"passwd -l {usr} >/dev/null 2>&1 || true", "ssh-keygen -A >/dev/null 2>&1",
+         f"/usr/sbin/sshd -o ListenAddress={resp} -o PasswordAuthentication=no -o PermitRootLogin=no -o AllowUsers={usr}",
+         "# Escuchas: 2049 en STORAGE (emulado, no es NFS) y 443 en MGMT (consola de gestión emulada)",
+         f"python3 /lab/escucha.py {alm} 2049 &", f"python3 /lab/escucha.py {ges} 443 &", "sh /lab/agente.sh &", "touch /run/lab-listo", ""]
+    escucha = ("import socket, sys\ns = socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)\n"
+               "s.bind((sys.argv[1], int(sys.argv[2]))); s.listen(16)\nwhile True:\n    c, _ = s.accept(); c.close()\n")
+    return {"arranque.sh": "\n".join(L), "escucha.py": escucha, "agente.sh": _agente_sh(x, NAS)}
+
+
 def todos_los_nodos() -> list[str]:
-    return ["fw01-sim", "vgw-sim", "ext01", "shield01"] + list(NODOS)
+    return ["fw01-sim", "vgw-sim", "ext01", "shield01", NAS] + list(NODOS)
 
 
 def puentes_sh(x: Infra) -> str:
@@ -522,21 +639,40 @@ def espejo_sh(x: Infra) -> str:
 # PKI de laboratorio (fuera del repositorio) y salida
 # ------------------------------------------------------------------------------------------------------------------
 
-def crear_pki(directorio: Path) -> None:
-    """CA de laboratorio y certificados del portal y del origen. Se generan una vez; nunca se versionan (lab/.run/ está en .gitignore)."""
+def crear_pki(directorio: Path, x: Infra | None = None) -> None:
+    """CA de laboratorio y certificados del portal, el origen, el shield, siem01 y los nodos EDGE (cliente, para mTLS), y una llave SSH de respaldo.
+    Se generan una vez; nunca se versionan (lab/.run/ está en .gitignore). Lo que falte se completa sin tocar la CA."""
     directorio.mkdir(parents=True, exist_ok=True)
-    if (directorio / "ca.pem").exists():
-        return
 
     def sh(*a):
         subprocess.run(a, check=True, capture_output=True, cwd=directorio)
-    sh("openssl", "req", "-x509", "-newkey", "rsa:3072", "-nodes", "-keyout", "ca.key", "-out", "ca.pem", "-days", "30", "-subj", "/CN=Celeris Lab CA",
-       "-addext", "basicConstraints=critical,CA:TRUE", "-addext", "keyUsage=critical,keyCertSign,cRLSign")
-    for nombre, dns in (("portal", [P["dominio_portal"]]), ("origen", [P["dominio_origen"], P["dominio_generico"]])):
-        sh("openssl", "req", "-newkey", "rsa:2048", "-nodes", "-keyout", f"{nombre}.key", "-out", f"{nombre}.csr", "-subj", f"/CN={dns[0]}")
-        (directorio / f"{nombre}.cnf").write_text("subjectAltName=" + ",".join(f"DNS:{d}" for d in dns) + "\nbasicConstraints=CA:FALSE\nextendedKeyUsage=serverAuth\n")
-        sh("openssl", "x509", "-req", "-in", f"{nombre}.csr", "-CA", "ca.pem", "-CAkey", "ca.key", "-CAcreateserial", "-out", f"{nombre}.pem", "-days", "30",
+
+    def ca(nombre: str, asunto: str):
+        if not (directorio / f"{nombre}.pem").exists():
+            sh("openssl", "req", "-x509", "-newkey", "rsa:3072", "-nodes", "-keyout", f"{nombre}.key", "-out", f"{nombre}.pem", "-days", "30", "-subj", f"/CN={asunto}",
+               "-addext", "basicConstraints=critical,CA:TRUE", "-addext", "keyUsage=critical,keyCertSign,cRLSign")
+
+    def cert(nombre: str, emisor: str, asunto: str, san: list[str], uso: str):
+        if (directorio / f"{nombre}.pem").exists():
+            return
+        sh("openssl", "req", "-newkey", "rsa:2048", "-nodes", "-keyout", f"{nombre}.key", "-out", f"{nombre}.csr", "-subj", f"/CN={asunto}")
+        ext = ("subjectAltName=" + ",".join(san) + "\n" if san else "") + f"basicConstraints=CA:FALSE\nextendedKeyUsage={uso}\n"
+        (directorio / f"{nombre}.cnf").write_text(ext)
+        sh("openssl", "x509", "-req", "-in", f"{nombre}.csr", "-CA", f"{emisor}.pem", "-CAkey", f"{emisor}.key", "-CAcreateserial", "-out", f"{nombre}.pem", "-days", "30",
            "-extfile", f"{nombre}.cnf")
+
+    ca("ca", "Celeris Lab CA")
+    ca("nodos-ca", "Celeris Lab CA de nodos")
+    cert("portal", "ca", P["dominio_portal"], [f"DNS:{P['dominio_portal']}"], "serverAuth")
+    cert("origen", "ca", P["dominio_origen"], [f"DNS:{d}" for d in (P["dominio_origen"], P["dominio_generico"], P["dominio_acme"])], "serverAuth")
+    if x is not None:
+        cert("shield", "ca", "shield01", [f"IP:{_ip_de(x, 'EC2-SHIELD')}"], "serverAuth")
+        cert("siem01", "ca", "siem01", [f"IP:{_ip_de(x, 'SIEM01')}"], "serverAuth")
+    for nodo in ("edge01", "edge02"):
+        cert(nodo, "nodos-ca", nodo, [], "clientAuth")
+    if not (directorio / "respaldo.key").exists():      # llave SSH de laboratorio de restic (F17): la pública va a NAS01, la privada a los servidores
+        sh("ssh-keygen", "-q", "-t", "ed25519", "-N", "", "-C", "respaldo-lab", "-f", "respaldo.key")
+        (directorio / "respaldo.key.pub").rename(directorio / "respaldo.pub")
     for f in directorio.glob("*.key"):
         f.chmod(0o644)       # los contenedores leen la llave desde un montaje de solo lectura; es de laboratorio y vive en lab/.run/
 
@@ -555,6 +691,6 @@ def generar_todo(x: Infra, lab_dir: Path, aviso_md: Path) -> list[Path]:
         escribir(gen / nombre, texto, 0o755)
         escritos.append(gen / nombre)
     pki = lab_dir / ".run" / "pki"
-    crear_pki(pki)
+    crear_pki(pki, x)
     vpn.escribir_psk(pki, x, P["aws_peers"], P["fw01_wan"])
     return escritos

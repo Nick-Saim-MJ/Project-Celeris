@@ -224,8 +224,10 @@ pruebas:
     criterio_aprobacion:
       - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "curl --http3 -m 5 https://example.com" }
       - { tipo: contador, metrica: paquetes_bloqueados_regla_F7, operador: ">", valor: 0 }
-      - { tipo: manual, descripcion: "El navegador carga la página por HTTP/2 sobre TCP" }
-    automatizable: false
+      - { tipo: regex, sobre: navegador, patron: "origen ", nota: "El navegador, con QUIC forzado hacia el origen, carga la página (Chromium sin pantalla en L; el navegador real en H)" }
+      - { tipo: contador, metrica: paquetes_quic_recibidos, operador: "==", valor: 0, nota: "registro de red del navegador: ninguna respuesta QUIC" }
+      - { tipo: contador, metrica: conexiones_tcp, operador: ">=", valor: 1, nota: "la página llegó por TCP (HTTP/2 si el origen lo ofrece; el origen de laboratorio es HTTP/1.1)" }
+    automatizable: true
     critica: true
     polaridad: negativa
     evidencia_a_capturar: ["Contador de la regla F7 en FW01", "Pestaña de red del navegador con el protocolo usado"]
@@ -249,10 +251,12 @@ pruebas:
     comando: "Apagar EDGE01 y navegar con navegador real; luego apagar EDGE02"
     resultado_esperado: "El PAC usa EDGE02; con ambos caídos, DIRECT; tiempo de cambio medido"
     criterio_aprobacion:
-      - { tipo: manual, descripcion: "Con EDGE01 apagado la navegación continúa por EDGE02 (registro de acceso de EDGE02)" }
-      - { tipo: manual, descripcion: "Con ambos apagados la navegación continúa por DIRECT (F6, solo piloto)" }
+      - { tipo: regex, sobre: navegador_con_edge01_caido, patron: "origen ", nota: "la página carga con EDGE01 apagado" }
+      - { tipo: contador, metrica: peticiones_nuevas_en_edge02_con_edge01_caido, operador: ">=", valor: 1, nota: "las atendió EDGE02 (estadísticas del nodo)" }
+      - { tipo: regex, sobre: navegador_sin_nodos, patron: "origen ", nota: "con ambos apagados la página sigue cargando" }
+      - { tipo: regex, sobre: registro_origen_directo, patron: "salida=DIRECT", nota: "el origen vio la IP pública de FW01 (NAT de salida) y no la de un nodo EDGE ni la del shield: salió DIRECT (F6, solo piloto)" }
       - { tipo: umbral, metrica: tiempo_de_cambio_s, operador: ">=", valor: 0, nota: "D1.16 no fija umbral: se reporta el valor medido" }
-    automatizable: false
+    automatizable: true
     critica: false
     polaridad: positiva
     evidencia_a_capturar: ["Cronometraje del cambio de nodo", "Registros de acceso de EDGE01 y EDGE02", "Captura del navegador"]
@@ -601,8 +605,8 @@ pruebas:
     criterio_aprobacion:
       - { tipo: exit_code, valor: 0, comando_adicional: "nslookup example.com 10.20.32.1" }
       - { tipo: regex, sobre: stdout, patron: "^200$", comando_adicional: "curl ... http://pac.celeris.internal/wpad.dat" }
-      - { tipo: manual, descripcion: "La navegación del usuario continúa sin intervención" }
-    automatizable: false
+      - { tipo: regex, sobre: navegador, patron: "origen ", nota: "el navegador carga la página con SVC01 apagado, sin intervención" }
+    automatizable: true
     critica: false
     polaridad: positiva
     evidencia_a_capturar: ["Salida de nslookup y curl", "Registro de acceso de EDGE01 con la petición del PAC"]
@@ -832,7 +836,7 @@ pruebas:
       - { tipo: contador, metrica: conexiones_registradas_en_hny02, operador: ">=", valor: 1 }
       - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
       - { tipo: umbral, metrica: latencia_alerta_wazuh_s, operador: "<", valor: 60 }
-      - { tipo: contador, metrica: paquetes_vistos_por_fw01, operador: "==", valor: 0, nota: "el tráfico dentro de la VLAN no cruza FW01" }
+      - { tipo: contador, metrica: paquetes_vistos_por_fw01, operador: "==", valor: 0, nota: "el tráfico del barrido dentro de la VLAN no cruza FW01 (se excluye el del agente de Wazuh, F13)" }
     automatizable: true
     critica: false
     polaridad: positiva
@@ -866,7 +870,7 @@ pruebas:
     critica: false
     polaridad: positiva
     evidencia_a_capturar: ["Petición y código devuelto", "Línea del registro de seguridad de Celeris", "Alerta de Wazuh (JSON)"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R4, R5]
     objetivos: [OD-09]
@@ -985,7 +989,7 @@ pruebas:
     critica: false
     polaridad: mixta
     evidencia_a_capturar: ["Código HTTP", "Salida de nc y de curl", "Contadores de FW01"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R4]
     objetivos: [OD-06]
@@ -993,6 +997,9 @@ pruebas:
     detecciones: []
     celdas_matriz: ["MGMT>INTERNET"]
     ampliacion: true
+    observacion_ensayo:
+      causa: "la matriz D1.8 permite MGMT → Internet por TCP 443 pero ningún flujo F-nn lo abre, y fw01-sim solo abre lo que declaran los flujos (CI-05)"
+      accion: "definir el flujo en D1.11 (por ejemplo, JMP01 → repositorios de actualización, TCP 443) o quitar la celda de la matriz; hasta entonces FW01 lo deniega"
     pendiente: true
     cambio: CI-05
 
@@ -1084,13 +1091,13 @@ pruebas:
   - id: T39
     categoria: disponibilidad
     nombre: "Respaldo y restauración en NAS01"
-    origen: DB01
+    origen: OBS01
     destino: "NAS01:respaldo"
     flujos: [F17]
-    componentes: [DB01, CTRL01, SVC01, OBS01, FW01, NAS01, LABCLI01]
+    componentes: [OBS01, FW01, NAS01, LABCLI01]
     objetivo_que_valida: "Los servidores respaldan por SSH hacia la VLAN 71, la restauración es íntegra y su tiempo cumple el RTO del plano de control (D2.9)"
     precondicion: "NAS01 en 10.20.71.20:22 con repositorio restic; <USUARIO_DE_RESPALDO> y <REPOSITORIO> no están en el inventario"
-    comando: "restic -r sftp:<USUARIO_DE_RESPALDO>@10.20.71.20:<REPOSITORIO> backup /var/lib/postgresql ; restic check ; time restic restore latest --target /restauracion ; desde LABCLI01: nc -zv -w3 10.20.71.20 22"
+    comando: "restic -r sftp:<USUARIO_DE_RESPALDO>@10.20.71.20:<REPOSITORIO> backup <DATOS_A_RESPALDAR> ; restic check ; time restic restore latest --target /restauracion ; desde LABCLI01: nc -zv -w3 10.20.71.20 22"
     resultado_esperado: "Respaldo y comprobación sin errores; restauración en ≤ 2 h (RTO del plano de control); LABCLI01 no llega a la VLAN 71"
     criterio_aprobacion:
       - { tipo: exit_code, valor: 0, comando_adicional: "restic backup" }
@@ -1101,7 +1108,7 @@ pruebas:
     critica: false
     polaridad: mixta
     evidencia_a_capturar: ["Salida de restic backup, check y restore con tiempos", "Salida de nc desde LABCLI01"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R6, R8]
     objetivos: [OD-06, OD-07]
@@ -1394,7 +1401,7 @@ pruebas:
     critica: false
     polaridad: mixta
     evidencia_a_capturar: ["Código HTTP del directorio ACME", "Salida de curl hacia el puerto 80", "Contador de la regla F23 en FW01"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R4, R6]
     objetivos: [OD-08]

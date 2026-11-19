@@ -204,6 +204,15 @@ fn remaining_ttl(expires_at: u64, now: u64) -> i64 {
     i64::try_from(expires_at).unwrap_or(i64::MAX).saturating_sub(i64::try_from(now).unwrap_or(i64::MAX))
 }
 
+/// ¿La ruta es una honey-URL (REQ-F-27)? Coincide la ruta exacta o cualquier ruta que cuelgue de ella. Una entrada vacía no cuenta: coincidiría con todo.
+fn is_honey_url(honey: &[String], path: &str) -> bool {
+    honey.iter().map(|h| h.trim()).filter(|h| !h.is_empty() && *h != "/").any(|h| {
+        let h = h.trim_end_matches('/');
+        let h = if h.starts_with('/') { h.to_owned() } else { format!("/{h}") };
+        path == h || path.starts_with(&format!("{h}/"))
+    })
+}
+
 /// El Host no decide nada: el destino y la clave de caché salen de la URI, que en HTTPS es la del CONNECT.
 /// Que no coincidan no daña la caché, pero un navegador normal no lo hace.
 fn host_differs(host_header: &HeaderValue, uri_host: &str) -> bool {
@@ -422,6 +431,12 @@ impl HttpHandler for CacheHandler {
         }
         if url.hostname() == sh.cfg.notice_host {
             return self.notice_response().into();
+        }
+        // req: REQ-F-27: ninguna persona pide estas rutas; quien lo hace está recorriendo el sitio en busca de algo. No se reenvía nada.
+        if is_honey_url(&sh.cfg.honey_urls, req.uri().path()) {
+            sh.security.record(SecurityEvent { event: "honey_url", srcip: Some(client), host: Some(url.hostname()), path: Some(req.uri().path()), ..Default::default() });
+            sh.detector.observe(client, Some(404), None);
+            return empty_response(StatusCode::NOT_FOUND).into();
         }
         Stats::inc(&sh.stats.requests);
         let host = req.uri().host().unwrap_or(url.hostname());
@@ -719,6 +734,18 @@ mod tests {
         assert_eq!(remaining_ttl(100, 40), 60);
         assert_eq!(remaining_ttl(40, 100), -60);
         assert_eq!(remaining_ttl(u64::MAX, 0), i64::MAX);
+    }
+
+    #[test]
+    fn las_honey_urls_coinciden_por_ruta_y_por_prefijo() {
+        let honey = vec!["/admin-backup.zip".to_owned(), "wp-login-trampa/".to_owned(), "".to_owned(), "/".to_owned()];
+        assert!(is_honey_url(&honey, "/admin-backup.zip"));
+        assert!(is_honey_url(&honey, "/wp-login-trampa"));
+        assert!(is_honey_url(&honey, "/wp-login-trampa/entrar"));
+        assert!(!is_honey_url(&honey, "/wp-login-trampa-otra"), "un prefijo de texto no es un prefijo de ruta");
+        assert!(!is_honey_url(&honey, "/"), "una entrada vacía o «/» no puede marcar todo el sitio como señuelo");
+        assert!(!is_honey_url(&honey, "/static.js"));
+        assert!(!is_honey_url(&[], "/admin-backup.zip"));
     }
 
     #[test]

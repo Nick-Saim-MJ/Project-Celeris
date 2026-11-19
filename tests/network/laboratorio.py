@@ -4,6 +4,25 @@ Todo se ejecuta en el anfitrión que tiene Docker (WSL en Windows). Cada orden s
 """
 from __future__ import annotations
 
+import os as _os
+import shutil as _shutil
+import subprocess as _subprocess
+
+
+def _docker_nativo() -> None:
+    """Con Docker Desktop (integración de WSL) el socket por defecto no es el del dockerd que usa containerlab: se usa el nativo (lab/docker-nativo.sh)."""
+    if _os.environ.get("DOCKER_HOST") or not _os.path.exists("/run/docker-nativo.sock") or not _shutil.which("docker"):
+        return
+    try:
+        nombre = _subprocess.run(["docker", "info", "--format", "{{.Name}}"], capture_output=True, text=True, timeout=20).stdout.strip()
+    except (OSError, _subprocess.SubprocessError):
+        return
+    if nombre == "docker-desktop":
+        _os.environ["DOCKER_HOST"] = "unix:///run/docker-nativo.sock"
+
+
+_docker_nativo()
+
 import re
 import subprocess
 import time
@@ -113,7 +132,7 @@ def verificar_laboratorio(nodos: list[str]) -> None:
     if faltan:
         raise LaboratorioNoDisponible(f"el laboratorio no está levantado (faltan {', '.join(faltan)}): ejecute `make lab-up`")
     for n in nodos:
-        if n == "hny01-cowrie":
+        if n in ("hny01-cowrie", "siem01-wazuh"):
             continue
         rc, _ = _run(["docker", "exec", PREFIJO + n, "test", "-f", "/run/lab-listo"], 20)
         if rc != 0:

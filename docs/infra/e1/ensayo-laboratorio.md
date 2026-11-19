@@ -4,8 +4,8 @@
 
 > **El laboratorio es emulado** (Parte F4.2 del documento maestro). Lo que pasa aquí demuestra que el *diseño* se comporta como está descrito en una emulación funcional; no es la validación del producto real (OPNsense, VGW de AWS) ni del campus.
 
-- Fecha: 2026-11-19 · commit: `f68cb8011e20`
-- Resultado: **13 PASA**, **0 FALLA**, **12 PARCIAL**, **24 NO_APLICA** (de 49 pruebas, 21 de ellas ampliaciones T29+ que aún no tienen caso en el Modo L)
+- Fecha: 2026-11-19 · commit: `41ebb9d65b4f`
+- Resultado: **29 PASA**, **1 FALLA**, **1 PARCIAL**, **18 NO_APLICA** (de 49 pruebas, 21 de ellas ampliaciones T29+ que aún no tienen caso en el Modo L)
 - `PARCIAL` = parte de los criterios no se pudo evaluar en el Modo L (navegador real, Wazuh…) o la medición no ejercitó lo que la prueba valida. **No cuenta como PASA.**
 - `NO_APLICA` = la prueba no se puede ejecutar en L; se indica el modo en que sí se ejecutará. **Nunca cuenta como PASA.**
 
@@ -17,79 +17,84 @@
 | T02 — AWS → ON-PREM | **NO_APLICA** | — | el Modo L no ejecuta T02 (modos de la prueba: A, H); se ejecuta en A y H |
 | T03 — DMZ → AWS | **NO_APLICA** | — | el Modo L no ejecuta T03 (modos de la prueba: A, H); se ejecuta en A y H |
 | T04 — Internet → subred privada AWS | **NO_APLICA** | — | el Modo L no ejecuta T04 (modos de la prueba: A, H); se ejecuta en A y H |
-| T05 — Falla de un túnel | **PASA** | convergencia_s = 22.2, interrupcion_s = 21.9 | tras la caída la ruta a 10.30.0.0/16 va por: vti2 |
+| T05 — Falla de un túnel | **PASA** | convergencia_s = 25.8, interrupcion_s = 25.6 | tras la caída la ruta a 10.30.0.0/16 va por: vti2 |
 | T06 — LAB → MGMT | **PASA** | puertos_open = 0, paquetes_denegados_por_fw01 = 664 |  |
 | T07 — LAB → EDGE 3128 | **PASA** | x_celeris_cache_primera = 1, cache_status_primera_miss = 1, cache_status_segunda_hit = 1 |  |
-| T08 — LAB → UDP 443 | **PARCIAL** | paquetes_bloqueados_regla_F7 = 5, datagramas_recibidos_en_ext01 = 0 | sin evaluar: El navegador carga la página por HTTP/2 sobre TCP (requiere un navegador real con QUIC activado (Modo H)) |
-| T09 — Caída de EDGE01 | **PARCIAL** | tiempo_de_cambio_s = 2.2, tiempo_hasta_direct_s = 4.2 | sin evaluar: Con EDGE01 apagado la navegación continúa por EDGE02 (registro de acceso de EDGE02) (requiere navegar con un navegador real (Modo H); aquí se imita la lógic… |
+| T08 — LAB → UDP 443 | **PASA** | paquetes_bloqueados_regla_F7 = 5, datagramas_recibidos_en_ext01 = 0, paquetes_quic_recibi… | curl del laboratorio no soporta HTTP/3: `curl --http3` se sustituyó por una sonda UDP 443 (5 datagramas) hacia ext01 |
+| T09 — Caída de EDGE01 | **PASA** | tiempo_de_cambio_s = 8.9, tiempo_hasta_direct_s = 16.6, peticiones_nuevas_en_edge02_con_e… | el navegador es Chromium sin pantalla con --ignore-certificate-errors (la CA del nodo no está en su almacén); el cliente imitado con curl se conserva como control |
 | T10 — DMZ → LAN | **PASA** | — |  |
-| T11 — Internet → DMZ-HONEY | **PARCIAL** | conexiones_en_cowrie = 6 | sin evaluar: /"level":\s*(1[0-9]\|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo… |
-| T12 — STORAGE no enrutada | **NO_APLICA** | — | NAS01 y la VLAN 70 no se emulan (F4.1 no tiene br-vlan70, CI-16): que 10.20.70.20 no responda no demuestra que la VLAN no tenga ruta; se ejecuta en Modo H |
+| T11 — Internet → DMZ-HONEY | **PASA** | conexiones_en_cowrie = 6, latencia_alerta_wazuh_s = 0.7 | el puerto 23 de F24 no se prueba: OpenCanary no está en el laboratorio |
+| T12 — STORAGE no enrutada | **PASA** | — | NAS01 es un equivalente funcional (F4.2): sshd, restic y un puerto 2049 que no es NFS; el origen CTRL01 no se emula (se usan LABCLI01 y OBS01) |
 | T13 — Abuso del proxy | **PASA** | — |  |
 | T14 — Puerto no permitido | **PASA** | — |  |
 | T15 — Exposición del portal | **PASA** | puertos_abiertos = 2, alertas_suricata_fw01 = 69 |  |
 | T16 — TLS del portal | **PASA** | — | calificación de testssl.sh: A+ (certificado de la CA de laboratorio; el ACME público se prueba en Modo H) |
 | T17 — Escaneo web | **PASA** | alertas_altas = 0 |  |
-| T18 — WAF | **PARCIAL** | eventos_modsecurity = 5 | sin evaluar: /"level":\s*(1[0-9]\|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo… |
+| T18 — WAF | **PASA** | eventos_modsecurity = 5, latencia_alerta_wazuh_s = 1.8 |  |
 | T19 — Salida del portal | **PASA** | — |  |
 | T20 — Aislamiento del señuelo | **PASA** | — |  |
 | T21 — MTU del túnel | **NO_APLICA** | — | el Modo L no ejecuta T21 (modos de la prueba: A, H); se ejecuta en A y H |
-| T22 — Caída de SVC01 | **PARCIAL** | tiempo_hasta_el_pac_s = 2.1 | sin evaluar: La navegación del usuario continúa sin intervención (requiere comprobar la navegación del usuario con un navegador real (Modo H)) |
+| T22 — Caída de SVC01 | **PASA** | tiempo_hasta_el_pac_s = 7.1, tiempo_navegador_con_svc01_caido_s = 6.1 | `nslookup` no está en la imagen: se usó kdig contra la IP de FW01 en la VLAN de LAB |
 | T23 — Fuga IPv6 | **NO_APLICA** | — | RA guard es un control del switch de acceso (SW-ACC, S-14); los puentes Linux del laboratorio no lo emulan; se ejecuta en Modo H |
 | T24 — DNS cifrado | **PASA** | paquetes_bloqueados_regla_F7 = 3 | el resolvedor de prueba es ext01 (IP del laboratorio), no 203.0.113.53 (CI-19): la regla F7 bloquea por puerto, no por destino |
 | T25 — Break-glass | **NO_APLICA** | — | ESX01, IPMI01, BRK01 y SW-CORE01 no se emulan: el puerto break-glass no existe en F4.1 (CI-16); se ejecuta en Modo H |
-| T26 — Privacidad del túnel | **PARCIAL** | paquetes_en_la_vpn = 11 | medición vacía: durante el MISS no cruzó nada por la VPN: el nodo no tiene ruta al shield (REQ-F-29 pendiente), así que la ausencia de cabeceras no demuestra nada |
+| T26 — Privacidad del túnel | **PASA** | paquetes_en_la_vpn = 35 | F9 (EDGE → EC2-SHIELD) se ejercita con REQ-F-29: los MISS salen del nodo hacia el shield por la VPN con mTLS; en la VPN solo se ve TLS, y por eso se mira también lo que … |
 | T27 — Métricas cifradas | **PASA** | esquema_https = 1, respuestas_http_en_claro_del_servidor = 0, paquetes_http_en_claro = 0,… | el puerto 9128 solo acepta TLS (REQ-NF-14); el certificado es autofirmado de laboratorio: en producción F12 usa los de step-ca (F11) |
-| T28 — Syslog cifrado | **NO_APLICA** | — | siem01 (Wazuh) no está desplegado y fw01-sim no tiene syslog sobre TLS configurado: no hay flujo F14 que capturar; se ejecuta en Modo H |
-| T29 — Escaneo lateral detectado por IDS01 | **PARCIAL** | puertos_open = 0, paquetes_denegados_por_fw01 = 1281 | sin evaluar: /"level":\s*(1[0-9]\|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo… |
-| T30 — Canary interno detecta un barrido en LAB | **PARCIAL** | conexiones_registradas_en_hny02 = 4, paquetes_vistos_por_fw01 = 0 | sin evaluar: /"level":\s*(1[0-9]\|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo… |
-| T31 — Honey-URL en el nodo de borde | **NO_APLICA** | — | el Modo L no ejecuta T31 (modos de la prueba: H); se ejecuta en H |
+| T28 — Syslog cifrado | **PASA** | paquetes_udp_514 = 0, handshakes_tls_6514 = 2, latencia_alerta_wazuh_s = 1.8 | fw01-sim no es OPNsense y no tiene syslog nativo: el evento lo envía `socat` desde fw01-sim; lo que se prueba es el receptor de SIEM01 (solo TLS) |
+| T29 — Escaneo lateral detectado por IDS01 | **PASA** | puertos_open = 0, paquetes_denegados_por_fw01 = 1282, latencia_alerta_wazuh_s = 3.1 | las reglas del laboratorio son locales (sid 9000001, escaneo SYN por origen): ET Open no está disponible en el Modo L |
+| T30 — Canary interno detecta un barrido en LAB | **PASA** | conexiones_registradas_en_hny02 = 4, paquetes_vistos_por_fw01 = 0, latencia_alerta_wazuh_… | el canario registró 0 eventos con un barrido SYN (-sS) y 4 con uno de conexión completa (-sT): un canario de aplicación no ve los SYN sin respuesta; IDS01 no captura la … |
+| T31 — Honey-URL en el nodo de borde | **PASA** | latencia_alerta_wazuh_s = 0.4 | la ruta señuelo del laboratorio es /admin-backup.zip [S-17]; en S2 se define con el equipo |
 | T32 — CrowdSec bloquea una IP abusiva en la WAN | **NO_APLICA** | — | el Modo L no ejecuta T32 (modos de la prueba: H); se ejecuta en H |
 | T33 — Toda denegación deja rastro con hora fiable | **NO_APLICA** | — | el Modo L no ejecuta T33 (modos de la prueba: H); se ejecuta en H |
 | T34 — Administración desde JMP01 | **NO_APLICA** | — | el Modo L no ejecuta T34 (modos de la prueba: H); se ejecuta en H |
-| T35 — MGMT → Internet solo por 443 | **NO_APLICA** | — | el Modo L no ejecuta T35 (modos de la prueba: H); se ejecuta en H |
+| T35 — MGMT → Internet solo por 443 | **FALLA** | — | /^[23]\d\d$/ sobre curl -sS -o /dev/null -w "%{http_code}" https://example.com: no coincide |
 | T36 — Enrolamiento del nodo por mTLS | **NO_APLICA** | — | el Modo L no ejecuta T36 (modos de la prueba: H); se ejecuta en H |
 | T37 — Telemetría OTLP por TLS | **NO_APLICA** | — | el Modo L no ejecuta T37 (modos de la prueba: H); se ejecuta en H |
 | T38 — CTRL01 → base de datos por TLS | **NO_APLICA** | — | el Modo L no ejecuta T38 (modos de la prueba: H); se ejecuta en H |
-| T39 — Respaldo y restauración en NAS01 | **NO_APLICA** | — | el Modo L no ejecuta T39 (modos de la prueba: H); se ejecuta en H |
+| T39 — Respaldo y restauración en NAS01 | **PASA** | tiempo_restauracion_s = 1.1 | NAS01 es un equivalente funcional (F4.2): sshd + restic; la clave del repositorio se genera al vuelo y no se guarda |
 | T40 — Respaldo en S3 con Object Lock | **NO_APLICA** | — | el Modo L no ejecuta T40 (modos de la prueba: H); se ejecuta en H |
 | T41 — Montaje NFS de almacenamiento | **NO_APLICA** | — | el Modo L no ejecuta T41 (modos de la prueba: H); se ejecuta en H |
 | T42 — Hora NTS y DNS cifrado desde SVC01 | **NO_APLICA** | — | el Modo L no ejecuta T42 (modos de la prueba: H); se ejecuta en H |
 | T43 — Actualización de reglas de seguridad | **NO_APLICA** | — | el Modo L no ejecuta T43 (modos de la prueba: H); se ejecuta en H |
 | T44 — Peering entre nodos de borde | **PARCIAL** | — | medición vacía: el protocolo y el puerto del peering no están definidos (CI-06): solo se probó el alcance IP |
-| T45 — Internet → zonas internas | **PARCIAL** | puertos_open = 0, paquetes_denegados_por_fw01 = 24 | medición vacía: STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L |
-| T46 — DMZ-SVC → zonas internas | **PARCIAL** | puertos_open = 0, paquetes_denegados_por_fw01 = 16 | medición vacía: STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L |
-| T47 — DMZ-HONEY → cualquier zona | **PARCIAL** | puertos_open = 0, paquetes_denegados_por_fw01 = 16 | sin evaluar: código de salida = 0 (nc -zv -w3 10.20.50.10 1514) (SIEM01 (Wazuh) no está desplegado: no hay control positivo hacia el puerto 1514 de F13) |
+| T45 — Internet → zonas internas | **PASA** | puertos_open = 0, paquetes_denegados_por_fw01 = 28 |  |
+| T46 — DMZ-SVC → zonas internas | **PASA** | puertos_open = 0, paquetes_denegados_por_fw01 = 20 | WEB01 se probó como equipo comprometido, sin su nftables de host: con él, WEB01 ya no puede iniciar conexiones (D1.9, «Salida») y no sería FW01 quien deniega |
+| T47 — DMZ-HONEY → cualquier zona | **PASA** | puertos_open = 0, paquetes_denegados_por_fw01 = 20 | «Internet» es ext01 (198.51.100.100): el laboratorio no tiene DNS ni salida a Internet real |
 | T48 — Cualquier zona → STORAGE | **NO_APLICA** | — | el Modo L no ejecuta T48 (modos de la prueba: A, H); se ejecuta en A y H |
-| T49 — Renovación ACME desde WAF01 | **NO_APLICA** | — | el Modo L no ejecuta T49 (modos de la prueba: H); se ejecuta en H |
+| T49 — Renovación ACME desde WAF01 | **PASA** | — | el directorio ACME es un servidor de laboratorio en ext01 (no Let's Encrypt, no emite certificados) |
 
 ## Mediciones
 
-- **Convergencia de la VPN (T05, OD-05):** 22.2 s desde que cae el túnel 1 hasta que el tráfico vuelve a pasar por el túnel 2 (interrupción visible 21.9 s). Meta de D1.10: ≤ 60 s. El hold de BGP (30 s) es solo un componente; el valor real es el medido.
-- **Cambio de nodo del PAC (T09/OD-03):** 2.2 s con EDGE01 caído; 4.2 s hasta DIRECT con ambos caídos (cliente que imita al PAC con `curl`, no un navegador).
+- **Convergencia de la VPN (T05, OD-05):** 25.8 s desde que cae el túnel 1 hasta que el tráfico vuelve a pasar por el túnel 2 (interrupción visible 25.6 s). Meta de D1.10: ≤ 60 s. El hold de BGP (30 s) es solo un componente; el valor real es el medido.
+- **Cambio de nodo del PAC (T09/OD-03):** 8.9 s con EDGE01 caído; 16.6 s hasta DIRECT con ambos caídos (cliente que imita al PAC con `curl`, no un navegador).
 - **TLS del portal (T16, OD-08):** calificación de testssl.sh: A+ (certificado de la CA de laboratorio; el ACME público se prueba en Modo H)
 - **Exposición (T15):** 2 puertos abiertos desde Internet; alertas de Suricata en fw01-sim durante el escaneo: 69.
 - **Métricas (T27, REQ-NF-14):** paquetes HTTP en claro = 0, handshakes TLS = 2, apariciones del token = 0.
 
 ## Hallazgos (contradicen o precisan el diseño)
 
+- **T35 FALLA** — /^[23]\d\d$/ sobre curl -sS -o /dev/null -w "%{http_code}" https://example.com: no coincide
 - T05 — tras la caída la ruta a 10.30.0.0/16 va por: vti2
 - T08 — curl del laboratorio no soporta HTTP/3: `curl --http3` se sustituyó por una sonda UDP 443 (5 datagramas) hacia ext01
+- T09 — el navegador es Chromium sin pantalla con --ignore-certificate-errors (la CA del nodo no está en su almacén); el cliente imitado con curl se conserva como control
 - T11 — el puerto 23 de F24 no se prueba: OpenCanary no está en el laboratorio
+- T12 — NAS01 es un equivalente funcional (F4.2): sshd, restic y un puerto 2049 que no es NFS; el origen CTRL01 no se emula (se usan LABCLI01 y OBS01)
 - T16 — calificación de testssl.sh: A+ (certificado de la CA de laboratorio; el ACME público se prueba en Modo H)
 - T22 — `nslookup` no está en la imagen: se usó kdig contra la IP de FW01 en la VLAN de LAB
 - T24 — el resolvedor de prueba es ext01 (IP del laboratorio), no 203.0.113.53 (CI-19): la regla F7 bloquea por puerto, no por destino
-- T26 — F9 (EDGE → EC2-SHIELD) no se ejercita en un MISS real hasta que exista REQ-F-29; REQ-F-28 se prueba en e2e (Etapa 5)
+- T26 — F9 (EDGE → EC2-SHIELD) se ejercita con REQ-F-29: los MISS salen del nodo hacia el shield por la VPN con mTLS; en la VPN solo se ve TLS, y por eso se mira también lo que llega al motor del shield ya descifrado
 - T27 — el puerto 9128 solo acepta TLS (REQ-NF-14); el certificado es autofirmado de laboratorio: en producción F12 usa los de step-ca (F11)
+- T28 — fw01-sim no es OPNsense y no tiene syslog nativo: el evento lo envía `socat` desde fw01-sim; lo que se prueba es el receptor de SIEM01 (solo TLS)
+- T28 — escuchas UDP en el puerto 514 de SIEM01: 0
 - T29 — las reglas del laboratorio son locales (sid 9000001, escaneo SYN por origen): ET Open no está disponible en el Modo L
 - T29 — el destino es OBS01, el nodo de SERVERS que existe en el laboratorio y que ningún flujo alcanza desde LAB-TEST (SVC01 no sirve: F3 le abre el puerto 80)
 - T30 — el canario registró 0 eventos con un barrido SYN (-sS) y 4 con uno de conexión completa (-sT): un canario de aplicación no ve los SYN sin respuesta; IDS01 no captura la VLAN 30 (D1.14)
 - T30 — el canario es un equivalente funcional de OpenCanary (F4.2): registra la conexión en un archivo, sin enviarla a un agente de Wazuh
-- T45 — STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L
+- T31 — la ruta señuelo del laboratorio es /admin-backup.zip [S-17]; en S2 se define con el equipo
+- T39 — NAS01 es un equivalente funcional (F4.2): sshd + restic; la clave del repositorio se genera al vuelo y no se guarda
 - T46 — WEB01 se probó como equipo comprometido, sin su nftables de host: con él, WEB01 ya no puede iniciar conexiones (D1.9, «Salida») y no sería FW01 quien deniega
-- T46 — STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L
 - T47 — «Internet» es ext01 (198.51.100.100): el laboratorio no tiene DNS ni salida a Internet real
-- T47 — STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L
+- T49 — el directorio ACME es un servidor de laboratorio en ext01 (no Let's Encrypt, no emite certificados)
 
 ## Qué se emula y qué no (equivalencias de F4.2)
 

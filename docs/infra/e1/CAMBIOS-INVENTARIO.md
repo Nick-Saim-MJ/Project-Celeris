@@ -56,6 +56,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-25 | vacío | IaC del Modo A (OpenTofu): DPD mínimo de AWS, reglas de salida, disco de NAT01, campus simulado (Etapa 6) | abierto |
 | CI-26 | decisión de transcripción | Qué pruebas son críticas (`critica` en pruebas.yaml) y qué hace V-42 con ellas (Etapa 7) | abierto |
 | CI-27 | vacío | Ampliación de la matriz de pruebas: T29–T49, polaridad y celdas críticas (P4) | abierto |
+| CI-28 | decisión de transcripción | Laboratorio emulado ampliado: NAS01 con VLAN 70/71, Wazuh, shield con mTLS, PAC del binario, honey-URL y navegador (P5) | abierto |
 
 ## Entradas
 
@@ -329,7 +330,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - **Celdas denegadas críticas:** T45 Internet → zonas internas, T46 DMZ-SVC → zonas internas, T47 DMZ-HONEY → cualquier zona, T48 cualquier zona → STORAGE.
 - **Regla de «celda denegada crítica»** (la del encargo, aplicada por `celdas_denegadas_criticas()`): Internet → interna o AWS, LAB → MGMT, DMZ-SVC → interna o AWS, DMZ-HONEY → cualquiera y cualquiera → STORAGE. «Interna» = MGMT, SERVERS, LAB, LAB-TEST, SECURITY, EDGE, STORAGE y BACKUP. Son 35 celdas y las 35 tienen prueba negativa. Las otras 56 celdas denegadas (por ejemplo, SERVERS → LAB-TEST) no son críticas y siguen sin prueba dedicada: las cubre la política deny-all y se miden en la hoja «Cobertura».
 - **Polaridad.** Cada prueba lleva `polaridad`: positiva (se espera tráfico permitido), negativa (se espera denegación) o mixta. «Prueba positiva de un flujo» = positiva o mixta que lo cita.
-- **Modos.** T29, T30 y T44–T47 son de los modos L y H y tienen caso en el laboratorio emulado (`tests/network/casos.py`); T48 es de A y H; el resto (T31–T43 y T49) es del Modo H porque el laboratorio no tiene Wazuh, CrowdSec, restic, S3, NTS ni ESXi: el ensayo las muestra como NO_APLICA, nunca como PASA. T45–T47 quedan PARCIAL en L porque STORAGE y BACKUP no se emulan (CI-16).
+- **Modos.** T29, T30, T31, T35, T39, T44–T47 y T49 son de los modos L y H y tienen caso en el laboratorio emulado (`tests/network/casos.py`; CI-28 explica qué se agregó al laboratorio); T48 es de A y H; el resto (T32–T34, T36–T38, T40–T43) es del Modo H porque el laboratorio no tiene CrowdSec, NTS, ESXi, S3, PostgreSQL ni el plano de control: el ensayo las muestra como NO_APLICA, nunca como PASA. T44 queda PARCIAL (el puerto del peering no está definido, CI-06) y T35 FALLA por el hallazgo de CI-05 (ver CI-28).
 - **Valores que el diseño no fija y las pruebas necesitan (no son del inventario):**
   1. T31: la ruta de la honey-URL (REQ-F-27 está pendiente); T31 queda `pendiente: true`.
   2. T32: la IP externa de pruebas; la pone el equipo al ejecutar.
@@ -345,3 +346,23 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **R1 y R7** no tienen pruebas: son criterios documentales (contexto y alcance; calidad documental y trazabilidad). La cobertura de rúbrica por pruebas se mide sobre R2–R6 y R8.
 - **Propuesta:** aceptar T29–T49 como ampliación de D1.16 (o descartar las que el equipo considere fuera de alcance), confirmar la regla de celdas críticas y resolver los valores 1 a 4.
 - **Decide:** equipo del proyecto
+
+### CI-28 — Laboratorio emulado ampliado (P5)
+- **Estado:** abierto
+- **Tipo:** decisión de transcripción (cierra parte de CI-16 y CI-24)
+- **Dónde:** `infra/gen/lab.py`, `lab/`, `siem/wazuh/local_rules.xml`, `tests/network/casos.py`, `src/` (REQ-F-26, REQ-F-27 y REQ-F-29)
+- **Qué se agregó al laboratorio (todo emulado, F4.2):**
+  1. **NAS01** con sus tres interfaces (STORAGE, BACKUP y MGMT) y los puentes `br-vlan70` y `br-vlan71`. STORAGE no tiene interfaz en FW01 (D1.4: sin gateway); BACKUP sí (10.20.71.1). NAS01 no reenvía entre interfaces. Es sshd + restic y un puerto 2049 que no es NFS: no es un NAS. ESX01, IPMI01, SW-CORE01, UPS01 y BRK01 siguen sin emularse, por lo que T25 queda NO_APLICA en el Modo L y T41 en el Modo H.
+  2. **SIEM01** como Wazuh manager 4.9.2 (imagen fijada por digest) y agentes en OBS01, SVC01, WAF01, WEB01, HNY01, HNY02, IDS01, EDGE01, EDGE02 y NAS01, que se enrolan por F13 (1515 y 1514): el laboratorio valida esas reglas de FW01. Las alertas de las pruebas son las reales del manager. Las reglas locales 100300–100304 del laboratorio están en `siem/wazuh/local_rules.xml`; el criterio de D1.14 es nivel ≥ 10.
+  3. **Syslog por TLS (F14).** SIEM01 recibe en 6514 con TLS (receptor `socat`) y lo pasa al syslog TCP de bucle local de Wazuh; no escucha UDP 514. FW01 no es OPNsense: el evento de T28 lo envía `socat` desde `fw01-sim`; lo que se prueba es el receptor de SIEM01.
+  4. **Shield con mTLS (REQ-F-29, F9).** EDGE01 y EDGE02 envían los MISS a `shield01` (10.30.10.10:8443) por la VPN con certificado de cliente de una CA de nodos. `vgw-sim` hace NAT de la VPC hacia «Internet» (hace el papel de NAT01).
+  5. **PAC generado por el binario (REQ-F-26).** EDGE01 ejecuta `celeris-cache pac` al arrancar y nginx sirve el resultado; SVC01 sigue sirviendo el PAC de `infra/gen/pac.py`.
+  6. **Honey-URL (REQ-F-27).** Ruta señuelo de laboratorio `/admin-backup.zip` [S-17].
+  7. **Navegador real automatizado.** Chromium sin pantalla en LABCLI01 para T08, T09 y T22; los criterios manuales de esas tres pruebas pasaron a medibles (`automatizable: true`). Usa `--ignore-certificate-errors` porque la CA del nodo no está en su almacén.
+  8. **Restic y ACME de laboratorio.** Usuario y carpeta de restic [S-18]; directorio ACME de laboratorio en `ext01` (no es Let's Encrypt).
+- **No se agregó:** CrowdSec (T32), NTS (T42), actualización de reglas (T43), OTLP (T37), PostgreSQL (T38), S3 (T40), ESXi/NFS real (T41), mTLS del plano de control (T36) y RA guard (T23). Siguen en el Modo H.
+- **Hallazgo — T35 (CI-05):** la matriz D1.8 permite MGMT → Internet por TCP 443, pero ningún flujo F-nn lo abre. FW01 solo abre lo que declaran los flujos, así que lo deniega: T35 FALLA en el Modo L por esa causa. Hay que definir el flujo en D1.11 o quitar la celda.
+- **Hallazgo — F13 e IDS01:** F13 no lista a IDS01 ni a FW01 como origen, pero DET-02 exige que sus alertas lleguen a Wazuh. En el laboratorio IDS01 y SIEM01 están en la misma VLAN y no cruzan FW01.
+- **Entorno (no es del diseño).** Con Docker Desktop y su integración de WSL, `/var/run/docker.sock` pasa a ser el de Docker Desktop y containerlab no funciona. `lab/docker-nativo.sh` (root, una vez) agrega un socket al `dockerd` de la distribución y `lab/docker-env.sh` lo usa solo cuando detecta Docker Desktop. La red de gestión de containerlab pasó a 172.30.250.0/24 porque 172.20.20.0/24 chocaba con otras redes de Docker.
+- **Decide:** equipo del proyecto
+

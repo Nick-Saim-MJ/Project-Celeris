@@ -42,11 +42,11 @@
 | V-30 | Sin secretos, llaves ni credenciales en infra/, docs/infra/, Makefile y CI | PASA | — |
 | V-31 | VPN (D1.10): ASN, /30 de túnel, MTU/MSS, temporizadores y flujos sobre la VPN | PASA | — |
 | V-32 | Servicios base (DHCP, DNS, PAC, NTP, IPv6, DNS cifrado) consistentes con el inventario | PASA | — |
-| V-33 | Lo emulado se rotula como emulado: pruebas en Modo L solo con componentes emulados (F4.2) | PASA con advertencias | 0 errores, 3 advertencias |
+| V-33 | Lo emulado se rotula como emulado: pruebas en Modo L solo con componentes emulados (F4.2) | PASA con advertencias | 0 errores, 2 advertencias |
 | V-34 | La rúbrica coincide con el XLSX oficial (nombre, peso y descriptor de nivel 4) | PASA | — |
 | V-40 | El ruleset generado de fw01-sim contiene exactamente los flujos permitidos (y los bloqueos) del inventario | PASA | — |
 | V-41 | swanctl, FRR y VTI generados coinciden con la sección vpn del inventario (cifrado, DPD, vidas, ASN, BGP, MTU, MSS) | PASA | — |
-| V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 7 advertencias |
+| V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 30 advertencias |
 | V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA | — |
 | V-50 | Diagramas draw.io: componentes, IP, zonas, colores (Okabe-Ito), flujos F-nn y criticidad contra el inventario | PENDIENTE | pendiente de P2 |
 | V-60 | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | PENDIENTE | pendiente de P3 |
@@ -71,22 +71,44 @@ Ninguno.
 - **V-11** — LAB-TEST→SERVERS: la matriz lista ['F2'] pero ningún flujo los deriva — contradicción registrada (CI-04)
 - **V-11** — MGMT→INTERNET: la matriz indica «permitido» sin flujos y los flujos derivan «denegado» — contradicción registrada (CI-05)
 - **V-26** — La correspondencia 1–15 → DOCX es una propuesta: el documento maestro no incluye la tabla (CI-02)
-- **V-33** — T12 (Modo L): destino NAS01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
 - **V-33** — T25 (Modo L): origen BRK01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
 - **V-33** — T25 (Modo L): destino ESX01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
-- **V-42** — 2026-11-19-L: la prueba crítica T08 (LAB → UDP 443) está en PARCIAL, no en PASA
-- **V-42** — 2026-11-19-L: la prueba crítica T12 (STORAGE no enrutada) está en NO_APLICA, no en PASA
-- **V-42** — 2026-11-19-L: la prueba crítica T23 (Fuga IPv6) está en NO_APLICA, no en PASA
-- **V-42** — 2026-11-19-L: la prueba crítica T28 (Syslog cifrado) está en NO_APLICA, no en PASA
-- **V-42** — 2026-11-19-L: la prueba crítica T45 (Internet → zonas internas) está en PARCIAL, no en PASA
-- **V-42** — 2026-11-19-L: la prueba crítica T46 (DMZ-SVC → zonas internas) está en PARCIAL, no en PASA
-- **V-42** — 2026-11-19-L: la prueba crítica T47 (DMZ-HONEY → cualquier zona) está en PARCIAL, no en PASA
+- **V-42** — tmp-solo-L: T05 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T06 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T07 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T09 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T10 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T12 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T13 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T14 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T15 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T16 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T17 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T18 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T19 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T20 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T22 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T23 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T24 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T25 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T26 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T27 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T28 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T29 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T31 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T35 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T39 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T44 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T45 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T46 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T47 aplica al modo L y no está en los resultados
+- **V-42** — tmp-solo-L: T49 aplica al modo L y no está en los resultados
 
 ## Información
 
 - **V-27** — 36 de 92 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 34 elementos pendientes en los YAML; 27 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26']
-- **V-42** — Resultados de 2026-11-19-L (commit f68cb80): {'PASA': 13, 'FALLA': 0, 'PARCIAL': 12, 'NO_APLICA': 24}
+- **V-29** — 34 elementos pendientes en los YAML; 28 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28']
+- **V-42** — Resultados de tmp-solo-L (commit 41ebb9d): {'PASA': 3, 'FALLA': 0, 'PARCIAL': 0, 'NO_APLICA': 0}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 56 de 92 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 765 fórmulas recalculadas con LibreOffice sin errores
 

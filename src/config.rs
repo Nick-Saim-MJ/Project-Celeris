@@ -108,6 +108,30 @@ pub struct Config {
     pub access_log_retention_days: u64,
     /// Qué se anota sobre el cliente. La IP real no es una opción.
     pub access_log_client_ip: ClientIpMode,
+    /// REQ-F-29: proxy padre (shield) `host:puerto` al que se envían las peticiones que saldrían a Internet. Se le habla por TLS y con
+    /// certificado de cliente (mTLS); sin `upstream_parent_cert` y `upstream_parent_key` el nodo no arranca. Vacío = salida directa.
+    pub upstream_parent: String,
+    /// Certificado y llave de cliente con los que este nodo se presenta al shield. La CA del shield va en `upstream_extra_ca`.
+    pub upstream_parent_cert: PathBuf,
+    pub upstream_parent_key: PathBuf,
+    /// REQ-F-29, lado shield: dirección `ip:puerto` donde se acepta TLS con certificado de cliente obligatorio. Las peticiones, ya
+    /// descifradas, pasan al proxy de `listen`, que debe ser de bucle local. Vacío = modo shield apagado.
+    pub shield_listen: String,
+    pub shield_cert: PathBuf,
+    pub shield_key: PathBuf,
+    /// CA que debe haber emitido el certificado de cada nodo que se conecta al shield.
+    pub shield_client_ca: PathBuf,
+    /// REQ-F-27: rutas señuelo. Pedir una de ellas (por ella o por un prefijo) genera el evento `honey_url` y devuelve 404; ningún usuario
+    /// legítimo las pide.
+    pub honey_urls: Vec<String>,
+    /// REQ-F-26: nodos del PAC, `ip:puerto`, en orden de preferencia. El PAC termina siempre en `DIRECT` como respaldo.
+    pub pac_nodes: Vec<String>,
+    /// REQ-F-26: redes (CIDR) que el PAC manda por `DIRECT` sin pasar por el proxy.
+    pub pac_direct_networks: Vec<String>,
+    /// REQ-F-26: nombre con el que se sirve el PAC; también va por `DIRECT`.
+    pub pac_host: String,
+    /// REQ-F-26: dirección `ip:puerto` donde el nodo sirve `/wpad.dat`. Vacío = no se sirve (se puede generar con `celeris-cache pac`).
+    pub pac_listen: String,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -209,6 +233,18 @@ impl Default for Config {
             access_log_dir: "./logs".into(),
             access_log_retention_days: 7,
             access_log_client_ip: ClientIpMode::Pseudonym,
+            upstream_parent: String::new(),
+            upstream_parent_cert: "./ca/parent-client.crt".into(),
+            upstream_parent_key: "./ca/parent-client.key".into(),
+            shield_listen: String::new(),
+            shield_cert: "./ca/shield.crt".into(),
+            shield_key: "./ca/shield.key".into(),
+            shield_client_ca: "./ca/shield-clients-ca.crt".into(),
+            honey_urls: vec![],
+            pac_nodes: vec![],
+            pac_direct_networks: vec![],
+            pac_host: String::new(),
+            pac_listen: String::new(),
         }
     }
 }

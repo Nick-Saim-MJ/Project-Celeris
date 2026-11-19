@@ -1,6 +1,9 @@
 # GENERADO por infra/gen/lab.py desde infra/inventory.yaml — no editar a mano (make lab-gen).
 # Laboratorio EMULADO (Modo L, Parte F4): no es el producto real. Las IP de cada nodo están en lab/generated/<nodo>/arranque.sh.
 name: celeris
+mgmt:
+  network: celeris-mgmt
+  ipv4-subnet: 172.30.250.0/24
 topology:
   nodes:
     br-vlan10:
@@ -19,6 +22,10 @@ topology:
       kind: bridge
     br-vlan60:
       kind: bridge
+    br-vlan70:
+      kind: bridge
+    br-vlan71:
+      kind: bridge
     br-wan:
       kind: bridge
     fw01-sim:
@@ -28,7 +35,7 @@ topology:
       - generated/fw01-sim:/lab:ro
       - .run/pki:/pki:ro
       env:
-        ESPERA_IFACES: eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9
+        ESPERA_IFACES: eth1 eth2 eth3 eth4 eth5 eth6 eth7 eth8 eth9 eth10
       cap-add:
       - NET_ADMIN
       - NET_RAW
@@ -138,6 +145,7 @@ topology:
       binds:
       - generated/hny01:/lab:ro
       - .run/pki:/pki:ro
+      - .run/cowrie-log:/var/log/cowrie:ro
       env:
         ESPERA_IFACES: eth1
       cap-add:
@@ -180,10 +188,43 @@ topology:
       - NET_ADMIN
       - NET_RAW
       - SYS_ADMIN
+    siem01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/siem01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
     hny01-cowrie:
       kind: linux
       image: cowrie/cowrie@sha256:e7c4b4fe5fbb874e682c6c0c7a1daf1c3183c622d5cc2d281f453c1c4d9f97ac
       network-mode: container:hny01
+      binds:
+      - .run/cowrie-log:/cowrie/cowrie-git/var/log/cowrie
+    siem01-wazuh:
+      kind: linux
+      image: wazuh/wazuh-manager@sha256:b906ebfc77d78446e9b676e1a0b3cd78e2bf3ac2341688f1726b09c29e0aa826
+      network-mode: container:siem01
+      binds:
+      - .run/wazuh/ossec.conf:/wazuh-config-mount/etc/ossec.conf:ro
+      - ../siem/wazuh/local_rules.xml:/wazuh-config-mount/etc/rules/local_rules.xml:ro
+    nas01:
+      kind: linux
+      image: celeris-lab/base:dev
+      binds:
+      - generated/nas01:/lab:ro
+      - .run/pki:/pki:ro
+      env:
+        ESPERA_IFACES: eth1 eth2 eth3
+      cap-add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_ADMIN
     ext01:
       kind: linux
       image: celeris-lab/base:dev
@@ -252,6 +293,9 @@ topology:
     - fw01-sim:eth9
     - br-vlan60:fw01-60
   - endpoints:
+    - fw01-sim:eth10
+    - br-vlan71:fw01-71
+  - endpoints:
     - jmp01:eth1
     - br-vlan10:jmp01-10
   - endpoints:
@@ -299,6 +343,18 @@ topology:
   - endpoints:
     - edge02:eth1
     - br-vlan60:edge02-60
+  - endpoints:
+    - siem01:eth1
+    - br-vlan50:siem01-50
+  - endpoints:
+    - nas01:eth1
+    - br-vlan70:nas01-70
+  - endpoints:
+    - nas01:eth2
+    - br-vlan71:nas01-71
+  - endpoints:
+    - nas01:eth3
+    - br-vlan10:nas01-10
   - endpoints:
     - ext01:eth1
     - br-wan:ext01-wan

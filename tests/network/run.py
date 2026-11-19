@@ -33,7 +33,7 @@ from evaluar import Medicion, evaluar  # noqa: E402
 from gen import lab as genlab  # noqa: E402
 
 NODOS_REQUERIDOS = ["fw01-sim", "vgw-sim", "ext01", "shield01", "jmp01", "svc01", "obs01", "labcli01", "hny02", "kali01", "waf01", "web01",
-                    "hny01", "hny01-cowrie", "ids01", "edge01", "edge02"]
+                    "hny01", "hny01-cowrie", "ids01", "edge01", "edge02", "nas01", "siem01", "siem01-wazuh"]
 
 
 def commit_actual() -> str:

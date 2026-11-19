@@ -477,6 +477,16 @@ supuestos:
     valor: menos de 1 s
     validacion: Medición con chronyc tracking en la prueba T33; el documento maestro no fija un umbral
     responsable: Equipo del proyecto
+  S-17:
+    supuesto: Ruta señuelo de laboratorio para la honey-URL (REQ-F-27, DET-07, T31)
+    valor: /admin-backup.zip
+    validacion: Solo el Modo L; en S2 la define el equipo con la implementación de REQ-F-27
+    responsable: Equipo del proyecto
+  S-18:
+    supuesto: Usuario SFTP y carpeta de repositorios restic de NAS01 en el laboratorio (T39)
+    valor: respaldo y /srv/respaldo
+    validacion: Solo el Modo L; la clave del repositorio se genera en cada ensayo y no se guarda
+    responsable: Equipo del proyecto
 
 decisiones:
   D-01:

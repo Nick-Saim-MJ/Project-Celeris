@@ -12,9 +12,17 @@ RUN echo 'wireshark-common wireshark-common/install-setuid boolean false' | debc
       iproute2 iputils-ping iptables nftables tcpdump tshark nmap hydra netcat-openbsd socat curl ca-certificates openssl \
       knot-dnsutils unbound chrony nginx libnginx-mod-http-modsecurity modsecurity-crs \
       strongswan-charon strongswan-swanctl libcharon-extra-plugins libstrongswan-extra-plugins libstrongswan-standard-plugins frr \
-      openssh-client python3 jq procps psmisc less \
+      openssh-client openssh-server restic chromium gnupg python3 jq procps psmisc less \
  && apt-get install -y --no-install-recommends -t bookworm-backports suricata \
  && rm -rf /var/lib/apt/lists/*
+# Agente de Wazuh (F13): misma versión que el manager del laboratorio (siem01). Se instala sin arrancar y sin manager fijo: cada nodo se enrola
+# al arrancar (lab/generated/<nodo>/arranque.sh). El repositorio es el oficial de Wazuh; la llave se importa al construir la imagen.
+ARG WAZUH_VERSION=4.9.2-1
+RUN curl -fsSL https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import \
+ && chmod 644 /usr/share/keyrings/wazuh.gpg \
+ && echo 'deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main' > /etc/apt/sources.list.d/wazuh.list \
+ && apt-get update && WAZUH_MANAGER=127.0.0.1 apt-get install -y --no-install-recommends wazuh-agent=${WAZUH_VERSION} \
+ && rm -rf /var/lib/apt/lists/* && mkdir -p /run/sshd
 # Sin demonios al instalar: cada nodo arranca solo lo suyo desde su script de rol.
 RUN rm -f /etc/nginx/sites-enabled/default
 COPY rol.sh /usr/local/bin/rol

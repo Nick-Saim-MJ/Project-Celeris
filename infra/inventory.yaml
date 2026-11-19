@@ -863,7 +863,7 @@ componentes:
     objetivos: [OD-01, OD-07]
     figuras: [FIG-5.1, FIG-5.2, FIG-5.3, FIG-5.5b]
     supuestos: []
-    emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "No aparece en la topología F4.1 (sin br-vlan70 ni br-vlan71)" }
+    emulacion_lab: { nodo: nas01, equivalencia: funcional, nota: "Nodo con las tres interfaces (STORAGE, BACKUP y MGMT): sshd + restic por SFTP en la VLAN 71 y un puerto 2049 que no es NFS; no es un NAS (CI-16, CI-28)" }
 
   - id: VTI1
     nombre: "VTI1 — Interfaz del túnel 1 (activo)"

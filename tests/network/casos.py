@@ -16,10 +16,8 @@ SIN_WAZUH = "Wazuh (siem01) no está desplegado en el laboratorio: la alerta del
 
 # T-nn con Modo L en infra/pruebas.yaml que el laboratorio no puede ejecutar, y por qué (CI-16, CI-24)
 NO_APLICA_L = {
-    "T12": "NAS01 y la VLAN 70 no se emulan (F4.1 no tiene br-vlan70, CI-16): que 10.20.70.20 no responda no demuestra que la VLAN no tenga ruta",
     "T23": "RA guard es un control del switch de acceso (SW-ACC, S-14); los puentes Linux del laboratorio no lo emulan",
     "T25": "ESX01, IPMI01, BRK01 y SW-CORE01 no se emulan: el puerto break-glass no existe en F4.1 (CI-16)",
-    "T28": "siem01 (Wazuh) no está desplegado y fw01-sim no tiene syslog sobre TLS configurado: no hay flujo F14 que capturar",
 }
 
 SONDA_PY = r"""
@@ -227,7 +225,7 @@ def t08(c: Contexto) -> Medicion:
     m.medidas["paquetes_bloqueados_regla_F7"] = despues - antes
     m.medidas["datagramas_recibidos_en_ext01"] = recibidos
     m.hallazgos.append("curl del laboratorio no soporta HTTP/3: `curl --http3` se sustituyó por una sonda UDP 443 (5 datagramas) hacia ext01")
-    m.no_evaluable["manual"] = "requiere un navegador real con QUIC activado (Modo H)"
+    t08_navegador(c, m)
     return m
 
 
@@ -265,7 +263,8 @@ def t09(c: Contexto) -> Medicion:
         m.salidas["conmutacion"] = o1 + o2
         m.hallazgos.append(f"conmutación incompleta: EDGE02={'sí' if ok1 else 'no'}, DIRECT={'sí' if ok2 else 'no'}")
         m.medidas["tiempo_de_cambio_s"] = -1
-    m.no_evaluable["manual"] = "requiere navegar con un navegador real (Modo H); aquí se imita la lógica del PAC con curl"
+    t09_navegador(c, m)
+    m.hallazgos.append("el navegador es Chromium sin pantalla con --ignore-certificate-errors (la CA del nodo no está en su almacén); el cliente imitado con curl se conserva como control")
     return m
 
 
@@ -293,6 +292,7 @@ def t11(c: Contexto) -> Medicion:
     """Internet → DMZ-HONEY: con la ventana autorizada (F24), ext01 llega a Cowrie por el 22 y queda registro."""
     m = Medicion()
     wan = c.P["fw01_wan"]
+    inicio = time.time()
     try:
         L.recargar_nft(_reglas(c, ventana=True))
         rc, out = L.ex("ext01", f"nc -zv -w3 {wan} 22")
@@ -308,7 +308,7 @@ def t11(c: Contexto) -> Medicion:
             m.codigos["principal"] = m.codigos["principal"] or 1
     finally:
         L.recargar_nft(_reglas(c, ventana=False))
-    _sin_wazuh(m)
+    _alerta_wazuh(c, m, "100302", inicio)
     m.hallazgos.append("el puerto 23 de F24 no se prueba: OpenCanary no está en el laboratorio")
     return m
 
@@ -402,6 +402,7 @@ def t17(c: Contexto) -> Medicion:
 def t18(c: Contexto) -> Medicion:
     """WAF: una inyección SQL debe recibir 403 y quedar en el registro de auditoría de ModSecurity."""
     m = Medicion()
+    inicio = time.time()
     q = "https://%s/?q=%%27%%20OR%%201%%3D1--" % c.P["dominio_portal"]
     rc, out = L.ex("ext01", f"curl -sk -m8 --resolve {c.P['dominio_portal']}:443:{c.P['fw01_wan']} -o /dev/null -w '%{{http_code}}' '{q}'")
     m.codigos["principal"] = rc
@@ -411,7 +412,7 @@ def t18(c: Contexto) -> Medicion:
     c.ev.guardar("modsec_audit.log", audit)
     n = L.ex("waf01", "grep -c '\"transaction\"' /var/log/modsec_audit.log 2>/dev/null")[1].strip()
     m.medidas["eventos_modsecurity"] = int(n) if n.isdigit() else 0
-    _sin_wazuh(m)
+    _alerta_wazuh(c, m, "100303", inicio)
     return m
 
 
@@ -460,7 +461,7 @@ def t22(c: Contexto) -> Medicion:
     c.ev.guardar("conmutacion.txt", f"DNS por FW01: {dns}\nPAC: {pac}\nnginx de EDGE01:\n{quien}")
     m.codigos["nslookup example.com 10.20.32.1"] = rc_dns if dns.strip() else 1
     m.salidas["curl ... http://pac.celeris.internal/wpad.dat"] = pac.strip()
-    m.no_evaluable["manual"] = "requiere comprobar la navegación del usuario con un navegador real (Modo H)"
+    t22_navegador(c, m)
     m.hallazgos.append("`nslookup` no está en la imagen: se usó kdig contra la IP de FW01 en la VLAN de LAB")
     return m
 
@@ -490,21 +491,27 @@ def t26(c: Contexto) -> Medicion:
     ca = c.ca_del_nodo()
     px = f"http://{c.ip('EDGE01')}:{c.puerto('F1')}"
     L.fondo("fw01-sim", "timeout 12 tcpdump -ni any -w /tmp/t26.pcap 'ip proto 50 or udp port 4500 or (host 10.30.10.10)'")
+    # Lo que llega al motor del shield ya descifrado (el TLS termina en el shield): ahí se vería cualquier cabecera que identifique al cliente
+    L.fondo("shield01", "timeout 12 tcpdump -ni lo -A -s 0 'tcp port 3128' > /tmp/t26-shield.txt 2>&1")
     time.sleep(1.5)
+    ruta = f"/t26-{int(time.time())}.js"
     L.ex("labcli01", f"curl -s -m8 -x {px} --cacert {ca} -H 'X-Forwarded-For: {c.ip('LABCLI01')}' -H 'Via: 1.1 cliente-lab' -o /dev/null "
-                     f"https://{c.P['dominio_origen']}/t26-{int(time.time())}.js")
+                     f"https://{c.P['dominio_origen']}{ruta}")
     time.sleep(11)
     L.traer("fw01-sim", "/tmp/t26.pcap", c.ev.dir / "t26.pcap")
     c.ev.registrar_existente("t26.pcap")
     _, ascii_ = L.ex("fw01-sim", "tcpdump -nn -A -r /tmp/t26.pcap 2>/dev/null | head -400")
     _, n = L.ex("fw01-sim", "tcpdump -nn -r /tmp/t26.pcap 2>/dev/null | wc -l")
     paquetes = int(n.strip() or 0)
-    m.salidas["captura"] = ascii_
+    en_shield = L.leer("shield01", "/tmp/t26-shield.txt")
+    m.salidas["captura"] = ascii_ + "\n--- en el shield, ya descifrado ---\n" + en_shield
     m.medidas["paquetes_en_la_vpn"] = paquetes
-    c.ev.guardar("captura.txt", ascii_)
-    m.vacia = ("" if paquetes > 0 and re.search(r"(?i)celeris|10\.30\.10\.10", ascii_) else
-               "durante el MISS no cruzó nada por la VPN: el nodo no tiene ruta al shield (REQ-F-29 pendiente), así que la ausencia de cabeceras no demuestra nada")
-    m.hallazgos.append("F9 (EDGE → EC2-SHIELD) no se ejercita en un MISS real hasta que exista REQ-F-29; REQ-F-28 se prueba en e2e (Etapa 5)")
+    c.ev.guardar("captura.txt", m.salidas["captura"])
+    llego_al_shield = ruta in en_shield
+    m.vacia = ("" if paquetes > 0 and llego_al_shield else
+               "el MISS no llegó al shield (la captura del shield no contiene la petición): la ausencia de cabeceras no demuestra nada")
+    m.hallazgos.append("F9 (EDGE → EC2-SHIELD) se ejercita con REQ-F-29: los MISS salen del nodo hacia el shield por la VPN con mTLS; en la VPN solo se ve TLS, "
+                       "y por eso se mira también lo que llega al motor del shield ya descifrado")
     return m
 
 
@@ -557,7 +564,8 @@ NO_EMULADAS = "STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan
 
 def _escuchas(nodos: dict[str, str], segundos: int = 90) -> None:
     """Abre los puertos 22 y 443 en cada nodo (control: sin un puerto abierto, que nmap no lo vea no demuestra nada)."""
-    for nodo, ip in nodos.items():
+    for clave, ip in nodos.items():
+        nodo = clave.split("#")[0]
         L.enviar(nodo, "/tmp/escucha.py", TCP_ESCUCHA_PY)
         L.fondo(nodo, f"python3 /tmp/escucha.py {ip} 22 {segundos} & python3 /tmp/escucha.py {ip} 443 {segundos} & wait")
     time.sleep(1)
@@ -567,7 +575,7 @@ def _escaneo_denegado(c: Contexto, origen: str, destinos: dict[str, str], previo
     """nmap desde `origen` hacia un nodo de cada zona: ninguno debe tener un puerto abierto y FW01 debe contar denegaciones."""
     m = Medicion()
     _escuchas(destinos)
-    controles = [L.ex(nodo, f"nc -zv -w2 {ip} 22")[0] for nodo, ip in destinos.items()]
+    controles = [L.ex(clave.split("#")[0], f"nc -zv -w2 {ip} 22")[0] for clave, ip in destinos.items()]
     antes = L.contador_nft("DENEGADO", "forward")
     rc, out = L.ex(origen, f"nmap -n -Pn -sS -p{PUERTOS_SONDA} --max-retries 1 --max-rtt-timeout 300ms {' '.join(destinos.values())}", timeout=180)
     despues = L.contador_nft("DENEGADO", "forward")
@@ -583,13 +591,19 @@ def _escaneo_denegado(c: Contexto, origen: str, destinos: dict[str, str], previo
 
 def _destinos_de_zonas(c: Contexto, zonas: list[str]) -> dict[str, str]:
     nodos = {"MGMT": ("jmp01", "JMP01"), "SERVERS": ("obs01", "OBS01"), "LAB": ("labcli01", "LABCLI01"), "LAB-TEST": ("kali01", "KALI01"),
-             "SECURITY": ("ids01", "IDS01"), "EDGE": ("edge01", "EDGE01")}
-    return {nodos[z][0]: c.ip(nodos[z][1], z) for z in zonas if z in nodos}
+             "SECURITY": ("ids01", "IDS01"), "EDGE": ("edge01", "EDGE01"), "STORAGE": ("nas01", "NAS01"), "BACKUP": ("nas01", "NAS01")}
+    out = {}
+    for z in zonas:
+        if z in nodos:
+            nodo = nodos[z][0]
+            out[nodo if nodo not in out else f"{nodo}#{len(out)}"] = c.ip(nodos[z][1], z)      # NAS01 aparece dos veces: una por zona
+    return out
 
 
 def t29(c: Contexto) -> Medicion:
     """Escaneo desde KALI01 hacia SERVERS: FW01 lo deniega e IDS01 lo detecta en su captura de la VLAN 31."""
     m = Medicion()
+    inicio = time.time()
     destinos = [c.ip("OBS01")]
     previas = int(L.ex("ids01", "grep -c '\"event_type\":\"alert\"' /var/log/suricata/eve.json")[1].strip() or 0)
     antes = L.contador_nft("DENEGADO", "forward")
@@ -604,8 +618,7 @@ def t29(c: Contexto) -> Medicion:
     m.salidas["eve_json_ids01"] = eve
     m.medidas["puertos_open"] = len(re.findall(r"(?m)^\d+/tcp\s+open", out))
     m.medidas["paquetes_denegados_por_fw01"] = despues - antes
-    _sin_wazuh(m)
-    m.no_evaluable["latencia_alerta_wazuh_s"] = SIN_WAZUH
+    _alerta_wazuh(c, m, "100300", inicio, filtro=r'10\.20\.31\.60')
     m.hallazgos.append("las reglas del laboratorio son locales (sid 9000001, escaneo SYN por origen): ET Open no está disponible en el Modo L")
     m.hallazgos.append("el destino es OBS01, el nodo de SERVERS que existe en el laboratorio y que ningún flujo alcanza desde LAB-TEST (SVC01 no sirve: F3 le abre el puerto 80)")
     return m
@@ -614,9 +627,10 @@ def t29(c: Contexto) -> Medicion:
 def t30(c: Contexto) -> Medicion:
     """Barrido de LABCLI01 hacia HNY02, en la misma VLAN: el canario lo registra y FW01 no ve ese tráfico."""
     m = Medicion()
+    inicio = time.time()
     canario = c.ip("HNY02")
     L.ex("hny02", "truncate -s 0 /var/log/canary.json")
-    L.enviar("fw01-sim", "/tmp/rx30.sh", f"timeout 40 tcpdump -ni vlan30 -c 1 'tcp and host {canario}' > /tmp/rx30.txt 2>&1\n")
+    L.enviar("fw01-sim", "/tmp/rx30.sh", f"timeout 40 tcpdump -ni vlan30 -c 1 'tcp and host {canario} and not port 1514' > /tmp/rx30.txt 2>&1\n")
     L.fondo("fw01-sim", "sh /tmp/rx30.sh")
     time.sleep(1)
     _, syn = L.ex("labcli01", f"nmap -n -Pn -sS -p 22,80,445,3389 --max-retries 1 {canario}", timeout=120)
@@ -634,8 +648,7 @@ def t30(c: Contexto) -> Medicion:
     m.salidas["stdout"] = out
     m.medidas["conexiones_registradas_en_hny02"] = len([linea for linea in registro.splitlines() if '"evento": "conexion"' in linea or '"evento":"conexion"' in linea])
     m.medidas["paquetes_vistos_por_fw01"] = len(re.findall(r"(?m)^\d\d:\d\d:\d\d", visto))
-    _sin_wazuh(m)
-    m.no_evaluable["latencia_alerta_wazuh_s"] = SIN_WAZUH
+    _alerta_wazuh(c, m, "100301", inicio)
     m.hallazgos.append(f"el canario registró {con_syn} eventos con un barrido SYN (-sS) y {m.medidas['conexiones_registradas_en_hny02']} con uno de conexión completa (-sT): un canario de aplicación no ve los SYN sin respuesta; IDS01 no captura la VLAN 30 (D1.14)")
     m.hallazgos.append("el canario es un equivalente funcional de OpenCanary (F4.2): registra la conexión en un archivo, sin enviarla a un agente de Wazuh")
     return m
@@ -657,7 +670,7 @@ def t44(c: Contexto) -> Medicion:
 def t45(c: Contexto) -> Medicion:
     """Internet → zonas internas: ext01 enruta 10.20.0.0/16 por la WAN de FW01 y escanea un nodo de cada zona emulada."""
     wan = c.P["fw01_wan"]
-    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB", "LAB-TEST", "SECURITY", "EDGE"])
+    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB", "LAB-TEST", "SECURITY", "EDGE", "STORAGE", "BACKUP"])
     try:
         L.ex("ext01", f"ip route replace 10.20.0.0/16 via {wan}")
         m = _escaneo_denegado(c, "ext01", destinos)
@@ -666,28 +679,24 @@ def t45(c: Contexto) -> Medicion:
             m.vacia = "el control positivo falló: ext01 no llega al puerto 443 publicado (F21), así que la ruta de prueba no es válida"
     finally:
         L.ex("ext01", "ip route del 10.20.0.0/16 via " + wan + "; true")
-    m.hallazgos.append(NO_EMULADAS)
-    m.vacia = m.vacia or NO_EMULADAS
     return m
 
 
 def t46(c: Contexto) -> Medicion:
     """DMZ-SVC → zonas internas: WEB01 «comprometido» (sin su cortafuegos de host) escanea un nodo de cada zona interna emulada."""
-    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB-TEST", "EDGE"])
+    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB-TEST", "EDGE", "STORAGE", "BACKUP"])
     try:
         L.ex("web01", "nft flush ruleset")      # el cortafuegos de host de WEB01 bloquearía la salida por sí solo: no sería FW01 quien deniega
         m = _escaneo_denegado(c, "web01", destinos)
     finally:
         L.ex("web01", "nft -f /lab/web01.nft")
     m.hallazgos.append("WEB01 se probó como equipo comprometido, sin su nftables de host: con él, WEB01 ya no puede iniciar conexiones (D1.9, «Salida») y no sería FW01 quien deniega")
-    m.hallazgos.append(NO_EMULADAS)
-    m.vacia = m.vacia or NO_EMULADAS
     return m
 
 
 def t47(c: Contexto) -> Medicion:
     """DMZ-HONEY → cualquier zona: HNY01 escanea un nodo de cada zona y no llega a Internet (ext01)."""
-    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB-TEST", "EDGE"])
+    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB-TEST", "EDGE", "STORAGE", "BACKUP"])
     ext = c.P["ext01"]
     L.enviar("ext01", "/tmp/escucha.py", TCP_ESCUCHA_PY)
     L.fondo("ext01", f"python3 /tmp/escucha.py {ext} 443 60")
@@ -697,16 +706,268 @@ def t47(c: Contexto) -> Medicion:
     m.codigos["curl -sS -m5 https://example.com"] = rc_ext
     if rc_ctrl != 0 and not m.vacia:
         m.vacia = "el control positivo falló: ext01 no escucha en 443 ni desde su propio nodo"
-    m.no_evaluable["nc -zv -w3 10.20.50.10 1514"] = "SIEM01 (Wazuh) no está desplegado: no hay control positivo hacia el puerto 1514 de F13"
+    m.codigos["nc -zv -w3 10.20.50.10 1514"], _ = L.ex("hny01", f"nc -zv -w3 {c.ip('SIEM01')} 1514")      # control positivo: F13 (agente → SIEM01)
     m.hallazgos.append("«Internet» es ext01 (198.51.100.100): el laboratorio no tiene DNS ni salida a Internet real")
-    m.hallazgos.append(NO_EMULADAS)
-    m.vacia = m.vacia or NO_EMULADAS
+    return m
+
+
+"""Casos del Modo L con Wazuh, NAS01, shield con mTLS y navegador (Chromium sin pantalla). Se agrega a tests/network/casos.py."""
+
+# ---------------------------------------------------------------------------------------------------------------
+# Wazuh (siem01): alertas reales del manager, no simuladas
+# ---------------------------------------------------------------------------------------------------------------
+def _epoch_wazuh(ts: str) -> float:
+    from datetime import datetime
+    return datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%f%z").timestamp()
+
+
+def _alerta_wazuh(c: Contexto, m: Medicion, regla: str, desde: float, filtro: str = "", espera: int = 75) -> None:
+    """Espera la alerta de la regla `regla` que Wazuh genera después de `desde` y la deja en las fuentes que miden los criterios
+    (`alerta_wazuh`, `latencia_alerta_wazuh_s`). Sin alerta en `espera` s la fuente queda vacía: el criterio FALLA, no se omite."""
+    fin = time.time() + espera
+    encontradas: list[tuple[float, str]] = []
+    while True:
+        _, out = L._run(["docker", "exec", L.PREFIJO + "siem01-wazuh", "tail", "-n", "4000", "/var/ossec/logs/alerts/alerts.json"], 30)
+        encontradas = []
+        for linea in out.splitlines():
+            if f'"id":"{regla}"' not in linea or (filtro and not re.search(filtro, linea)):
+                continue
+            ts = re.search(r'"timestamp":"([^"]+)"', linea)
+            if ts and _epoch_wazuh(ts.group(1)) >= desde - 1:
+                encontradas.append((_epoch_wazuh(ts.group(1)), linea))
+        if encontradas or time.time() > fin:
+            break
+        time.sleep(3)
+    m.salidas["alerta_wazuh"] = "\n".join(linea for _, linea in encontradas)
+    m.medidas["latencia_alerta_wazuh_s"] = round(min(e for e, _ in encontradas) - desde, 1) if encontradas else 999
+    c.ev.guardar(f"alerta_wazuh_{regla}.json", m.salidas["alerta_wazuh"] or "(sin alerta en %d s)" % espera)
+    m.no_evaluable.pop("alerta_wazuh", None)
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Navegador real automatizado (Chromium sin pantalla dentro de labcli01)
+# ---------------------------------------------------------------------------------------------------------------
+CHROMIUM = ("chromium --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --no-first-run --ignore-certificate-errors "
+            "--user-data-dir=/tmp/cr-{n} {extra} --dump-dom '{url}'")
+
+
+def _navegar(c: Contexto, url: str, extra: str = "", espera: int = 90, perfil: str | None = None) -> tuple[int, float, str]:
+    """Carga `url` con Chromium; devuelve (código, segundos, DOM). `extra` agrega opciones (PAC, QUIC, registro de red).
+    Con `perfil` se reutiliza el perfil (el navegador recuerda lo aprendido, como el Alt-Svc) y no se borra."""
+    n = perfil or str(int(time.time() * 1000) % 10**9)
+    t = time.time()
+    rc, out = L.ex("labcli01", CHROMIUM.format(n=n, extra=extra, url=url) + " 2>/dev/null", timeout=espera)
+    if perfil is None:
+        L.ex("labcli01", f"rm -rf /tmp/cr-{n}")
+    return rc, round(time.time() - t, 1), out
+
+
+def _peticiones_del_nodo(c: Contexto, nodo: str) -> int:
+    """Peticiones que ha atendido un nodo EDGE (estadísticas de celeris-cache, F1)."""
+    ip = c.ip(nodo.upper())
+    _, out = L.ex("labcli01", f"curl -s -m5 -x http://{ip}:{c.puerto('F1')} http://celeris.stats/ | jq -r .requests")
+    return int(out.strip()) if out.strip().isdigit() else -1
+
+
+PAC_URL = "http://pac.celeris.internal/wpad.dat"
+
+
+def t08_navegador(c: Contexto, m: Medicion) -> None:
+    """Chromium con QUIC forzado hacia el origen: UDP 443 está bloqueado (F7), así que debe terminar por TCP/HTTP2."""
+    dominio = c.P["dominio_generico"]
+    L.ex("labcli01", "rm -rf /tmp/net.json /tmp/cr-t08")
+    # El origen anuncia h3 (Alt-Svc). La primera visita lo aprende; en la segunda el navegador intenta QUIC por UDP 443, que F7 bloquea, y debe terminar por TCP.
+    _navegar(c, f"https://{dominio}/t08-aprende", "--enable-quic", perfil="t08")
+    rc, seg, dom = _navegar(c, f"https://{dominio}/t08-navegador", "--enable-quic --log-net-log=/tmp/net.json --net-log-capture-mode=Default", perfil="t08")
+    _, net = L.ex("labcli01", "cat /tmp/net.json", timeout=60)
+    c.ev.guardar("navegador_dom.html", dom)
+    m.salidas["navegador"] = dom
+    try:
+        import json
+        d = json.loads(net)
+        tipos = {v: k for k, v in d["constants"]["logEventTypes"].items()}
+        nombres = [tipos.get(e["type"], "") for e in d["events"]]
+        m.medidas["paquetes_quic_recibidos"] = sum(1 for n in nombres if n == "QUIC_SESSION_PACKET_RECEIVED")
+        m.medidas["conexiones_tcp"] = sum(1 for n in nombres if n == "TCP_CONNECT")
+        m.medidas["intentos_quic"] = sum(1 for n in nombres if n.startswith("QUIC_SESSION"))
+    except (ValueError, KeyError):
+        m.no_evaluable["paquetes_quic_recibidos"] = "Chromium no escribió el registro de red"
+        m.no_evaluable["conexiones_tcp"] = "Chromium no escribió el registro de red"
+
+
+def t09_navegador(c: Contexto, m: Medicion) -> None:
+    """Chromium con el PAC del laboratorio: con EDGE01 caído usa EDGE02 y, con ambos caídos, DIRECT. El origen ve la IP de quien le llega."""
+    dominio = c.P["dominio_generico"]
+    p1, p2 = c.puerta("EDGE01"), c.puerta("EDGE02")
+    pac = f"--proxy-pac-url={PAC_URL}"
+    try:
+        rc0, t0, d0 = _navegar(c, f"https://{c.P['dominio_origen']}/t09-nav-base", pac)
+        antes2 = _peticiones_del_nodo(c, "edge02")
+        L.enlace("edge01", False)
+        rc1, t1, d1 = _navegar(c, f"https://{c.P['dominio_origen']}/t09-nav-a", pac)
+        despues2 = _peticiones_del_nodo(c, "edge02")
+        L.enlace("edge02", False)
+        rc2, t2, d2 = _navegar(c, f"https://{c.P['dominio_origen']}/t09-nav-b", pac, espera=120)
+    finally:
+        L.enlace("edge01", True, p1)
+        L.enlace("edge02", True, p2)
+    log = L.ex("ext01", "grep -E 't09-nav' /var/log/origen.log | tail -5")[1]
+    c.ev.guardar("navegador.txt", f"normal ({t0}s) rc={rc0}\nEDGE01 caído ({t1}s) rc={rc1}\nambos caídos ({t2}s) rc={rc2}\norigen:\n{log}")
+    m.salidas["navegador_con_edge01_caido"] = d1
+    m.salidas["navegador_sin_nodos"] = d2
+    directas = [linea for linea in log.splitlines() if "t09-nav-b" in linea]
+    # DIRECT: el origen ve la IP de la WAN de FW01 (NAT de salida); si pasara por un nodo EDGE o por el shield vería otra (la de vgw-sim)
+    m.salidas["registro_origen_directo"] = "salida=DIRECT" if any(f"origen {c.P['fw01_wan']} " in linea for linea in directas) else "\n".join(directas)
+    m.medidas["tiempo_de_cambio_s"] = t1
+    m.medidas["tiempo_hasta_direct_s"] = t2
+    m.medidas["peticiones_nuevas_en_edge02_con_edge01_caido"] = despues2 - antes2 if antes2 >= 0 and despues2 >= 0 else -1
+
+
+def t22_navegador(c: Contexto, m: Medicion) -> None:
+    """Chromium con SVC01 caído: el DNS lo resuelve FW01 y la navegación sigue sin intervención."""
+    puerta_svc = c.puerta("SVC01")
+    resolv = L.leer("labcli01", "/etc/resolv.conf")
+    try:
+        L.ex("labcli01", "printf '%s\\noptions timeout:2 attempts:1\\n' \"$(cat /etc/resolv.conf)\" > /tmp/r && cat /tmp/r > /etc/resolv.conf")
+        L.enlace("svc01", False)
+        rc, seg, dom = _navegar(c, f"https://{c.P['dominio_origen']}/t22-navegador", f"--proxy-server=http://{c.ip('EDGE01')}:{c.puerto('F1')}")
+    finally:
+        L.enlace("svc01", True, puerta_svc)
+        L.enviar("labcli01", "/etc/resolv.conf", resolv)
+    c.ev.guardar("navegador_dom.html", dom)
+    m.salidas["navegador"] = dom
+    m.medidas["tiempo_navegador_con_svc01_caido_s"] = seg
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# T12, T28, T31, T35, T39, T49: ahora con NAS01, siem01, el nodo con honey-URL, restic y el ACME de laboratorio
+# ---------------------------------------------------------------------------------------------------------------
+def t12(c: Contexto) -> Medicion:
+    """STORAGE no enrutada: sin gateway ni ruta, ni LABCLI01 ni OBS01 alcanzan a NAS01 en la VLAN 70 (control: NAS01 sí escucha en 2049)."""
+    m = Medicion()
+    alm = c.ip("NAS01", "STORAGE")
+    rc_ctrl, _ = L.ex("nas01", f"nc -zv -w2 {alm} 2049")
+    rcs, perdidas = [], []
+    for nodo in ("labcli01", "obs01"):
+        rc, out = L.ex(nodo, f"ping -c 4 -W 2 {alm}")
+        rcs.append(rc)
+        perdidas.append(out)
+        rc_t, _ = L.ex(nodo, f"nc -zv -w3 {alm} 2049")
+        rcs.append(rc_t)
+    c.ev.guardar("ping.txt", "\n---\n".join(perdidas))
+    m.codigos["principal"] = 0 if 0 in rcs else 1
+    m.salidas["stdout"] = perdidas[0]
+    if rc_ctrl != 0:
+        m.vacia = "el control positivo falló: NAS01 no escucha en el puerto 2049 de la VLAN 70 ni desde su propio nodo"
+    m.hallazgos.append("NAS01 es un equivalente funcional (F4.2): sshd, restic y un puerto 2049 que no es NFS; el origen CTRL01 no se emula (se usan LABCLI01 y OBS01)")
+    return m
+
+
+def t28(c: Contexto) -> Medicion:
+    """Syslog cifrado: un evento de FW01 llega a SIEM01 solo por TLS en 6514, sin UDP 514 (receptor de siem01 hacia el syslog local de Wazuh)."""
+    m = Medicion()
+    siem = c.ip("SIEM01")
+    inicio = time.time()
+    L.fondo("siem01", f"timeout 10 tcpdump -ni eth1 -w /tmp/t28.pcap 'host {c.ip('FW01', 'SECURITY')} and (udp port 514 or tcp port 6514)'")
+    time.sleep(1.5)
+    evento = "<134>fw01sim DENEGADO forward: T28 prueba de syslog por TLS"
+    L.ex("fw01-sim", f"printf '%s\\n' '{evento}' | socat - OPENSSL:{siem}:6514,cafile=/pki/ca.pem,verify=0")
+    time.sleep(13)
+    _, udp = L.ex("siem01", "tcpdump -nn -r /tmp/t28.pcap 'udp port 514' 2>/dev/null | wc -l")
+    _, tls = L.ex("siem01", "tcpdump -nn -r /tmp/t28.pcap 'tcp port 6514 and tcp[((tcp[12] & 0xf0) >> 2)] = 0x16' 2>/dev/null | wc -l")
+    c.ev.guardar("syslog_tcpdump.txt", L.ex("siem01", "tcpdump -nn -r /tmp/t28.pcap 2>/dev/null | head -30")[1])
+    m.medidas["paquetes_udp_514"] = 0 if udp.strip() == "0" else int(udp.strip() or 0)
+    m.medidas["handshakes_tls_6514"] = int(tls.strip() or 0)
+    m.salidas["tshark -r syslog.pcap -Y 'udp.port == 514'"] = ""
+    _alerta_wazuh(c, m, "100304", inicio, espera=45)
+    m.hallazgos.append("fw01-sim no es OPNsense y no tiene syslog nativo: el evento lo envía `socat` desde fw01-sim; lo que se prueba es el receptor de SIEM01 (solo TLS)")
+    _, abierto = L.ex("siem01", "ss -uln | grep -c ':514 '")
+    m.hallazgos.append(f"escuchas UDP en el puerto 514 de SIEM01: {abierto.strip() or '0'}")
+    if abierto.strip() not in ("0", ""):
+        m.medidas["paquetes_udp_514"] = 1
+    if m.medidas["handshakes_tls_6514"] == 0:
+        m.vacia = "no se vio ningún apretón de manos TLS en la captura"
+    return m
+
+
+def t31(c: Contexto) -> Medicion:
+    """Honey-URL (REQ-F-27): pedir la ruta señuelo al nodo genera el evento honey_url y la alerta de Wazuh."""
+    m = Medicion()
+    ca = c.ca_del_nodo()
+    px = f"http://{c.ip('EDGE01')}:{c.puerto('F1')}"
+    inicio = time.time()
+    rc, out = L.ex("labcli01", f"curl -sS -o /dev/null -w '%{{http_code}}' -x {px} --cacert {ca} https://{c.P['dominio_origen']}{c.P['honey_url']}")
+    m.codigos["principal"] = rc
+    m.salidas["stdout"] = out.strip()
+    time.sleep(1.5)
+    log = _nodo_edge_log(c)
+    m.salidas["registro_celeris"] = log
+    c.ev.guardar("registro_seguridad.jsonl", log)
+    _alerta_wazuh(c, m, "100135", inicio)
+    m.hallazgos.append(f"la ruta señuelo del laboratorio es {c.P['honey_url']} [S-17]; en S2 se define con el equipo")
+    return m
+
+
+def t35(c: Contexto) -> Medicion:
+    """MGMT → Internet solo por 443: JMP01 llega a un origen de prueba por HTTPS; el puerto 22 y el HTTP en claro no deben abrir."""
+    m = Medicion()
+    dom = c.P["dominio_generico"]
+    rc_https, code = L.ex("jmp01", f"curl -sS -m8 --cacert /pki/ca.pem --resolve {dom}:443:{c.P['ext01']} -o /dev/null -w '%{{http_code}}' https://{dom}/")
+    m.salidas["stdout"] = code.strip()
+    m.salidas["curl -sS -o /dev/null -w \"%{http_code}\" https://example.com"] = code.strip()
+    m.codigos["nc -zv -w5 example.com 22"], _ = L.ex("jmp01", f"nc -zv -w5 {dom} 22")
+    m.codigos["curl -sS -m5 http://example.com"], _ = L.ex("jmp01", f"curl -sS -m5 --resolve {dom}:80:{c.P['ext01']} http://{dom}/")
+    return m
+
+
+def t39(c: Contexto) -> Medicion:
+    """Respaldo por SFTP (F17): OBS01 respalda en NAS01 por la VLAN 71 con restic, comprueba y restaura; LABCLI01 no llega a esa VLAN."""
+    import secrets
+    m = Medicion()
+    nas = c.ip("NAS01", "BACKUP")
+    usr, repo = c.P["restic_usuario"], c.P["restic_repositorio"]
+    clave = secrets.token_hex(16)      # solo para este ensayo: se genera al vuelo y no se guarda en el repositorio
+    nombre = f"t39-{int(time.time())}"
+    ssh = f"ssh -i /root/.ssh/id_respaldo -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR {usr}@{nas} -s sftp"
+    r = f"restic -r sftp:{usr}@{nas}:{repo}/{nombre} -o sftp.command='{ssh}'"
+    pre = f"export RESTIC_PASSWORD={clave}; mkdir -p /root/.ssh /tmp/datos; install -m600 /pki/respaldo.key /root/.ssh/id_respaldo; "
+    L.ex("obs01", pre + "head -c 4194304 /dev/urandom > /tmp/datos/a.bin; sha256sum /tmp/datos/a.bin > /tmp/datos.sha")
+    rc_init, o_init = L.ex("obs01", pre + f"{r} init", timeout=120)
+    rc_b, o_b = L.ex("obs01", pre + f"{r} backup /tmp/datos", timeout=180)
+    rc_c, o_c = L.ex("obs01", pre + f"{r} check", timeout=180)
+    inicio = time.time()
+    rc_r, o_r = L.ex("obs01", pre + f"{r} restore latest --target /tmp/restaurado", timeout=180)
+    m.medidas["tiempo_restauracion_s"] = round(time.time() - inicio, 1)
+    _, ok = L.ex("obs01", "cd /tmp/restaurado/tmp/datos && sha256sum -c /tmp/datos.sha 2>&1 | tail -1; cd /; sha256sum /tmp/restaurado/tmp/datos/a.bin | cut -d' ' -f1; cut -d' ' -f1 /tmp/datos.sha")
+    iguales = len(set(ok.split()[-2:])) == 1
+    c.ev.guardar("restic.txt", "\n".join(re.sub(clave, "<clave>", x) for x in (o_init, o_b, o_c, o_r)))
+    m.codigos["restic backup"] = rc_b if rc_init == 0 else rc_init
+    m.salidas["stdout"] = o_c
+    m.salidas["restic check"] = o_c
+    rc_lab, _ = L.ex("labcli01", f"nc -zv -w3 {nas} 22")
+    m.codigos["nc -zv -w3 10.20.71.20 22"] = rc_lab
+    if not iguales:
+        m.vacia = "la restauración no coincide con el original (sha256)"
+    m.hallazgos.append("NAS01 es un equivalente funcional (F4.2): sshd + restic; la clave del repositorio se genera al vuelo y no se guarda")
+    return m
+
+
+def t49(c: Contexto) -> Medicion:
+    """ACME desde WAF01 (F23): el directorio ACME de laboratorio de ext01 responde 200 por 443; el HTTP en claro hacia Internet no sale."""
+    m = Medicion()
+    acme = c.P["dominio_acme"]
+    rc, out = L.ex("waf01", f"curl -sS -m8 --cacert /pki/ca.pem --resolve {acme}:443:{c.P['ext01']} -o /dev/null -w '%{{http_code}}' https://{acme}/directory")
+    m.salidas["stdout"] = out.strip()
+    m.salidas["curl -sS -o /dev/null -w \"%{http_code}\" https://acme-v02.api.letsencrypt.org/directory"] = out.strip()
+    m.codigos["curl -sS -m5 http://example.com"], _ = L.ex("waf01", f"curl -sS -m5 --resolve {c.P['dominio_generico']}:80:{c.P['ext01']} http://{c.P['dominio_generico']}/")
+    m.hallazgos.append("el directorio ACME es un servidor de laboratorio en ext01 (no Let's Encrypt, no emite certificados)")
     return m
 
 
 CASOS = {"T05": t05, "T06": t06, "T07": t07, "T08": t08, "T09": t09, "T10": t10, "T11": t11, "T13": t13, "T14": t14, "T15": t15,
          "T16": t16, "T17": t17, "T18": t18, "T19": t19, "T20": t20, "T22": t22, "T24": t24, "T26": t26, "T27": t27,
-         "T29": t29, "T30": t30, "T44": t44, "T45": t45, "T46": t46, "T47": t47}
+         "T29": t29, "T30": t30, "T44": t44, "T45": t45, "T46": t46, "T47": t47,
+         "T12": t12, "T28": t28, "T31": t31, "T35": t35, "T39": t39, "T49": t49}
 
 TESTSSL_IMAGEN = "drwetter/testssl.sh@sha256:64bab3c1fd8eee440f68d5e020dd633c1f2d375fe0ae593bdfec2725110a7e29"   # 3.2
 ZAP_IMAGEN = "ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af"   # stable

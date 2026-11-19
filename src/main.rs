@@ -1,6 +1,7 @@
 //! celeris-cache: proxy de caché local con intercepción TLS selectiva.
 //!
 //! Uso:  celeris-cache [ruta/config.toml]
+//!       celeris-cache pac [ruta/config.toml]    imprime el archivo PAC (REQ-F-26) y termina
 //! Luego configura 127.0.0.1:3128 como proxy HTTP y HTTPS e instala ca/celeris-ca.crt
 //! en el almacén de confianza de TUS dispositivos.
 
@@ -17,13 +18,16 @@ mod live;
 mod memory;
 mod monitor;
 mod notice;
+mod pac;
 mod policy;
 mod secure;
 mod security;
+mod shield;
 mod stats;
 mod store;
 mod upstream;
 
+use anyhow::Context;
 use handler::{CacheHandler, Shared};
 use hudsucker::Proxy;
 use std::{net::SocketAddr, path::PathBuf, sync::Arc};
@@ -35,7 +39,16 @@ async fn main() -> anyhow::Result<()> {
         .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| "celeris_cache=info,hudsucker=warn".into()))
         .init();
 
-    let cfg_path = std::env::args().nth(1).map(PathBuf::from).unwrap_or_else(|| "config.toml".into());
+    let mut args = std::env::args().skip(1);
+    let primero = args.next();
+    // REQ-F-26: `celeris-cache pac [config.toml]` genera el PAC desde la configuración sin arrancar el proxy.
+    if primero.as_deref() == Some("pac") {
+        let ruta = args.next().map(PathBuf::from).unwrap_or_else(|| "config.toml".into());
+        let cfg: config::Config = toml::from_str(&std::fs::read_to_string(&ruta).with_context(|| format!("leyendo {}", ruta.display()))?)?;
+        print!("{}", pac::generar(&cfg)?);
+        return Ok(());
+    }
+    let cfg_path = primero.map(PathBuf::from).unwrap_or_else(|| "config.toml".into());
     let cfg = config::Config::load_or_create(&cfg_path)?;
     let addr: SocketAddr = cfg.listen.parse()?;
 
@@ -47,7 +60,7 @@ async fn main() -> anyhow::Result<()> {
     monitor::restore_stats(&cfg.data_dir, &stats).await;
     let store = store::Store::open(&cfg.data_dir, cfg.mem_index_entries, cfg.max_disk_bytes, stats.clone()).await?;
     let normalizer = policy::KeyNormalizer::new(&cfg)?;
-    let connector = upstream::connector(&cfg.upstream_extra_ca, destinations.clone(), stats.clone())?;
+    let connector = upstream::connector(&cfg.upstream_extra_ca, destinations.clone(), stats.clone(), upstream::ParentSettings::from_config(&cfg).as_ref())?;
 
     // Hudsucker anota la IP del cliente en sus spans de nivel INFO: con un filtro como RUST_LOG=info,
     // esa IP acompaña a cada línea del registro aunque celeris-cache no esté en modo debug.
@@ -113,6 +126,8 @@ async fn main() -> anyhow::Result<()> {
     let traffic = Arc::new(live::Traffic::default());
     admin::start(&cfg, stats.clone(), health.clone(), client_stats.clone(), detector.clone(), live_log.clone(), traffic.clone(), security.clone()).await?;
     live::start(stats.clone(), live_log.clone(), traffic);
+    shield::start(&cfg).await?;
+    pac::start(&cfg).await?;
     monitor::start(&cfg, stats.clone(), client_stats.clone(), detector.clone(), health);
 
     let data_dir = cfg.data_dir.clone();

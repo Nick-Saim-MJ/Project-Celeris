@@ -6,6 +6,8 @@
 #   y F4.3 (T05 se demuestra también en L).
 # criterio_aprobacion: lista de verificaciones. tipo ∈ exit_code | regex | umbral | contador | manual.
 #   `automatizable: false` cuando alguna verificación requiere intervención humana.
+# critica: true si un FALLA invalida un límite de seguridad del diseño (V-42 lo exige en resultados.json). Regla adoptada: categoría
+#   segmentacion, vpn o cifrado (CI-26); el equipo puede cambiarla marcando la prueba a mano.
 # Los comandos son los «comandos sugeridos» de D1.16; los argumentos añadidos solo hacen que terminen
 # o produzcan una salida verificable (-c, -w, -m, -o /dev/null -w). No añaden puertos ni IP.
 # `pendiente: true` = vacío o contradicción registrado en docs/infra/e1/CAMBIOS-INVENTARIO.md.
@@ -33,6 +35,7 @@ pruebas:
       - { tipo: exit_code, valor: 0 }
       - { tipo: regex, sobre: stdout, patron: "(?m)\\b0% packet loss" }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de ping", "swanctl --list-sas", "Resumen BGP (vtysh -c 'show bgp summary')"]
     modos: [A, H]
     semestre: S2
@@ -59,6 +62,7 @@ pruebas:
       - { tipo: exit_code, valor: 0, nota: "puerto 5432" }
       - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "nc -zv -w 3 10.20.20.11 22", nota: "cualquier otro puerto (22 como ejemplo negativo)" }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de nc para 5432 y para el puerto negativo", "Contador de la regla F16 en FW01"]
     modos: [A, H]
     semestre: S2
@@ -84,6 +88,7 @@ pruebas:
       - { tipo: exit_code, valor: distinto_de_0 }
       - { tipo: regex, sobre: stdout, patron: "(?m)\\b100% packet loss" }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de ping desde HNY01 y desde WEB01", "Registro de denegación en FW01 (log de la regla por defecto)"]
     modos: [A, H]
     semestre: S2
@@ -109,6 +114,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?i)(host seems down|0 hosts up|all 1000 scanned ports .* (filtered|no-response))" }
       - { tipo: regex, sobre: stdout, patron: "(?m)^\\d+/tcp\\s+open", debe_coincidir: false }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de nmap", "Tablas de rutas rt-private (captura de la consola o tofu show)"]
     modos: [A, H]
     semestre: S2
@@ -133,6 +139,7 @@ pruebas:
       - { tipo: umbral, metrica: convergencia_s, operador: "<=", valor: 60, nota: "tiempo medido desde la caída hasta la primera respuesta por el túnel 2; se reporta el valor real" }
       - { tipo: regex, sobre: stdout, patron: "(?i)ESTABLISHED", comando_adicional: "swanctl --list-sas", nota: "túnel 2 en ESTABLISHED tras la caída" }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Marca de tiempo de la caída y de la primera respuesta", "swanctl --list-sas antes y después", "vtysh -c 'show bgp summary' antes y después"]
     modos: [L, A, H]
     nota_modos: "F3 asigna T05 al Modo A; F4.3 la incluye en la demostración en vivo del Modo L"
@@ -159,6 +166,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?m)^\\d+/tcp\\s+open", debe_coincidir: false }
       - { tipo: contador, metrica: puertos_open, operador: "==", valor: 0 }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de nmap", "Contadores y registros de la regla de denegación LAB → MGMT en FW01"]
     modos: [L, H]
     semestre: S2
@@ -183,6 +191,7 @@ pruebas:
       - { tipo: exit_code, valor: 0 }
       - { tipo: regex, sobre: stdout, patron: "(?im)^cache-status:" }
     automatizable: true
+    critica: false
     evidencia_a_capturar: ["Cabeceras de respuesta (primera petición MISS y segunda HIT)", "Registro de acceso de Celeris"]
     modos: [L, H]
     semestre: S2
@@ -208,6 +217,7 @@ pruebas:
       - { tipo: contador, metrica: paquetes_bloqueados_regla_F7, operador: ">", valor: 0 }
       - { tipo: manual, descripcion: "El navegador carga la página por HTTP/2 sobre TCP" }
     automatizable: false
+    critica: true
     evidencia_a_capturar: ["Contador de la regla F7 en FW01", "Pestaña de red del navegador con el protocolo usado"]
     modos: [L, H]
     semestre: S2
@@ -233,6 +243,7 @@ pruebas:
       - { tipo: manual, descripcion: "Con ambos apagados la navegación continúa por DIRECT (F6, solo piloto)" }
       - { tipo: umbral, metrica: tiempo_de_cambio_s, operador: ">=", valor: 0, nota: "D1.16 no fija umbral: se reporta el valor medido" }
     automatizable: false
+    critica: false
     evidencia_a_capturar: ["Cronometraje del cambio de nodo", "Registros de acceso de EDGE01 y EDGE02", "Captura del navegador"]
     modos: [L, H]
     semestre: S2
@@ -257,6 +268,7 @@ pruebas:
     criterio_aprobacion:
       - { tipo: exit_code, valor: distinto_de_0 }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de nc desde WEB01 y desde HNY01", "Registro de denegación en FW01"]
     modos: [L, H]
     semestre: S2
@@ -281,6 +293,7 @@ pruebas:
       - { tipo: exit_code, valor: 0 }
       - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])", nota: "alerta de nivel ≥ 10 en SIEM01" }
     automatizable: true
+    critica: false
     evidencia_a_capturar: ["Salida de nc", "Evento de Cowrie/OpenCanary", "Alerta de Wazuh (JSON)"]
     modos: [L, H]
     semestre: S2
@@ -306,6 +319,7 @@ pruebas:
       - { tipo: exit_code, valor: distinto_de_0 }
       - { tipo: regex, sobre: stdout, patron: "(?m)\\b100% packet loss" }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de ping desde LAB y desde SERVERS", "Tabla de interfaces de FW01 sin VLAN 70"]
     modos: [L, H]
     semestre: S2
@@ -332,6 +346,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "^403$" }
       - { tipo: regex, sobre: registro_celeris, patron: "destination_blocked" }
     automatizable: true
+    critica: false
     evidencia_a_capturar: ["Código HTTP devuelto", "Línea del registro de seguridad de Celeris con destination_blocked", "Alerta en Wazuh"]
     modos: [L, H]
     semestre: S2
@@ -356,6 +371,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "^403$" }
       - { tipo: regex, sobre: registro_celeris, patron: "port_blocked" }
     automatizable: true
+    critica: false
     evidencia_a_capturar: ["Código HTTP devuelto", "Línea del registro de seguridad de Celeris con port_blocked"]
     modos: [L, H]
     semestre: S2
@@ -380,6 +396,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?m)^(?!(80|443)/)\\d+/tcp\\s+open", debe_coincidir: false, nota: "22 y 23 se aceptan solo dentro de la ventana autorizada" }
       - { tipo: regex, sobre: stdout, patron: "(?m)^443/tcp\\s+open" }
     automatizable: true
+    critica: false
     evidencia_a_capturar: ["Salida de nmap", "Alertas de Suricata IPS y CrowdSec por el escaneo", "Alerta en Wazuh"]
     modos: [L, H]
     semestre: S2
@@ -405,6 +422,7 @@ pruebas:
       - { tipo: regex, sobre: tls.json, patron: "\"id\"\\s*:\\s*\"HSTS_time\"[^}]*\"finding\"\\s*:\\s*\"\\d+ days", nota: "testssl.sh 3.2 informa HSTS_time; si el id cambia en otra versión, ajustar aquí" }
       - { tipo: regex, sobre: tls.json, patron: "\"id\"\\s*:\\s*\"(SSLv2|SSLv3|TLS1|TLS1_1)\"[^}]*\"finding\"\\s*:\\s*\"offered", debe_coincidir: false }
     automatizable: true
+    critica: false
     evidencia_a_capturar: ["tls.json de testssl.sh", "Resumen de calificación"]
     modos: [L, H]
     semestre: S2
@@ -430,6 +448,7 @@ pruebas:
     criterio_aprobacion:
       - { tipo: regex, sobre: zap.json, patron: "\"riskcode\"\\s*:\\s*\"3\"", debe_coincidir: false }
     automatizable: true
+    critica: false
     evidencia_a_capturar: ["zap.json", "Resumen HTML de ZAP"]
     modos: [L, H]
     semestre: S2
@@ -456,6 +475,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "^403$" }
       - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
     automatizable: true
+    critica: false
     evidencia_a_capturar: ["Código HTTP", "Registro de auditoría del WAF", "Alerta de Wazuh (JSON)"]
     modos: [L, H]
     semestre: S2
@@ -481,6 +501,7 @@ pruebas:
     criterio_aprobacion:
       - { tipo: exit_code, valor: distinto_de_0 }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de curl", "Registro de denegación en FW01"]
     modos: [L, H]
     semestre: S2
@@ -505,6 +526,7 @@ pruebas:
     criterio_aprobacion:
       - { tipo: exit_code, valor: distinto_de_0 }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de nc desde HNY01", "Registro de denegación en FW01"]
     modos: [L, H]
     semestre: S2
@@ -530,6 +552,7 @@ pruebas:
       - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "ping -M do -s 1400 -c 3 10.30.10.10" }
       - { tipo: regex, sobre: stdout, patron: "(?i)(message too long|frag needed)", comando_adicional: "ping -M do -s 1400 -c 3 10.30.10.10" }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de ambos ping", "Sesión TCP sostenida durante la prueba (sin reinicios)"]
     modos: [A, H]
     semestre: S2
@@ -557,6 +580,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "^200$", comando_adicional: "curl ... http://pac.celeris.internal/wpad.dat" }
       - { tipo: manual, descripcion: "La navegación del usuario continúa sin intervención" }
     automatizable: false
+    critica: false
     evidencia_a_capturar: ["Salida de nslookup y curl", "Registro de acceso de EDGE01 con la petición del PAC"]
     modos: [L, H]
     semestre: S2
@@ -581,6 +605,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "^$", comando_adicional: "ip -6 route show default", nota: "sin ruta IPv6 por defecto" }
       - { tipo: contador, metrica: ra_descartados_en_puerto, operador: ">", valor: 0 }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de ip -6 route show default", "Contador de RA guard del puerto"]
     modos: [L, H]
     semestre: S2
@@ -605,6 +630,7 @@ pruebas:
       - { tipo: exit_code, valor: distinto_de_0 }
       - { tipo: contador, metrica: paquetes_bloqueados_regla_F7, operador: ">", valor: 0 }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["Salida de kdig", "Contador de la regla F7"]
     modos: [L, H]
     semestre: S2
@@ -634,6 +660,7 @@ pruebas:
       - { tipo: umbral, metrica: restauracion_fw01_horas, operador: "<=", valor: 1, nota: "RTO del firewall en D2.9" }
       - { tipo: manual, descripcion: "FW01 restaurado desde el XML en Git y reglas operativas" }
     automatizable: false
+    critica: false
     evidencia_a_capturar: ["Salida de nc", "Cronometraje de la restauración", "Commit del XML restaurado"]
     modos: [L, H]
     semestre: S2
@@ -660,6 +687,7 @@ pruebas:
       - { tipo: regex, sobre: captura, patron: "(?i)(x-forwarded-for|^via:|forwarded:)", debe_coincidir: false }
       - { tipo: regex, sobre: captura, patron: "\\b10\\.20\\.(3[2-5])\\.\\d{1,3}\\b", debe_coincidir: false, nota: "ninguna IP de LAB (10.20.32.0/22)" }
     automatizable: true
+    critica: false
     evidencia_a_capturar: ["Captura .pcap de la VTI", "Resultado de las búsquedas de cabeceras e IP"]
     modos: [L, A, H]
     semestre: S2
@@ -686,6 +714,7 @@ pruebas:
       - { tipo: contador, metrica: handshakes_tls, operador: ">", valor: 0, comando_adicional: "tshark -r scrape.pcap -Y tls.handshake" }
       - { tipo: contador, metrica: respuestas_http_en_claro_del_servidor, operador: "==", valor: 0, nota: "una petición HTTP en claro al 9128 (sin token) no recibe respuesta" }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["scrape.pcap", "Salida de tshark"]
     modos: [L, H]
     semestre: S2
@@ -710,6 +739,7 @@ pruebas:
       - { tipo: contador, metrica: paquetes_udp_514, operador: "==", valor: 0, comando_adicional: "tshark -r syslog.pcap -Y 'udp.port == 514'" }
       - { tipo: contador, metrica: handshakes_tls_6514, operador: ">", valor: 0, comando_adicional: "tshark -r syslog.pcap -Y 'tcp.port == 6514 && tls.handshake'" }
     automatizable: true
+    critica: true
     evidencia_a_capturar: ["syslog.pcap", "Salida de tshark"]
     modos: [L, H]
     semestre: S2

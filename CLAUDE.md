@@ -40,7 +40,7 @@ make release-e1      # copia la versión final a entregables/CE0311/vX.Y/
 - `infra/inventory.yaml`, `infra/pruebas.yaml`, `infra/trazabilidad.yaml` + `infra/schema/*.json`: los datos y su esquema.
 - `infra/celeris_infra.py`: librería de carga y derivación (matriz zona × zona, coberturas). Los generadores (diagramas, XLSX,
   DOCX) la importan; no leen los YAML por su cuenta.
-- `infra/validate.py` (V-01…V-34) y `infra/checks/v50_…v80_` (ganchos para P2–P5). Resultado en `docs/infra/e1/validacion.md`.
+- `infra/validate.py` (V-01…V-43) y `infra/checks/v50_…v80_` (ganchos para P2–P5). Resultado en `docs/infra/e1/validacion.md`.
 - `docs/infra/e1/CAMBIOS-INVENTARIO.md`: contradicciones y vacíos del documento maestro (CI-nn). Léelo antes de tocar un dato
   marcado `pendiente: true`.
 - Dependencias: `pip install -r infra/requirements.txt` (`make deps`). En Windows sin GNU make, `python infra/validate.py` es

@@ -54,6 +54,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-23 | decisión de transcripción | Parámetros del laboratorio y tráfico sin F-nn en los generadores (Etapa 1) | abierto |
 | CI-24 | decisión de transcripción | Parámetros del laboratorio emulado (WAN, DNS de prueba, vgw-sim) y qué no se emula (Etapa 3) | abierto |
 | CI-25 | vacío | IaC del Modo A (OpenTofu): DPD mínimo de AWS, reglas de salida, disco de NAT01, campus simulado (Etapa 6) | abierto |
+| CI-26 | decisión de transcripción | Qué pruebas son críticas (`critica` en pruebas.yaml) y qué hace V-42 con ellas (Etapa 7) | abierto |
 
 ## Entradas
 
@@ -303,4 +304,14 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - AWS Emulator no está instalado: la única verificación de planificación es `tofu validate` y un plan estructural con credenciales falsas en una copia temporal (78 recursos, sin llamadas a AWS), cuya salida no es evidencia de despliegue.
 - **Secretos.** Las llaves precompartidas de los túneles las genera AWS (`tunnelN_preshared_key`) y quedan en el estado de OpenTofu y en el `user_data` de cgw-sim. El estado es local, está en `.gitignore` y no debe versionarse; es un riesgo aceptado solo para el laboratorio efímero.
 - **Propuesta:** completar D2.5 con las reglas de salida (2 y 3), corregir D1.10 o documentar el DPD de 30 s (1), fijar el tope de RE-07 (8) y decidir si se verifica en AWS Academy antes de la demostración.
+- **Decide:** equipo del proyecto
+
+### CI-26 — Pruebas críticas y alcance de V-40 a V-43 (Etapa 7)
+- **Estado:** abierto
+- **Tipo:** decisión de transcripción
+- **Dónde:** `infra/pruebas.yaml` (campo `critica`), `infra/schema/pruebas.schema.json`, `infra/validate.py` (V-40…V-43)
+- **Qué no definía el diseño:** D1.16 no dice qué pruebas son críticas. Se adoptó una regla: una prueba es crítica si su categoría es `segmentacion`, `vpn` o `cifrado` (16 de 28: T01–T06, T08, T10, T12, T19–T21, T23–T24, T27–T28), es decir, si un FALLA invalida un límite de seguridad del diseño. Quedan fuera conectividad, disponibilidad, detección, seguridad web y privacidad. La regla es del equipo del proyecto, no de D1.16.
+- **Qué hace V-42:** FALLA en una prueba crítica = FALLA del validador. Una crítica que aplica al modo y no está en PASA (PARCIAL, NO_APLICA, ausente), o una FALLA no crítica, = advertencia: PARCIAL y NO_APLICA no cuentan como PASA.
+- **Límites de V-40 y V-41:** comprueban los artefactos generados contra el inventario (puertos, acciones, modos, algoritmos, temporizadores, ASN, MTU/MSS), no el comportamiento del firewall; eso lo mide `make test-lab`. V-40 trata como correctas las reglas «sin F-nn» de CI-23 (VPN, NAT, anti-spoofing, MSS).
+- **Propuesta:** confirmar o cambiar la regla de criticidad; en particular, si T15 (WAF) y T17 (inyección) deben ser críticas.
 - **Decide:** equipo del proyecto

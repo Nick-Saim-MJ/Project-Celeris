@@ -13,7 +13,7 @@ Esta carpeta documenta los archivos que sostienen el Entregable 1 (Análisis y D
 | [`infra/trazabilidad.yaml`](../../../infra/trazabilidad.yaml) | Objetivos OD, amenazas STRIDE AM, detecciones DET, figuras FIG, rúbrica R1–R8, correspondencia con el DOCX y catálogos de S-xx, D-xx y REQ | Quien edite el informe; la rúbrica solo cambia si cambia el XLSX oficial |
 | [`infra/schema/*.schema.json`](../../../infra/schema) | JSON Schema de los tres YAML (IDs, enumeraciones, campos obligatorios) | Quien cambie la estructura de los YAML |
 | [`infra/celeris_infra.py`](../../../infra/celeris_infra.py) | Librería: carga, resuelve referencias, deriva la matriz zona × zona y calcula coberturas | La usan el validador y los generadores P2–P5; no releer los YAML por otra vía |
-| [`infra/validate.py`](../../../infra/validate.py) | Validador V-01…V-34 + ganchos V-50+ | Quien agregue chequeos |
+| [`infra/validate.py`](../../../infra/validate.py) | Validador V-01…V-43 + ganchos V-50+ | Quien agregue chequeos |
 | [`infra/checks/`](../../../infra/checks) | Ganchos vacíos: `v50_` diagramas (P2), `v60_` XLSX de componentes (P3), `v70_` XLSX de pruebas (P4), `v80_` DOCX (P5) | Cada P# implementa el suyo |
 | [`validacion.md`](validacion.md) | Resultado de la última validación. Lo escribe `make validate`; no se edita a mano | Automático (el CI exige que esté al día) |
 | [`CAMBIOS-INVENTARIO.md`](CAMBIOS-INVENTARIO.md) | Registro de contradicciones y vacíos del documento maestro (CI-nn) | Quien detecte el problema; lo resuelve el equipo |
@@ -37,6 +37,10 @@ Esta carpeta documenta los archivos que sostienen el Entregable 1 (Análisis y D
 - **V-20…V-27** pruebas, objetivos, amenazas, detecciones y rúbrica con coherencia en ambos sentidos.
 - **V-28…V-34** integridad del contrato, pendientes registrados, secretos, VPN, servicios base, Modo L (lo emulado se rotula)
   y rúbrica contra el XLSX oficial.
+- **V-40…V-43** artefactos generados y resultados (Etapa 7): el ruleset de nftables tiene exactamente los flujos del inventario
+  (puertos, bloqueos, F6 solo en piloto, F24 solo con ventana, política drop); swanctl, FRR y VTI coinciden con la sección `vpn`;
+  los últimos `evidencias/*/resultados.json` no tienen FALLA en pruebas con `critica: true`; el tfvars de OpenTofu y la topología
+  de containerlab están al día.
 - **V-50+, V-60+, V-70+, V-80+** ganchos para P2–P5. Mientras no estén implementados salen como «PENDIENTE de P#».
 
 ## Qué NO es

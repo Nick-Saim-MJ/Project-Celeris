@@ -35,6 +35,7 @@
           "resultado_esperado",
           "criterio_aprobacion",
           "automatizable",
+          "critica",
           "evidencia_a_capturar",
           "modos",
           "semestre",
@@ -153,6 +154,10 @@
           },
           "automatizable": {
             "type": "boolean"
+          },
+          "critica": {
+            "type": "boolean",
+            "description": "true si un FALLA de esta prueba invalida un límite de seguridad del diseño (V-42). Regla: categoría segmentacion, vpn o cifrado (CI-26)."
           },
           "evidencia_a_capturar": {
             "type": "array",

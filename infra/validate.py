@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validador de la fuente única de datos de red (CE0311, Entregable 1).
 
-Ejecuta los chequeos V-01…V-34 sobre infra/inventory.yaml, infra/pruebas.yaml e infra/trazabilidad.yaml,
+Ejecuta los chequeos V-01…V-43 sobre infra/inventory.yaml, infra/pruebas.yaml e infra/trazabilidad.yaml,
 ejecuta los ganchos de infra/checks/ (V-50+ diagramas, V-60+ XLSX componentes, V-70+ XLSX pruebas, V-80+ DOCX)
 y escribe docs/infra/e1/validacion.md.
 
@@ -850,6 +850,279 @@ def v34(x: Infra):
             r.append(E(f"{rid}: peso {mio['peso']} ≠ {int(fila[2])} del XLSX", "Copie el peso del XLSX"))
         if limpia(fila[3]) != limpia(mio["descriptor_nivel_4"]):
             r.append(E(f"{rid}: el descriptor de nivel 4 difiere del XLSX oficial", "Copie el descriptor del XLSX sin modificarlo"))
+    return r
+
+
+# --------------------------------------------------------------------------------------------------
+# V-40 … V-43: artefactos generados del laboratorio y resultados de las pruebas (Etapa 7)
+# --------------------------------------------------------------------------------------------------
+
+PARES_AWS_DOC = ["198.51.100.21", "198.51.100.22"]      # RFC 5737: solo para poder generar (CI-23)
+
+
+def _cruza_fw01(x: Infra, f: dict) -> bool:
+    """¿Algún par origen→destino del flujo pasa por FW01? (si todo es una misma VLAN, FW01 no ve el tráfico)."""
+    for o in x.extremos(f, "origen"):
+        for d in x.extremos(f, "destino"):
+            if o.es_firewall or d.es_firewall or o.zona != d.zona:
+                return True
+    return False
+
+
+def _puertos_de_regla(linea: str) -> set[tuple[str, int]]:
+    out = set()
+    m = re.search(r"meta l4proto \. th dport \{([^}]*)\}", linea)
+    if m:
+        for par in m.group(1).split(","):
+            pr, _, pt = par.partition(" . ")
+            out.add((pr.strip(), int(pt)))
+    for m in re.finditer(r"\b(tcp|udp) dport (\{[^}]*\}|\d+)", linea):
+        for pt in re.findall(r"\d+", m.group(2)):
+            out.add((m.group(1), int(pt)))
+    return out
+
+
+def _puertos_permitidos(f: dict) -> set[tuple[str, int]]:
+    """Puertos del flujo, con el original y el traducido por DNAT (la regla NAT usa el original; forward, el traducido)."""
+    out = set()
+    for p in f["protocolos"]:
+        if p["proto"] in ("tcp", "udp"):
+            for pt in p["puertos"]:
+                out.add((p["proto"], pt))
+                out.add((p["proto"], (p.get("dnat") or {}).get(str(pt), pt)))
+    return out
+
+
+def _verbo(linea: str) -> str:
+    return "drop" if " drop" in linea else "dnat" if " dnat to" in linea else "accept" if " accept" in linea else "?"
+
+
+def ruleset_contra_inventario(x: Infra, texto: str, modo: str, ventana: bool) -> list[Hallazgo]:
+    """Compara un ruleset de nftables con los flujos del inventario: ni una regla de más, ni una de menos."""
+    r = []
+    etiqueta = f"modo={modo}{' +ventana' if ventana else ''}"
+    por_flujo: dict[str, list[str]] = {}
+    for linea in texto.splitlines():
+        s = linea.strip()
+        if not s or s.startswith(("#", "type ")):       # «type … policy accept» declara una cadena, no una regla
+            continue
+        m = re.search(r'comment "(F\d+)\b', s)
+        if m:
+            por_flujo.setdefault(m.group(1), []).append(s)
+        if re.match(r"(counter\s+)?accept\b", s):
+            r.append(E(f"[{etiqueta}] regla que acepta todo sin condición: «{s}»", "Toda regla accept debe llevar interfaz, dirección o puerto"))
+        elif " accept" in f" {s}" and not m:
+            ok = s.startswith("ct state established,related accept") or re.match(r'[io]ifname "lo" accept', s) or "(sin F-nn" in s
+            if not ok:
+                r.append(E(f"[{etiqueta}] regla accept sin flujo F-nn ni rótulo «sin F-nn»: «{s[:110]}»",
+                           "Agregue el flujo a D1.11 o rotule la regla como «sin F-nn» (CI-23)"))
+    for cadena in ("input", "forward", "output"):
+        if not re.search(rf"hook {cadena} priority 0; policy drop;", texto):
+            r.append(E(f"[{etiqueta}] la cadena {cadena} no tiene política drop", "La política por defecto de FW01 es denegar (D1.13)"))
+    flujos = {f["id"]: f for f in x.inv["flujos"]}
+    for fid in sorted(set(por_flujo) - set(flujos)):
+        r.append(E(f"[{etiqueta}] el ruleset tiene reglas de {fid}, que no existe en el inventario", "Regenere el ruleset (make gen)"))
+    for fid, f in flujos.items():
+        lineas = por_flujo.get(fid, [])
+        verbos = {_verbo(linea) for linea in lineas}
+        if f["estado"] != "activo":
+            if lineas:
+                r.append(E(f"[{etiqueta}] {fid} está {f['estado']} y tiene regla en el ruleset", "Un flujo no activo no se abre"))
+            continue
+        if f["accion"] == "bloquear":
+            if "accept" in verbos or "dnat" in verbos:
+                r.append(E(f"[{etiqueta}] {fid} es un bloqueo y el ruleset lo acepta", "Un flujo con accion=bloquear solo genera drop"))
+            elif not lineas:
+                r.append(E(f"[{etiqueta}] {fid} es un bloqueo y no tiene regla drop", "Regenere el ruleset"))
+        else:
+            sin_regla = (f["modo"] == "piloto" and modo != "piloto") or (fid == "F24" and not ventana) or not _cruza_fw01(x, f)
+            if sin_regla:
+                if lineas:
+                    r.append(E(f"[{etiqueta}] {fid} no debe estar abierto en este modo y tiene {len(lineas)} regla(s)",
+                               "F6 solo en piloto; F24 solo con ventana autorizada; lo local a una VLAN no pasa por FW01"))
+                continue
+            if not lineas:
+                r.append(E(f"[{etiqueta}] {fid} está permitido y no tiene regla", "Regenere el ruleset"))
+                continue
+            if "drop" in verbos or "?" in verbos:
+                r.append(E(f"[{etiqueta}] {fid} está permitido y una de sus reglas no es accept/dnat", "Regenere el ruleset"))
+            if any(p["proto"] in ("tcp", "udp") and p["puertos"] for p in f["protocolos"]):
+                for linea in lineas:
+                    if " dnat to" not in linea and not _puertos_de_regla(linea):
+                        r.append(E(f"[{etiqueta}] {fid}: regla sin protocolo ni puerto (acepta cualquier tráfico entre los extremos): «{linea[:100]}»",
+                                   "La regla debe limitar protocolo y puerto"))
+        esperado = _puertos_permitidos(f)
+        vistos = set().union(*[_puertos_de_regla(linea) for linea in lineas]) if lineas else set()
+        if vistos - esperado:
+            r.append(E(f"[{etiqueta}] {fid}: puertos abiertos fuera del inventario: {sorted(vistos - esperado)}", "Los puertos salen solo de `protocolos` del flujo"))
+        if lineas and esperado - vistos:
+            r.append(E(f"[{etiqueta}] {fid}: puertos del inventario sin regla: {sorted(esperado - vistos)}", "Regenere el ruleset"))
+    for fid, lineas in por_flujo.items():
+        f = flujos.get(fid)
+        if f and any(" dnat to" in linea for linea in lineas) and not any(e.zona == "INTERNET" for e in x.extremos(f, "origen")):
+            r.append(E(f"[{etiqueta}] {fid} tiene DNAT y su origen no es INTERNET", "El DNAT es solo de entrada desde Internet (F21, F24)"))
+    return r
+
+
+@chequeo("V-40", "El ruleset generado de fw01-sim contiene exactamente los flujos permitidos (y los bloqueos) del inventario")
+def v40(x: Infra):
+    from gen import nftables
+    r = []
+    for modo, ventana in (("piloto", False), ("gestionado", False), ("piloto", True)):
+        r += ruleset_contra_inventario(x, nftables.generar(x, modo=modo, ventana=ventana, aws_peers=PARES_AWS_DOC), modo, ventana)
+    return r
+
+
+_CIFRADO = {"AES-256-GCM-16": "aes256gcm16"}
+_PRF = {"SHA2-384": "prfsha384"}
+_DH = {20: "ecp384"}
+
+
+def vpn_contra_inventario(x: Infra, lado: str, swanctl_txt: str, frr_txt: str, vti_txt: str) -> list[Hallazgo]:
+    """Compara swanctl.conf, frr.conf y vti-up.sh de un lado con la sección `vpn` del inventario."""
+    import ipaddress
+    v = x.inv["vpn"]
+    r = []
+    mio, otro = (v["extremo_onpremise"], v["extremo_aws"]) if lado == "fw01" else (v["extremo_aws"], v["extremo_onpremise"])
+    pref = f"[{lado}]"
+    # ---- swanctl
+    conns = re.findall(r"^  (tunel\d+) \{\n(.*?)^  \}$", swanctl_txt, re.S | re.M)
+    if len(conns) != len(v["tuneles"]):
+        r.append(E(f"{pref} swanctl.conf tiene {len(conns)} conexiones y el inventario {len(v['tuneles'])} túneles", "Regenere (make gen)"))
+    f1, f2 = v["fase1"], v["fase2"]
+    dh1 = int(re.search(r"\d+", f1["dh"]).group())
+    dh2 = int(re.search(r"\d+", f2["pfs"]).group())
+    esperado_ike = [_CIFRADO.get(f1["cifrado"]), _PRF.get(f1["prf"]), _DH.get(dh1)]
+    esperado_esp = [_CIFRADO.get(f2["cifrado"]), _DH.get(dh2)]
+    if None in esperado_ike + esperado_esp:
+        r.append(W(f"{pref} algoritmo de fase 1/2 sin equivalente conocido por el validador: {f1['cifrado']}, {f1['prf']}, {f1['dh']}",
+                   "Agregue el equivalente a _CIFRADO/_PRF/_DH de validate.py"))
+    for i, (nombre, cuerpo) in enumerate(conns):
+        n = i + 1
+
+        def campo(k, _c=cuerpo):
+            m = re.search(rf"^\s+{k} = (.+)$", _c, re.M)
+            return m.group(1).strip() if m else None
+
+        comprobar = [
+            ("proposals", "-".join(esperado_ike) if None not in esperado_ike else None),
+            ("esp_proposals", "-".join(esperado_esp) if None not in esperado_esp else None),
+            ("rekey_time", f"{f1['vida_s']}s"), ("life_time", f"{f2['vida_s']}s"),
+            ("dpd_delay", f"{v['dpd']['intervalo_s']}s"), ("dpd_action", v["dpd"]["accion"]),
+            ("mark_in", str(n)), ("mark_out", str(n)), ("version", "2"),
+            ("start_action", "start" if lado == "fw01" else "none"),
+        ]
+        for k, esp in comprobar:
+            if esp is not None and campo(k) != esp:
+                r.append(E(f"{pref} {nombre}: {k} = {campo(k)} y el inventario pide {esp}", "Regenere desde la sección vpn del inventario"))
+        propio = "local_addrs" if lado == "fw01" else "remote_addrs"
+        if campo(propio) != v["extremo_onpremise"]["ip_publica"]:
+            r.append(E(f"{pref} {nombre}: {propio} = {campo(propio)} y la IP pública de FW01 es {v['extremo_onpremise']['ip_publica']}", "Regenere"))
+    # ---- FRR
+    asn = re.search(r"^router bgp (\d+)", frr_txt, re.M)
+    if not asn or int(asn.group(1)) != mio["asn"]:
+        r.append(E(f"{pref} frr.conf: router bgp {asn.group(1) if asn else '—'} y el inventario pide {mio['asn']}", "Regenere"))
+    esperados = {}
+    for t in v["tuneles"]:
+        h = list(ipaddress.ip_network(t["red_interna"]).hosts())
+        esperados[str(h[0] if lado == "fw01" else h[1])] = t
+    vecinos = dict(re.findall(r"^ neighbor (\S+) remote-as (\d+)", frr_txt, re.M))
+    if set(vecinos) != set(esperados):
+        r.append(E(f"{pref} frr.conf: vecinos {sorted(vecinos)} ≠ {sorted(esperados)} (host de cada /30 del inventario)", "Regenere"))
+    for ip, rem in vecinos.items():
+        if int(rem) != otro["asn"]:
+            r.append(E(f"{pref} frr.conf: el vecino {ip} usa remote-as {rem} y el inventario pide {otro['asn']}", "Regenere"))
+    for ip, k, h in re.findall(r"^ neighbor (\S+) timers (\d+) (\d+)", frr_txt, re.M):
+        if (int(k), int(h)) != (v["bgp"]["keepalive_s"], v["bgp"]["hold_s"]):
+            r.append(E(f"{pref} frr.conf: timers {k}/{h} del vecino {ip} ≠ {v['bgp']['keepalive_s']}/{v['bgp']['hold_s']} del inventario", "Regenere"))
+    if not re.search(r"^\s+maximum-paths 1$", frr_txt, re.M):
+        r.append(E(f"{pref} frr.conf: falta `maximum-paths 1` (D1.10: un solo túnel a la vez, sin ECMP)", "Regenere"))
+    redes = sorted(re.findall(r"^  network (\S+)", frr_txt, re.M))
+    if redes != sorted(mio["redes_anunciadas"]):
+        r.append(E(f"{pref} frr.conf: redes anunciadas {redes} ≠ {sorted(mio['redes_anunciadas'])}", "Regenere"))
+    con_prepend = set(re.findall(r"^  neighbor (\S+) route-map PREPEND-\S+ out", frr_txt, re.M))
+    esperados_prepend = {ip for ip, t in esperados.items() if t.get("bgp_as_path_prepending")} if lado == "fw01" else set()
+    if con_prepend != esperados_prepend:
+        r.append(E(f"{pref} frr.conf: prepending en {sorted(con_prepend)} y el inventario lo pide en {sorted(esperados_prepend)}",
+                   "Solo el túnel de respaldo de FW01 lleva AS-path prepending"))
+    # ---- VTI
+    mtus = set(re.findall(r"mtu (\d+) up", vti_txt))
+    if mtus != {str(v["mtu"])}:
+        r.append(E(f"{pref} vti-up.sh: MTU {sorted(mtus)} ≠ {v['mtu']} del inventario", "Regenere"))
+    claves = re.findall(r"key (\d+)", vti_txt)
+    if claves != [str(i + 1) for i in range(len(v["tuneles"]))]:
+        r.append(E(f"{pref} vti-up.sh: claves VTI {claves} no coinciden con las marcas de swanctl.conf", "Regenere"))
+    return r
+
+
+@chequeo("V-41", "swanctl, FRR y VTI generados coinciden con la sección vpn del inventario (cifrado, DPD, vidas, ASN, BGP, MTU, MSS)")
+def v41(x: Infra):
+    from gen import nftables, vpn
+    r = []
+    for lado in ("fw01", "vgw"):
+        r += vpn_contra_inventario(x, lado, vpn.swanctl(x, lado, PARES_AWS_DOC), vpn.frr(x, lado), vpn.vti_up(x, lado, PARES_AWS_DOC))
+    mss = re.findall(r"maxseg size set (\d+)", nftables.generar(x, aws_peers=PARES_AWS_DOC))
+    if mss != [str(x.inv["vpn"]["mss_clamping"])]:
+        r.append(E(f"El ruleset fija MSS {mss} y el inventario pide {x.inv['vpn']['mss_clamping']}", "Regenere el ruleset"))
+    return r
+
+
+def resultados_mas_recientes(raiz: Path) -> tuple[Path | None, dict | None]:
+    import json
+    candidatos = sorted(raiz.glob("evidencias/*/resultados.json"), key=lambda p: p.parent.name)
+    if not candidatos:
+        return None, None
+    return candidatos[-1], json.loads(candidatos[-1].read_text(encoding="utf-8"))
+
+
+def evaluar_resultados(x: Infra, datos: dict, origen: str) -> list[Hallazgo]:
+    """FALLA en una prueba crítica = error. Crítica que aplica al modo y no está en PASA, o FALLA no crítico = advertencia."""
+    r = []
+    modo = str(datos.get("meta", {}).get("modo", ""))[:1]
+    por_id = {t["id"]: t for t in datos["resultados"]}
+    for tid in sorted(por_id):
+        if tid not in x.pruebas:
+            r.append(E(f"{origen}: {tid} no existe en pruebas.yaml", "Vuelva a ejecutar make test-lab con el inventario actual"))
+    for t in x.pruebas.values():
+        res = por_id.get(t["id"])
+        aplica = modo in t["modos"]
+        if res is None:
+            if aplica:
+                r.append(W(f"{origen}: {t['id']} aplica al modo {modo} y no está en los resultados", "Vuelva a ejecutar make test-lab"))
+            continue
+        estado = res["resultado"]
+        if t["critica"]:
+            if estado == "FALLA":
+                r.append(E(f"{origen}: la prueba crítica {t['id']} ({t['nombre']}) FALLA",
+                           "Corrija el diseño o la implementación; una prueba crítica en FALLA invalida un límite de seguridad"))
+            elif aplica and estado != "PASA":
+                r.append(W(f"{origen}: la prueba crítica {t['id']} ({t['nombre']}) está en {estado}, no en PASA", "Complete la prueba o registre por qué no aplica (CI-16)"))
+            elif res.get("error_de_ejecucion"):
+                r.append(W(f"{origen}: la prueba crítica {t['id']} terminó con error de ejecución", "Repita la prueba"))
+        elif estado == "FALLA":
+            r.append(W(f"{origen}: {t['id']} ({t['nombre']}) FALLA (no es crítica)", "Revise el hallazgo en docs/infra/e1/ensayo-laboratorio.md"))
+    return r
+
+
+@chequeo("V-42", "Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas")
+def v42(x: Infra):
+    ruta, datos = resultados_mas_recientes(x.raiz)
+    if datos is None:
+        return [W("No hay evidencias/*/resultados.json: no se ha ejecutado make test-lab", "Ejecute make lab-up && make test-lab y versione resultados.json")]
+    meta = datos.get("meta", {})
+    return [I(f"Resultados de {ruta.parent.name} (commit {str(meta.get('commit', '—'))[:7]}): {meta.get('resumen', {})}")] + evaluar_resultados(x, datos, ruta.parent.name)
+
+
+@chequeo("V-43", "Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario")
+def v43(x: Infra):
+    from gen import lab, tofu
+    r = []
+    for ruta, texto in ((x.raiz / "deploy/opentofu/envs/demo/diseno.auto.tfvars.json", tofu.texto(x)),
+                        (x.raiz / "lab/celeris.clab.yml", lab.topologia_yaml(x))):
+        if not ruta.exists():
+            r.append(W(f"Falta {ruta.relative_to(x.raiz)}", "Genérelo (make tofu-gen / make lab-gen) y versiónelo"))
+        elif ruta.read_text(encoding="utf-8").replace("\r\n", "\n") != texto:
+            r.append(E(f"{ruta.relative_to(x.raiz)} no coincide con el inventario", "Regénerelo (make tofu-gen / make lab-gen) y commitee el resultado"))
     return r
 
 

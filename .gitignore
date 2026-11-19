@@ -20,3 +20,10 @@ e2e/config.*.toml
 # Python (infra/)
 __pycache__/
 *.pyc
+
+# Laboratorio emulado: lo generado y los secretos de laboratorio no se versionan
+lab/generated/
+lab/.run/
+*.psk
+psk-*.conf
+.pytest_cache/

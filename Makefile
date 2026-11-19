@@ -4,10 +4,12 @@
 PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
 VERSION ?= v1.0
 
-.PHONY: help deps validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
+.PHONY: help deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
 
 help:
 	@echo "make validate        fuente única + artefactos + secretos (infra/validate.py y gitleaks si está instalado)"
+	@echo "make gen              genera ruleset, VPN y PAC del laboratorio en lab/generated (Etapa 1; --aws-peer en AWS_PEERS)"
+	@echo "make test-gen         pruebas unitarias y snapshots de los generadores"
 	@echo "make lab-up|lab-down|test-lab   laboratorio containerlab (pendiente de P6)"
 	@echo "make matrices        genera las dos matrices XLSX (pendiente de P3 y P4)"
 	@echo "make diagrams-check  valida los .drawio contra el inventario (pendiente de P2)"
@@ -16,6 +18,18 @@ help:
 
 deps:
 	$(PYTHON) -m pip install -r infra/requirements.txt
+
+deps-dev:
+	$(PYTHON) -m pip install -r infra/requirements-dev.txt
+
+# IP públicas de los dos extremos AWS: el inventario no las fija (CI-23). Documentación RFC 5737 por defecto.
+AWS_PEERS ?= 198.51.100.21 198.51.100.22
+
+gen:
+	$(PYTHON) infra/genera.py todo $(foreach p,$(AWS_PEERS),--aws-peer $(p))
+
+test-gen:
+	$(PYTHON) -m pytest tests/gen -q
 
 validate:
 	$(PYTHON) infra/validate.py

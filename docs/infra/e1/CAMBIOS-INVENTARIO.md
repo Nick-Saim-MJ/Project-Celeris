@@ -51,6 +51,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-20 | decisión de transcripción | IDs OD/AM/DET/FIG asignados por posición; FIG-5.5a/5.5b | abierto |
 | CI-21 | vacío | Nombre DNS del portal y orígenes de varias pruebas no definidos | abierto |
 | CI-22 | vacío | 9 flujos sin prueba T-nn propia | abierto |
+| CI-23 | decisión de transcripción | Parámetros del laboratorio y tráfico sin F-nn en los generadores (Etapa 1) | abierto |
 
 ## Entradas
 
@@ -243,4 +244,19 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Tipo:** vacío
 - **Dónde:** D1.16 vs D1.11: F10, F11, F15, F17, F18, F19, F20, F25, F26. F23 solo tiene la prueba negativa T19 (WEB01 no sale a Internet); la renovación ACME no tiene prueba.
 - **Propuesta:** mantener `sin_prueba_justificacion` (cada una dice cómo se valida en S2) o ampliar D1.16 con T29+. Los demás flujos tienen al menos un T-nn.
+- **Decide:** equipo del proyecto
+
+### CI-23 — Parámetros del laboratorio y tráfico sin F-nn en los generadores (Etapa 1)
+- **Estado:** abierto
+- **Tipo:** decisión de transcripción
+- **Dónde:** `infra/gen/nftables.py`, `infra/gen/vpn.py`, `infra/gen/pac.py`
+- **Qué falta en el inventario y cómo se resolvió (todo es del laboratorio emulado, nada cambia el diseño):**
+  1. **IP públicas de los dos extremos AWS.** D1.10 dice «2 IP asignadas por AWS». Los generadores las reciben por parámetro (`--aws-peer`, ×2); los tests usan 198.51.100.21 y .22 (RFC 5737). La IP WAN de `fw01-sim` en el laboratorio (F4.1: red 198.51.100.0/24) se fija en la Etapa 3.
+  2. **Direcciones de host de los /30 de túnel.** D1.8 solo da 169.254.10.0/30 y 169.254.11.0/30. Convención adoptada, la de AWS: primer host = extremo AWS, segundo = campus.
+  3. **AS-path prepending del túnel 2.** El inventario dice `bgp_as_path_prepending: true` sin cantidad. Se usa una repetición del ASN (el mínimo que invierte la preferencia).
+  4. **Nombre de las interfaces de túnel y `if_id` XFRM.** `vti1`/`vti2` (ID del componente en minúsculas) y el número de túnel.
+  5. **Tráfico que no es un flujo F-nn de D1.11 pero el firewall necesita:** IKEv2 (UDP 500/4500), ESP y BGP (TCP 179) de la VPN; NAT de salida; anti-spoofing de WAN (D1.13); MSS clamping (D1.10). Se generan en reglas rotuladas «sin F-nn» y el validador (V-40) las distingue de los flujos.
+  6. **F20 hacia FW01.** F20 usa los mismos puertos para todos los destinos («hosts listados»); la regla de entrada a FW01 hereda 22, 443, 3000, 5601 y 9128 aunque la GUI solo necesita 443. Conviene fijar el puerto por destino en D1.11.
+  7. **REQ-F-26.** `infra/gen/pac.py` genera el `wpad.dat` desde el inventario (lab y entrega), pero el binario `celeris-cache` (src/) aún no genera PAC: el requisito de producto sigue pendiente en el código.
+- **Propuesta:** aceptar las convenciones 2–4 como definitivas para el laboratorio; fijar 1 en la Etapa 3; revisar 5 y 6 al corregir D1.11.
 - **Decide:** equipo del proyecto

@@ -1608,7 +1608,7 @@ flujos:
     origen: [INTERNET]
     destino: [HNY01]
     destino_detalle: "10.20.41.20"
-    protocolos: [{ proto: tcp, puertos: [22, 23], nota: "22→2222 (DNAT), 23" }]
+    protocolos: [{ proto: tcp, puertos: [22, 23], nota: "22→2222 (DNAT), 23", dnat: { "22": 2222 } }]
     proposito: "Señuelo (solo con aprobación de la DTI)"
     accion: permitir
     proteccion: { tipo: sin_cifrar_riesgo_aceptado, detalle: "En claro a propósito (es un señuelo)" }

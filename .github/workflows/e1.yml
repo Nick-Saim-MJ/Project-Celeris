@@ -18,9 +18,10 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: infra/requirements.txt
-      - run: make deps
+          cache-dependency-path: infra/requirements*.txt
+      - run: make deps-dev
       - run: make validate
+      - run: make test-gen
       - name: El informe de validación versionado está al día
         run: git diff --exit-code docs/infra/e1/validacion.md
       - uses: actions/upload-artifact@v4

@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "celeris/pruebas.schema.json",
+  "title": "Pruebas de conectividad planeadas (CE0311)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "meta",
+    "pruebas"
+  ],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": [
+        "version",
+        "fecha"
+      ]
+    },
+    "pruebas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "categoria",
+          "nombre",
+          "origen",
+          "destino",
+          "flujos",
+          "componentes",
+          "objetivo_que_valida",
+          "precondicion",
+          "comando",
+          "resultado_esperado",
+          "criterio_aprobacion",
+          "automatizable",
+          "evidencia_a_capturar",
+          "modos",
+          "semestre",
+          "criterios_rubrica",
+          "objetivos",
+          "amenazas"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^T(0[1-9]|1[0-9]|2[0-8])$"
+          },
+          "categoria": {
+            "enum": [
+              "conectividad",
+              "segmentacion",
+              "vpn",
+              "seguridad_web",
+              "deteccion",
+              "disponibilidad",
+              "privacidad",
+              "cifrado"
+            ]
+          },
+          "nombre": {
+            "type": "string",
+            "minLength": 1
+          },
+          "origen": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1
+              }
+            ]
+          },
+          "destino": {
+            "oneOf": [
+              {
+                "type": "string",
+                "minLength": 1
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1
+              }
+            ]
+          },
+          "flujos": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^F([1-9]|1[0-9]|2[0-6])$"
+            }
+          },
+          "flujos_justificacion": {
+            "type": "string",
+            "minLength": 1
+          },
+          "componentes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*$"
+            },
+            "minItems": 1
+          },
+          "objetivo_que_valida": {
+            "type": "string",
+            "minLength": 1
+          },
+          "precondicion": {
+            "type": "string",
+            "minLength": 1
+          },
+          "comando": {
+            "type": "string",
+            "minLength": 1
+          },
+          "resultado_esperado": {
+            "type": "string",
+            "minLength": 1
+          },
+          "criterio_aprobacion": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "tipo"
+              ],
+              "properties": {
+                "tipo": {
+                  "enum": [
+                    "exit_code",
+                    "regex",
+                    "umbral",
+                    "contador",
+                    "manual"
+                  ]
+                }
+              }
+            },
+            "minItems": 1
+          },
+          "automatizable": {
+            "type": "boolean"
+          },
+          "evidencia_a_capturar": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "modos": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "L",
+                "A",
+                "H"
+              ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "nota_modos": {
+            "type": "string"
+          },
+          "semestre": {
+            "enum": [
+              "S2"
+            ]
+          },
+          "criterios_rubrica": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^R[1-8]$"
+            },
+            "minItems": 1
+          },
+          "objetivos": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^OD-\\d{2}$"
+            }
+          },
+          "amenazas": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^AM-\\d{2}$"
+            }
+          },
+          "detecciones": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^DET-\\d{2}$"
+            }
+          },
+          "celdas_matriz": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9-]*>[A-Z][A-Z0-9-]*$"
+            }
+          },
+          "pendiente": {
+            "type": "boolean"
+          },
+          "cambio": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^CI-\\d{2}$"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^CI-\\d{2}$"
+                },
+                "minItems": 1
+              }
+            ]
+          }
+        }
+      },
+      "minItems": 1
+    }
+  }
+}

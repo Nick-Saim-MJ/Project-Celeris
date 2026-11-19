@@ -16,3 +16,7 @@ e2e/*.srl
 e2e/*.log
 e2e/*.cnf
 e2e/config.*.toml
+
+# Python (infra/)
+__pycache__/
+*.pyc

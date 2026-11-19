@@ -53,6 +53,9 @@ stats_host = "celeris.stats"
 upstream_extra_ca = ["./origin-ca.pem"]
 admin_listen = "${ADMIN:-}"
 admin_token_file = "${ADMIN_TOKEN:-./ca/admin.token}"
+admin_tls = ${ADMIN_TLS:-false}
+admin_tls_cert = "./ca/admin-tls-$1.crt"
+admin_tls_key = "./ca/admin-tls-$1.key"
 max_disk_bytes = ${MAX_DISK:-0}
 maintenance_interval_secs = 1
 alert_disk_free_percent = ${ALERT_DISK_FREE:-0}
@@ -117,6 +120,7 @@ ADMIN=127.0.0.1:3159 SECURITY=true ALERT_CA_DAYS=5000 DETECT_DENIED=3 start_prox
 SECURITY=true CLIENTS='["192.0.2.0/24"]' start_proxy secdenied 3160
 SECURITY=true RATE=2 start_proxy secrate 3161
 SECURITY=true INTERNAL='[]' start_proxy secclosed 3162
+ADMIN=127.0.0.1:3164 ADMIN_TLS=true start_proxy admintls 3163
 
 FAILS=0
 expect() { # descripción, esperado, obtenido
@@ -759,6 +763,34 @@ expect "y se anota"                          "si" "$(over "$(sec_count secrate '
 PX=http://127.0.0.1:3162
 expect "un nombre que apunta a la red interna" "502 -" "$(px http://localhost:8080/copia.js)"
 expect "también se anota, con su destino"    "1" "$(sec_count secclosed 'l["event"]=="destination_blocked" and l["host"]=="localhost" and l["dstport"]==8080 and l["srcip"]=="127.0.0.1"')"
+
+section "29. Identidad del cliente hacia el origen (REQ-F-28)"
+PX=http://127.0.0.1:3129
+# El origen devuelve las cabeceras que recibió. Se pide por HTTPS interceptado y por HTTP plano, con las tres cabeceras del cliente.
+IDENT='-H X-Forwarded-For:203.0.113.7 -H Via:1.1-cliente-lab -H Forwarded:for=203.0.113.7 -H X-Prueba:conservada'
+vistas() { python3 -c "import json,sys; h=json.load(sys.stdin); print(' '.join(sorted(k for k in ('x-forwarded-for','via','forwarded') if k in h)) or 'ninguna')"; }
+expect "HTTPS: el origen no recibe X-Forwarded-For, Via ni Forwarded" "ninguna" "$(body $IDENT $L/echo | vistas)"
+expect "HTTP plano: tampoco"                 "ninguna" "$(body $IDENT http://localhost:8080/echo | vistas)"
+expect "el resto de cabeceras se conserva"   "conservada" "$(body $IDENT $L/echo | python3 -c "import json,sys; print(json.load(sys.stdin).get('x-prueba','falta'))")"
+expect "varias apariciones de X-Forwarded-For también se quitan" "ninguna" "$(body -H X-Forwarded-For:1.1.1.1 -H X-Forwarded-For:2.2.2.2 $L/echo | vistas)"
+
+section "30. Administración solo por TLS (REQ-NF-14)"
+ADMIN_TLS_URL=https://127.0.0.1:3164
+ATLS="--cacert ca/admin-tls-admintls.crt"
+ATOKEN=$(cat ca/admin.token)
+expect "el certificado de laboratorio existe" "si" "$([ -f ca/admin-tls-admintls.crt ] && echo si || echo no)"
+expect "la llave solo la lee su dueño"        "600" "$(stat -c %a ca/admin-tls-admintls.key 2>/dev/null || stat -f %Lp ca/admin-tls-admintls.key)"
+expect "por TLS, /healthz responde"          "200" "$(curl -s --noproxy "*" $ATLS -o /dev/null -w '%{http_code}' $ADMIN_TLS_URL/healthz)"
+expect "por TLS, /metrics sin token es 401"  "401" "$(curl -s --noproxy "*" $ATLS -o /dev/null -w '%{http_code}' $ADMIN_TLS_URL/metrics)"
+expect "por TLS, /metrics con token es 200"  "200" "$(curl -s --noproxy "*" $ATLS -H "Authorization: Bearer $ATOKEN" -o /dev/null -w '%{http_code}' $ADMIN_TLS_URL/metrics)"
+expect "sin confiar en el certificado, falla" "60" "$(curl -s --noproxy "*" -o /dev/null $ADMIN_TLS_URL/healthz; echo $?)"
+expect "HTTP en claro no recibe respuesta"    "" "$(curl -s -m5 --noproxy "*" -H "Authorization: Bearer $ATOKEN" http://127.0.0.1:3164/metrics)"
+expect "y curl termina con error"             "si" "$(curl -s -m5 --noproxy "*" -o /dev/null http://127.0.0.1:3164/healthz && echo no || echo si)"
+ADMIN=0.0.0.0:3168 write_config admin-abierto-sin-tls 3167
+expect "abierto a la red sin TLS no arranca"  "1" "$(startup_exit admin-abierto-sin-tls)"
+expect "y dice por qué"                       "1" "$(grep -c 'REQ-NF-14' admin-abierto-sin-tls.log)"
+ADMIN=0.0.0.0:3170 ADMIN_TLS=true write_config admin-abierto-con-tls 3169
+expect "abierto a la red con TLS sí arranca"  "124" "$(startup_exit admin-abierto-con-tls)"
 
 echo
 if [ "$FAILS" -eq 0 ]; then

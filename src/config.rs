@@ -59,6 +59,13 @@ pub struct Config {
     pub admin_listen: String,
     /// Archivo con el token de administración. Si no existe, se genera al arrancar.
     pub admin_token_file: PathBuf,
+    /// Sirve el puerto de administración solo por TLS (REQ-NF-14): el token nunca viaja en claro. Es obligatorio si
+    /// `admin_listen` no es de bucle local; una conexión HTTP en claro se cierra sin respuesta.
+    pub admin_tls: bool,
+    /// Certificado y llave del puerto de administración. Si no existen, se genera un certificado autofirmado de laboratorio
+    /// (con la IP de `admin_listen` y `localhost`) para que el cliente lo fije como ancla de confianza.
+    pub admin_tls_cert: PathBuf,
+    pub admin_tls_key: PathBuf,
     /// Espacio máximo de la caché en disco. Al llegar a él se borra lo usado hace más tiempo (0 = sin límite).
     pub max_disk_bytes: u64,
     /// Cada cuántos segundos se guardan los contadores y se evalúan las alertas.
@@ -179,6 +186,9 @@ impl Default for Config {
             upstream_extra_ca: vec![],
             admin_listen: "127.0.0.1:9128".into(),
             admin_token_file: "./ca/admin.token".into(),
+            admin_tls: false,
+            admin_tls_cert: "./ca/admin-tls.crt".into(),
+            admin_tls_key: "./ca/admin-tls.key".into(),
             max_disk_bytes: 10 * 1024 * 1024 * 1024,
             maintenance_interval_secs: 60,
             alert_disk_free_percent: 10,

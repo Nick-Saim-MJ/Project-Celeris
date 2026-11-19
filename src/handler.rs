@@ -355,6 +355,13 @@ impl HttpHandler for CacheHandler {
             }
         }
 
+        // req: REQ-F-28: nada que identifique al cliente sale hacia el origen ni hacia el shield. Las cabeceras que el cliente
+        // (o un proxy anterior) haya puesto se eliminan aquí, antes de cualquier camino que reenvíe la petición.
+        let quitadas = policy::strip_client_identity(req.headers_mut());
+        if quitadas > 0 {
+            tracing::debug!(%client, quitadas, "cabeceras de identidad del cliente eliminadas (REQ-F-28)");
+        }
+
         // Hudsucker también pasa aquí el CONNECT inicial del túnel: no es contenido.
         if req.method() == Method::CONNECT {
             return self.guard_connect(client, started, req).await;

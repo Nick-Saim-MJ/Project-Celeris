@@ -62,6 +62,10 @@ class H(http.server.BaseHTTPRequestHandler):
             # Origen que arma la respuesta con una cabecera que no forma parte de la clave de caché.
             host = self.headers.get("X-Forwarded-Host", "cdn.legit")
             return self.send(200, f'<script src="//{host}/app.js"></script>'.encode(), {"Cache-Control": "max-age=60"})
+        if path == "/echo":
+            # Devuelve las cabeceras tal como llegaron al origen (REQ-F-28: ninguna debe identificar al cliente).
+            cuerpo = json.dumps({k.lower(): v for k, v in self.headers.items()}).encode()
+            return self.send(200, cuerpo, {"Content-Type": "application/json", "Cache-Control": "no-store"})
         if path == "/slow":
             # Objeto cacheable que tarda: varios clientes simultáneos deben compartir una sola descarga.
             time.sleep(1)

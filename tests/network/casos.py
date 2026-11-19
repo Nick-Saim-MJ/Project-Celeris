@@ -504,14 +504,20 @@ def t27(c: Contexto) -> Medicion:
     m = Medicion()
     edge, puerto = c.ip("EDGE01"), c.puerto("F12")
     token = L.leer("edge01", "/data/admin.token").strip()
+    # el certificado de laboratorio del nodo se fija como ancla de confianza en obs01 (equivale a `--cacert` de Prometheus)
+    L.enviar("obs01", "/tmp/admin-tls.crt", L.leer("edge01", "/data/ca/admin-tls.crt"))
     L.fondo("edge01", f"timeout 12 tcpdump -ni eth1 -w /tmp/t27.pcap 'host {c.ip('OBS01')} and port {puerto}'")
     time.sleep(1.5)
-    for esquema in ("https", "http"):
-        rc, out = L.ex("obs01", f"curl -sk -m6 -H \"Authorization: Bearer {token}\" -o /dev/null -w '%{{http_code}}' {esquema}://{edge}:{puerto}/metrics")
+    m.medidas["esquema_https"] = 0
+    for esquema, opcion in (("https", "--cacert /tmp/admin-tls.crt"), ("http", "")):
+        rc, out = L.ex("obs01", f"curl -s -m6 {opcion} -H \"Authorization: Bearer {token}\" -o /dev/null -w '%{{http_code}}' {esquema}://{edge}:{puerto}/metrics")
         if rc == 0 and out.strip() == "200":
             m.medidas["esquema_https"] = 1 if esquema == "https" else 0
             break
     time.sleep(10)
+    # fuera de la ventana de captura (y sin token): una petición HTTP en claro al mismo puerto no debe recibir ninguna respuesta
+    rc_claro, resp_claro = L.ex("obs01", f"curl -s -m5 http://{edge}:{puerto}/healthz")
+    m.medidas["respuestas_http_en_claro_del_servidor"] = 0 if (rc_claro != 0 and not resp_claro.strip()) else 1
     L.traer("edge01", "/tmp/t27.pcap", c.ev.dir / "t27.pcap")
     c.ev.registrar_existente("t27.pcap")
     _, ascii_ = L.ex("edge01", "tcpdump -nn -A -r /tmp/t27.pcap 2>/dev/null | head -300")
@@ -523,8 +529,10 @@ def t27(c: Contexto) -> Medicion:
     m.medidas["handshakes_tls"] = int(tls.strip() or 0)
     m.medidas["apariciones_del_token_en_la_captura"] = int(enclaro) if enclaro.isdigit() else -1
     c.ev.guardar("captura.txt", m.salidas["scrape.pcap"])
-    if m.medidas["paquetes_http_en_claro"] > 0:
+    if m.medidas["paquetes_http_en_claro"] > 0 or m.medidas["respuestas_http_en_claro_del_servidor"] > 0:
         m.hallazgos.append("el puerto 9128 sigue sirviendo HTTP en claro con el token en la cabecera Authorization: incumple REQ-NF-14 (hallazgo F12 de D1.11)")
+    else:
+        m.hallazgos.append("el puerto 9128 solo acepta TLS (REQ-NF-14); el certificado es autofirmado de laboratorio: en producción F12 usa los de step-ca (F11)")
     if m.medidas.get("apariciones_del_token_en_la_captura", 0) > 0:
         m.hallazgos.append("el token de administración aparece en claro en la captura")
     return m

@@ -217,9 +217,45 @@ pub fn is_hop_by_hop(name: &str) -> bool {
     )
 }
 
+/// Cabeceras que identifican al cliente o delatan al proxy ante el origen: nunca se reenvían.
+// req: REQ-F-28
+const CLIENT_IDENTITY_HEADERS: [&str; 3] = ["x-forwarded-for", "via", "forwarded"];
+
+/// Elimina de forma explícita `X-Forwarded-For`, `Via` y `Forwarded` (todas sus apariciones) antes de enviar una petición al
+/// origen o al shield. Devuelve cuántas cabeceras distintas quitó.
+// req: REQ-F-28
+pub fn strip_client_identity(headers: &mut HeaderMap) -> usize {
+    CLIENT_IDENTITY_HEADERS.iter().filter(|name| headers.remove(**name).is_some()).count()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // req: REQ-F-28
+    #[test]
+    fn quita_las_cabeceras_que_identifican_al_cliente() {
+        let mut h = HeaderMap::new();
+        h.append("x-forwarded-for", "10.20.32.50".parse().unwrap());
+        h.append("X-Forwarded-For", "10.20.32.51".parse().unwrap());
+        h.insert("via", "1.1 cliente-lab".parse().unwrap());
+        h.insert("forwarded", "for=10.20.32.50".parse().unwrap());
+        h.insert("accept", "*/*".parse().unwrap());
+        assert_eq!(strip_client_identity(&mut h), 3);
+        for name in ["x-forwarded-for", "via", "forwarded"] {
+            assert!(!h.contains_key(name), "{name} debe haberse eliminado");
+        }
+        assert!(h.contains_key("accept"), "el resto de cabeceras no se toca");
+    }
+
+    // req: REQ-F-28
+    #[test]
+    fn sin_cabeceras_de_identidad_no_cambia_nada() {
+        let mut h = HeaderMap::new();
+        h.insert("host", "example.com".parse().unwrap());
+        assert_eq!(strip_client_identity(&mut h), 0);
+        assert_eq!(h.len(), 1);
+    }
 
     fn norm(url: &str) -> String {
         let cfg = Config::default();

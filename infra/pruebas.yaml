@@ -684,6 +684,7 @@ pruebas:
       - { tipo: contador, metrica: paquetes_http_en_claro, operador: "==", valor: 0, comando_adicional: "tshark -r scrape.pcap -Y http" }
       - { tipo: regex, sobre: scrape.pcap, patron: "(?i)authorization:|bearer ", debe_coincidir: false }
       - { tipo: contador, metrica: handshakes_tls, operador: ">", valor: 0, comando_adicional: "tshark -r scrape.pcap -Y tls.handshake" }
+      - { tipo: contador, metrica: respuestas_http_en_claro_del_servidor, operador: "==", valor: 0, nota: "una petición HTTP en claro al 9128 (sin token) no recibe respuesta" }
     automatizable: true
     evidencia_a_capturar: ["scrape.pcap", "Salida de tshark"]
     modos: [L, H]

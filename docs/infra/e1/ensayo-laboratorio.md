@@ -4,8 +4,8 @@
 
 > **El laboratorio es emulado** (Parte F4.2 del documento maestro). Lo que pasa aquí demuestra que el *diseño* se comporta como está descrito en una emulación funcional; no es la validación del producto real (OPNsense, VGW de AWS) ni del campus.
 
-- Fecha: 2026-11-19 · commit: `15b526b68d04`
-- Resultado: **11 PASA**, **2 FALLA**, **6 PARCIAL**, **9 NO_APLICA** (de 28 pruebas T01–T28)
+- Fecha: 2026-11-19 · commit: `19124d4646d1`
+- Resultado: **12 PASA**, **1 FALLA**, **6 PARCIAL**, **9 NO_APLICA** (de 28 pruebas T01–T28)
 - `PARCIAL` = parte de los criterios no se pudo evaluar en el Modo L (navegador real, Wazuh…) o la medición no ejercitó lo que la prueba valida. **No cuenta como PASA.**
 - `NO_APLICA` = la prueba no se puede ejecutar en L; se indica el modo en que sí se ejecutará. **Nunca cuenta como PASA.**
 
@@ -17,8 +17,8 @@
 | T02 — AWS → ON-PREM | **NO_APLICA** | — | el Modo L no ejecuta T02 (modos de la prueba: A, H); se ejecuta en A y H |
 | T03 — DMZ → AWS | **NO_APLICA** | — | el Modo L no ejecuta T03 (modos de la prueba: A, H); se ejecuta en A y H |
 | T04 — Internet → subred privada AWS | **NO_APLICA** | — | el Modo L no ejecuta T04 (modos de la prueba: A, H); se ejecuta en A y H |
-| T05 — Falla de un túnel | **PASA** | convergencia_s = 29.5, interrupcion_s = 29.2 | tras la caída la ruta a 10.30.0.0/16 va por: vti2 |
-| T06 — LAB → MGMT | **PASA** | puertos_open = 0, paquetes_denegados_por_fw01 = 664 |  |
+| T05 — Falla de un túnel | **PASA** | convergencia_s = 23.1, interrupcion_s = 22.8 | tras la caída la ruta a 10.30.0.0/16 va por: vti2 |
+| T06 — LAB → MGMT | **PASA** | puertos_open = 0, paquetes_denegados_por_fw01 = 666 |  |
 | T07 — LAB → EDGE 3128 | **FALLA** | x_celeris_cache_primera = 1 | /(?im)^cache-status:/ sobre stdout: no coincide |
 | T08 — LAB → UDP 443 | **PARCIAL** | paquetes_bloqueados_regla_F7 = 5, datagramas_recibidos_en_ext01 = 0 | sin evaluar: El navegador carga la página por HTTP/2 sobre TCP (requiere un navegador real con QUIC activado (Modo H)) |
 | T09 — Caída de EDGE01 | **PARCIAL** | tiempo_de_cambio_s = 2.2, tiempo_hasta_direct_s = 4.2 | sin evaluar: Con EDGE01 apagado la navegación continúa por EDGE02 (registro de acceso de EDGE02) (requiere navegar con un navegador real (Modo H); aquí se imita la lógic… |
@@ -27,7 +27,7 @@
 | T12 — STORAGE no enrutada | **NO_APLICA** | — | NAS01 y la VLAN 70 no se emulan (F4.1 no tiene br-vlan70, CI-16): que 10.20.70.20 no responda no demuestra que la VLAN no tenga ruta; se ejecuta en Modo H |
 | T13 — Abuso del proxy | **PASA** | — |  |
 | T14 — Puerto no permitido | **PASA** | — |  |
-| T15 — Exposición del portal | **PASA** | puertos_abiertos = 2, alertas_suricata_fw01 = 137 |  |
+| T15 — Exposición del portal | **PASA** | puertos_abiertos = 2, alertas_suricata_fw01 = 69 |  |
 | T16 — TLS del portal | **PASA** | — | calificación de testssl.sh: A+ (certificado de la CA de laboratorio; el ACME público se prueba en Modo H) |
 | T17 — Escaneo web | **PASA** | alertas_altas = 0 |  |
 | T18 — WAF | **PARCIAL** | eventos_modsecurity = 5 | sin evaluar: /"level":\s*(1[0-9]\|[2-9][0-9])/ sobre alerta_wazuh (Wazuh (siem01) no está desplegado en el laboratorio: la alerta del SIEM no se puede evaluar en el Modo… |
@@ -38,22 +38,21 @@
 | T23 — Fuga IPv6 | **NO_APLICA** | — | RA guard es un control del switch de acceso (SW-ACC, S-14); los puentes Linux del laboratorio no lo emulan; se ejecuta en Modo H |
 | T24 — DNS cifrado | **PASA** | paquetes_bloqueados_regla_F7 = 3 | el resolvedor de prueba es ext01 (IP del laboratorio), no 203.0.113.53 (CI-19): la regla F7 bloquea por puerto, no por destino |
 | T25 — Break-glass | **NO_APLICA** | — | ESX01, IPMI01, BRK01 y SW-CORE01 no se emulan: el puerto break-glass no existe en F4.1 (CI-16); se ejecuta en Modo H |
-| T26 — Privacidad del túnel | **PARCIAL** | paquetes_en_la_vpn = 15 | medición vacía: durante el MISS no cruzó nada por la VPN: el nodo no tiene ruta al shield (REQ-F-29 pendiente), así que la ausencia de cabeceras no demuestra nada |
-| T27 — Métricas cifradas | **FALLA** | esquema_https = 0, paquetes_http_en_claro = 3, handshakes_tls = 1, apariciones_del_token_… | paquetes_http_en_claro == 0: paquetes_http_en_claro = 3; sin coincidencia con /(?i)authorization:\|bearer / sobre scrape.pcap: coincide |
+| T26 — Privacidad del túnel | **PARCIAL** | paquetes_en_la_vpn = 10 | medición vacía: durante el MISS no cruzó nada por la VPN: el nodo no tiene ruta al shield (REQ-F-29 pendiente), así que la ausencia de cabeceras no demuestra nada |
+| T27 — Métricas cifradas | **PASA** | esquema_https = 1, respuestas_http_en_claro_del_servidor = 0, paquetes_http_en_claro = 0,… | el puerto 9128 solo acepta TLS (REQ-NF-14); el certificado es autofirmado de laboratorio: en producción F12 usa los de step-ca (F11) |
 | T28 — Syslog cifrado | **NO_APLICA** | — | siem01 (Wazuh) no está desplegado y fw01-sim no tiene syslog sobre TLS configurado: no hay flujo F14 que capturar; se ejecuta en Modo H |
 
 ## Mediciones
 
-- **Convergencia de la VPN (T05, OD-05):** 29.5 s desde que cae el túnel 1 hasta que el tráfico vuelve a pasar por el túnel 2 (interrupción visible 29.2 s). Meta de D1.10: ≤ 60 s. El hold de BGP (30 s) es solo un componente; el valor real es el medido.
+- **Convergencia de la VPN (T05, OD-05):** 23.1 s desde que cae el túnel 1 hasta que el tráfico vuelve a pasar por el túnel 2 (interrupción visible 22.8 s). Meta de D1.10: ≤ 60 s. El hold de BGP (30 s) es solo un componente; el valor real es el medido.
 - **Cambio de nodo del PAC (T09/OD-03):** 2.2 s con EDGE01 caído; 4.2 s hasta DIRECT con ambos caídos (cliente que imita al PAC con `curl`, no un navegador).
 - **TLS del portal (T16, OD-08):** calificación de testssl.sh: A+ (certificado de la CA de laboratorio; el ACME público se prueba en Modo H)
-- **Exposición (T15):** 2 puertos abiertos desde Internet; alertas de Suricata en fw01-sim durante el escaneo: 137.
-- **Métricas (T27, REQ-NF-14):** paquetes HTTP en claro = 3, handshakes TLS = 1, apariciones del token = 1.
+- **Exposición (T15):** 2 puertos abiertos desde Internet; alertas de Suricata en fw01-sim durante el escaneo: 69.
+- **Métricas (T27, REQ-NF-14):** paquetes HTTP en claro = 0, handshakes TLS = 2, apariciones del token = 0.
 
 ## Hallazgos (contradicen o precisan el diseño)
 
 - **T07 FALLA** — /(?im)^cache-status:/ sobre stdout: no coincide (el nodo responde X-Celeris-Cache (MISS, HIT) pero no la cabecera estándar Cache-Status (RFC 9211) que pide D1.16 (REQ-NF-11))
-- **T27 FALLA** — paquetes_http_en_claro == 0: paquetes_http_en_claro = 3; sin coincidencia con /(?i)authorization:|bearer / sobre scrape.pcap: coincide (el puerto 9128 sigue sirviendo HTTP en claro con el token en la cabecera Authorization: incumple REQ-NF-14 (hallazgo F12 de D1.11); el token de administración aparece en claro en la captura)
 - T05 — tras la caída la ruta a 10.30.0.0/16 va por: vti2
 - T08 — curl del laboratorio no soporta HTTP/3: `curl --http3` se sustituyó por una sonda UDP 443 (5 datagramas) hacia ext01
 - T11 — el puerto 23 de F24 no se prueba: OpenCanary no está en el laboratorio
@@ -61,6 +60,7 @@
 - T22 — `nslookup` no está en la imagen: se usó kdig contra la IP de FW01 en la VLAN de LAB
 - T24 — el resolvedor de prueba es ext01 (IP del laboratorio), no 203.0.113.53 (CI-19): la regla F7 bloquea por puerto, no por destino
 - T26 — F9 (EDGE → EC2-SHIELD) no se ejercita en un MISS real hasta que exista REQ-F-29; REQ-F-28 se prueba en e2e (Etapa 5)
+- T27 — el puerto 9128 solo acepta TLS (REQ-NF-14); el certificado es autofirmado de laboratorio: en producción F12 usa los de step-ca (F11)
 
 ## Qué se emula y qué no (equivalencias de F4.2)
 

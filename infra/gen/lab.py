@@ -311,6 +311,8 @@ def _config_edge(x: Infra, nodo: str) -> str:
             f'operator_contact = "redes@example.invalid"\ndata_dir = "/data/store"\nca_cert = "/data/ca/celeris-ca.crt"\nca_key = "/data/ca/celeris-ca.key"\n'
             f'intercept_domains = ["{P["dominio_origen"]}"]\nupstream_extra_ca = ["/pki/ca.pem"]\n'
             f'admin_listen = "{ip}:{admin}"\nadmin_token_file = "/data/admin.token"\n'
+            # REQ-NF-14: el puerto de administración solo por TLS (certificado autofirmado de laboratorio, generado por el nodo al arrancar)
+            'admin_tls = true\nadmin_tls_cert = "/data/ca/admin-tls.crt"\nadmin_tls_key = "/data/ca/admin-tls.key"\n'
             'security_log_enabled = true\nsecurity_log_dir = "/data/logs"\n')
 
 

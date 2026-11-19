@@ -7,7 +7,8 @@ Lo que el inventario no fija y se decide aquí (CI-23):
   * la IP pública de los dos extremos AWS (D1.10: «asignadas por AWS») llega por parámetro;
   * en cada /30 de túnel, el primer host es el extremo AWS y el segundo el del campus (convención de AWS);
   * el AS-path prepending del túnel 2 es de una repetición del ASN (el mínimo que invierte la preferencia);
-  * el ID numérico de la interfaz XFRM es el número de túnel (VTI1 → 1).
+  * la interfaz es un VTI del kernel (D1.10: «route-based con interfaces VTI»); su clave y la marca de strongSwan son el número de túnel (VTI1 → 1).
+    El kernel de WSL2 no trae interfaces XFRM (`ip link add type xfrm`), pero sí VTI.
 La llave precompartida NO está en estos archivos: se genera al vuelo y se escribe aparte (ver `escribir_psk`).
 """
 from __future__ import annotations
@@ -93,7 +94,7 @@ def swanctl(x: Infra, lado: str, aws_peers: list[str], wan_campus: str | None = 
               f"        esp_proposals = {esp}",
               f"        life_time = {v['fase2']['vida_s']}s",
               "        mode = tunnel",
-              f"        if_id_in = {t['n']}", f"        if_id_out = {t['n']}",
+              f"        mark_in = {t['n']}", f"        mark_out = {t['n']}",
               f"        dpd_action = {v['dpd']['accion']}",
               f"        start_action = {'start' if lado == 'fw01' else 'none'}",
               "      }", "    }", "  }"]
@@ -131,16 +132,24 @@ def frr(x: Infra, lado: str) -> str:
     return "\n".join(L)
 
 
-def vti_up(x: Infra, lado: str, aws_peers: list[str], dev: str = "lo") -> str:
-    """Script que crea las interfaces XFRM (route-based), fija MTU y direcciones de los /30."""
+def strongswan_conf() -> str:
+    """strongswan.conf mínimo: con VTI las rutas las pone BGP (FRR), no charon."""
+    return cabecera("#") + "charon {\n  install_routes = no\n}\n"
+
+
+def vti_up(x: Infra, lado: str, aws_peers: list[str], wan_campus: str | None = None) -> str:
+    """Script que crea las interfaces VTI (route-based), fija MTU, direcciones de los /30 y desactiva la política xfrm en ellas."""
     v = x.inv["vpn"]
+    wan = _extremos(x, lado, aws_peers, wan_campus)
     L = ["#!/bin/sh", cabecera("#").rstrip(), "set -eu"]
-    for t in tuneles(x):
+    for t, peer in zip(tuneles(x), aws_peers):
         ip = t["ip_campus"] if lado == "fw01" else t["ip_aws"]
+        local, remote = (wan, peer) if lado == "fw01" else (peer, wan)
         mask = ipaddress.ip_network(t["red"]).prefixlen
-        L += [f"ip link add {t['iface']} type xfrm dev {dev} if_id {t['n']}",
+        L += [f"ip tunnel add {t['iface']} mode vti local {local} remote {remote} key {t['n']}",
               f"ip addr add {ip}/{mask} dev {t['iface']}",
-              f"ip link set {t['iface']} mtu {v['mtu']} up"]
+              f"ip link set {t['iface']} mtu {v['mtu']} up",
+              f"sysctl -qw net.ipv4.conf.{t['iface']}.disable_policy=1 net.ipv4.conf.{t['iface']}.rp_filter=0"]
     return "\n".join(L) + "\n"
 
 
@@ -167,7 +176,8 @@ def main(x: Infra, salida: Path, aws_peers: list[str], wan_campus: str | None = 
         d = salida / lado
         escribir(d / "swanctl.conf", swanctl(x, lado, aws_peers, wan_campus))
         escribir(d / "frr.conf", frr(x, lado))
-        escribir(d / "vti-up.sh", vti_up(x, lado, aws_peers), modo=0o755)
-        rutas += [d / "swanctl.conf", d / "frr.conf", d / "vti-up.sh"]
+        escribir(d / "vti-up.sh", vti_up(x, lado, aws_peers, wan_campus), modo=0o755)
+        escribir(d / "strongswan.conf", strongswan_conf())
+        rutas += [d / "swanctl.conf", d / "frr.conf", d / "vti-up.sh", d / "strongswan.conf"]
     rutas += escribir_psk(secretos or (salida / ".secretos"), x, aws_peers, wan_campus)
     return rutas

@@ -40,10 +40,21 @@ def test_frr_asn_temporizadores_y_prepending(infra):
     assert "route-map" not in g
 
 
-def test_vti_mtu_y_direcciones(infra):
+def test_vti_mtu_direcciones_y_extremos(infra):
     t = vpn.vti_up(infra, "fw01", AWS_PEERS)
+    assert "ip tunnel add vti1 mode vti local 203.0.113.10 remote 198.51.100.21 key 1" in t
+    assert "ip tunnel add vti2 mode vti local 203.0.113.10 remote 198.51.100.22 key 2" in t
     assert "ip addr add 169.254.10.2/30 dev vti1" in t and "ip addr add 169.254.11.2/30 dev vti2" in t
-    assert t.count("mtu 1400") == 2
+    assert t.count("mtu 1400") == 2 and "disable_policy=1" in t
+    g = vpn.vti_up(infra, "vgw", AWS_PEERS)
+    assert "ip tunnel add vti1 mode vti local 198.51.100.21 remote 203.0.113.10 key 1" in g
+    assert "ip addr add 169.254.10.1/30 dev vti1" in g
+
+
+def test_marcas_de_strongswan_coinciden_con_la_clave_del_vti(infra):
+    t = vpn.swanctl(infra, "fw01", AWS_PEERS)
+    assert "mark_in = 1" in t and "mark_out = 1" in t and "mark_in = 2" in t and "mark_out = 2" in t
+    assert "install_routes = no" in vpn.strongswan_conf()
 
 
 def test_un_parametro_nuevo_cambia_la_salida(infra, mutar):

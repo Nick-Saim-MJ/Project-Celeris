@@ -174,6 +174,36 @@ fn empty_response(status: StatusCode) -> Response<Body> {
     Response::builder().status(status).body(Body::empty()).expect("respuesta estática válida")
 }
 
+const CACHE_STATUS: &str = "cache-status";
+/// Nombre de este nodo en `Cache-Status` (RFC 9211, sección 2: identifica a la caché que responde).
+const CACHE_NAME: &str = "celeris";
+
+/// Qué hizo la caché con una petición, para la cabecera `Cache-Status` (RFC 9211, REQ-NF-11).
+enum CacheResult {
+    /// Servida desde disco; `ttl` es lo que le queda de vida (segundos, negativo si venció).
+    Hit { ttl: i64 },
+    /// La copia estaba vencida, el origen respondió 304 y se sirvió la copia con `ttl` ya renovado.
+    Revalidated { ttl: i64 },
+    /// Pedida al origen; `stored` indica si quedó guardada.
+    Miss { stored: bool },
+}
+
+/// Valor de la cabecera `Cache-Status`: una lista estructurada (RFC 8941) con un elemento por caché.
+/// No incluye `key` ni `detail`: la clave de caché contiene la URL completa y no debe salir del nodo.
+fn cache_status_value(result: &CacheResult) -> String {
+    match result {
+        CacheResult::Hit { ttl } => format!("{CACHE_NAME}; hit; ttl={ttl}"),
+        CacheResult::Revalidated { ttl } => format!("{CACHE_NAME}; hit; fwd=stale; fwd-status=304; ttl={ttl}"),
+        CacheResult::Miss { stored: true } => format!("{CACHE_NAME}; fwd=miss; stored"),
+        CacheResult::Miss { stored: false } => format!("{CACHE_NAME}; fwd=miss"),
+    }
+}
+
+/// Segundos de vida que le quedan a una copia (negativo si ya venció).
+fn remaining_ttl(expires_at: u64, now: u64) -> i64 {
+    i64::try_from(expires_at).unwrap_or(i64::MAX).saturating_sub(i64::try_from(now).unwrap_or(i64::MAX))
+}
+
 /// El Host no decide nada: el destino y la clave de caché salen de la URI, que en HTTPS es la del CONNECT.
 /// Que no coincidan no daña la caché, pero un navegador normal no lo hace.
 fn host_differs(host_header: &HeaderValue, uri_host: &str) -> bool {
@@ -195,12 +225,16 @@ impl CacheHandler {
         &self,
         meta: &Meta,
         status: &'static str,
+        cache_status: String,
         reservation: R,
     ) -> Option<Response<Body>> {
         let body = self.shared.store.read_object(meta).await?;
         let mut b = Response::builder().status(StatusCode::OK);
         for (k, v) in &meta.headers {
-            b = b.header(k.as_str(), v.as_str());
+            // El Cache-Status guardado describe otra transacción (la del origen con su propia caché): no se repite en un HIT.
+            if !k.eq_ignore_ascii_case("cache-status") {
+                b = b.header(k.as_str(), v.as_str());
+            }
         }
         let age = now().saturating_sub(meta.stored_at);
         let len = body.len();
@@ -208,6 +242,7 @@ impl CacheHandler {
             .header(header::CONTENT_LENGTH, len)
             .header(header::AGE, age)
             .header("x-celeris-cache", status)
+            .header(CACHE_STATUS, cache_status)
             .body(hold(Body::from(body), reservation))
             .ok()?;
         Stats::add(&self.shared.stats.bytes_from_cache, len as u64);
@@ -447,7 +482,8 @@ impl HttpHandler for CacheHandler {
                     return req.into();
                 };
                 if meta.is_fresh() {
-                    if let Some(res) = self.serve_from_cache(&meta, "HIT", reservation).await {
+                    let value = cache_status_value(&CacheResult::Hit { ttl: remaining_ttl(meta.expires_at, now()) });
+                    if let Some(res) = self.serve_from_cache(&meta, "HIT", value, reservation).await {
                         Stats::inc(&sh.stats.hits);
                         info.finish(&sh, Outcome::Hit, Some(200), Some(meta.size));
                         tracing::info!(url = %log_url, "HIT");
@@ -498,7 +534,8 @@ impl HttpHandler for CacheHandler {
                 Stats::inc(&sh.stats.store_write_errors);
                 tracing::warn!(url = %log_url, error = %e, "no se pudo extender la vigencia");
             }
-            if let Some(cached) = self.serve_from_cache(meta, "REVALIDATED", reservation.clone()).await {
+            let value = cache_status_value(&CacheResult::Revalidated { ttl: i64::try_from(ttl).unwrap_or(i64::MAX) });
+            if let Some(cached) = self.serve_from_cache(meta, "REVALIDATED", value, reservation.clone()).await {
                 Stats::inc(&sh.stats.revalidated);
                 p.info.finish(&sh, Outcome::Revalidated, Some(200), Some(meta.size));
                 tracing::info!(url = %log_url, "REVALIDATED (304)");
@@ -586,23 +623,32 @@ impl HttpHandler for CacheHandler {
             last_modified: h.get(header::LAST_MODIFIED).and_then(|v| v.to_str().ok()).map(str::to_owned),
         };
 
-        match sh.store.put(&p.key_hash, meta, &bytes).await {
-            Ok(PutOutcome::New) => Stats::inc(&sh.stats.stored_new),
+        let stored = match sh.store.put(&p.key_hash, meta, &bytes).await {
+            Ok(PutOutcome::New) => {
+                Stats::inc(&sh.stats.stored_new);
+                true
+            }
             Ok(PutOutcome::Deduplicated) => {
                 Stats::inc(&sh.stats.dedup);
                 tracing::info!(url = %log_url, "contenido idéntico ya almacenado (dedup)");
+                true
             }
             Err(e) => {
                 Stats::inc(&sh.stats.store_write_errors);
                 tracing::warn!(url = %log_url, error = %e, "no se pudo guardar");
+                false
             }
-        }
+        };
         p.info.finish(&sh, Outcome::Miss, Some(status.as_u16()), Some(bytes.len() as u64));
         tracing::info!(url = %log_url, bytes = bytes.len(), ttl, "MISS → guardado");
 
         parts.headers.remove(header::TRANSFER_ENCODING);
         parts.headers.insert(header::CONTENT_LENGTH, HeaderValue::from(bytes.len()));
         parts.headers.insert("x-celeris-cache", HeaderValue::from_static("MISS"));
+        // Se añade al final de la lista: si el origen ya trae `Cache-Status` de otra caché, se conserva (RFC 9211, sección 2).
+        if let Ok(value) = HeaderValue::from_str(&cache_status_value(&CacheResult::Miss { stored })) {
+            parts.headers.append(CACHE_STATUS, value);
+        }
         Response::from_parts(parts, hold(Body::from(bytes), reservation))
     }
 
@@ -645,6 +691,34 @@ mod tests {
         assert!(!differs("[::1]:8080", "[::1]"));
         assert!(differs("otro.example.com", "cdn.example.com"));
         assert!(differs("no es un host", "cdn.example.com"));
+    }
+
+    #[test]
+    fn cache_status_sigue_la_sintaxis_de_rfc_9211() {
+        assert_eq!(cache_status_value(&CacheResult::Hit { ttl: 120 }), "celeris; hit; ttl=120");
+        assert_eq!(cache_status_value(&CacheResult::Hit { ttl: -5 }), "celeris; hit; ttl=-5");
+        assert_eq!(cache_status_value(&CacheResult::Miss { stored: true }), "celeris; fwd=miss; stored");
+        assert_eq!(cache_status_value(&CacheResult::Miss { stored: false }), "celeris; fwd=miss");
+        assert_eq!(
+            cache_status_value(&CacheResult::Revalidated { ttl: 60 }),
+            "celeris; hit; fwd=stale; fwd-status=304; ttl=60"
+        );
+    }
+
+    #[test]
+    fn cache_status_no_revela_la_clave_ni_detalles() {
+        for r in [CacheResult::Hit { ttl: 1 }, CacheResult::Revalidated { ttl: 1 }, CacheResult::Miss { stored: true }] {
+            let v = cache_status_value(&r);
+            assert!(!v.contains("key") && !v.contains("detail") && !v.contains("http"), "{v}");
+            assert!(HeaderValue::from_str(&v).is_ok());
+        }
+    }
+
+    #[test]
+    fn la_vida_restante_puede_ser_negativa_y_no_desborda() {
+        assert_eq!(remaining_ttl(100, 40), 60);
+        assert_eq!(remaining_ttl(40, 100), -60);
+        assert_eq!(remaining_ttl(u64::MAX, 0), i64::MAX);
     }
 
     #[test]

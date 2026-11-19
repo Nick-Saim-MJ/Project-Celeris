@@ -197,8 +197,14 @@ def t07(c: Contexto) -> Medicion:
     c.ev.guardar("cabeceras.txt", m.salidas["stdout"])
     est = re.findall(r"(?im)^x-celeris-cache:\s*(\S+)", m.salidas["stdout"])
     m.medidas["x_celeris_cache_primera"] = 0 if not est else (1 if est[0] == "MISS" else 2)
-    if est:
+    # Cache-Status (RFC 9211): la primera petición es un MISS guardado y la segunda un HIT (D1.16, REQ-NF-11).
+    primera, segunda = (re.findall(r"(?im)^cache-status:\s*(.+?)\s*$", h) for h in (h1, h2))
+    m.medidas["cache_status_primera_miss"] = int(any(re.match(r"celeris; fwd=miss; stored$", v) for v in primera))
+    m.medidas["cache_status_segunda_hit"] = int(any(re.match(r"celeris; hit; ttl=-?\d+$", v) for v in segunda))
+    if not primera:
         m.hallazgos.append(f"el nodo responde X-Celeris-Cache ({', '.join(est)}) pero no la cabecera estándar Cache-Status (RFC 9211) que pide D1.16 (REQ-NF-11)")
+    elif not (m.medidas["cache_status_primera_miss"] and m.medidas["cache_status_segunda_hit"]):
+        m.hallazgos.append(f"Cache-Status presente pero distinto de lo esperado: primera = {primera}, segunda = {segunda}")
     return m
 
 

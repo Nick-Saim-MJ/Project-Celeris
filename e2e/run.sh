@@ -131,6 +131,8 @@ curlx() { curl -s -g --ssl-no-revoke --noproxy "" -x "$PX" --cacert ca/celeris-c
 # Devuelve "<estado> <x-celeris-cache>", con "-" si la respuesta no pasó por la caché.
 px() { curlx -o /dev/null -D - "$@" | tr -d '\r' | awk '/^HTTP/{s=$2} tolower($1)=="x-celeris-cache:"{c=$2} END{print s, (c?c:"-")}'; }
 body() { curlx "$@"; }
+# Valor de todas las cabeceras Cache-Status (RFC 9211) de la respuesta, unidas con " | ", o "-" si no hay.
+cstatus() { curlx -o /dev/null -D - "$@" | tr -d '' | awk 'tolower($1)=="cache-status:"{sub(/^[^:]*: */, ""); v=(v?v " | ":"") $0} END{print (v?v:"-")}'; }
 metric() { curl -s --noproxy "" -x "$PX" http://celeris.stats/ | python3 -c "import json,sys; print(json.load(sys.stdin).get(sys.argv[1], 'ausente'))" "$1"; }
 sha() { sha256sum | cut -d' ' -f1; }
 # Ruta en disco del objeto cuyo contenido es el que el origen entrega hoy en esa URL.
@@ -791,6 +793,13 @@ expect "abierto a la red sin TLS no arranca"  "1" "$(startup_exit admin-abierto-
 expect "y dice por qué"                       "1" "$(grep -c 'REQ-NF-14' admin-abierto-sin-tls.log)"
 ADMIN=0.0.0.0:3170 ADMIN_TLS=true write_config admin-abierto-con-tls 3169
 expect "abierto a la red con TLS sí arranca"  "124" "$(startup_exit admin-abierto-con-tls)"
+
+section "31. Cache-Status (RFC 9211, REQ-NF-11)"
+expect "MISS guardado en la caché"      "celeris; fwd=miss; stored" "$(cstatus $L/blob/cache-status)"
+expect "HIT con vida restante"                "si" "$(cstatus $L/blob/cache-status | grep -Eq '^celeris; hit; ttl=[0-9]+$' && echo si || echo no)"
+expect "la cabecera propia sigue presente"    "200 HIT" "$(px $L/blob/cache-status)"
+expect "no pasó por la caché: sin Cache-Status" "-" "$(cstatus $L/private)"
+expect "el Cache-Status no lleva la URL ni la clave" "0" "$(cstatus $L/blob/cache-status | grep -c -E 'key=|detail=|blob')"
 
 echo
 if [ "$FAILS" -eq 0 ]; then

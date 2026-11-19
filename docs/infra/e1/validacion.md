@@ -46,7 +46,7 @@
 | V-34 | La rúbrica coincide con el XLSX oficial (nombre, peso y descriptor de nivel 4) | PASA | — |
 | V-40 | El ruleset generado de fw01-sim contiene exactamente los flujos permitidos (y los bloqueos) del inventario | PASA | — |
 | V-41 | swanctl, FRR y VTI generados coinciden con la sección vpn del inventario (cifrado, DPD, vidas, ASN, BGP, MTU, MSS) | PASA | — |
-| V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 5 advertencias |
+| V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 4 advertencias |
 | V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA | — |
 | V-50 | Diagramas draw.io: componentes, IP, zonas, colores (Okabe-Ito), flujos F-nn y criticidad contra el inventario | PENDIENTE | pendiente de P2 |
 | V-60 | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | PENDIENTE | pendiente de P3 |
@@ -75,7 +75,6 @@ Ninguno.
 - **V-33** — T12 (Modo L): destino NAS01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
 - **V-33** — T25 (Modo L): origen BRK01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
 - **V-33** — T25 (Modo L): destino ESX01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
-- **V-42** — 2026-11-19-L: T07 (LAB → EDGE 3128) FALLA (no es crítica)
 - **V-42** — 2026-11-19-L: la prueba crítica T08 (LAB → UDP 443) está en PARCIAL, no en PASA
 - **V-42** — 2026-11-19-L: la prueba crítica T12 (STORAGE no enrutada) está en NO_APLICA, no en PASA
 - **V-42** — 2026-11-19-L: la prueba crítica T23 (Fuga IPv6) está en NO_APLICA, no en PASA
@@ -94,7 +93,7 @@ Ninguno.
 - **V-16** — F26: sin prueba T-nn en D1.16 (justificado)
 - **V-27** — 8 de 92 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
 - **V-29** — 36 elementos pendientes en los YAML; 26 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26']
-- **V-42** — Resultados de 2026-11-19-L (commit 19124d4): {'PASA': 12, 'FALLA': 1, 'PARCIAL': 6, 'NO_APLICA': 9}
+- **V-42** — Resultados de 2026-11-19-L (commit 450ea2b): {'PASA': 13, 'FALLA': 0, 'PARCIAL': 6, 'NO_APLICA': 9}
 
 ## Cobertura
 

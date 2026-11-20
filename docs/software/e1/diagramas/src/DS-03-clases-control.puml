@@ -1,0 +1,106 @@
+@startuml DS-03-clases-control
+!include _estilo.iuml
+title DS-03 · Clases de diseño de celeris-control (R2 — diseño, no implementado)
+caption Todo este diagrama es «R2»: celeris-control no existe aún (H-03). Rust + axum (D-01) en CTRL01 10.20.20.10; PostgreSQL 18 en DB01 10.20.20.11 (D-12).
+skinparam linetype ortho
+skinparam nodesep 40
+skinparam ranksep 70
+
+package "API REST /v1 (axum, OpenAPI 3.1) · operadores: OIDC · nodos: mTLS en TCP 8443" {
+  class NodesApi <<R2>> {
+    POST /v1/nodes/enroll
+    GET /v1/nodes/{id}/bundle?since=v
+  }
+  class PoliciesApi <<R2>> {
+    POST /v1/policies
+    POST /v1/policies/{v}/simulate
+    POST /v1/policies/{v}/approve
+  }
+  class OpsApi <<R2>> {
+    POST /v1/purges
+    GET /v1/reports/savings
+    POST /v1/portal/publish
+  }
+}
+
+package "Servicios de dominio" {
+  class EnrollmentService <<R2>> {
+    enroll(csr, token_unico): CertificadoMtls
+  }
+  class PolicyService <<R2>> {
+    propose(autor, contenido_cedar): PolicyVersion
+    simulate(v): ImpactReport
+    approve(v, aprobador): PolicyVersion
+    -exigir_cuatro_ojos(v, aprobador)
+  }
+  class RolloutManager <<R2>> {
+    start(v, porcentaje = 10)
+    on_heartbeat(nodo, errores)
+    rollback(v_anterior)
+  }
+  class BundleSigner <<R2>> {
+    sign(v): SignedBundle
+  }
+  class PurgeService <<R2>> {
+    purge(selector: url | prefijo | etiqueta)
+  }
+  class ReportService <<R2>> {
+    savings(desde, hasta): SavingsReport
+  }
+  class PortalPublisher <<R2>> {
+    publish(v): SitioFirmado
+  }
+}
+
+package "Puertos de infraestructura" {
+  interface Pki <<R2>> {
+    issue_node_ca(nodo, dominios): NodeCa
+    covers(nodo, dominio): bool
+    revoke(serial)
+  }
+  interface Repo <<R2>>
+  interface AuditLog <<R2>> {
+    append(actor, accion, objeto, antes, despues)
+  }
+  interface KeyStore <<R2>> {
+    sign_ed25519(bytes): Signature
+  }
+}
+
+class "step-ca (CTRL01)" as StepCa <<R2>>
+class "PostgreSQL (DB01)" as Pg <<R2>>
+class "Sitio estático firmado\n(lo despliega JMP01 en WEB01 por SSH, F20; CI-27)" as WebDeploy <<R2>>
+
+NodesApi --> EnrollmentService
+NodesApi --> RolloutManager : heartbeat / bundle
+PoliciesApi --> PolicyService
+OpsApi --> PurgeService
+OpsApi --> ReportService
+OpsApi --> PortalPublisher
+EnrollmentService --> Pki
+PolicyService --> Pki : ¿la CA cubre el dominio? (REQ-RN-04)
+PolicyService --> BundleSigner
+PolicyService --> RolloutManager
+PolicyService --> AuditLog
+PolicyService --> Repo
+BundleSigner --> KeyStore
+RolloutManager --> Repo
+PurgeService --> AuditLog
+ReportService --> Repo
+PortalPublisher --> KeyStore
+Pki <|.. StepCa
+Repo <|.. Pg
+AuditLog <|.. Pg : audit_log solo inserción
+PortalPublisher --> WebDeploy : genera
+
+note bottom of PolicyService
+  approve() falla si aprobador == propuesta_por (REQ-RN-07).
+  Toda acción deja un registro de auditoría (REQ-F-24).
+end note
+note bottom of BundleSigner
+  El nodo rechaza un bundle sin firma
+  válida (REQ-RN-08, D-11).
+end note
+
+$pie("DS-03", "REQ-F-16, F-17, F-18, F-19, F-20, F-24, F-25, F-30, RN-04, RN-07, RN-08", "CU-03, CU-04, CU-05, CU-06, CU-10", "P-04, P-05, P-07, P-08")
+@enduml

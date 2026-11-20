@@ -1,0 +1,65 @@
+@startuml DS-07-secuencia-politica-cuatro-ojos
+!include _estilo.iuml
+title DS-07 · Secuencia: despliegue de una política con aprobación de cuatro ojos (C4.3, CU-03)
+caption Todo «R2 — diseño»: celeris-control no existe aún. Pantallas: P-04 (proponer y simular) y P-08 (aprobar).
+
+actor "Operador A\n(autor)" as A
+actor "Operador B\n(aprobador)" as B
+box "celeris-control · CTRL01 10.20.20.10" #E8F1FB
+  participant "PoliciesApi" as API <<R2>>
+  participant "PolicyService" as PS <<R2>>
+  participant "Pki\n(step-ca)" as PKI <<R2>>
+  participant "BundleSigner" as SG <<R2>>
+  participant "RolloutManager" as RM <<R2>>
+end box
+database "PostgreSQL\nDB01 10.20.20.11" as DB
+participant "Nodos\nEDGE01 / EDGE02" as N <<R2>>
+participant "JMP01\n10.20.10.20" as J
+participant "Portal\nWEB01 10.20.40.20" as PT <<R2>>
+
+== Proponer (P-04) ==
+A -> API : POST /v1/policies {agrega "cdn.example" a intercept_domains}
+API -> PS : propose(A, contenido_cedar)
+PS -> PS : validar Cedar (D-07)
+PS -> DB : INSERT policy_version v42 (estado = propuesta)\nINSERT audit_log (REQ-F-24)
+A -> API : POST /v1/policies/42/simulate
+API -> PS : simulate(42)
+PS -> DB : leer registros de acceso de ayer (sin IP ni parámetros)
+PS --> A : reporte de impacto: URL que pasarían a descifrarse/cachearse (REQ-F-20)
+
+== Aprobar (P-08) ==
+A -> API : POST /v1/policies/42/approve
+API -> PS : approve(42, A)
+PS --> A : 403 «Debe aprobarlo otro operador» (REQ-RN-07)
+B -> API : POST /v1/policies/42/approve
+API -> PS : approve(42, B)
+PS -> PKI : covers(nodo, "cdn.example") para cada nodo
+alt la CA intermedia del nodo no cubre el dominio (REQ-RN-04)
+  PKI --> PS : no
+  PS -> PKI : issue_node_ca(nodo, dominios) con Name Constraints (REQ-F-18, D-04)
+  note right of PKI : La llave de la CA se genera en el nodo;\nsolo viaja el CSR (REQ-NF-05)
+end
+PS -> SG : sign(42)
+SG --> PS : bundle v42 firmado (ed25519, D-11)
+PS -> DB : UPDATE estado = aprobada, aprobada_por = B; audit_log
+PS -> PS : generar y firmar el sitio del aviso v42 (REQ-F-30, RN-06)
+J -> API : descargar sitio v42 firmado
+J -> PT : verificar firma y desplegar por SSH (F20)
+note right of J : No hay flujo CTRL01 → WEB01 en el inventario:\nel despliegue lo hace JMP01 (pendiente CI-27)
+
+== Desplegar gradualmente (REQ-F-17) ==
+PS -> RM : start(42, 10 %)
+N -> API : GET /v1/nodes/{id}/bundle?since=41 (mTLS 8443)
+API --> N : bundle v42
+N -> N : verificar firma ed25519;\nsi no es válida, se rechaza (REQ-RN-08)
+N -> API : heartbeat {version_config = 42, errores}
+API -> RM : on_heartbeat(nodo, errores)
+alt errores < umbral
+  RM -> RM : ampliar al 100 % (umbral [S-17])
+else errores ≥ umbral o heartbeat tardío
+  RM -> RM : rollback(41) (CU-10)
+  RM -> DB : audit_log «reversión automática a v41»
+end
+
+$pie("DS-07", "REQ-F-17, F-18, F-20, F-24, F-30, RN-04, RN-06, RN-07, RN-08, NF-05", "CU-03, CU-10", "P-04, P-08")
+@enduml

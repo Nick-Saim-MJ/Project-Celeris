@@ -27,3 +27,6 @@ lab/.run/
 *.psk
 psk-*.conf
 .pytest_cache/
+
+# Herramientas descargadas (PlantUML); se obtienen con docs/software/e1/diagramas/render.py
+.tools/

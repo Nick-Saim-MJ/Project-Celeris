@@ -1,0 +1,31 @@
+@startuml DS-10-estados-nodo
+!include _estilo.iuml
+title DS-10 · Estados de un nodo de la flota (C4.5)
+caption «R2 — diseño»: los estados los guarda celeris-control en node.estado (DB01). Los mismos nombres aparecen en P-05.
+
+[*] --> Aprovisionado
+state Aprovisionado <<R2>> : registro creado en P-05;\ntoken de un solo uso [S-16]
+state Enrolado <<R2>> : certificado mTLS y CA\nintermedia emitidos
+state Activo <<R2>> : aplica el bundle vigente;\nheartbeat a tiempo
+state Degradado <<R2>> : heartbeat tardío o\nerrores > umbral [S-17]
+state Drenando <<R2>> : no recibe clientes nuevos;\ntermina lo que atiende
+state Retirado <<R2>> : CA intermedia revocada
+
+Aprovisionado --> Enrolado : POST /v1/nodes/enroll\nCSR aprobado (REQ-F-16)
+Enrolado --> Activo : bundle firmado verificado\ny aplicado (REQ-RN-08)
+Activo --> Degradado : heartbeat tardío\no errores > umbral
+Degradado --> Activo : se recupera
+Degradado --> Drenando : el operador lo saca de servicio
+Activo --> Drenando : mantenimiento (P-05 «Drenar»)
+Drenando --> Activo : vuelve
+Drenando --> Retirado : baja definitiva\n(Pki.revoke, audit_log)
+Retirado --> [*]
+
+note bottom of Activo
+  Si CTRL01 10.20.20.10 cae, el nodo sigue Activo con su
+  último bundle firmado: «la navegación continúa» (inventario,
+  CTRL01 si_falla; réplica en EC2-CTRLR 10.30.11.10).
+end note
+
+$pie("DS-10", "REQ-F-16, F-17, F-18, RN-08", "CU-04, CU-10", "P-05, P-07")
+@enduml

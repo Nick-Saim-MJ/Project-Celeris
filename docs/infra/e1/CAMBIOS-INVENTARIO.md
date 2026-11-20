@@ -55,6 +55,8 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-24 | vacío | Capas de defensa en profundidad (D1.9) y salto de la ruta por defecto hacia el ISP fuera de infra/*.yaml | abierto |
 | CI-25 | contradicción | FIG-5.4: FW01 anuncia 10.20.0.0/16 por BGP, las tablas de rutas de la VPC citan 10.20.0.0/14 | abierto |
 | CI-26 | texto genérico | 17 textos de componentes (por qué / aporta / si falla) sin dato verificable (V-66) | abierto |
+| CI-27 | contradicción | C4.3: celeris-control (CTRL01) publica el portal en WEB01, pero no existe flujo CTRL01 → WEB01; el sitio lo despliega JMP01 por SSH (F20) | abierto |
+| CI-28 | supuesto nuevo | S-16 (vigencia del token de enrolamiento) y S-17 (umbral de error del rollout), usados por el diseño detallado de CE02 | abierto |
 
 ## Entradas
 
@@ -321,3 +323,37 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 
 - **Efecto al resolver:** V-66 pasa sin advertencias; `make matrices` regenera la matriz con los textos nuevos.
 - **Decide:** responsable de P0 (dueño de `infra/inventory.yaml`) y equipo del proyecto
+
+### CI-27 — Publicación del portal: CTRL01 → WEB01 sin flujo en el inventario (CE02 E1, sección 4)
+- **Estado:** abierto
+- **Tipo:** contradicción
+- **Dónde:** documento maestro C3.1 («CE publica política vigente → PT»), C3.2 (`celeris-control`: «generación del portal»;
+  diagrama «C publica sitio firmado → PT») y C4.3 (`CP->>PT: publicar aviso v42 firmado`); C4.7 `POST /v1/portal/publish`.
+  En `infra/inventory.yaml`: WEB01 solo atiende TCP 8080 desde WAF01 (F22) y su `aporta` no menciona a CTRL01; JMP01
+  (10.20.10.20) «despliega el sitio de WEB01 por SSH» dentro de F20 (TCP 22).
+- **Qué dice cada fuente:** el maestro da por hecho que CTRL01 empuja el sitio firmado al portal; el inventario no tiene
+  ningún flujo CTRL01 → WEB01 (ni CTRL01 → DMZ-SVC) y asigna el despliegue a JMP01.
+- **Propuesta:** mantener el inventario (menor superficie: SERVERS no abre conexiones hacia DMZ-SVC). `celeris-control`
+  genera y firma el sitio estático (REQ-F-30) y lo deja como artefacto; JMP01 lo descarga y lo despliega en WEB01 por SSH
+  (F20) tras verificar la firma. Alternativa: agregar un flujo F-nn CTRL01 → WEB01 TCP 22 con su regla, prueba y riesgo.
+  Los diagramas de CE02 (DS-03, DS-07 en `docs/software/e1/diagramas/`) muestran la propuesta y citan esta entrada.
+- **Decide:** responsable de P0 (dueño de `infra/inventory.yaml`) y equipo de software (CE02)
+- **Efecto al resolver:** si se adopta la propuesta, corregir C3.1, C3.2 y C4.3 del maestro; si se adopta la alternativa,
+  agregar el flujo a `infra/inventory.yaml` (y su T-nn) y quitar la nota de los diagramas.
+
+### CI-28 — Supuestos nuevos del diseño detallado de software: S-16 y S-17 (CE02 E1, sección 4)
+- **Estado:** abierto
+- **Tipo:** supuesto nuevo
+- **Dónde:** documento maestro C4.3 («error < umbral», sin valor) y C4.5 («CSR aprobado», sin decir cómo se autentica el
+  primer contacto del nodo); `infra/trazabilidad.yaml` → `supuestos` llega hasta S-15.
+- **Qué dice cada fuente:** el maestro usa un umbral de errores para ampliar o revertir el rollout y un enrolamiento con mTLS,
+  pero no fija el valor del umbral ni el mecanismo de arranque de confianza del nodo.
+- **Propuesta:** registrar en `supuestos` de `infra/trazabilidad.yaml`:
+  - S-16 — El nodo se enrola con un token de un solo uso, de vigencia corta, entregado fuera de banda; valor de la vigencia
+    por definir con la prueba de enrolamiento de S2. Responsable: equipo de software.
+  - S-17 — Umbral de errores del rollout por nodo (porcentaje de respuestas 5xx o de heartbeats perdidos); valor por
+    definir con la línea base de métricas de S2. Responsable: equipo de software.
+  Mientras tanto, los diagramas DS-07, DS-08, DS-10, DS-11 y DS-12 los citan como [S-16] y [S-17] y
+  `docs/software/e1/diagramas/README.md` los lista en «Supuestos nuevos».
+- **Decide:** equipo del proyecto
+- **Efecto al resolver:** agregar S-16 y S-17 a `infra/trazabilidad.yaml` y quitarlos de la tabla del README.

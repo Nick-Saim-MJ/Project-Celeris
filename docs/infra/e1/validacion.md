@@ -113,7 +113,7 @@ Ninguno.
 - **V-16** — F25: sin prueba T-nn en D1.16 (justificado)
 - **V-16** — F26: sin prueba T-nn en D1.16 (justificado)
 - **V-27** — 8 de 92 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 36 elementos pendientes en los YAML; 26 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26']
+- **V-29** — 36 elementos pendientes en los YAML; 28 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-27', 'CI-28']
 
 ## Cobertura
 

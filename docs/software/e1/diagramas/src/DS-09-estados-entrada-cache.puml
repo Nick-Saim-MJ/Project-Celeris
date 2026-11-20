@@ -1,0 +1,38 @@
+@startuml DS-09-estados-entrada-cache
+!include _estilo.iuml
+title DS-09 · Estados de una entrada de caché (C4.4, según store.rs y handler.rs)
+caption «R1»: todos los estados existen en el código (no hay un campo «estado»: se deducen de Meta, Flights y del índice de disco).
+
+[*] --> Ausente
+state Ausente : store.get() = None
+state Llenando : líder del coalescer\n(Flights::enter = Leader)
+state Fresca : now < expires_at\n(Meta::is_fresh)
+state Vencida : now ≥ expires_at
+state Revalidando : petición con If-None-Match\n/ If-Modified-Since
+state Corrupta <<error>> : SHA-256 ≠ meta.object\n(stats.corrupt_objects)
+state Expulsada : quitada por LRU\n(DiskIndex::remove_oldest)
+
+Ausente --> Llenando : MISS cacheable\n[request_is_cacheable]
+Llenando --> Fresca : 200 cacheable guardado\n(Store::put → New | Deduplicated)
+Llenando --> Ausente : no cacheable, > max_object_bytes,\nsin memoria o error del origen (Bypass / OriginError)
+Fresca --> Vencida : pasa expires_at
+Fresca --> Fresca : HIT (read_object verifica el hash; touch last_used)
+Vencida --> Revalidando : MISS con ETag o Last-Modified\ny copia legible
+Vencida --> Llenando : sin validadores\n(se pide completo)
+Revalidando --> Fresca : 304 → Store::refresh(ttl)\n(REVALIDATED)
+Revalidando --> Fresca : 200 con contenido nuevo\n→ Store::put
+Fresca --> Corrupta : read_object detecta hash distinto
+Vencida --> Corrupta : read_object detecta hash distinto
+Corrupta --> Ausente : se borra el objeto;\nla próxima petición lo descarga (REQ-NF-04)
+Fresca --> Expulsada : disco > límite
+Vencida --> Expulsada : disco > límite
+Expulsada --> [*]
+
+note right of Fresca
+  Nunca entra a Fresca una respuesta con Set-Cookie,
+  Cache-Control: private o no-store (REQ-RN-01),
+  ni se sirve si la petición trae Authorization o Cookie (REQ-RN-02).
+end note
+
+$pie("DS-09", "REQ-F-03, F-04, F-05, F-06, F-09, RN-01, RN-02, NF-04", "CU-01", "P-02, P-03")
+@enduml

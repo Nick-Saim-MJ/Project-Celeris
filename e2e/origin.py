@@ -62,6 +62,10 @@ class H(http.server.BaseHTTPRequestHandler):
             # Origen que arma la respuesta con una cabecera que no forma parte de la clave de caché.
             host = self.headers.get("X-Forwarded-Host", "cdn.legit")
             return self.send(200, f'<script src="//{host}/app.js"></script>'.encode(), {"Cache-Control": "max-age=60"})
+        if path == "/ident":
+            # Devuelve las cabeceras de identidad que llegaron al origen (REQ-F-28): deben llegar vacías.
+            vistas = [k for k in ("X-Forwarded-For", "Via", "Forwarded") if self.headers.get(k) is not None]
+            return self.send(200, ("ident:" + ",".join(vistas)).encode(), {"Cache-Control": "no-store"})
         if path == "/slow":
             # Objeto cacheable que tarda: varios clientes simultáneos deben compartir una sola descarga.
             time.sleep(1)

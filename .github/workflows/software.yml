@@ -1,0 +1,81 @@
+name: software-celeris-node
+
+# CE02 — evidencia de calidad del plano de datos (REQ-NF-09 mantenibilidad, REQ-NF-10 flexibilidad).
+# Compila y prueba en Linux x86_64 y Windows x86_64; aarch64 lo cubre imagen.yml (linux/arm64).
+# Sin secretos: solo lee el repositorio.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "src/**"
+      - "e2e/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - ".github/workflows/software.yml"
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  pruebas:
+    name: test + clippy (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: clippy sin advertencias (REQ-NF-09)
+        run: cargo clippy --all-targets --locked -- -D warnings
+      - name: pruebas unitarias
+        run: cargo test --locked
+
+  e2e:
+    name: e2e (proxy real contra origen de laboratorio)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release --locked
+      - name: e2e/run.sh (incluye REQ-F-02 y REQ-F-28)
+        run: bash e2e/run.sh
+
+  auditoria:
+    name: dependencias con vulnerabilidades conocidas (cargo-audit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
+      - run: cargo audit
+
+  cobertura:
+    name: cobertura (informe; la meta de REQ-NF-09 aún no se exige)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+      - run: cargo llvm-cov --locked --lcov --output-path lcov.info
+      - run: cargo llvm-cov report --summary-only
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-lcov
+          path: lcov.info

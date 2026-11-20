@@ -124,6 +124,16 @@ const UNKEYED_REQUEST_HEADERS: [&str; 7] = [
     "x-rewrite-url",
 ];
 
+/// Cabeceras que identifican al cliente o su camino por la red. No deben salir del campus (REQ-F-28).
+const CLIENT_IDENTITY_HEADERS: [&str; 3] = ["x-forwarded-for", "via", "forwarded"];
+
+/// Quita las cabeceras que identifican al cliente antes de reenviar al origen o al shield.
+/// `HeaderMap::remove` borra todos los valores de un nombre. Devuelve cuántos nombres se quitaron.
+// req: REQ-F-28
+pub fn strip_client_identity(headers: &mut HeaderMap) -> usize {
+    CLIENT_IDENTITY_HEADERS.iter().filter(|name| headers.remove(**name).is_some()).count()
+}
+
 /// ¿La petición es candidata? Solo GET anónimos y completos, cuya respuesta no dependa de quién la pide.
 pub fn request_is_cacheable<B>(req: &Request<B>) -> bool {
     let h = req.headers();
@@ -255,11 +265,32 @@ mod tests {
         }
     }
 
+    // req: REQ-F-28
+    #[test]
+    fn quita_las_cabeceras_que_identifican_al_cliente() {
+        let mut req = Request::get("https://cdn.example.com/a.js")
+            .header("X-Forwarded-For", "10.20.32.50")
+            .header("x-forwarded-for", "10.20.32.51")
+            .header("Via", "1.1 proxy-interno")
+            .header("Forwarded", "for=10.20.32.50")
+            .header("Accept", "*/*")
+            .body(())
+            .unwrap();
+        assert_eq!(strip_client_identity(req.headers_mut()), 3);
+        for name in ["x-forwarded-for", "via", "forwarded"] {
+            assert!(!req.headers().contains_key(name), "{name} no debería salir");
+        }
+        assert!(req.headers().contains_key("accept"));
+        assert_eq!(strip_client_identity(req.headers_mut()), 0);
+    }
+
     #[test]
     fn never_intercept_gana_sobre_intercept() {
-        let mut cfg = Config::default();
-        cfg.intercept_domains = vec!["example.com".into()];
-        cfg.never_intercept = vec!["bank.example.com".into()];
+        let cfg = Config {
+            intercept_domains: vec!["example.com".into()],
+            never_intercept: vec!["bank.example.com".into()],
+            ..Default::default()
+        };
         assert!(cfg.should_intercept("cdn.example.com"));
         assert!(!cfg.should_intercept("online.bank.example.com"));
         assert!(cfg.is_never_intercept("BANK.example.com."));

@@ -200,6 +200,9 @@ expect "vuelve a revalidarse"                "200 REVALIDATED" "$(px $L/dyn)"
 section "6. Envenenamiento de caché"
 expect "petición con X-Forwarded-Host no se guarda" "200 -" "$(px -H 'X-Forwarded-Host: evil.invalid' $L/reflect)"
 expect "los demás no reciben el contenido alterado" '<script src="//cdn.legit/app.js"></script>' "$(body $L/reflect)"
+# REQ-F-28: la identidad del cliente no sale hacia el origen, ni por HTTPS descifrado ni por HTTP.
+expect "X-Forwarded-For, Via y Forwarded no llegan al origen (HTTPS)" "ident:" "$(body -H 'X-Forwarded-For: 10.20.32.50' -H 'Via: 1.1 interno' -H 'Forwarded: for=10.20.32.50' $L/ident)"
+expect "tampoco por HTTP"                    "ident:" "$(body -H 'X-Forwarded-For: 10.20.32.50' -H 'Via: 1.1 interno' -H 'Forwarded: for=10.20.32.50' http://localhost:8080/ident)"
 
 section "7. Contadores"
 before=$(metric bypass)

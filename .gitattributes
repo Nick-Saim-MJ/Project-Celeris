@@ -2,3 +2,5 @@
 *.sh text eol=lf
 # Wazuh lee estas reglas dentro de un contenedor Linux.
 siem/wazuh/* text eol=lf
+# pen.dev guarda sus documentos con LF: se conservan tal cual en cualquier sistema.
+*.pen text eol=lf

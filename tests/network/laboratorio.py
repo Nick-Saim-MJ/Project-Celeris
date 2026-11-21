@@ -14,10 +14,10 @@ def _docker_nativo() -> None:
     if _os.environ.get("DOCKER_HOST") or not _os.path.exists("/run/docker-nativo.sock") or not _shutil.which("docker"):
         return
     try:
-        nombre = _subprocess.run(["docker", "info", "--format", "{{.Name}}"], capture_output=True, text=True, timeout=20).stdout.strip()
+        nombre = _subprocess.run(["docker", "info", "--format", "{{.Name}}"], capture_output=True, text=True, timeout=8).stdout.strip()
     except (OSError, _subprocess.SubprocessError):
-        return
-    if nombre == "docker-desktop":
+        nombre = "docker-desktop"       # no responde: se usa el nativo
+    if nombre in ("docker-desktop", ""):
         _os.environ["DOCKER_HOST"] = "unix:///run/docker-nativo.sock"
 
 

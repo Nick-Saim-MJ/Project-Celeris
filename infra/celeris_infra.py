@@ -111,7 +111,9 @@ def titulos_de_cambios() -> dict[str, str]:
 def resultados_mas_recientes(raiz: Path = RAIZ) -> tuple[Path | None, dict | None]:
     """(carpeta, contenido) del evidencias/<fecha>-<modo>/resultados.json más reciente; (None, None) si no hay."""
     import json
-    candidatos = sorted(raiz.glob("evidencias/*/resultados.json"), key=lambda p: p.parent.name)
+    # Solo carpetas evidencias/AAAA-MM-DD-<modo>: las temporales de depuración no cuentan como último ensayo
+    candidatos = sorted((p for p in raiz.glob("evidencias/*/resultados.json") if re.fullmatch(r"\d{4}-\d{2}-\d{2}-[A-Z]", p.parent.name)),
+                        key=lambda p: p.parent.name)
     if not candidatos:
         return None, None
     return candidatos[-1].parent, json.loads(candidatos[-1].read_text(encoding="utf-8"))

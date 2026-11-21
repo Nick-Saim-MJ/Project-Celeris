@@ -1649,6 +1649,25 @@ flujos:
     adr: []
     req: []
 
+  - id: F27
+    estado: activo
+    origen: [JMP01]
+    destino: [INTERNET]
+    destino_detalle: "Repositorios de actualización de ESXi, OPNsense y NAS01 (la lista de destinos se fija en S2, S-19)"
+    protocolos: [{ proto: tcp, puertos: [443] }]
+    proposito: "Actualizaciones de la infraestructura desde MGMT"
+    accion: permitir
+    proteccion: { tipo: tls, detalle: "TLS" }
+    riesgo_residual: "Medio: hoy el destino es cualquier servidor TCP 443 de Internet; se limita a los repositorios cuando S-19 los defina"
+    modo: ambos
+    regla_fw: "F27 JMP01 > INTERNET actualizaciones tcp/443"
+    figura: FIG-5.5b
+    objetivos: [OD-06]
+    adr: []
+    req: []
+    ampliacion: true
+    cambio: CI-29
+
 # Matriz zona × zona esperada (D1.8), transcrita celda por celda. Fila = origen; columna = destino.
 # estado: permitido | denegado | no_aplica ("—" del documento). `bloqueados` = flujos bloqueados explícitos (✖ Fn).
 # La matriz no incluye una fila Perímetro: los flujos que nacen o terminan en FW01 son locales al firewall y no se derivan.
@@ -1667,7 +1686,7 @@ matriz_esperada:
       STORAGE: { estado: denegado }
       BACKUP: { estado: permitido, flujos: [F20] }
       AWS: { estado: denegado, nota: "SSM por Internet" }
-      INTERNET: { estado: permitido, flujos: [], nota: "TCP 443 actualizaciones (sin F-nn en el documento)", pendiente: true, cambio: CI-05 }
+      INTERNET: { estado: permitido, flujos: [F27], nota: "TCP 443 actualizaciones: F27 se agrega al contrato (CI-05, CI-29)" }
     SERVERS:
       MGMT: { estado: denegado }
       SERVERS: { estado: no_aplica }

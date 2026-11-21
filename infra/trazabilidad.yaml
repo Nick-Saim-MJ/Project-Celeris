@@ -487,6 +487,11 @@ supuestos:
     valor: respaldo y /srv/respaldo
     validacion: Solo el Modo L; la clave del repositorio se genera en cada ensayo y no se guarda
     responsable: Equipo del proyecto
+  S-19:
+    supuesto: Destinos de actualización de MGMT (F27)
+    valor: cualquier servidor TCP 443 de Internet hasta que se fije la lista de repositorios
+    validacion: La DTI entrega los repositorios de ESXi, OPNsense y NAS01 en S2; entonces F27 se limita a ellos
+    responsable: Equipo del proyecto
 
 decisiones:
   D-01:

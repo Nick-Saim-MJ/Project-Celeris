@@ -422,6 +422,14 @@
     <group>attack,web,</group>
   </rule>
 
+  <!-- DET-08: CrowdSec (FW01) bloqueó una IP; el evento llega por el syslog por TLS de F14 -->
+  <rule id="100305" level="10">
+    <match>fw01sim CROWDSEC ban</match>
+    <description>CrowdSec (FW01): IP bloqueada por comportamiento abusivo</description>
+    <mitre><id>T1110</id></mitre>
+    <group>attack,crowdsec,</group>
+  </rule>
+
   <!-- F14: syslog de FW01 por TLS (6514): una denegación recibida -->
   <rule id="100304" level="5">
     <match>fw01sim DENEGADO</match>

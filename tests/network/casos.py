@@ -964,10 +964,44 @@ def t49(c: Contexto) -> Medicion:
     return m
 
 
+def t32(c: Contexto) -> Medicion:
+    """CrowdSec (DET-08): una decisión de bloqueo sobre la IP externa la aplica el bouncer de nftables de FW01 y llega a Wazuh por el syslog TLS."""
+    m = Medicion()
+    wan, ext, siem = c.P["fw01_wan"], c.P["ext01"], c.ip("SIEM01")
+    inicio = time.time()
+    # Otras pruebas recargan las reglas de FW01 con `flush ruleset` y eso borra la tabla del bouncer: se reinicia para empezar con su tabla creada.
+    L.ex("fw01-sim", "pkill -x crowdsec-firewall-bouncer; sleep 1; (crowdsec-firewall-bouncer -c /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml >> /var/log/crowdsec-bouncer.out 2>&1 &); sleep 3")
+    rc_antes, _ = L.ex("ext01", f"nc -zv -w3 {wan} 443")              # control: F21 está abierto, así que el bloqueo posterior se debe a CrowdSec
+    cont = "nft list counters table ip crowdsec 2>/dev/null | awk '/counter crowdsec-blacklists/ {f=1} f && /packets/ {s+=$2; f=0} END {print s+0}'"
+    antes = int(L.ex("fw01-sim", cont)[1].strip() or 0)
+    try:
+        L.ex("fw01-sim", f"cscli decisions add --ip {ext} --duration 5m --type ban --reason 'T32 simulación (escenario de prueba)'")
+        time.sleep(6)                                                   # el bouncer consulta la API cada 2 s
+        rcs = [L.ex("ext01", f"nc -zv -w2 {wan} 443")[0] for _ in range(4)]
+        _, lista = L.ex("fw01-sim", "cscli decisions list")
+        despues = int(L.ex("fw01-sim", cont)[1].strip() or 0)
+        L.ex("fw01-sim", f"printf '%s\\n' '<134>fw01sim CROWDSEC ban {ext}: decisión de CrowdSec' | socat - OPENSSL:{siem}:6514,cafile=/pki/ca.pem,verify=0")
+    finally:
+        L.ex("fw01-sim", f"cscli decisions delete --ip {ext}")
+    time.sleep(4)
+    rc_tras, _ = L.ex("ext01", f"nc -zv -w3 {wan} 443")                 # al retirar la decisión, el acceso vuelve
+    c.ev.guardar("cscli_decisions.txt", lista)
+    m.salidas["stdout"] = lista
+    m.salidas["cscli decisions list"] = lista
+    m.medidas["paquetes_descartados_tras_la_decision"] = max(despues - antes, 0)
+    m.codigos["principal"] = 0 if all(r != 0 for r in rcs) else 1
+    _alerta_wazuh(c, m, "100305", inicio, espera=45)
+    if rc_antes != 0 or rc_tras != 0:
+        m.vacia = f"el control falló: antes del bloqueo {'abre' if rc_antes == 0 else 'no abre'} y tras retirarlo {'abre' if rc_tras == 0 else 'no abre'} el puerto 443"
+    m.hallazgos.append("la decisión se agrega con `cscli decisions add` (la «simulación con su escenario de prueba» de D1.14): un escenario real exige logs de SSH o del WAF")
+    m.hallazgos.append("fw01-sim no es OPNsense: el aviso a Wazuh lo envía `socat` por el syslog TLS (F14); CrowdSec y su bouncer sí son los reales, en modo local sin nube")
+    return m
+
+
 CASOS = {"T05": t05, "T06": t06, "T07": t07, "T08": t08, "T09": t09, "T10": t10, "T11": t11, "T13": t13, "T14": t14, "T15": t15,
          "T16": t16, "T17": t17, "T18": t18, "T19": t19, "T20": t20, "T22": t22, "T24": t24, "T26": t26, "T27": t27,
          "T29": t29, "T30": t30, "T44": t44, "T45": t45, "T46": t46, "T47": t47,
-         "T12": t12, "T28": t28, "T31": t31, "T35": t35, "T39": t39, "T49": t49}
+         "T12": t12, "T28": t28, "T32": t32, "T31": t31, "T35": t35, "T39": t39, "T49": t49}
 
 TESTSSL_IMAGEN = "drwetter/testssl.sh@sha256:64bab3c1fd8eee440f68d5e020dd633c1f2d375fe0ae593bdfec2725110a7e29"   # 3.2
 ZAP_IMAGEN = "ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af"   # stable

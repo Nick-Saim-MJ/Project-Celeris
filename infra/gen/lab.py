@@ -444,8 +444,21 @@ def _arranque_fw(x: Infra) -> str:
           "cp /lab/frr.conf /etc/frr/frr.conf", "chown frr:frr /etc/frr/frr.conf /run/frr; chmod 640 /etc/frr/frr.conf",
           "sed -i 's/^bgpd=no/bgpd=yes/; s/^staticd=no/staticd=yes/' /etc/frr/daemons", "/usr/lib/frr/frrinit.sh start > /var/log/frr-start.log 2>&1",
           "# DNS secundario (Unbound de FW01), reglas y detección", "unbound -c /lab/unbound.conf &", "nft -f /lab/fw01sim.nft",
-          f"nohup suricata --af-packet -c /lab/suricata.yaml > /var/log/suricata.out 2>&1 &", "touch /run/lab-listo", ""]
+          f"nohup suricata --af-packet -c /lab/suricata.yaml > /var/log/suricata.out 2>&1 &", "sh /lab/crowdsec.sh &", "touch /run/lab-listo", ""]
     return "\n".join(L)
+
+
+def _crowdsec_sh() -> str:
+    return "\n".join(["#!/bin/sh", cabecera("#").rstrip(), "# CrowdSec (DET-08) en modo local: API de bucle local y bouncer de nftables; sin conexión a la nube de CrowdSec. Clave del bouncer generada al arrancar.",
+        "set -u", "mkdir -p /etc/crowdsec/bouncers /var/lib/crowdsec/data /var/log/crowdsec; touch /var/log/fw01-auth.log",
+        "printf 'filenames:%s  - /var/log/fw01-auth.log%slabels:%s  type: syslog%s' '\n' '\n' '\n' '\n' > /etc/crowdsec/acquis.yaml",
+        "rm -rf /etc/crowdsec/acquis.d", "mkdir -p /etc/crowdsec/hub; [ -s /etc/crowdsec/hub/.index.json ] || echo '{}' > /etc/crowdsec/hub/.index.json", "sed -i '/online_client:/,+1d' /etc/crowdsec/config.yaml",
+        "[ -s /etc/crowdsec/local_api_credentials.yaml ] || cscli machines add --auto > /var/log/crowdsec-machine.log 2>&1",
+        "crowdsec -no-cs > /var/log/crowdsec.out 2>&1 &",
+        "for i in $(seq 1 90); do cscli lapi status >/dev/null 2>&1 && break; sleep 1; done",
+        "cscli bouncers delete fw01-bouncer >/dev/null 2>&1; CLAVE=$(cscli bouncers add fw01-bouncer -o raw 2>/dev/null)",
+        "printf 'mode: nftables\nupdate_frequency: 2s\nlog_mode: stdout\napi_url: http://127.0.0.1:8080/\napi_key: %s\ndisable_ipv6: true\ndeny_action: DROP\ndeny_log: false\nsupported_decisions_types:\n  - ban\nblacklists_ipv4: crowdsec-blacklists\nnftables:\n  ipv4:\n    enabled: true\n    set-only: false\n    table: crowdsec\n    chain: crowdsec-chain\n    priority: -10\nnftables_hooks:\n  - input\n  - forward\n' \"$CLAVE\" > /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml",
+        "crowdsec-firewall-bouncer -c /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml > /var/log/crowdsec-bouncer.out 2>&1 &", ""])
 
 
 def _arranque_vgw(x: Infra) -> str:
@@ -505,6 +518,7 @@ def archivos_nodo(x: Infra, nodo: str, aviso_md: Path) -> dict[str, str]:
             "unbound.conf": _unbound(x, ifaces_dns),
             "suricata.yaml": _suricata([fw["PERIMETRO"]["interfaz"]], "/lab/local.rules"),
             "local.rules": REGLAS_SURICATA,
+            "crowdsec.sh": _crowdsec_sh(),
         }
     if nodo == "vgw-sim":
         aws = P["aws_peers"]

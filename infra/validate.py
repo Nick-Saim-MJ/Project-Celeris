@@ -446,14 +446,16 @@ def v13(x: Infra):
     return r
 
 
-@chequeo("V-14", "F1–F26 completos, F4 reservado y regla de firewall con el ID del flujo")
+@chequeo("V-14", "F1–F26 de D1.11 completos (F4 reservado), ampliaciones F27+ registradas y regla de firewall con el ID del flujo")
 def v14(x: Infra):
     r = []
     ids = [f["id"] for f in x.inv["flujos"]]
-    if sorted(ids, key=ci._clave_id if hasattr(ci, "_clave_id") else str) != ci.FLUJOS_ESPERADOS:
-        faltan = sorted(set(ci.FLUJOS_ESPERADOS) - set(ids))
-        sobran = sorted(set(ids) - set(ci.FLUJOS_ESPERADOS))
-        r.append(E(f"Flujos distintos de F1–F26 (faltan {faltan}, sobran {sobran})", "Transcriba los 26 flujos de D1.11"))
+    faltan = sorted(set(ci.FLUJOS_ESPERADOS) - set(ids))
+    if faltan:
+        r.append(E(f"Faltan flujos de D1.11 (F1–F26): {faltan}", "Transcriba los 26 flujos de D1.11"))
+    for f in x.flujos.values():
+        if f["id"] not in ci.FLUJOS_ESPERADOS and not (f.get("ampliacion") and f.get("cambio")):
+            r.append(E(f"{f['id']}: no es de D1.11; debe llevar `ampliacion: true` y `cambio` (CI-nn)", "Registre la ampliación en CAMBIOS-INVENTARIO.md"))
     if x.flujos.get("F4", {}).get("estado") != "reservado":
         r.append(E("F4 debe existir con estado «reservado»", "Restituya F4 como reservado"))
     for f in x.flujos.values():
@@ -1190,7 +1192,7 @@ def informe_md(x: Infra, res: list[Resultado]) -> str:
     L.append("> Generado por `infra/validate.py` (`make validate`). No editar a mano.\n")
     L.append(f"- Inventario: versión {inv['meta']['inventario_version']} · fecha {inv['meta']['fecha']}")
     L.append(f"- Contenido cargado: **{len(x.zonas)} zonas**, **{len(x.componentes)} componentes**, "
-             f"**{len(x.flujos)} flujos** (F1–F26, F4 reservado), **{len(x.pruebas)} pruebas** (T01–T28 de D1.16 y {len(x.pruebas) - 28} ampliaciones), "
+             f"**{len(x.flujos)} flujos** (F1–F26 de D1.11, F4 reservado, y {len(x.flujos) - 26} ampliaciones), **{len(x.pruebas)} pruebas** (T01–T28 de D1.16 y {len(x.pruebas) - 28} ampliaciones), "
              f"{len(x.objetivos)} objetivos OD, {len(x.amenazas)} amenazas AM, {len(x.detecciones)} detecciones DET, "
              f"{len(x.figuras)} figuras, {len(x.rubrica)} criterios de rúbrica.")
     n = {k: sum(r.estado == k for r in res) for k in ("PASA", "ADVERTENCIA", "FALLA", "PENDIENTE")}

@@ -3,7 +3,7 @@
 > Generado por `infra/validate.py` (`make validate`). No editar a mano.
 
 - Inventario: versión 1.0 · fecha 2026-11-18
-- Contenido cargado: **14 zonas**, **37 componentes**, **26 flujos** (F1–F26, F4 reservado), **49 pruebas** (T01–T28 de D1.16 y 21 ampliaciones), 10 objetivos OD, 13 amenazas AM, 9 detecciones DET, 7 figuras, 8 criterios de rúbrica.
+- Contenido cargado: **14 zonas**, **37 componentes**, **27 flujos** (F1–F26 de D1.11, F4 reservado, y 1 ampliaciones), **49 pruebas** (T01–T28 de D1.16 y 21 ampliaciones), 10 objetivos OD, 13 amenazas AM, 9 detecciones DET, 7 figuras, 8 criterios de rúbrica.
 - Resultado: **0 FALLA**, 4 con advertencias, 40 PASA, 3 pendientes de P2–P5.
 
 ## Chequeos
@@ -20,10 +20,10 @@
 | V-08 | Convención VLAN = tercer octeto (excepción documentada: VLAN 30 → 10.20.32.0/22) | PASA | — |
 | V-09 | IP públicas solo de documentación (RFC 5737) | PASA | — |
 | V-10 | Hosts útiles coinciden con el CIDR | PASA | — |
-| V-11 | La matriz zona × zona derivada de los flujos coincide con D1.8 | PASA con advertencias | 0 errores, 5 advertencias |
+| V-11 | La matriz zona × zona derivada de los flujos coincide con D1.8 | PASA con advertencias | 0 errores, 4 advertencias |
 | V-12 | Matriz esperada completa (celda por celda) y coherente con las acciones de los flujos | PASA | — |
 | V-13 | Todo flujo permitido tiene protección en tránsito y riesgo residual | PASA | — |
-| V-14 | F1–F26 completos, F4 reservado y regla de firewall con el ID del flujo | PASA | — |
+| V-14 | F1–F26 de D1.11 completos (F4 reservado), ampliaciones F27+ registradas y regla de firewall con el ID del flujo | PASA | — |
 | V-15 | Todo flujo bloqueado tiene una prueba | PASA | — |
 | V-16 | Todo flujo tiene ≥ 1 prueba o una justificación | PASA | — |
 | V-17 | Componentes: por_que (1–3 frases), aporta_corto (≤ 12 palabras), aporta, si_falla, criticidad | PASA | — |
@@ -46,7 +46,7 @@
 | V-34 | La rúbrica coincide con el XLSX oficial (nombre, peso y descriptor de nivel 4) | PASA | — |
 | V-40 | El ruleset generado de fw01-sim contiene exactamente los flujos permitidos (y los bloqueos) del inventario | PASA | — |
 | V-41 | swanctl, FRR y VTI generados coinciden con la sección vpn del inventario (cifrado, DPD, vidas, ASN, BGP, MTU, MSS) | PASA | — |
-| V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 30 advertencias |
+| V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 1 advertencias |
 | V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA | — |
 | V-50 | Diagramas draw.io: componentes, IP, zonas, colores (Okabe-Ito), flujos F-nn y criticidad contra el inventario | PENDIENTE | pendiente de P2 |
 | V-60 | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | PENDIENTE | pendiente de P3 |
@@ -69,55 +69,25 @@ Ninguno.
 - **V-11** — LAB→EDGE: los flujos ['F3'] permiten LAB→EDGE pero la matriz no los lista — contradicción registrada (CI-03)
 - **V-11** — LAB-TEST→EDGE: los flujos ['F3'] permiten LAB-TEST→EDGE pero la matriz no los lista — contradicción registrada (CI-03)
 - **V-11** — LAB-TEST→SERVERS: la matriz lista ['F2'] pero ningún flujo los deriva — contradicción registrada (CI-04)
-- **V-11** — MGMT→INTERNET: la matriz indica «permitido» sin flujos y los flujos derivan «denegado» — contradicción registrada (CI-05)
 - **V-26** — La correspondencia 1–15 → DOCX es una propuesta: el documento maestro no incluye la tabla (CI-02)
 - **V-33** — T25 (Modo L): origen BRK01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
 - **V-33** — T25 (Modo L): destino ESX01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
-- **V-42** — tmp-solo-L: T05 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T06 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T07 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T09 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T10 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T12 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T13 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T14 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T15 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T16 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T17 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T18 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T19 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T20 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T22 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T23 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T24 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T25 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T26 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T27 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T28 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T29 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T31 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T35 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T39 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T44 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T45 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T46 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T47 aplica al modo L y no está en los resultados
-- **V-42** — tmp-solo-L: T49 aplica al modo L y no está en los resultados
+- **V-42** — 2026-11-21-L: la prueba crítica T23 (Fuga IPv6) está en NO_APLICA, no en PASA
 
 ## Información
 
 - **V-27** — 36 de 92 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 34 elementos pendientes en los YAML; 28 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28']
-- **V-42** — Resultados de tmp-solo-L (commit 41ebb9d): {'PASA': 3, 'FALLA': 0, 'PARCIAL': 0, 'NO_APLICA': 0}
+- **V-29** — 32 elementos pendientes en los YAML; 29 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29']
+- **V-42** — Resultados de 2026-11-21-L (commit e480bdc): {'PASA': 31, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 56 de 92 (las cubre la política deny-all; ver hoja «Cobertura»)
-- **V-74** — 765 fórmulas recalculadas con LibreOffice sin errores
+- **V-74** — 768 fórmulas recalculadas con LibreOffice sin errores
 
 ## Cobertura
 
 | Relación | Cubiertos | Total |
 | --- | ---: | ---: |
-| flujos con prueba | 25 | 25 |
-| flujos con prueba o justificación | 25 | 25 |
+| flujos con prueba | 26 | 26 |
+| flujos con prueba o justificación | 26 | 26 |
 | componentes con ≥ 1 flujo | 25 | 37 |
 | objetivos con ≥ 1 prueba | 10 | 10 |
 | amenazas con ≥ 1 prueba | 13 | 13 |

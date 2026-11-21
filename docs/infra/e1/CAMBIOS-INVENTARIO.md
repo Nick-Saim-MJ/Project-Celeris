@@ -33,7 +33,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-02 | contradicción | «15 secciones» del documento vs 11 de la plantilla; falta la tabla de contenidos mínimos | abierto |
 | CI-03 | contradicción | F3 llega a EDGE01, la matriz LAB→EDGE solo lista F1 | abierto |
 | CI-04 | contradicción | F2 no tiene LAB-TEST de origen, la matriz LAB-TEST→SERVERS lista F2 | abierto |
-| CI-05 | vacío | MGMT→Internet «443 actualizaciones» sin flujo F-nn | abierto |
+| CI-05 | vacío | MGMT→Internet «443 actualizaciones» sin flujo F-nn | resuelto en CI-29 (F27) |
 | CI-06 | vacío | EDGE→EDGE «peering» sin flujo ni puertos | abierto |
 | CI-07 | contradicción | F13 «todos los agentes» frente a la matriz y a las reglas de zona | abierto |
 | CI-08 | contradicción | T01/T21 hacen ping, pero ningún flujo ni Security Group permite ICMP | abierto |
@@ -57,6 +57,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-26 | decisión de transcripción | Qué pruebas son críticas (`critica` en pruebas.yaml) y qué hace V-42 con ellas (Etapa 7) | abierto |
 | CI-27 | vacío | Ampliación de la matriz de pruebas: T29–T49, polaridad y celdas críticas (P4) | abierto |
 | CI-28 | decisión de transcripción | Laboratorio emulado ampliado: NAS01 con VLAN 70/71, Wazuh, shield con mTLS, PAC del binario, honey-URL y navegador (P5) | abierto |
+| CI-29 | decisión de transcripción | Flujo F27: MGMT → Internet por TCP 443 para actualizaciones (resuelve CI-05) | abierto |
 
 ## Entradas
 
@@ -97,7 +98,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Efecto al resolver:** agregar `LAB-TEST` a `F2.origen`; quitar `pendiente` de F2 y de la celda.
 
 ### CI-05 — MGMT→Internet «443 actualizaciones» sin flujo F-nn
-- **Estado:** abierto
+- **Estado:** resuelto en CI-29 (F27)
 - **Tipo:** vacío
 - **Dónde:** D1.8 matriz fila MGMT, columna Internet (línea 1561); `matriz_esperada` MGMT→INTERNET
 - **Qué dice cada fuente:** la celda dice «✔ 443 actualizaciones», sin ID de flujo. D1.11 no tiene un flujo MGMT→Internet, y el objetivo OD-07 exige que el 100 % de los flujos de D1.11 tengan protección documentada. D1.9 dice «Solo JMP01 inicia conexiones» en MGMT.
@@ -360,9 +361,21 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   6. **Honey-URL (REQ-F-27).** Ruta señuelo de laboratorio `/admin-backup.zip` [S-17].
   7. **Navegador real automatizado.** Chromium sin pantalla en LABCLI01 para T08, T09 y T22; los criterios manuales de esas tres pruebas pasaron a medibles (`automatizable: true`). Usa `--ignore-certificate-errors` porque la CA del nodo no está en su almacén.
   8. **Restic y ACME de laboratorio.** Usuario y carpeta de restic [S-18]; directorio ACME de laboratorio en `ext01` (no es Let's Encrypt).
-- **No se agregó:** CrowdSec (T32), NTS (T42), actualización de reglas (T43), OTLP (T37), PostgreSQL (T38), S3 (T40), ESXi/NFS real (T41), mTLS del plano de control (T36) y RA guard (T23). Siguen en el Modo H.
-- **Hallazgo — T35 (CI-05):** la matriz D1.8 permite MGMT → Internet por TCP 443, pero ningún flujo F-nn lo abre. FW01 solo abre lo que declaran los flujos, así que lo deniega: T35 FALLA en el Modo L por esa causa. Hay que definir el flujo en D1.11 o quitar la celda.
+- **No se agregó:** NTS (T42), actualización de reglas (T43), OTLP (T37), PostgreSQL (T38), S3 (T40), ESXi/NFS real (T41), mTLS del plano de control (T36) y RA guard (T23). Siguen en el Modo H.
+- **Hallazgo — T35 (CI-05):** la matriz D1.8 permitía MGMT → Internet por TCP 443 sin ningún flujo F-nn, y FW01 lo denegaba: T35 fallaba en el Modo L por esa causa. Se resolvió con el flujo F27 (CI-29).
+  9. **CrowdSec (T32).** CrowdSec y su bouncer de nftables, reales y del repositorio oficial del fabricante, corren en `fw01-sim` en modo local (sin la nube de CrowdSec). La decisión de bloqueo se agrega con `cscli decisions add` (la «simulación con su escenario de prueba» de D1.14); el aviso a Wazuh lo envía `socat` por el syslog TLS de F14. Versión instalada en el ensayo: CrowdSec 1.8.2. Como el contenedor no tiene systemd, los paquetes se extraen sin ejecutar sus scripts de instalación; el script de arranque crea las credenciales de la API local, un índice vacío del hub y la clave del bouncer (generadas al arrancar, fuera del repositorio). No hay parsers ni escenarios del hub: la detección real de abusos exige logs de SSH o del WAF y queda en el Modo H.
+  - **Hallazgo — T32:** una recarga de reglas de FW01 con `flush ruleset` borra la tabla `crowdsec` del bouncer y deja de bloquear. T32 reinicia el bouncer antes de medir. En OPNsense real habrá que comprobar que un `reload` de reglas no tenga el mismo efecto (se ejecuta en el Modo H).
 - **Hallazgo — F13 e IDS01:** F13 no lista a IDS01 ni a FW01 como origen, pero DET-02 exige que sus alertas lleguen a Wazuh. En el laboratorio IDS01 y SIEM01 están en la misma VLAN y no cruzan FW01.
 - **Entorno (no es del diseño).** Con Docker Desktop y su integración de WSL, `/var/run/docker.sock` pasa a ser el de Docker Desktop y containerlab no funciona. `lab/docker-nativo.sh` (root, una vez) agrega un socket al `dockerd` de la distribución y `lab/docker-env.sh` lo usa solo cuando detecta Docker Desktop. La red de gestión de containerlab pasó a 172.30.250.0/24 porque 172.20.20.0/24 chocaba con otras redes de Docker.
+- **Decide:** equipo del proyecto
+
+### CI-29 — Flujo F27: MGMT → Internet por TCP 443 para actualizaciones (resuelve CI-05)
+- **Estado:** abierto
+- **Tipo:** decisión de transcripción (ampliación de D1.11)
+- **Dónde:** `infra/inventory.yaml` (flujo F27 y celda MGMT → INTERNET), `infra/pruebas.yaml` (T35), `infra/validate.py` (V-14)
+- **Qué decía el documento:** la matriz D1.8 permite MGMT → Internet por TCP 443 (actualizaciones), pero D1.11 no tiene ningún flujo para eso. El firewall de laboratorio, que solo abre lo que declaran los flujos, lo denegaba y T35 fallaba.
+- **Qué se hizo:** se agregó F27 (JMP01 → Internet, TCP 443, TLS, registro de FW01, FIG-5.5b, OD-06) con `ampliacion: true`. D1.11 sigue siendo F1–F26; V-14 exige que todo flujo extra lleve `ampliacion` y un CI.
+- **Supuesto [S-19]:** D1.8 no lista los destinos. Hasta que la DTI entregue los repositorios de actualización de ESXi, OPNsense y NAS01, F27 queda abierto a cualquier servidor TCP 443 (riesgo residual medio, anotado en el flujo).
+- **Propuesta:** aceptar F27 y reemplazar el destino por la lista de repositorios cuando exista.
 - **Decide:** equipo del proyecto
 

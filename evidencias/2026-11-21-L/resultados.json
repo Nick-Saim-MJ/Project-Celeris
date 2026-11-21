@@ -1,17 +1,17 @@
 {
   "meta": {
     "modo": "L (emulación local con containerlab)",
-    "fecha": "2026-11-19",
-    "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
+    "fecha": "2026-11-21",
+    "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
     "imagenes": [
       "celeris-node:dev ad8b0f9dcb5f"
     ],
     "aviso": "Laboratorio EMULADO (Parte F4.2): no es OPNsense ni el VGW de AWS. PARCIAL y NO_APLICA no cuentan como PASA.",
     "resumen": {
-      "PASA": 29,
-      "FALLA": 1,
+      "PASA": 31,
+      "FALLA": 0,
       "PARCIAL": 1,
-      "NO_APLICA": 18
+      "NO_APLICA": 17
     }
   },
   "resultados": [
@@ -32,8 +32,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T02",
@@ -54,8 +54,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T03",
@@ -74,8 +74,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T04",
@@ -94,8 +94,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T05",
@@ -114,15 +114,15 @@
       "resultado": "PASA",
       "motivo": "",
       "valor_medido": {
-        "convergencia_s": 25.8,
-        "interrupcion_s": 25.6
+        "convergencia_s": 22.6,
+        "interrupcion_s": 22.3
       },
       "criterios": [
         {
           "descripcion": "convergencia_s <= 60",
           "estado": "PASA",
-          "medido": 25.8,
-          "detalle": "convergencia_s = 25.8"
+          "medido": 22.6,
+          "detalle": "convergencia_s = 22.6"
         },
         {
           "descripcion": "/(?i)ESTABLISHED/ sobre swanctl --list-sas",
@@ -141,9 +141,9 @@
         "T05/despues.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 123.4,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 121.0,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T06",
@@ -159,7 +159,7 @@
       "motivo": "",
       "valor_medido": {
         "puertos_open": 0,
-        "paquetes_denegados_por_fw01": 664
+        "paquetes_denegados_por_fw01": 665
       },
       "criterios": [
         {
@@ -182,8 +182,8 @@
       ],
       "error_de_ejecucion": false,
       "duracion_s": 33.6,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T07",
@@ -228,9 +228,9 @@
         "T07/cabeceras.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 0.7,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 0.6,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T08",
@@ -296,9 +296,9 @@
         "T08/navegador_dom.html"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 12.2,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 11.3,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T09",
@@ -318,7 +318,7 @@
       "motivo": "",
       "valor_medido": {
         "tiempo_de_cambio_s": 8.9,
-        "tiempo_hasta_direct_s": 16.6,
+        "tiempo_hasta_direct_s": 16.9,
         "peticiones_nuevas_en_edge02_con_edge01_caido": 2
       },
       "criterios": [
@@ -362,9 +362,9 @@
         "T09/navegador.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 34.1,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 35.5,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T10",
@@ -396,9 +396,9 @@
         "T10/salida.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 7.7,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 7.9,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T11",
@@ -445,9 +445,9 @@
         "T11/alerta_wazuh_100302.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 3.5,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 3.8,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T12",
@@ -488,9 +488,9 @@
         "T12/ping.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 16.9,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 17.0,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T13",
@@ -531,9 +531,9 @@
         "T13/registro_seguridad.jsonl"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 1.8,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 2.0,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T14",
@@ -574,9 +574,9 @@
         "T14/registro_seguridad.jsonl"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 1.8,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 1.9,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T15",
@@ -621,9 +621,9 @@
         "T15/suricata_alertas.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 7.5,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 7.7,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T16",
@@ -674,9 +674,9 @@
         "T16/tls.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 0.5,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 0.6,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T17",
@@ -714,9 +714,9 @@
         "T17/zap.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 47.4,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 58.8,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T18",
@@ -735,7 +735,7 @@
       "motivo": "",
       "valor_medido": {
         "eventos_modsecurity": 5,
-        "latencia_alerta_wazuh_s": 1.8,
+        "latencia_alerta_wazuh_s": 2.0,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -761,9 +761,9 @@
         "T18/alerta_wazuh_100303.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 4.7,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 5.2,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T19",
@@ -797,9 +797,9 @@
         "T19/salida.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 6.3,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 6.5,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T20",
@@ -831,9 +831,9 @@
         "T20/salida.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 3.3,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 3.5,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T21",
@@ -854,8 +854,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T22",
@@ -874,8 +874,8 @@
       "resultado": "PASA",
       "motivo": "",
       "valor_medido": {
-        "tiempo_hasta_el_pac_s": 7.1,
-        "tiempo_navegador_con_svc01_caido_s": 6.1,
+        "tiempo_hasta_el_pac_s": 7.3,
+        "tiempo_navegador_con_svc01_caido_s": 6.4,
         "codigos_de_salida": {
           "nslookup example.com 10.20.32.1": 0
         }
@@ -909,9 +909,9 @@
         "T22/navegador_dom.html"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 14.9,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 17.0,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T23",
@@ -935,8 +935,8 @@
       "modo_en_que_si_se_ejecuta": [
         "H"
       ],
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T24",
@@ -979,9 +979,9 @@
         "T24/salida.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 4.8,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 5.6,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T25",
@@ -1003,8 +1003,8 @@
       "modo_en_que_si_se_ejecuta": [
         "H"
       ],
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T26",
@@ -1022,7 +1022,7 @@
       "resultado": "PASA",
       "motivo": "",
       "valor_medido": {
-        "paquetes_en_la_vpn": 35
+        "paquetes_en_la_vpn": 34
       },
       "criterios": [
         {
@@ -1047,9 +1047,9 @@
         "T26/captura.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 13.7,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 14.5,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T27",
@@ -1107,9 +1107,9 @@
         "T27/captura.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 13.5,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 15.2,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T28",
@@ -1128,7 +1128,7 @@
       "valor_medido": {
         "paquetes_udp_514": 0,
         "handshakes_tls_6514": 2,
-        "latencia_alerta_wazuh_s": 1.8
+        "latencia_alerta_wazuh_s": 2.0
       },
       "criterios": [
         {
@@ -1154,9 +1154,9 @@
         "T28/alerta_wazuh_100304.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 15.5,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 16.3,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T29",
@@ -1172,8 +1172,8 @@
       "motivo": "",
       "valor_medido": {
         "puertos_open": 0,
-        "paquetes_denegados_por_fw01": 1282,
-        "latencia_alerta_wazuh_s": 3.1,
+        "paquetes_denegados_por_fw01": 1281,
+        "latencia_alerta_wazuh_s": 3.7,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -1206,8 +1206,8 @@
         {
           "descripcion": "latencia_alerta_wazuh_s < 60",
           "estado": "PASA",
-          "medido": 3.1,
-          "detalle": "latencia_alerta_wazuh_s = 3.1"
+          "medido": 3.7,
+          "detalle": "latencia_alerta_wazuh_s = 3.7"
         }
       ],
       "hallazgos": [
@@ -1221,9 +1221,9 @@
         "T29/alerta_wazuh_100300.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 68.8,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 70.0,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T30",
@@ -1242,7 +1242,7 @@
       "valor_medido": {
         "conexiones_registradas_en_hny02": 4,
         "paquetes_vistos_por_fw01": 0,
-        "latencia_alerta_wazuh_s": 4.4,
+        "latencia_alerta_wazuh_s": 4.3,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -1263,8 +1263,8 @@
         {
           "descripcion": "latencia_alerta_wazuh_s < 60",
           "estado": "PASA",
-          "medido": 4.4,
-          "detalle": "latencia_alerta_wazuh_s = 4.4"
+          "medido": 4.3,
+          "detalle": "latencia_alerta_wazuh_s = 4.3"
         },
         {
           "descripcion": "paquetes_vistos_por_fw01 == 0",
@@ -1285,9 +1285,9 @@
         "T30/alerta_wazuh_100301.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 5.7,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 7.1,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T31",
@@ -1305,7 +1305,7 @@
       "resultado": "PASA",
       "motivo": "",
       "valor_medido": {
-        "latencia_alerta_wazuh_s": 0.4,
+        "latencia_alerta_wazuh_s": 2.1,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -1326,8 +1326,8 @@
         {
           "descripcion": "latencia_alerta_wazuh_s < 60",
           "estado": "PASA",
-          "medido": 0.4,
-          "detalle": "latencia_alerta_wazuh_s = 0.4"
+          "medido": 2.1,
+          "detalle": "latencia_alerta_wazuh_s = 2.1"
         }
       ],
       "hallazgos": [
@@ -1339,30 +1339,64 @@
         "T31/alerta_wazuh_100135.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 3.4,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 3.9,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T32",
       "nombre": "CrowdSec bloquea una IP abusiva en la WAN",
       "categoria": "deteccion",
       "modos": [
+        "L",
         "H"
       ],
       "flujos": [
         "F26"
       ],
-      "comando_de_referencia": "for i in $(seq 1 60); do nc -zv -w1 203.0.113.10 22; done   # desde <IP_EXTERNA_DE_PRUEBA>; después: cscli decisions list",
-      "resultado": "NO_APLICA",
-      "motivo": "el Modo L no ejecuta T32 (modos de la prueba: H); se ejecuta en H",
-      "valor_medido": {},
-      "criterios": [],
-      "hallazgos": [],
-      "evidencia": [],
+      "comando_de_referencia": "cscli decisions add --ip <IP_EXTERNA_DE_PRUEBA> --duration 5m --type ban ; nc -zv -w2 203.0.113.10 443 (desde esa IP) ; cscli decisions list",
+      "resultado": "PASA",
+      "motivo": "",
+      "valor_medido": {
+        "paquetes_descartados_tras_la_decision": 8,
+        "latencia_alerta_wazuh_s": 21.5,
+        "codigos_de_salida": {
+          "principal": 0
+        }
+      },
+      "criterios": [
+        {
+          "descripcion": "/(?m)\\b(\\d{1,3}\\.){3}\\d{1,3}\\b.*ban/ sobre cscli decisions list",
+          "estado": "PASA",
+          "medido": "198.51.100.100 | T32 simulación (escenario de prueba) | ban",
+          "detalle": "coincide"
+        },
+        {
+          "descripcion": "paquetes_descartados_tras_la_decision >= 1",
+          "estado": "PASA",
+          "medido": 8,
+          "detalle": "paquetes_descartados_tras_la_decision = 8"
+        },
+        {
+          "descripcion": "/\"level\":\\s*(1[0-9]|[2-9][0-9])/ sobre alerta_wazuh",
+          "estado": "PASA",
+          "medido": "\"level\":10",
+          "detalle": "coincide"
+        }
+      ],
+      "hallazgos": [
+        "la decisión se agrega con `cscli decisions add` (la «simulación con su escenario de prueba» de D1.14): un escenario real exige logs de SSH o del WAF",
+        "fw01-sim no es OPNsense: el aviso a Wazuh lo envía `socat` por el syslog TLS (F14); CrowdSec y su bouncer sí son los reales, en modo local sin nube"
+      ],
+      "evidencia": [
+        "T32/salida.txt",
+        "T32/cscli_decisions.txt",
+        "T32/alerta_wazuh_100305.json"
+      ],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 26.4,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T33",
@@ -1382,8 +1416,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T34",
@@ -1403,8 +1437,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T35",
@@ -1414,10 +1448,12 @@
         "L",
         "H"
       ],
-      "flujos": [],
+      "flujos": [
+        "F27"
+      ],
       "comando_de_referencia": "curl -sS -o /dev/null -w \"%{http_code}\" https://example.com ; nc -zv -w5 example.com 22 ; curl -sS -m5 http://example.com",
-      "resultado": "FALLA",
-      "motivo": "/^[23]\\d\\d$/ sobre curl -sS -o /dev/null -w \"%{http_code}\" https://example.com: no coincide",
+      "resultado": "PASA",
+      "motivo": "",
       "valor_medido": {
         "codigos_de_salida": {
           "nc -zv -w5 example.com 22": 1,
@@ -1427,9 +1463,9 @@
       "criterios": [
         {
           "descripcion": "/^[23]\\d\\d$/ sobre curl -sS -o /dev/null -w \"%{http_code}\" https://example.com",
-          "estado": "FALLA",
-          "medido": null,
-          "detalle": "no coincide"
+          "estado": "PASA",
+          "medido": "200",
+          "detalle": "coincide"
         },
         {
           "descripcion": "código de salida ≠ 0 (nc -zv -w5 example.com 22)",
@@ -1449,9 +1485,9 @@
         "T35/salida.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 33.4,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 25.9,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T36",
@@ -1471,8 +1507,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T37",
@@ -1492,8 +1528,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T38",
@@ -1513,8 +1549,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T39",
@@ -1531,7 +1567,7 @@
       "resultado": "PASA",
       "motivo": "",
       "valor_medido": {
-        "tiempo_restauracion_s": 1.1,
+        "tiempo_restauracion_s": 1.2,
         "codigos_de_salida": {
           "restic backup": 0,
           "nc -zv -w3 10.20.71.20 22": 1
@@ -1553,8 +1589,8 @@
         {
           "descripcion": "tiempo_restauracion_s <= 7200",
           "estado": "PASA",
-          "medido": 1.1,
-          "detalle": "tiempo_restauracion_s = 1.1"
+          "medido": 1.2,
+          "detalle": "tiempo_restauracion_s = 1.2"
         },
         {
           "descripcion": "código de salida ≠ 0 (nc -zv -w3 10.20.71.20 22)",
@@ -1571,9 +1607,9 @@
         "T39/restic.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 10.4,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 11.2,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T40",
@@ -1593,8 +1629,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T41",
@@ -1614,8 +1650,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T42",
@@ -1635,8 +1671,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T43",
@@ -1656,8 +1692,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T44",
@@ -1697,9 +1733,9 @@
         "T44/ping.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 4.4,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 4.6,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T45",
@@ -1715,7 +1751,7 @@
       "motivo": "",
       "valor_medido": {
         "puertos_open": 0,
-        "paquetes_denegados_por_fw01": 28,
+        "paquetes_denegados_por_fw01": 30,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -1736,8 +1772,8 @@
         {
           "descripcion": "paquetes_denegados_por_fw01 > 0",
           "estado": "PASA",
-          "medido": 28,
-          "detalle": "paquetes_denegados_por_fw01 = 28"
+          "medido": 30,
+          "detalle": "paquetes_denegados_por_fw01 = 30"
         }
       ],
       "hallazgos": [],
@@ -1746,9 +1782,9 @@
         "T45/nmap.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 7.6,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 11.8,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T46",
@@ -1764,7 +1800,7 @@
       "motivo": "",
       "valor_medido": {
         "puertos_open": 0,
-        "paquetes_denegados_por_fw01": 20,
+        "paquetes_denegados_por_fw01": 22,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -1785,8 +1821,8 @@
         {
           "descripcion": "paquetes_denegados_por_fw01 > 0",
           "estado": "PASA",
-          "medido": 20,
-          "detalle": "paquetes_denegados_por_fw01 = 20"
+          "medido": 22,
+          "detalle": "paquetes_denegados_por_fw01 = 22"
         }
       ],
       "hallazgos": [
@@ -1797,9 +1833,9 @@
         "T46/nmap.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 6.4,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 9.7,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T47",
@@ -1858,9 +1894,9 @@
         "T47/nmap.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 11.3,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 13.6,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T48",
@@ -1879,8 +1915,8 @@
       "hallazgos": [],
       "evidencia": [],
       "error_de_ejecucion": false,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     },
     {
       "id": "T49",
@@ -1922,9 +1958,9 @@
         "T49/salida.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 5.3,
-      "commit": "41ebb9d65b4f42d3b0fd12c3598305fe099f4610",
-      "fecha": "2026-11-19"
+      "duracion_s": 5.6,
+      "commit": "e480bdc6075415546b9cf4477f3318a16ed523de",
+      "fecha": "2026-11-21"
     }
   ]
 }

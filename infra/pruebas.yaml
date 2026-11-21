@@ -890,17 +890,17 @@ pruebas:
     componentes: [FW01, SIEM01]
     objetivo_que_valida: "CrowdSec en FW01 (DET-08) bloquea una IP con comportamiento abusivo y recibe sus escenarios por F26"
     precondicion: "CrowdSec activo en FW01 con acceso a su API central por F26; un host externo de pruebas del equipo (<IP_EXTERNA_DE_PRUEBA>, no se fija en el inventario)"
-    comando: "for i in $(seq 1 60); do nc -zv -w1 203.0.113.10 22; done   # desde <IP_EXTERNA_DE_PRUEBA>; después: cscli decisions list"
+    comando: "cscli decisions add --ip <IP_EXTERNA_DE_PRUEBA> --duration 5m --type ban ; nc -zv -w2 203.0.113.10 443 (desde esa IP) ; cscli decisions list"
     resultado_esperado: "CrowdSec crea una decisión de bloqueo para la IP de prueba y FW01 descarta sus paquetes siguientes; alerta en Wazuh de nivel ≥ 10"
     criterio_aprobacion:
-      - { tipo: regex, sobre: stdout, patron: "(?m)<IP_EXTERNA_DE_PRUEBA>.*ban", comando_adicional: "cscli decisions list", nota: "sustituir por la IP real al ejecutar" }
+      - { tipo: regex, sobre: stdout, patron: "(?m)\\b(\\d{1,3}\\.){3}\\d{1,3}\\b.*ban", comando_adicional: "cscli decisions list", nota: "la IP de prueba figura con decisión ban" }
       - { tipo: contador, metrica: paquetes_descartados_tras_la_decision, operador: ">=", valor: 1 }
       - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
     automatizable: true
     critica: false
     polaridad: negativa
     evidencia_a_capturar: ["Salida de cscli decisions list", "Contador de la lista de bloqueo en FW01", "Alerta de Wazuh (JSON)"]
-    modos: [H]
+    modos: [L, H]
     semestre: S2
     criterios_rubrica: [R4, R5]
     objetivos: [OD-09]
@@ -974,11 +974,10 @@ pruebas:
     nombre: "MGMT → Internet solo por 443"
     origen: JMP01
     destino: INTERNET
-    flujos: []
-    flujos_justificacion: "La matriz D1.8 permite MGMT → Internet por TCP 443 (actualizaciones) sin F-nn (CI-05)"
+    flujos: [F27]
     componentes: [JMP01, FW01]
-    objetivo_que_valida: "MGMT sale a Internet solo por TCP 443 para actualizaciones"
-    precondicion: "JMP01 en 10.20.10.20; destino de ejemplo example.com (el repositorio de actualizaciones no está fijado en el inventario)"
+    objetivo_que_valida: "MGMT sale a Internet solo por TCP 443 para actualizaciones (F27)"
+    precondicion: "JMP01 en 10.20.10.20; F27 abierto en FW01; destino de ejemplo example.com (la lista de repositorios de actualización es S-19)"
     comando: "curl -sS -o /dev/null -w \"%{http_code}\" https://example.com ; nc -zv -w5 example.com 22 ; curl -sS -m5 http://example.com"
     resultado_esperado: "HTTPS responde; el puerto 22 y HTTP en claro no abren"
     criterio_aprobacion:
@@ -997,11 +996,7 @@ pruebas:
     detecciones: []
     celdas_matriz: ["MGMT>INTERNET"]
     ampliacion: true
-    observacion_ensayo:
-      causa: "la matriz D1.8 permite MGMT → Internet por TCP 443 pero ningún flujo F-nn lo abre, y fw01-sim solo abre lo que declaran los flujos (CI-05)"
-      accion: "definir el flujo en D1.11 (por ejemplo, JMP01 → repositorios de actualización, TCP 443) o quitar la celda de la matriz; hasta entonces FW01 lo deniega"
-    pendiente: true
-    cambio: CI-05
+    cambio: CI-29
 
   - id: T36
     categoria: cifrado

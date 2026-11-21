@@ -46,6 +46,7 @@ table inet fw01sim {
     iifname "wan" ip daddr 10.20.41.20 tcp dport { 23, 2222 } counter accept comment "F24 INTERNET > HNY01 senuelo tcp/22>2222,23 (solo ventana autorizada)"
     ip saddr 10.20.20.30 oifname "wan" meta l4proto . th dport { tcp . 853, tcp . 4460, udp . 123 } counter accept comment "F25 SVC01 > INTERNET nts+dot tcp/4460,853 udp/123"
     ip saddr { 10.20.50.10, 10.20.50.20 } oifname "wan" tcp dport 443 counter accept comment "F26 SIEM01,IDS01,FW01 > INTERNET feeds tcp/443"
+    ip saddr 10.20.10.20 oifname "wan" tcp dport 443 counter accept comment "F27 JMP01 > INTERNET actualizaciones tcp/443"
     limit rate 20/second burst 50 packets log prefix "fw01sim DENEGADO forward: " level info counter drop
   }
 

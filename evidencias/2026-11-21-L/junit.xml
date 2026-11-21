@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="celeris-modo-L" tests="49" failures="1" skipped="19" timestamp="2026-11-19">
+<testsuite name="celeris-modo-L" tests="49" failures="0" skipped="18" timestamp="2026-11-21">
   <testcase classname="CE0311.vpn" name="T01 ON-PREM → AWS" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T01 (modos de la prueba: A, H); se ejecuta en A y H"/>
   </testcase>
@@ -12,65 +12,64 @@
   <testcase classname="CE0311.segmentacion" name="T04 Internet → subred privada AWS" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T04 (modos de la prueba: A, H); se ejecuta en A y H"/>
   </testcase>
-  <testcase classname="CE0311.vpn" name="T05 Falla de un túnel" time="123.4">
+  <testcase classname="CE0311.vpn" name="T05 Falla de un túnel" time="121.0">
   </testcase>
   <testcase classname="CE0311.segmentacion" name="T06 LAB → MGMT" time="33.6">
   </testcase>
-  <testcase classname="CE0311.conectividad" name="T07 LAB → EDGE 3128" time="0.7">
+  <testcase classname="CE0311.conectividad" name="T07 LAB → EDGE 3128" time="0.6">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T08 LAB → UDP 443" time="12.2">
+  <testcase classname="CE0311.segmentacion" name="T08 LAB → UDP 443" time="11.3">
   </testcase>
-  <testcase classname="CE0311.disponibilidad" name="T09 Caída de EDGE01" time="34.1">
+  <testcase classname="CE0311.disponibilidad" name="T09 Caída de EDGE01" time="35.5">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T10 DMZ → LAN" time="7.7">
+  <testcase classname="CE0311.segmentacion" name="T10 DMZ → LAN" time="7.9">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T11 Internet → DMZ-HONEY" time="3.5">
+  <testcase classname="CE0311.deteccion" name="T11 Internet → DMZ-HONEY" time="3.8">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T12 STORAGE no enrutada" time="16.9">
+  <testcase classname="CE0311.segmentacion" name="T12 STORAGE no enrutada" time="17.0">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T13 Abuso del proxy" time="1.8">
+  <testcase classname="CE0311.deteccion" name="T13 Abuso del proxy" time="2.0">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T14 Puerto no permitido" time="1.8">
+  <testcase classname="CE0311.deteccion" name="T14 Puerto no permitido" time="1.9">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T15 Exposición del portal" time="7.5">
+  <testcase classname="CE0311.seguridad_web" name="T15 Exposición del portal" time="7.7">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T16 TLS del portal" time="0.5">
+  <testcase classname="CE0311.seguridad_web" name="T16 TLS del portal" time="0.6">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T17 Escaneo web" time="47.4">
+  <testcase classname="CE0311.seguridad_web" name="T17 Escaneo web" time="58.8">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T18 WAF" time="4.7">
+  <testcase classname="CE0311.seguridad_web" name="T18 WAF" time="5.2">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T19 Salida del portal" time="6.3">
+  <testcase classname="CE0311.segmentacion" name="T19 Salida del portal" time="6.5">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T20 Aislamiento del señuelo" time="3.3">
+  <testcase classname="CE0311.segmentacion" name="T20 Aislamiento del señuelo" time="3.5">
   </testcase>
   <testcase classname="CE0311.vpn" name="T21 MTU del túnel" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T21 (modos de la prueba: A, H); se ejecuta en A y H"/>
   </testcase>
-  <testcase classname="CE0311.disponibilidad" name="T22 Caída de SVC01" time="14.9">
+  <testcase classname="CE0311.disponibilidad" name="T22 Caída de SVC01" time="17.0">
   </testcase>
   <testcase classname="CE0311.segmentacion" name="T23 Fuga IPv6" time="0">
     <skipped message="NO_APLICA: RA guard es un control del switch de acceso (SW-ACC, S-14); los puentes Linux del laboratorio no lo emulan; se ejecuta en Modo H"/>
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T24 DNS cifrado" time="4.8">
+  <testcase classname="CE0311.segmentacion" name="T24 DNS cifrado" time="5.6">
   </testcase>
   <testcase classname="CE0311.disponibilidad" name="T25 Break-glass" time="0">
     <skipped message="NO_APLICA: ESX01, IPMI01, BRK01 y SW-CORE01 no se emulan: el puerto break-glass no existe en F4.1 (CI-16); se ejecuta en Modo H"/>
   </testcase>
-  <testcase classname="CE0311.privacidad" name="T26 Privacidad del túnel" time="13.7">
+  <testcase classname="CE0311.privacidad" name="T26 Privacidad del túnel" time="14.5">
   </testcase>
-  <testcase classname="CE0311.cifrado" name="T27 Métricas cifradas" time="13.5">
+  <testcase classname="CE0311.cifrado" name="T27 Métricas cifradas" time="15.2">
   </testcase>
-  <testcase classname="CE0311.cifrado" name="T28 Syslog cifrado" time="15.5">
+  <testcase classname="CE0311.cifrado" name="T28 Syslog cifrado" time="16.3">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T29 Escaneo lateral detectado por IDS01" time="68.8">
+  <testcase classname="CE0311.deteccion" name="T29 Escaneo lateral detectado por IDS01" time="70.0">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T30 Canary interno detecta un barrido en LAB" time="5.7">
+  <testcase classname="CE0311.deteccion" name="T30 Canary interno detecta un barrido en LAB" time="7.1">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T31 Honey-URL en el nodo de borde" time="3.4">
+  <testcase classname="CE0311.deteccion" name="T31 Honey-URL en el nodo de borde" time="3.9">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T32 CrowdSec bloquea una IP abusiva en la WAN" time="0">
-    <skipped message="NO_APLICA: el Modo L no ejecuta T32 (modos de la prueba: H); se ejecuta en H"/>
+  <testcase classname="CE0311.deteccion" name="T32 CrowdSec bloquea una IP abusiva en la WAN" time="26.4">
   </testcase>
   <testcase classname="CE0311.deteccion" name="T33 Toda denegación deja rastro con hora fiable" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T33 (modos de la prueba: H); se ejecuta en H"/>
@@ -78,8 +77,7 @@
   <testcase classname="CE0311.conectividad" name="T34 Administración desde JMP01" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T34 (modos de la prueba: H); se ejecuta en H"/>
   </testcase>
-  <testcase classname="CE0311.conectividad" name="T35 MGMT → Internet solo por 443" time="33.4">
-    <failure message="/^[23]\d\d$/ sobre curl -sS -o /dev/null -w &quot;%{http_code}&quot; https://example.com: no coincide"/>
+  <testcase classname="CE0311.conectividad" name="T35 MGMT → Internet solo por 443" time="25.9">
   </testcase>
   <testcase classname="CE0311.cifrado" name="T36 Enrolamiento del nodo por mTLS" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T36 (modos de la prueba: H); se ejecuta en H"/>
@@ -90,7 +88,7 @@
   <testcase classname="CE0311.cifrado" name="T38 CTRL01 → base de datos por TLS" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T38 (modos de la prueba: H); se ejecuta en H"/>
   </testcase>
-  <testcase classname="CE0311.disponibilidad" name="T39 Respaldo y restauración en NAS01" time="10.4">
+  <testcase classname="CE0311.disponibilidad" name="T39 Respaldo y restauración en NAS01" time="11.2">
   </testcase>
   <testcase classname="CE0311.disponibilidad" name="T40 Respaldo en S3 con Object Lock" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T40 (modos de la prueba: H); se ejecuta en H"/>
@@ -104,18 +102,18 @@
   <testcase classname="CE0311.conectividad" name="T43 Actualización de reglas de seguridad" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T43 (modos de la prueba: H); se ejecuta en H"/>
   </testcase>
-  <testcase classname="CE0311.disponibilidad" name="T44 Peering entre nodos de borde" time="4.4">
+  <testcase classname="CE0311.disponibilidad" name="T44 Peering entre nodos de borde" time="4.6">
     <skipped message="PARCIAL: medición vacía: el protocolo y el puerto del peering no están definidos (CI-06): solo se probó el alcance IP"/>
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T45 Internet → zonas internas" time="7.6">
+  <testcase classname="CE0311.segmentacion" name="T45 Internet → zonas internas" time="11.8">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T46 DMZ-SVC → zonas internas" time="6.4">
+  <testcase classname="CE0311.segmentacion" name="T46 DMZ-SVC → zonas internas" time="9.7">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T47 DMZ-HONEY → cualquier zona" time="11.3">
+  <testcase classname="CE0311.segmentacion" name="T47 DMZ-HONEY → cualquier zona" time="13.6">
   </testcase>
   <testcase classname="CE0311.segmentacion" name="T48 Cualquier zona → STORAGE" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T48 (modos de la prueba: A, H); se ejecuta en A y H"/>
   </testcase>
-  <testcase classname="CE0311.conectividad" name="T49 Renovación ACME desde WAF01" time="5.3">
+  <testcase classname="CE0311.conectividad" name="T49 Renovación ACME desde WAF01" time="5.6">
   </testcase>
 </testsuite>

@@ -66,6 +66,10 @@ class H(http.server.BaseHTTPRequestHandler):
             # Devuelve las cabeceras tal como llegaron al origen (REQ-F-28: ninguna debe identificar al cliente).
             cuerpo = json.dumps({k.lower(): v for k, v in self.headers.items()}).encode()
             return self.send(200, cuerpo, {"Content-Type": "application/json", "Cache-Control": "no-store"})
+        if path == "/ident":
+            # Devuelve las cabeceras de identidad que llegaron al origen (REQ-F-28): deben llegar vacías.
+            vistas = [k for k in ("X-Forwarded-For", "Via", "Forwarded") if self.headers.get(k) is not None]
+            return self.send(200, ("ident:" + ",".join(vistas)).encode(), {"Cache-Control": "no-store"})
         if path == "/slow":
             # Objeto cacheable que tarda: varios clientes simultáneos deben compartir una sola descarga.
             time.sleep(1)

@@ -1,0 +1,35 @@
+@startuml DS-11-estados-version-politica
+!include _estilo.iuml
+title DS-11 · Estados de una versión de política (cuatro ojos y despliegue gradual)
+caption «R2 — diseño»: policy_version.estado en DB01. Coincide con P-04 (proponer, simular) y P-08 (aprobar, rollout).
+
+[*] --> Propuesta : POST /v1/policies\n(autor = operador A)
+state Propuesta <<R2>> : Cedar válido (D-07);\nsimulable (REQ-F-20)
+state Aprobada <<R2>> : segunda firma (operador B);\nbundle firmado ed25519
+state Desplegando <<R2>> : rollout gradual\n10 % → 100 %
+state Vigente <<R2>> : todos los nodos la aplican
+state Revertida <<R2>> : vuelve a la versión anterior
+state Rechazada <<R2>>
+state Reemplazada <<R2>>
+
+Propuesta --> Propuesta : simulate (no cambia nada)
+Propuesta --> Aprobada : approve(v, B) [B ≠ autor]\n(REQ-RN-07)
+Propuesta --> Rechazada : el aprobador la rechaza\no el autor la retira
+Aprobada --> Desplegando : RolloutManager.start(v, 10 %)\n+ aviso firmado publicado (REQ-F-30)
+Desplegando --> Vigente : errores < umbral [S-21]\nen el 100 % de los nodos
+Desplegando --> Revertida : errores ≥ umbral\n(reversión automática)
+Vigente --> Revertida : el operador la revierte\n(CU-10, P-05)
+Vigente --> Reemplazada : otra versión pasa a Vigente
+Rechazada --> [*]
+Revertida --> [*]
+Reemplazada --> [*]
+
+note right of Propuesta
+  approve(v, autor) responde 403
+  «Debe aprobarlo otro operador».
+  Cada transición escribe audit_log (REQ-F-24).
+  Una versión no se edita: un cambio es una versión nueva.
+end note
+
+$pie("DS-11", "REQ-F-17, F-20, F-24, F-30, RN-07, RN-08", "CU-03, CU-10", "P-04, P-08")
+@enduml

@@ -120,7 +120,7 @@ Ninguno.
 ## Información
 
 - **V-27** — 36 de 92 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 32 elementos pendientes en los YAML; 32 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32']
+- **V-29** — 32 elementos pendientes en los YAML; 34 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34']
 - **V-42** — Resultados de 2026-11-21-L (commit e480bdc): {'PASA': 31, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 56 de 92 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 768 fórmulas recalculadas con LibreOffice sin errores

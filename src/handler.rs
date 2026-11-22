@@ -340,17 +340,15 @@ impl HttpHandler for CacheHandler {
         yes
     }
 
-    /// Segundo filtro sobre el SNI real del ClientHello: si no está en la lista, pasa cifrado.
-    /// La intercepción se cuenta aquí porque recién en este punto queda decidida.
+    /// Segundo filtro sobre el SNI real del ClientHello: si no está en la lista o no coincide con el
+    /// CONNECT, pasa cifrado (REQ-F-02). La intercepción se cuenta aquí porque recién en este punto queda decidida.
     async fn should_intercept_tls(&mut self, ctx: &HttpContext, hello: ClientHello<'_>) -> bool {
         let sni = hello.server_name();
-        let yes = sni.map(|sni| self.shared.cfg.should_intercept(sni)).unwrap_or(false);
+        let (yes, mismatch) = tls_decision(&self.shared.cfg, sni, self.connect_host.as_deref());
         let s = &self.shared.stats;
         Stats::inc(if yes { &s.tls_intercepted } else { &s.tls_passthrough });
-        if let (Some(sni), Some(connect)) = (sni, self.connect_host.as_deref()) {
-            if canonical_host(sni) != canonical_host(connect) {
-                self.shared.detector.host_mismatch(ctx.client_addr.ip(), "El SNI no coincide con el destino del CONNECT.");
-            }
+        if mismatch {
+            self.shared.detector.host_mismatch(ctx.client_addr.ip(), "El SNI no coincide con el destino del CONNECT.");
         }
         if !yes {
             self.shared.client_stats.record(ctx.client_addr.ip(), Outcome::Tunnel, None);
@@ -401,6 +399,7 @@ impl HttpHandler for CacheHandler {
 
         // req: REQ-F-28: nada que identifique al cliente sale hacia el origen ni hacia el shield. Las cabeceras que el cliente
         // (o un proxy anterior) haya puesto se eliminan aquí, antes de cualquier camino que reenvíe la petición.
+        // Como el origen ya no ve Forwarded, esa cabecera deja de afectar a si la respuesta se puede compartir.
         let quitadas = policy::strip_client_identity(req.headers_mut());
         if quitadas > 0 {
             tracing::debug!(%client, quitadas, "cabeceras de identidad del cliente eliminadas (REQ-F-28)");
@@ -693,9 +692,39 @@ impl HttpHandler for CacheHandler {
     }
 }
 
+/// Decide si se descifra un túnel ya autorizado: el SNI debe estar en la lista y coincidir con el
+/// destino del CONNECT (REQ-F-02). Devuelve (descifrar, el SNI difiere del CONNECT).
+// req: REQ-F-02
+fn tls_decision(cfg: &Config, sni: Option<&str>, connect: Option<&str>) -> (bool, bool) {
+    let mismatch = matches!((sni, connect), (Some(sni), Some(connect)) if canonical_host(sni) != canonical_host(connect));
+    let yes = !mismatch && sni.is_some_and(|sni| cfg.should_intercept(sni));
+    (yes, mismatch)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn cfg_intercepta(dominios: &[&str]) -> Config {
+        Config { intercept_domains: dominios.iter().map(|d| d.to_string()).collect(), ..Default::default() }
+    }
+
+    // req: REQ-F-02
+    #[test]
+    fn sni_distinto_del_connect_no_se_descifra_aunque_ambos_esten_en_la_lista() {
+        let cfg = cfg_intercepta(&["cdn.example", "otro.example"]);
+        assert_eq!(tls_decision(&cfg, Some("otro.example"), Some("cdn.example")), (false, true));
+        assert_eq!(tls_decision(&cfg, Some("fuera.invalid"), Some("cdn.example")), (false, true));
+    }
+
+    // req: REQ-F-02
+    #[test]
+    fn sni_igual_al_connect_y_en_la_lista_se_descifra() {
+        let cfg = cfg_intercepta(&["cdn.example"]);
+        assert_eq!(tls_decision(&cfg, Some("CDN.example."), Some("cdn.example")), (true, false));
+        assert_eq!(tls_decision(&cfg, None, Some("cdn.example")), (false, false));
+        assert_eq!(tls_decision(&cfg_intercepta(&[]), Some("cdn.example"), Some("cdn.example")), (false, false));
+    }
 
     #[test]
     fn compara_el_host_sin_contar_puerto_mayusculas_ni_punto_final() {

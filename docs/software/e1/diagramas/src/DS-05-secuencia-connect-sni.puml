@@ -1,0 +1,61 @@
+@startuml DS-05-secuencia-connect-sni
+!include _estilo.iuml
+title DS-05 · Secuencia: CONNECT y decisión de intercepción por SNI (REQ-F-02, implementado)
+caption «R1»: handler.rs (guard_connect, should_intercept_connect, should_intercept_tls, tls_decision) y config.rs (should_intercept).
+
+actor "Cliente\n(zona LAB)" as C
+box "celeris-node · EDGE01 10.20.60.10" #FFFFFF
+  participant "Hudsucker\n(D-02)" as HS <<R1>>
+  participant "CacheHandler" as H <<R1>>
+  participant "Config\n(política)" as P <<R1>>
+  participant "DestinationPolicy\n(access.rs)" as D <<R1>>
+  participant "Detector +\nSecurityLog" as DET <<R1>>
+end box
+participant "Origen" as O
+
+C -> HS : CONNECT cdn.example:443
+HS -> H : handle_request(CONNECT)
+H -> H : clients.check(ip)
+alt cliente fuera de allowed_clients o límite por minuto
+  H --> C : 403 / 429 + Retry-After: 60 (REQ-F-10)
+end
+H -> H : guard_connect: connect_port_allowed(443)
+alt puerto no permitido
+  H -> DET : rare_port(ip, puerto) + evento port_blocked
+  H --> C : 403 (REQ-F-11)
+end
+H -> D : resolve(host, 443)
+alt resuelve a una IP interna (SSRF)
+  H -> DET : evento destination_blocked
+  H --> C : 403 (REQ-F-11)
+end
+HS -> H : should_intercept_connect(cdn.example)
+H -> P : should_intercept(host)
+note right of P : never_intercept gana siempre\nsobre intercept_domains (REQ-RN-03)
+
+alt dominio no listado o en never_intercept
+  P --> H : false
+  H --> HS : false → túnel a la IP ya validada
+  HS <-> O : TLS de extremo a extremo (sin descifrar)
+  note right of H : Outcome::Tunnel, stats.tls_passthrough
+else dominio en intercept_domains
+  P --> H : true; connect_host = cdn.example
+  C -> HS : ClientHello (SNI)
+  HS -> H : should_intercept_tls(hello)
+  H -> H : tls_decision(cfg, sni, connect_host)
+  alt SNI ≠ CONNECT (canonical_host)
+    H -> DET : host_mismatch(ip, "El SNI no coincide…")
+    H --> HS : false → no se descifra
+    HS <-> O : túnel sin descifrar
+  else SNI = CONNECT y SNI en la lista
+    H --> HS : true
+    HS -> HS : certificado de hoja firmado por la CA\ncon Name Constraints (REQ-F-18 parcial)
+    HS --> C : TLS 1.2+ (X25519MLKEM768 preferido, REQ-NF-06)
+    note over C, H : Siguen las peticiones HTTP descifradas (DS-04, DS-06)
+  end
+end
+
+note over H, P : Por defecto no se descifra: sin SNI, sin coincidencia o con SNI distinto, tls_decision devuelve false.\nLa prueba de inyección de fallos de REQ-NF-08 (error interno del motor de políticas) es de R2 (Cedar, D-07).
+
+$pie("DS-05", "REQ-F-01, F-02, F-10, F-11, F-15, F-18, RN-03, NF-06, NF-08", "CU-01, CU-07", "P-04, P-06")
+@enduml

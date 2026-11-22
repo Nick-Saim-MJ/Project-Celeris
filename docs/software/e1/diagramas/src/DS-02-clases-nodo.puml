@@ -1,0 +1,174 @@
+@startuml DS-02-clases-nodo
+!include _estilo.iuml
+title DS-02 · Clases de diseño de celeris-node (código actual + puertos R2)
+caption «R1» tipo que existe en src/ (archivo indicado) · «R2» puerto propuesto en C3.3 para el workspace · las flechas punteadas «implementa» son la refactorización planeada
+left to right direction
+
+package "Hudsucker 0.25 (D-02)" {
+  interface HttpHandler <<R1>> {
+    should_intercept_connect(req): bool
+    should_intercept_tls(hello): bool
+    handle_request(req): RequestOrResponse
+    handle_response(res): Response
+  }
+}
+
+package "ingress + tls (handler.rs, access.rs)" {
+  class CacheHandler <<R1>> {
+    -exchange: Exchange
+    -connect_host: Option<String>
+    -tls_decision(cfg, sni, connect): (bool, bool)
+    -guard_connect(client, req)
+    -serve_from_cache(meta, estado, reserva)
+  }
+  class Shared <<R1>> {
+    cfg: Config
+    notice: Bytes
+  }
+  class ClientGate <<R1>> {
+    check(ip): ClientDecision
+  }
+  class DestinationPolicy <<R1>> {
+    permits(ip): bool
+    resolve(host, port): Vec<SocketAddr>
+  }
+  enum ClientDecision <<R1>> {
+    Allow
+    Denied
+    RateLimited
+  }
+  enum Exchange <<R1>> {
+    Untracked
+    Bypass: RequestInfo
+    Candidate: Pending
+  }
+}
+
+package "policy (config.rs, policy.rs)" {
+  class Config <<R1>> {
+    intercept_domains: Vec<String>
+    never_intercept: Vec<String>
+    store_id: Vec<StoreIdRule>
+    should_intercept(host): bool
+    is_never_intercept(host): bool
+  }
+  class KeyNormalizer <<R1>> {
+    normalize(url: AbsUrl): String
+  }
+  class "policy (funciones)" as PolicyFns <<R1>> {
+    strip_client_identity(headers): usize
+    request_is_cacheable(req): bool
+    response_is_cacheable(res, max): bool
+    ttl_secs(headers, default): u64
+  }
+}
+
+package "cache (store.rs, coalesce.rs, memory.rs)" {
+  class Store <<R1>> {
+    -index: moka::Cache<String, Meta>
+    -limit: u64
+    key_hash(key): String
+    get(key_hash): Option<Meta>
+    read_object(meta): Option<Bytes>
+    put(key_hash, meta, body): PutOutcome
+    refresh(key_hash, meta, ttl)
+  }
+  class Meta <<R1>> {
+    url: String
+    object: String
+    size: u64
+    expires_at: u64
+    etag: Option<String>
+    is_fresh(): bool
+  }
+  class Flights <<R1>> {
+    enter(key): Entry
+  }
+  enum Entry <<R1>> {
+    Leader: FlightGuard
+    Waited
+    Disabled
+  }
+  class MemoryBudget <<R1>> {
+    try_reserve(bytes): Option<Reservation>
+  }
+}
+
+package "security + telemetry (detect.rs, security.rs, stats.rs, access_log.rs, live.rs)" {
+  class Detector <<R1>> {
+    observe(ip, status, bytes)
+    rare_port(ip, port)
+    host_mismatch(ip, detalle)
+    events(): Vec<Event>
+  }
+  class SecurityLog <<R1>> {
+    record(SecurityEvent)
+  }
+  class Stats <<R1>> {
+    observe(outcome, elapsed)
+    prometheus(): String
+  }
+  class AccessLog <<R1>> {
+    record(Record)
+  }
+  class LiveLog <<R1>>
+  enum Outcome <<R1>> {
+    Hit
+    Revalidated
+    Miss
+    Bypass
+    OriginError
+    CacheError
+    Blocked
+    Tunnel
+  }
+}
+
+package "Puertos del workspace (C3.3, R2)" {
+  interface PolicyEngine <<R2>> {
+    decide_tls(host, sni): Decision
+    simulate(url): Explanation
+  }
+  interface ObjectStore <<R2>> {
+    get(key): Option<Meta>
+    put(key, meta, body)
+  }
+  interface SecuritySink <<R2>> {
+    emit(evento OCSF)
+  }
+  interface MetricsSink <<R2>>
+  interface UpstreamConnector <<R2>> {
+    connect(destino | shield mTLS)
+  }
+}
+
+HttpHandler <|.. CacheHandler
+CacheHandler --> Shared : Arc
+CacheHandler ..> Exchange
+Shared *-- Config
+Shared *-- KeyNormalizer
+Shared *-- ClientGate
+Shared *-- DestinationPolicy
+Shared *-- Store
+Shared *-- Flights
+Shared *-- MemoryBudget
+Shared *-- AccessLog
+Shared o-- Detector
+Shared o-- SecurityLog
+Shared o-- Stats
+Shared o-- LiveLog
+ClientGate ..> ClientDecision
+Store ..> Meta
+Flights ..> Entry
+Detector --> SecurityLog : eventos
+Stats ..> Outcome
+CacheHandler ..> PolicyFns
+
+Config ..|> PolicyEngine : implementa (R2, Cedar D-07)
+Store ..|> ObjectStore : implementa (R2)
+SecurityLog ..|> SecuritySink : implementa (R2, OCSF D-08)
+Stats ..|> MetricsSink : implementa (R2)
+DestinationPolicy ..> UpstreamConnector : lo usa (R2, REQ-F-29)
+
+$pie("DS-02", "REQ-F-01…F-11, F-13…F-15, F-28, NF-08, NF-13", "CU-01, CU-07", "P-02, P-03, P-06")
+@enduml

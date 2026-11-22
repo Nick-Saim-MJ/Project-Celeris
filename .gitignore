@@ -39,3 +39,6 @@ evidencias/*/*.pcap
 *.tfstate.*
 *.tfplan
 crash.log
+
+# Herramientas descargadas (PlantUML); se obtienen con docs/software/e1/diagramas/render.py
+.tools/

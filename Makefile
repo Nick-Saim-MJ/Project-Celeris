@@ -18,7 +18,7 @@ help:
 	@echo "make tofu-gen         genera deploy/opentofu/envs/demo/diseno.auto.tfvars.json desde el inventario (Modo A)"
 	@echo "make tofu-check       tofu fmt -check y tofu validate de deploy/opentofu (no planifica ni aplica nada)"
 	@echo "make test-lab         ejecuta las pruebas T-nn del Modo L (Etapa 4)"
-	@echo "make matrices        genera el XLSX de pruebas (P4); el de componentes está pendiente de P3"
+	@echo "make matrices        genera las dos matrices XLSX (componentes y pruebas)"
 	@echo "make diagrams-check  genera, exporta y valida los diagramas draw.io (V-50…V-56)"
 	@echo "make informe         genera DOCX y PDF (pendiente de P5)"
 	@echo "make release-e1      copia la versión final a entregables/CE0311/vX.Y/ (pendiente de P5)"
@@ -76,10 +76,10 @@ lab-down:
 test-lab:
 	$(PYTHON) tests/network/run.py
 
-# Matriz de pruebas (P4): entregables/CE0311/Matriz_Pruebas_Conectividad_v<versión>.xlsx. La matriz de componentes es de P3 y aún no existe.
+# Matrices XLSX: componentes (P3, gancho V-60; recalcula una copia en LibreOffice o Excel, V-65) y pruebas (P4, gancho V-70).
 matrices:
+	$(PYTHON) infra/gen/xlsx_componentes.py --verificar
 	$(PYTHON) infra/genera.py xlsx-pruebas
-	@echo "matriz de componentes: pendiente de P3" >&2
 
 # Genera los 7 .drawio desde infra/*.yaml, los exporta a PNG/PDF con el XML embebido (necesita draw.io Desktop;
 # ruta en DRAWIO si no está en el PATH) y los valida (V-50…V-56). Informe: docs/infra/e1/cobertura-figuras.md.

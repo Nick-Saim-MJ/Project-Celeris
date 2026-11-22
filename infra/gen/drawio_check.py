@@ -326,8 +326,14 @@ def comprobar(x: Infra, dir_: Path = DIR) -> tuple[list[Chequeo], dict]:
     return chequeos, cobertura
 
 
+def _escribir_si_cambia(ruta: Path, texto: str) -> None:
+    """No toca el archivo si el contenido no cambia (la matriz XLSX compara su fecha con la del JSON: V-62)."""
+    if not ruta.exists() or ruta.read_text(encoding="utf-8") != texto:
+        ruta.write_text(texto, encoding="utf-8", newline="\n")
+
+
 def escribir_informe(x: Infra, chequeos: list[Chequeo], cob: dict) -> None:
-    INFORME_JSON.write_text(json.dumps(cob, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
+    _escribir_si_cambia(INFORME_JSON, json.dumps(cob, ensure_ascii=False, indent=2) + "\n")
     cab = "| Componente | Crit. | " + " | ".join(f.replace("FIG-", "") for f in FIGURAS) + " | Total |"
     sep = "|---|---|" + "---|" * len(FIGURAS) + "---|"
     filas = []
@@ -368,7 +374,7 @@ Flujos sin figura asignada (no se dibujan): {', '.join(cob['flujos_sin_figura'])
 {sep}
 {chr(10).join(filas)}
 """
-    INFORME_MD.write_text(md, encoding="utf-8", newline="\n")
+    _escribir_si_cambia(INFORME_MD, md)
 
 
 def main(argv=None) -> int:

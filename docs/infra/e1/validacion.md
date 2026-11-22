@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.0 · fecha 2026-11-18
 - Contenido cargado: **14 zonas**, **37 componentes**, **27 flujos** (F1–F26 de D1.11, F4 reservado, y 1 ampliaciones), **49 pruebas** (T01–T28 de D1.16 y 21 ampliaciones), 10 objetivos OD, 13 amenazas AM, 9 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **0 FALLA**, 5 con advertencias, 46 PASA, 2 pendientes de P2–P5.
+- Resultado: **0 FALLA**, 6 con advertencias, 52 PASA, 1 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -55,7 +55,13 @@
 | V-54 | Flujos F-nn: FIG-5.5a ∪ FIG-5.5b completas y etiquetas derivadas del inventario | PASA | — |
 | V-55 | Título, leyenda y panel «Qué aporta y qué pasa si falla» en cada figura | PASA | — |
 | V-56 | Criticidad (borde + texto) y color de zona según CLAUDE.md | PASA | — |
-| V-60 | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | PENDIENTE | pendiente de P3 |
+| V-60 | Matriz de componentes: archivo y hojas | PASA | entregables/CE0311/Matriz_Componentes_Red_v1.0.xlsx |
+| V-61 | Matriz 1 a 1 con el inventario (ID, nombre, IP, zona, criticidad, estado) | PASA | 37 filas · 37 componentes en el inventario |
+| V-62 | Componentes dibujados en los .drawio = 100 % en la matriz | PASA | — |
+| V-63 | Ninguna celda obligatoria vacía en la hoja Matriz | PASA | — |
+| V-64 | Ningún «Por qué existe» repetido | PASA | — |
+| V-65 | Las fórmulas recalculan sin errores | PASA | Microsoft Excel (COM) · 195 fórmulas · 0 errores |
+| V-66 | «Por qué», «Qué aporta» y «Si falla» citan algo verificable | PASA con advertencias | 0 errores, 17 advertencias |
 | V-70 | XLSX de pruebas: hojas y una fila por prueba del YAML, con sus datos | PASA | — |
 | V-71 | XLSX de pruebas: cada prueba cita flujos, componentes, OD, AM, DET y criterios de rúbrica existentes | PASA | — |
 | V-72 | Cobertura: 100 % de flujos permitidos con prueba positiva, de bloqueos y celdas críticas con prueba negativa; OD, AM, DET y R3/R4 con ≥ 1 prueba | PASA | 0 errores, 0 advertencias |
@@ -93,11 +99,28 @@ Ninguno.
 - **V-50** — FIG-5.5a.pdf es anterior a FIG-5.5a.drawio
 - **V-50** — FIG-5.5b.png es anterior a FIG-5.5b.drawio
 - **V-50** — FIG-5.5b.pdf es anterior a FIG-5.5b.drawio
+- **V-66** — CTRL01: «Por qué existe» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — OBS01: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — HNY01: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — PROBE01: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — KALI01: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — EC2-CTRLR: «Por qué existe» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-PUB-A: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-PUB-B: «Por qué existe» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-PUB-B: «Qué aporta al diseño» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-PUB-B: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-APP-B: «Qué aporta al diseño» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-A: «Por qué existe» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-A: «Qué aporta al diseño» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-A: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-B: «Por qué existe» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-B: «Qué aporta al diseño» no cita ningún ID, flujo, zona, IP, puerto ni cifra
+- **V-66** — AWS-DATA-B: «Si falla: impacto y mitigación» no cita ningún ID, flujo, zona, IP, puerto ni cifra
 
 ## Información
 
 - **V-27** — 36 de 92 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 32 elementos pendientes en los YAML; 31 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31']
+- **V-29** — 32 elementos pendientes en los YAML; 32 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32']
 - **V-42** — Resultados de 2026-11-21-L (commit e480bdc): {'PASA': 31, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 56 de 92 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 768 fórmulas recalculadas con LibreOffice sin errores
@@ -119,5 +142,4 @@ Ninguno.
 
 | Gancho | Qué validará | Estado |
 | --- | --- | --- |
-| V-60+ | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | pendiente de P3 |
 | V-80+ | Informe DOCX: 11 secciones, tablas generadas del inventario, figuras y leyendas | pendiente de P5 |

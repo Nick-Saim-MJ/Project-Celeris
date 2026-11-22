@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.0 · fecha 2026-11-18
 - Contenido cargado: **14 zonas**, **37 componentes**, **27 flujos** (F1–F26 de D1.11, F4 reservado, y 1 ampliaciones), **49 pruebas** (T01–T28 de D1.16 y 21 ampliaciones), 10 objetivos OD, 13 amenazas AM, 9 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **0 FALLA**, 4 con advertencias, 40 PASA, 3 pendientes de P2–P5.
+- Resultado: **0 FALLA**, 5 con advertencias, 46 PASA, 2 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -48,7 +48,13 @@
 | V-41 | swanctl, FRR y VTI generados coinciden con la sección vpn del inventario (cifrado, DPD, vidas, ASN, BGP, MTU, MSS) | PASA | — |
 | V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 1 advertencias |
 | V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA | — |
-| V-50 | Diagramas draw.io: componentes, IP, zonas, colores (Okabe-Ito), flujos F-nn y criticidad contra el inventario | PENDIENTE | pendiente de P2 |
+| V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA con advertencias | Detalle y matriz componente × figura en docs/infra/e1/cobertura-figuras.md |
+| V-51 | Cobertura componente × figura igual al campo `figuras` del inventario | PASA | — |
+| V-52 | Todo celeris_id es un ID del contrato | PASA | — |
+| V-53 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | PASA | — |
+| V-54 | Flujos F-nn: FIG-5.5a ∪ FIG-5.5b completas y etiquetas derivadas del inventario | PASA | — |
+| V-55 | Título, leyenda y panel «Qué aporta y qué pasa si falla» en cada figura | PASA | — |
+| V-56 | Criticidad (borde + texto) y color de zona según CLAUDE.md | PASA | — |
 | V-60 | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | PENDIENTE | pendiente de P3 |
 | V-70 | XLSX de pruebas: hojas y una fila por prueba del YAML, con sus datos | PASA | — |
 | V-71 | XLSX de pruebas: cada prueba cita flujos, componentes, OD, AM, DET y criterios de rúbrica existentes | PASA | — |
@@ -73,11 +79,25 @@ Ninguno.
 - **V-33** — T25 (Modo L): origen BRK01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
 - **V-33** — T25 (Modo L): destino ESX01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
 - **V-42** — 2026-11-21-L: la prueba crítica T23 (Fuga IPv6) está en NO_APLICA, no en PASA
+- **V-50** — FIG-1.1.png es anterior a FIG-1.1.drawio
+- **V-50** — FIG-1.1.pdf es anterior a FIG-1.1.drawio
+- **V-50** — FIG-5.1.png es anterior a FIG-5.1.drawio
+- **V-50** — FIG-5.1.pdf es anterior a FIG-5.1.drawio
+- **V-50** — FIG-5.2.png es anterior a FIG-5.2.drawio
+- **V-50** — FIG-5.2.pdf es anterior a FIG-5.2.drawio
+- **V-50** — FIG-5.3.png es anterior a FIG-5.3.drawio
+- **V-50** — FIG-5.3.pdf es anterior a FIG-5.3.drawio
+- **V-50** — FIG-5.4.png es anterior a FIG-5.4.drawio
+- **V-50** — FIG-5.4.pdf es anterior a FIG-5.4.drawio
+- **V-50** — FIG-5.5a.png es anterior a FIG-5.5a.drawio
+- **V-50** — FIG-5.5a.pdf es anterior a FIG-5.5a.drawio
+- **V-50** — FIG-5.5b.png es anterior a FIG-5.5b.drawio
+- **V-50** — FIG-5.5b.pdf es anterior a FIG-5.5b.drawio
 
 ## Información
 
 - **V-27** — 36 de 92 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 32 elementos pendientes en los YAML; 29 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29']
+- **V-29** — 32 elementos pendientes en los YAML; 31 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31']
 - **V-42** — Resultados de 2026-11-21-L (commit e480bdc): {'PASA': 31, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 56 de 92 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 768 fórmulas recalculadas con LibreOffice sin errores
@@ -99,6 +119,5 @@ Ninguno.
 
 | Gancho | Qué validará | Estado |
 | --- | --- | --- |
-| V-50+ | Diagramas draw.io: componentes, IP, zonas, colores (Okabe-Ito), flujos F-nn y criticidad contra el inventario | pendiente de P2 |
 | V-60+ | XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla | pendiente de P3 |
 | V-80+ | Informe DOCX: 11 secciones, tablas generadas del inventario, figuras y leyendas | pendiente de P5 |

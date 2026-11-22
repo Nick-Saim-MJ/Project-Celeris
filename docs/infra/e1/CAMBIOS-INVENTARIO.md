@@ -58,6 +58,8 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-27 | vacío | Ampliación de la matriz de pruebas: T29–T49, polaridad y celdas críticas (P4) | abierto |
 | CI-28 | decisión de transcripción | Laboratorio emulado ampliado: NAS01 con VLAN 70/71, Wazuh, shield con mTLS, PAC del binario, honey-URL y navegador (P5) | abierto |
 | CI-29 | decisión de transcripción | Flujo F27: MGMT → Internet por TCP 443 para actualizaciones (resuelve CI-05) | abierto |
+| CI-30 | vacío | Capas de defensa en profundidad (D1.9) y salto de la ruta por defecto hacia el ISP fuera de infra/*.yaml | abierto |
+| CI-31 | contradicción | FIG-5.4: FW01 anuncia 10.20.0.0/16 por BGP, las tablas de rutas de la VPC citan 10.20.0.0/14 | abierto |
 
 ## Entradas
 
@@ -379,3 +381,30 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Propuesta:** aceptar F27 y reemplazar el destino por la lista de repositorios cuando exista.
 - **Decide:** equipo del proyecto
 
+### CI-30 — Capas de defensa en profundidad y salto de la ruta por defecto, fuera de la fuente única (P3)
+- **Estado:** abierto
+- **Tipo:** vacío
+- **Dónde:** FIG-5.3 (franja «Defensa en profundidad») y FIG-5.2 (nota «Ruteo»); `infra/gen/drawio.py` (`CAPAS_D19`)
+- **Qué falta:**
+  1. La tabla de nueve capas de D1.9 (perímetro, zona, capa 2, host, aplicación, datos en tránsito, detección, respuesta,
+     recuperación) no está en `infra/*.yaml`. FIG-5.3 la necesita; se transcribió en `CAPAS_D19` con la marca CI-30 en la
+     figura, sin IP ni puertos nuevos.
+  2. La ruta por defecto 0.0.0.0/0 de FW01 sale por la WAN 203.0.113.10, pero el salto siguiente del ISP no está definido.
+     FIG-5.2 lo rotula «salto del ISP no definido: CI-30»; no se inventó una IP.
+- **Propuesta:** añadir a `trazabilidad.yaml` una lista `defensa_profundidad` (capa, controles, componentes) y a
+  `inventory.yaml` el campo `vpn`/`ruteo.salto_isp` (IP de documentación RFC 5737 hasta tener el dato de la DTI [S-xx]).
+  Al hacerlo, `drawio.py` debe leerlos de `Infra` y borrar `CAPAS_D19`.
+- **Decide:** equipo del proyecto (capas) y DTI (salto del ISP)
+
+### CI-31 — Prefijo on-premise: /16 anunciado frente a /14 en las tablas de rutas de la VPC (P3)
+- **Estado:** abierto
+- **Tipo:** contradicción
+- **Dónde:** `inventory.yaml` → `vpn.extremo_onpremise.redes_anunciadas` (10.20.0.0/16) y `redes_anunciadas_futuro`
+  (10.20.0.0/14) frente al `aporta` de AWS-PUB-A y AWS-APP-A (rt-public y rt-private: «10.20.0.0/14 → VGW»). Se ve en FIG-5.4.
+- **Qué dice cada fuente:** FW01 anuncia hoy por BGP solo el /16; el `por_que` de VGW dice que «aprende 10.20.0.0/14» y
+  las tablas de la VPC lo citan como ruta propagada. El /14 es la reserva `CAMPUS-RESUMEN` (agrega las sedes), que según
+  `redes_anunciadas_futuro` se anunciará más adelante. No rompe el ruteo actual (el /16 está dentro del /14), pero el texto
+  describe como presente una ruta que hoy no se anuncia.
+- **Propuesta:** que VGW, AWS-PUB-A y AWS-APP-A digan «10.20.0.0/16 (10.20.0.0/14 cuando se anuncie el resumen)», o anunciar ya el /14.
+  Al resolverlo, quitar la observación de FIG-5.4 (`fig_5_4` en `infra/gen/drawio.py`).
+- **Decide:** equipo del proyecto

@@ -115,18 +115,18 @@ def test_cobertura_exigida_al_100(infra):
 
 def test_las_celdas_criticas_siguen_la_regla(infra):
     criticas = infra.celdas_denegadas_criticas()
-    assert "LAB>MGMT" in criticas and "INTERNET>MGMT" in criticas and "DMZ-HONEY>INTERNET" in criticas and "MGMT>STORAGE" in criticas
+    assert "LAB>MGMT" in criticas and "INTERNET>MGMT" in criticas and "DMZ-HONEY>INTERNET" in criticas and "WIFI-EST>MGMT" in criticas
     assert "SERVERS>LAB" not in criticas
     assert all(infra.matriz_esperada()[tuple(c.split(">"))]["estado"] == "denegado" for c in criticas)
 
 
 def test_quitar_la_prueba_de_un_flujo_permitido_se_detecta(infra):
-    otro = con_pruebas(infra, lambda t, _: t["T34"].update(flujos=[]))
+    otro = con_pruebas(infra, lambda t, _: [x.update(flujos=[f for f in x["flujos"] if f != "F20"]) for x in t.values()])
     assert any("F20" in m for m in niveles(v70.chequeo_cobertura(otro)))
 
 
 def test_una_prueba_solo_negativa_no_cubre_un_flujo_permitido(infra):
-    otro = con_pruebas(infra, lambda t, _: [t[i].update(polaridad="negativa") for i in ("T34",)])
+    otro = con_pruebas(infra, lambda t, _: [x.update(polaridad="negativa") for x in t.values() if "F20" in x["flujos"]])
     assert any("F20" in m for m in niveles(v70.chequeo_cobertura(otro)))
 
 
@@ -201,15 +201,15 @@ def test_una_falla_con_causa_y_accion_pasa(infra, tmp_path):
 
 
 def test_no_aplica_y_parcial_nunca_se_muestran_como_pasa(infra, tmp_path):
-    wb, datos = libro_con_resultados(infra, tmp_path, [res("T08", "PARCIAL", motivo="sin navegador"), res("T12", "NO_APLICA", motivo="sin NAS01"), res("T06", "PASA")])
+    wb, datos = libro_con_resultados(infra, tmp_path, [res("T08", "PARCIAL", motivo="sin navegador"), res("T25", "NO_APLICA", motivo="sin ESXi ni IPMI"), res("T06", "PASA")])
     assert niveles(v70.chequeo_ensayo(infra, wb, datos)) == []
     filas = {f["id"]: f["l_res"] for f in v70.filas_de_matriz(wb)}
-    assert filas["T08"] == "PARCIAL" and filas["T12"] == "NO_APLICA" and filas["T06"] == "PASA" and filas["T01"] == "SIN ENSAYO"
+    assert filas["T08"] == "PARCIAL" and filas["T25"] == "NO_APLICA" and filas["T06"] == "PASA" and filas["T01"] == "SIN ENSAYO"
     # alterar la celda a mano a PASA se detecta
     ws = wb["Matriz"]
-    fila = next(f["_fila"] for f in v70.filas_de_matriz(wb) if f["id"] == "T12")
+    fila = next(f["_fila"] for f in v70.filas_de_matriz(wb) if f["id"] == "T25")
     ws.cell(row=fila, column=xp.IDX["l_res"]).value = "PASA"
-    assert any("T12" in m and "PASA" in m for m in niveles(v70.chequeo_ensayo(infra, wb, datos)))
+    assert any("T25" in m and "PASA" in m for m in niveles(v70.chequeo_ensayo(infra, wb, datos)))
 
 
 # ------------------------------------------------------------------------------------------ fórmulas y actualidad

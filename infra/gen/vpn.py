@@ -80,10 +80,14 @@ def swanctl(x: Infra, lado: str, aws_peers: list[str], wan_campus: str | None = 
     L = [cabecera("#").rstrip(), f"# lado={lado} (emula {'FW01 OPNsense' if lado == 'fw01' else 'el VGW de AWS'})", "connections {"]
     for t, peer in zip(tuneles(x), aws_peers):
         local, remote = (wan, peer) if lado == "fw01" else (peer, wan)
+        # D1.10 v0.4: FW01 está detrás del FortiGate. Escucha en su IP interna (tránsito), se identifica con la IP pública (NAT 1:1) y usa NAT-T (UDP 4500).
+        interna = v["extremo_onpremise"]["ip_interna"] if v["extremo_onpremise"].get("nat_t") else wan
+        local_addr = interna if lado == "fw01" else local
         L += [f"  {t['nombre']} {{",
               "    version = 2",
-              f"    local_addrs = {local}",
+              f"    local_addrs = {local_addr}",
               f"    remote_addrs = {remote}",
+              f"    encap = {'yes' if v['extremo_onpremise'].get('nat_t') else 'no'}",
               f"    proposals = {ike}",
               f"    dpd_delay = {v['dpd']['intervalo_s']}s",
               f"    rekey_time = {v['fase1']['vida_s']}s",
@@ -149,6 +153,8 @@ def vti_up(x: Infra, lado: str, aws_peers: list[str], wan_campus: str | None = N
     for t, peer in zip(tuneles(x), aws_peers):
         ip = t["ip_campus"] if lado == "fw01" else t["ip_aws"]
         local, remote = (wan, peer) if lado == "fw01" else (peer, wan)
+        if lado == "fw01" and v["extremo_onpremise"].get("nat_t"):
+            local = v["extremo_onpremise"]["ip_interna"]         # detrás del NAT 1:1: el VTI usa la IP de la WAN de FW01 (tránsito)
         mask = ipaddress.ip_network(t["red"]).prefixlen
         L += [f"ip tunnel add {t['iface']} mode vti local {local} remote {remote} key {t['n']}",
               f"ip addr add {ip}/{mask} dev {t['iface']}",

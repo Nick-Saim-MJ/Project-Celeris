@@ -1,4 +1,4 @@
-"""Topología del Modo L: las IP de cada nodo son las del inventario y lab/celeris.clab.yml está al día."""
+"""Topología del Modo L v0.4 (CE03 D5.3): las IP de cada nodo son las del inventario y lab/celeris.clab.yml está al día."""
 import re
 
 import yaml
@@ -25,36 +25,81 @@ def test_cada_host_usa_la_ip_del_inventario(infra):
         a = arranque(infra, nodo)
         assert f"ip addr add {ip}/{pref} dev eth1" in a, nodo
         assert f"ip route replace default via {infra.zonas[zona]['gateway']}" in a, nodo
+        assert f"nameserver {infra.zonas[zona]['gateway']}" in a and "nameserver 10.20.20.30" not in a, "el DNS es Unbound de FW01 (D-28)"
+
+
+def test_los_pc_de_prueba_estan_dentro_del_rango_de_su_laboratorio(infra):
+    """labcli02 en LAB-01 y labcli03 en LAB-03 (T52): sus IP son parámetros del laboratorio (CI-48) y caen en el /26 correcto."""
+    import ipaddress
+    rangos = {l["id"]: ipaddress.ip_network(l["cidr"]) for l in infra.inv["rangos_lab"]["laboratorios"]}
+    assert ipaddress.ip_address(lab.P["labcli02"]) in rangos["LAB-01"] and ipaddress.ip_address(lab.P["labcli03"]) in rangos["LAB-03"]
+    for nodo, (zona, par) in lab.CLIENTES_LAB.items():
+        assert f"ip addr add {lab.P[par]}/22 dev eth1" in arranque(infra, nodo)
 
 
 def test_fw01_sim_usa_las_interfaces_e_ip_de_fw01(infra):
+    """v0.4: la WAN de FW01 es 10.20.0.2/29 en la red de tránsito y la ruta por defecto va al FortiGate (10.20.0.1)."""
     a = arranque(infra, "fw01-sim")
     for i in infra.componentes["FW01"]["ips"]:
-        if i["interfaz"] == "wan":
-            continue                    # la WAN del laboratorio es 198.51.100.0/24 (F4.1)
         pref = int(infra.zonas[i["zona"]]["cidr"].split("/")[1])
         assert f"ip addr add {i['ip']}/{pref} dev {i['interfaz']}" in a, i
-    assert f"ip addr add {lab.P['fw01_wan']}/24 dev wan" in a
+    assert "ip addr add 10.20.0.2/29 dev wan" in a and "ip route replace default via 10.20.0.1" in a
+    assert "chronyd" in a and "unbound" in a, "DNS y NTP en FW01 (D-28)"
 
 
-def test_storage_y_backup_tienen_puente_y_solo_backup_llega_a_fw01(infra):
+def test_fgt_sim_hace_nat_1_a_1_solo_de_ipsec_y_portal(infra):
+    archivos = lab.archivos_nodo(infra, "fgt-sim", AVISO)
+    nft = archivos["fgt.nft"]
+    pub = lab.P["fgt_wan"]
+    assert f"ip daddr {pub} udp dport {{ 500, 4500 }}" in nft and f"ip daddr {pub} tcp dport {{ 80, 443 }}" in nft
+    assert nft.count("dnat to 10.20.0.2") == 2, "solo esos puertos se publican"
+    a = archivos["arranque.sh"]
+    assert "ip addr add 10.20.0.1/29 dev eth1" in a and "ip route replace 10.20.0.0/16 via 10.20.0.2" in a
+    assert f"ip addr add {lab.P['wifi_gw']}/16 dev eth3" in a, "ruta al Wi-Fi 172.16.0.0/16"
+
+
+def test_fw01_negocia_nat_t_con_la_ip_publica_como_identidad(infra):
+    sw = lab.archivos_nodo(infra, "fw01-sim", AVISO)["swanctl.conf"]
+    assert "local_addrs = 10.20.0.2" in sw and "encap = yes" in sw
+    assert f"id = {lab.P['fgt_wan']}" in sw
+    assert f"remote_addrs = {lab.P['fgt_wan']}" in lab.archivos_nodo(infra, "vgw-sim", AVISO)["swanctl.conf"]
+    assert "local 10.20.0.2" in lab.archivos_nodo(infra, "fw01-sim", AVISO)["vti-up.sh"]
+
+
+def test_siete_vlan_con_puente_y_sin_las_retiradas(infra):
     t = lab.topologia(infra)["topology"]
     puentes = {n for n in t["nodes"] if n.startswith("br-")}
-    assert puentes == {f"br-vlan{infra.zonas[z]['vlan']}" for z in lab.ZONAS_PUENTE} | {"br-wan"}
-    assert {"br-vlan70", "br-vlan71"} <= puentes
-    fw = [l["endpoints"][1].split(":")[0] for l in t["links"] if l["endpoints"][0].startswith("fw01-sim:")]
-    assert "br-vlan71" in fw and "br-vlan70" not in fw, "STORAGE no tiene interfaz en FW01 (D1.4: sin gateway)"
+    assert puentes == {f"br-vlan{infra.zonas[z]['vlan']}" for z in lab.ZONAS_PUENTE} | {"br-wan", "br-wifi"}
+    assert not ({"br-vlan31", "br-vlan70", "br-vlan71"} & puentes), "VLAN 31, 70 y 71 retiradas (CI-39)"
+    fw = [l["endpoints"][1].split(":")[0] for l in t["links"] if l["endpoints"][0].startswith("fw01-sim:") and l["endpoints"][1].startswith("br-")]
+    assert sorted(fw) == sorted(f"br-vlan{infra.zonas[z]['vlan']}" for z in lab.ZONAS_FW01)
+    assert ["fw01-sim:eth1", "fgt-sim:eth1"] in [l["endpoints"] for l in t["links"]], "la WAN de FW01 va al FortiGate por la red de tránsito"
 
 
-def test_nas01_tiene_las_tres_ips_del_inventario_y_no_reenvia(infra):
-    a = lab.archivos_nodo(infra, "nas01", AVISO)["arranque.sh"]
-    for iface, zona in (("eth1", "STORAGE"), ("eth2", "BACKUP"), ("eth3", "MGMT")):
-        ip = next(i["ip"] for i in infra.componentes["NAS01"]["ips"] if i["zona"] == zona)
-        assert f"ip addr add {ip}/{infra.zonas[zona]['cidr'].split('/')[1]} dev {iface}" in a, zona
-    assert "net.ipv4.ip_forward=0" in a
-    assert "ip route replace default via 10.20.71.1" in a and "10.20.70.1" not in a, "STORAGE no tiene gateway"
-    enlaces = [l["endpoints"] for l in lab.topologia(infra)["topology"]["links"] if l["endpoints"][0].startswith("nas01:")]
-    assert [e[1].split(":")[0] for e in enlaces] == ["br-vlan70", "br-vlan71", "br-vlan10"]
+def test_los_nodos_retirados_no_existen_y_los_nuevos_si(infra):
+    nodos = lab.topologia(infra)["topology"]["nodes"]
+    for retirado in ("svc01", "obs01", "ids01", "nas01", "probe01", "shield01", "ctrlr-sim", "waf01", "web01"):
+        assert retirado not in nodos, retirado
+    for nuevo in ("fgt-sim", "byod01", "enc01", "labcli02", "labcli03", "ctrl01", "origin-sim", "gw-sim", "portal01"):
+        assert nuevo in nodos, nuevo
+
+
+def test_wifi_sim_conecta_byod01_con_fgt_sim_y_gw_sim_cuelga_de_vgw_sim(infra):
+    enlaces = [l["endpoints"] for l in lab.topologia(infra)["topology"]["links"]]
+    assert any(e[0] == "byod01:eth1" and e[1].startswith("br-wifi:") for e in enlaces)
+    assert any(e[0] == "fgt-sim:eth3" and e[1].startswith("br-wifi:") for e in enlaces)
+    assert ["vgw-sim:eth2", "gw-sim:eth1"] in enlaces
+    a = lab.archivos_nodo(infra, "gw-sim", AVISO)["arranque.sh"]
+    assert "ip addr add 10.30.0.10/24 dev eth1" in a and "ip route replace default via 10.30.0.1" in a
+    assert "proxy_pass https://10.20.20.10:443" in lab.archivos_nodo(infra, "gw-sim", AVISO)["nginx.conf"]
+    assert "proxy_ssl_certificate /pki/gw-sim.pem" in lab.archivos_nodo(infra, "gw-sim", AVISO)["nginx.conf"]
+
+
+def test_portal01_une_el_waf_y_el_sitio_estatico(infra):
+    a = lab.archivos_nodo(infra, "portal01", AVISO)
+    assert "root /lab/web" in a["nginx.conf"] and "modsecurity on" in a["nginx.conf"] and "proxy_pass" not in a["nginx.conf"]
+    assert "web/index.html" in a and "<script" not in a["web/index.html"]
+    assert "ip addr add 10.20.40.10/24 dev eth1" in a["arranque.sh"]
 
 
 def test_siem01_recibe_el_syslog_solo_por_tls_en_6514(infra):
@@ -73,11 +118,13 @@ def test_todo_agente_de_wazuh_se_enrola_en_siem01_por_f13(infra):
         assert "sh /lab/agente.sh &" in lab.archivos_nodo(infra, nodo, AVISO)["arranque.sh"], nodo
 
 
-def test_ids01_captura_vlan_10_20_31_y_50(infra):
-    enlaces = [e for l in lab.topologia(infra)["topology"]["links"] for e in l["endpoints"] if e.startswith("ids01:")]
-    assert len(enlaces) == 5            # eth1 (gestión) + 4 capturas
-    puentes = [l["endpoints"][1].split(":")[0] for l in lab.topologia(infra)["topology"]["links"] if l["endpoints"][0].startswith("ids01:")]
-    assert puentes == ["br-vlan50", "br-vlan10", "br-vlan20", "br-vlan31", "br-vlan50"]
+def test_la_deteccion_de_red_es_suricata_de_fw01_en_lab_y_servers(infra):
+    """DET-02 (v0.4): ya no hay ids01 ni captura por espejo; Suricata corre en fw01-sim sobre las interfaces LAB y SERVERS."""
+    archivos = lab.archivos_nodo(infra, "fw01-sim", AVISO)
+    assert "- interface: vlan30" in archivos["suricata.yaml"] and "- interface: vlan20" in archivos["suricata.yaml"]
+    assert "sid:9000001" in archivos["local.rules"]
+    assert "suricata --af-packet" in archivos["arranque.sh"]
+    assert "OPENSSL:10.20.50.10:6514" in archivos["eve-a-siem.sh"], "los eventos llegan a Wazuh por F14, no por un agente"
 
 
 def test_todos_los_enlaces_apuntan_a_nodos_existentes(infra):
@@ -101,15 +148,31 @@ def test_el_aviso_se_convierte_en_html_estatico(infra):
     assert h.startswith("<!doctype html>") and "<script" not in h
 
 
-def test_edge_acepta_solo_los_clientes_de_f1(infra):
-    c = lab.archivos_nodo(infra, "edge01", AVISO)["config.toml"]
-    assert 'allowed_clients = ["10.20.32.0/22", "10.20.31.0/24"]' in c
-    assert 'listen = "10.20.60.10:3128"' in c and 'admin_listen = "10.20.60.10:9128"' in c
+def test_edge_acepta_solo_los_rangos_habilitados_y_trata_el_wifi_como_byod(infra):
+    """REQ-F-10 y REQ-F-32: allowed_clients = rangos /26 habilitados + infraestructura de LAB + Wi-Fi; REQ-F-36: byod_networks = el Wi-Fi."""
+    import tomllib
+    cfg = tomllib.loads(lab.archivos_nodo(infra, "edge01", AVISO)["config.toml"])
+    esperados = [l["cidr"] for l in infra.inv["rangos_lab"]["laboratorios"] if l["habilitado"]] + ["10.20.35.0/24", "172.16.0.0/16"]
+    assert cfg["allowed_clients"] == esperados and cfg["byod_networks"] == ["172.16.0.0/16"]
+    assert cfg["listen"] == "10.20.60.10:3128" and cfg["admin_listen"] == "10.20.60.10:9128"
+    assert "upstream_parent" not in cfg, "sin shield (D-19)"
 
 
-def test_el_pac_de_svc01_es_el_generado(infra):
-    from gen import pac
-    assert lab.archivos_nodo(infra, "svc01", AVISO)["wpad.dat"] == pac.generar(infra)
+def test_un_laboratorio_deshabilitado_sale_de_allowed_clients(infra):
+    import copy
+    import tomllib
+    from celeris_infra import Infra
+    inv = copy.deepcopy(infra.inv)
+    next(l for l in inv["rangos_lab"]["laboratorios"] if l["id"] == "LAB-03")["habilitado"] = False
+    cfg = tomllib.loads(lab.archivos_nodo(Infra(inv, infra.pru, infra.traz), "edge01", AVISO)["config.toml"])
+    assert "10.20.32.128/26" not in cfg["allowed_clients"] and "10.20.32.0/26" in cfg["allowed_clients"]
+
+
+def test_los_dos_nodos_sirven_el_pac_con_el_binario(infra):
+    for nodo in ("edge01", "edge02"):
+        archivos = lab.archivos_nodo(infra, nodo, AVISO)
+        assert "celeris-cache pac /lab/config.toml > /pac/wpad.dat" in archivos["arranque.sh"] and "nginx -c /lab/nginx.conf" in archivos["arranque.sh"], nodo
+    assert not any("svc01" in n for n in lab.todos_los_nodos())
 
 
 def test_edge01_genera_su_pac_con_el_binario_desde_el_inventario(infra):
@@ -130,23 +193,22 @@ def test_edge01_genera_su_pac_con_el_binario_desde_el_inventario(infra):
     assert all(linea in generado for linea in esperado) and f'host === "{cfg["pac_host"]}"' in generado
 
 
-def test_los_nodos_edge_envian_los_miss_al_shield_con_mtls_y_conocen_la_honey_url(infra):
+def test_los_nodos_edge_conocen_la_honey_url(infra):
     import tomllib
     for nodo in ("edge01", "edge02"):
         cfg = tomllib.loads(lab.archivos_nodo(infra, nodo, AVISO)["config.toml"])
-        puerto_f9 = infra.flujos["F9"]["protocolos"][0]["puertos"][0]
-        assert cfg["upstream_parent"] == f"10.30.10.10:{puerto_f9}"
-        assert cfg["upstream_parent_cert"] == f"/pki/{nodo}.pem" and cfg["upstream_parent_key"] == f"/pki/{nodo}.key"
         assert cfg["honey_urls"] == [lab.P["honey_url"]]
-    sh = tomllib.loads(lab.archivos_nodo(infra, "shield01", AVISO)["config.toml"])
-    assert sh["shield_listen"] == "10.30.10.10:8443" and sh["listen"].startswith("127.0.0.1:")
-    assert sh["shield_client_ca"] == "/pki/nodos-ca.pem" and sh["admin_tls"] is True
+
+
+def test_ctrl01_es_una_consola_de_prueba_con_sesiones_campus_y_remoto(infra):
+    a = lab.archivos_nodo(infra, "ctrl01", AVISO)
+    assert "ip addr add 10.20.20.10/24 dev eth1" in a["arranque.sh"] and "REQ-F-37" in a["consola.py"] and "403" in a["consola.py"]
 
 
 def test_las_reglas_de_fw01_sim_son_las_del_generador(infra):
     from gen import nftables
     assert lab.archivos_nodo(infra, "fw01-sim", AVISO)["fw01sim.nft"] == nftables.generar(
-        infra, modo="piloto", ventana=False, wan_ip=lab.P["fw01_wan"], aws_peers=lab.P["aws_peers"])
+        infra, modo="piloto", ventana=False, aws_peers=lab.P["aws_peers"])
 
 
 def test_ningun_archivo_generado_contiene_llaves(infra):

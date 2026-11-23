@@ -314,6 +314,8 @@ class Infra:
             if c["estado"] != "denegado":
                 continue
             celda = f"{o}>{d}"
+            if d == "WIFI-EST":
+                continue          # D1.8 v0.4 no tiene columna WIFI-EST (CI-45): se acepta denegado, sin prueba dedicada
             if o == "WIFI-EST" and d in ZONAS_INTERNAS:
                 out[celda] = "WIFI-EST → interna"
             elif o == "DMZ-HONEY":

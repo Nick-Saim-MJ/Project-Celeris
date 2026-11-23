@@ -228,7 +228,7 @@ def chequeo_formulas(x: ci.Infra, ruta: Path, datos: dict | None) -> list[tuple[
             if (cubiertos, total) != (cob[dim]["cubiertos"], cob[dim]["total"]):
                 r.append(("error", f"Cobertura «{fila}»: la hoja calcula {cubiertos}/{total} y la biblioteca {cob[dim]['cubiertos']}/{cob[dim]['total']}", "Regenere con make matrices"))
         # El conteo del ensayo L de la hoja coincide con resultados.json
-        resultados = [z["resultado"] for z in (datos or {}).get("resultados", [])]
+        resultados = [z["resultado"] for z in (datos or {}).get("resultados", []) if z.get("id") in x.pruebas]   # las retiradas (v0.4) no cuentan
         esperados = {e: resultados.count(e) for e in ("PASA", "FALLA", "PARCIAL", "NO_APLICA")}
         esperados["SIN ENSAYO"] = len(x.pruebas) - len(resultados)
         we = wb["Ensayo L"]

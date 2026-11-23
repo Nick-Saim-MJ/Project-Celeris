@@ -1525,13 +1525,14 @@ pruebas:
     comando: "for i in $(seq 1 10); do curl -sk -o /dev/null -w \"%{http_code}\\n\" https://<IP pública de EC2-GW>/ -d 'usuario=encargado&clave=incorrecta'; done ; un inicio de sesión con clave correcta y sin segundo factor"
     resultado_esperado: "Rechazo de cada intento, bloqueo temporal y alerta en Wazuh"
     criterio_aprobacion:
+      - { tipo: regex, sobre: stdout, patron: "^200$", comando_adicional: "inicio de sesión con clave correcta y segundo factor válido", nota: "control positivo de F29: sin él, el rechazo no demuestra nada" }
       - { tipo: contador, metrica: sesiones_iniciadas_sin_segundo_factor, operador: "==", valor: 0 }
       - { tipo: regex, sobre: stdout, patron: "(?m)^(401|403|429)$" }
       - { tipo: contador, metrica: intentos_aceptados_tras_el_bloqueo, operador: "==", valor: 0 }
       - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
     automatizable: true
     critica: false
-    polaridad: negativa
+    polaridad: mixta
     evidencia_a_capturar: ["Códigos HTTP de los 10 intentos", "Registro de auditoría de la consola", "Alerta de Wazuh (JSON)"]
     modos: [L, A, H]
     semestre: S2
@@ -1633,16 +1634,17 @@ pruebas:
     nombre: "WIFI-EST hacia CTRL01, MGMT y LAB"
     origen: WIFI-EST
     destino: [CTRL01, MGMT, LAB]
-    flujos: [F31]
+    flujos: [F31, F32]
     flujos_justificacion: "Prueba de denegación: WIFI-EST solo tiene F31 (EDGE) y F32 (PORTAL01); F31 se usa solo como control positivo"
     componentes: [WIFI-EST, FW01, CTRL01, ESX01, LABCLI01]
     objetivo_que_valida: "El Wi-Fi de estudiantes no alcanza la consola, la gestión ni los laboratorios; solo llega a EDGE y al portal (F31, F32)"
-    precondicion: "Equipo BYOD en 172.16.0.0/16 (byod01 en el Modo L); objetivos: CTRL01 10.20.20.10, ESX01 10.20.10.10, LABCLI01 10.20.35.50; control positivo: EDGE01 10.20.60.10:3128"
-    comando: "nmap -Pn -sS -p 22,443,3128,5432,8443,9128,2049 10.20.20.10 10.20.10.10 10.20.35.50 ; nc -zv -w3 10.20.60.10 3128"
+    precondicion: "Equipo BYOD en 172.16.0.0/16 (byod01 en el Modo L); objetivos: CTRL01 10.20.20.10, ESX01 10.20.10.10, LABCLI01 10.20.35.50; controles positivos: EDGE01 10.20.60.10:3128 (F31) y PORTAL01 10.20.40.10:443 (F32)"
+    comando: "nmap -Pn -sS -p 22,443,3128,5432,8443,9128,2049 10.20.20.10 10.20.10.10 10.20.35.50 ; nc -zv -w3 10.20.60.10 3128 ; nc -zv -w3 10.20.40.10 443"
     resultado_esperado: "Ningún puerto abierto en CTRL01, MGMT ni LAB; el control positivo hacia EDGE01:3128 sí abre; denegaciones registradas"
     criterio_aprobacion:
       - { tipo: contador, metrica: puertos_open, operador: "==", valor: 0 }
-      - { tipo: exit_code, valor: 0, comando_adicional: "nc -zv -w3 10.20.60.10 3128", nota: "control positivo: sin él, la denegación no demuestra nada" }
+      - { tipo: exit_code, valor: 0, comando_adicional: "nc -zv -w3 10.20.60.10 3128 ; nc -zv -w3 10.20.40.10 443", nota: "control positivo: sin él, la denegación no demuestra nada" }
+      - { tipo: exit_code, valor: 0, comando_adicional: "nc -zv -w3 10.20.40.10 443", nota: "control positivo de F32" }
       - { tipo: contador, metrica: paquetes_denegados_por_fw01, operador: ">", valor: 0 }
     automatizable: true
     critica: true
@@ -1703,9 +1705,9 @@ pruebas:
     criterio_aprobacion:
       - { tipo: exit_code, valor: 0, comando_adicional: "restic restore latest" }
       - { tipo: umbral, metrica: rto_h, operador: "<=", valor: 2 }
-      - { tipo: manual, descripcion: "La consola restaurada abre su pantalla de inicio con las fuentes y laboratorios del respaldo" }
-      - { tipo: manual, descripcion: "EC2-DR y NAT-DR destruidas tras el simulacro (tofu destroy) y sin recursos con Ttl vencida" }
-    automatizable: false
+      - { tipo: regex, sobre: stdout, patron: "^200$", comando_adicional: "curl -sk -o /dev/null -w \"%{http_code}\" https://localhost/   # en EC2-DR, con la consola restaurada" }
+      - { tipo: contador, metrica: recursos_con_ttl_tras_tofu_destroy, operador: "==", valor: 0, comando_adicional: "tofu destroy y verificación por etiqueta Ttl" }
+    automatizable: true
     critica: false
     polaridad: positiva
     evidencia_a_capturar: ["Tiempo de la restauración", "Captura de la consola restaurada", "Salida de tofu destroy y verificación"]
@@ -1724,7 +1726,7 @@ pruebas:
     nombre: "Secuestro de WPAD"
     origen: LABCLI01
     destino: EDGE01
-    flujos: [F3]
+    flujos: [F3, F2]
     componentes: [LABCLI01, EDGE01, EDGE02, FW01]
     objetivo_que_valida: "Un equipo de LAB que anuncia `wpad` por DNS y DHCP no engaña a las PCs con la URL fija del PAC por GPO (AM-02)"
     precondicion: "LABCLI01 con la URL fija http://pac.celeris.internal/wpad.dat por GPO; un equipo de LAB (KALI01) anuncia el nombre wpad por DNS y DHCP"
@@ -1733,10 +1735,11 @@ pruebas:
     criterio_aprobacion:
       - { tipo: regex, sobre: stdout, patron: "FindProxyForURL", comando_adicional: "curl http://pac.celeris.internal/wpad.dat" }
       - { tipo: regex, sobre: stdout, patron: "10\\.20\\.60\\.1[01]:3128", comando_adicional: "curl http://pac.celeris.internal/wpad.dat" }
+      - { tipo: exit_code, valor: 0, comando_adicional: "nslookup pac.celeris.internal 10.20.32.1", nota: "el nombre fijo se resuelve con el DNS de FW01 (F2)" }
       - { tipo: contador, metrica: peticiones_a_la_url_falsa_wpad, operador: "==", valor: 0 }
     automatizable: true
     critica: true
-    polaridad: negativa
+    polaridad: mixta
     evidencia_a_capturar: ["PAC obtenido por LABCLI01", "Captura de las consultas de nombre y de las peticiones HTTP"]
     modos: [L, H]
     semestre: S2

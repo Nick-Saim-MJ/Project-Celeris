@@ -53,8 +53,8 @@ def _v(x): return x.inv["vpn"]
 PARAMETROS_VPN = {
     "T01": [("Ruta ON-PREM → AWS por el túnel activo", lambda x: f"{_v(x)['extremo_onpremise']['redes_anunciadas'][0]} → {_v(x)['extremo_aws']['redes_anunciadas'][0]}; túnel activo {_v(x)['tuneles'][0]['red_interna']}"),
             ("ASN de cada extremo (BGP)", lambda x: f"{_v(x)['extremo_onpremise']['asn']} (campus) y {_v(x)['extremo_aws']['asn']} (AWS)")],
-    "T02": [("Sentido AWS → ON-PREM: solo lo que F16 permite", lambda x: f"F16: {x.flujos['F16']['protocolos'][0]['proto']}/{x.flujos['F16']['protocolos'][0]['puertos'][0]} desde EC2-CTRLR hacia DB01"),
-            ("Protección de F16", lambda x: x.flujos["F16"]["proteccion"]["tipo"])],
+    "T02": [("Sentido AWS → ON-PREM: solo lo que F30 permite", lambda x: f"F30: {x.flujos['F30']['protocolos'][0]['proto']}/{x.flujos['F30']['protocolos'][0]['puertos'][0]} desde EC2-GW hacia CTRL01"),
+            ("Protección de F30", lambda x: x.flujos["F30"]["proteccion"]["tipo"])],
     "T03": [("Zonas no autorizadas no cruzan hacia AWS", lambda x: "flujos sobre la VPN: " + ", ".join(_v(x)["flujos_sobre_vpn"]))],
     "T04": [("Sin exposición pública del lado AWS", lambda x: f"redes de AWS: {_v(x)['extremo_aws']['redes_anunciadas'][0]}; sin ruta desde Internet")],
     "T05": [("Túneles en activo y respaldo", lambda x: ", ".join(f"{t['id']} ({t['rol']}) {t['red_interna']}" for t in _v(x)["tuneles"])),
@@ -63,7 +63,9 @@ PARAMETROS_VPN = {
             ("DPD", lambda x: f"cada {_v(x)['dpd']['intervalo_s']} s, acción {_v(x)['dpd']['accion']}"),
             ("Convergencia meta", lambda x: f"≤ {_v(x)['convergencia_meta_s']} s (OD-05)")],
     "T21": [("MTU del túnel", lambda x: f"{_v(x)['mtu']} bytes"), ("MSS clamping", lambda x: f"{_v(x)['mss_clamping']} bytes")],
-    "T26": [("Cabeceras que identifican al cliente no cruzan la VPN (REQ-F-28)", lambda x: "sin X-Forwarded-For, Via ni IP de clientes en F9"),
+    "T58": [("EC2-GW solo alcanza lo que F30 y F13 permiten", lambda x: "CTRL01:443 (F30) y SIEM01:1514/1515 (F13) por la VPN"),
+            ("Flujos que cruzan la VPN", lambda x: ", ".join(_v(x)["flujos_sobre_vpn"]))],
+    "T26": [("Cabeceras que identifican al cliente no salen del campus (REQ-F-28, F8)", lambda x: "sin X-Forwarded-For, Via ni IP de clientes en la petición saliente (F8)"),
             ("Cifrado fase 1", lambda x: f"{_v(x)['fase1']['cifrado']}, {_v(x)['fase1']['prf']}, {_v(x)['fase1']['dh']}, vida {_v(x)['fase1']['vida_s']} s"),
             ("Cifrado fase 2", lambda x: f"{_v(x)['fase2']['cifrado']}, PFS {_v(x)['fase2']['pfs']}, vida {_v(x)['fase2']['vida_s']} s")],
     "T36": [("mTLS del nodo hacia el plano de control (F10, dentro del campus)", lambda x: x.flujos["F10"]["proteccion"]["tipo"])],
@@ -436,7 +438,7 @@ def hoja_vpn(wb, x: Infra, resultados: dict) -> None:
         criterio = "\n".join("• " + describir_criterio(c) for c in t["criterio_aprobacion"])
         for k, (texto, valor) in enumerate(params):
             xc.escribir_fila(ws, fila, [tid, t["nombre"], texto, valor(x), criterio if k == 0 else "", ", ".join(t["modos"]), _resultado_l(res) if k == 0 else ""],
-                             centrar={1, 6, 7}, alterna=(tid in ("T01", "T03", "T05", "T26", "T36")))
+                             centrar={1, 6, 7}, alterna=(tid in ("T01", "T03", "T05", "T26", "T36", "T58")))
             if k == 0:
                 xc.celda_estado(ws.cell(row=fila, column=7), _resultado_l(res))
             fila += 1

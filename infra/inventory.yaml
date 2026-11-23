@@ -1012,7 +1012,7 @@ componentes:
     objetivos: [OD-03, OD-10, OD-11]
     figuras: [FIG-1.1, FIG-5.1, FIG-5.2, FIG-5.3, FIG-5.5a]
     supuestos: [S-01, S-26]
-    emulacion_lab: { nodo: labcli01, equivalencia: funcional, nota: "labcli01 y labcli03 representan PCs de LAB-01 y LAB-03 (D5.3); no se emulan los 400 equipos" }
+    emulacion_lab: { nodo: labcli01, equivalencia: funcional, nota: "labcli02 (LAB-01) y labcli03 (LAB-03) representan PCs de laboratorio (D5.3, CI-48); no se emulan los 400 equipos" }
     cambio: CI-40
 
   - id: WIFI-EST
@@ -1338,7 +1338,7 @@ componentes:
     objetivos: [OD-08, OD-12]
     figuras: [FIG-1.1, FIG-5.1, FIG-5.2, FIG-5.3, FIG-5.4, FIG-5.5b]
     supuestos: [S-13]
-    emulacion_lab: { nodo: gw-sim, equivalencia: mismo_producto, nota: "Caddy + Coraza con la misma configuración, detrás de vgw-sim (D5.3)" }
+    emulacion_lab: { nodo: gw-sim, equivalencia: funcional, nota: "nginx + ModSecurity + OWASP CRS detrás de vgw-sim; D5.3 dice Caddy + Coraza, que la imagen base no trae (CI-48)" }
     cambio: CI-36
 
   - id: S3
@@ -1541,7 +1541,6 @@ flujos:
     adr: [D-05, D-28]
     req: []
     nota: "v0.4: el destino es FW01 (D-28); sin LAB-TEST ni SVC01. DMZ-HONEY queda fuera: solo envía al SIEM (D1.9; CI-47 resuelto el 2026-11-22)"
-    sin_prueba_justificacion: "D1.16 v0.4 no tiene una prueba propia de DNS y NTP hacia las zonas; lo ejercitan T09, T24, T33 y T42 desde FW01"
 
   - id: F3
     estado: activo
@@ -2084,7 +2083,6 @@ flujos:
     req: [REQ-RN-05]
     ampliacion: true
     cambio: CI-38
-    sin_prueba_justificacion: "D1.16 v0.4 no tiene una prueba propia del aviso para BYOD: T56 y T57 cubren F31 y las denegaciones de WIFI-EST, y el portal es el mismo de F5 (T16 a T18)"
 
 # Matriz zona × zona esperada (D1.8 v0.4), transcrita celda por celda. Fila = origen; columna = destino.
 # estado: permitido | denegado | no_aplica ("—" del documento). `bloqueados` = flujos bloqueados explícitos (✖ Fn).

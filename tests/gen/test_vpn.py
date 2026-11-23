@@ -43,8 +43,8 @@ def test_frr_asn_temporizadores_y_prepending(infra):
 
 def test_vti_mtu_direcciones_y_extremos(infra):
     t = vpn.vti_up(infra, "fw01", AWS_PEERS)
-    assert "ip tunnel add vti1 mode vti local 203.0.113.10 remote 198.51.100.21 key 1" in t
-    assert "ip tunnel add vti2 mode vti local 203.0.113.10 remote 198.51.100.22 key 2" in t
+    assert "ip tunnel add vti1 mode vti local 10.20.0.2 remote 198.51.100.21 key 1" in t  # NAT-T: la IP de tránsito de FW01
+    assert "ip tunnel add vti2 mode vti local 10.20.0.2 remote 198.51.100.22 key 2" in t
     assert "ip addr add 169.254.10.2/30 dev vti1" in t and "ip addr add 169.254.11.2/30 dev vti2" in t
     assert t.count("mtu 1400") == 2 and "disable_policy=1" in t
     g = vpn.vti_up(infra, "vgw", AWS_PEERS)
@@ -105,3 +105,10 @@ def test_snapshots(infra, lado):
     comparar_snapshot(f"swanctl-{lado}.conf", vpn.swanctl(infra, lado, AWS_PEERS))
     comparar_snapshot(f"frr-{lado}.conf", vpn.frr(infra, lado))
     comparar_snapshot(f"vti-{lado}.sh", vpn.vti_up(infra, lado, AWS_PEERS))
+
+
+def test_nat_t_fw01_escucha_en_su_ip_de_transito_y_se_identifica_con_la_publica(infra):
+    t = vpn.swanctl(infra, "fw01", AWS_PEERS)
+    assert t.count("local_addrs = 10.20.0.2") == 2 and t.count("encap = yes") == 2
+    assert "id = 203.0.113.10" in t
+    assert "remote_addrs = 203.0.113.10" in vpn.swanctl(infra, "vgw", AWS_PEERS)

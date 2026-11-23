@@ -76,6 +76,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-45 | vacío | La matriz D1.8 v0.4 no tiene columna WIFI-EST | resuelto (2026-11-22: se acepta «denegado») |
 | CI-46 | vacío | nacl-private de D2.5: «puertos de servicio» sin definir | resuelto (2026-11-22: TCP 443 desde pub-a y efímeros) |
 | CI-47 | contradicción | F2 «zonas internas» frente a DMZ-HONEY («solo envía al SIEM», D1.9) | resuelto (2026-11-22: F2 excluye DMZ-HONEY) |
+| CI-48 | decisión de transcripción | Laboratorio emulado v0.4 (I2): parámetros que el inventario no fija (WAN y IP públicas, labcli02/03, byod01, gw-sim) y equivalencias distintas de D5.3 | abierto |
 
 ## Entradas
 
@@ -633,3 +634,17 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto
 - **Propuesta:** quitar DMZ-HONEY del origen de F2.
 - **Efecto al resolver:** corregir `origen` y `regla_fw` de F2 y quitar `pendiente`.
+
+### CI-48 — Laboratorio emulado v0.4: parámetros del laboratorio y equivalencias (I2)
+- **Estado:** abierto
+- **Tipo:** decisión de transcripción
+- **Dónde:** `infra/gen/lab.py` (`PARAMETROS_LAB`, `NODOS`, `CLIENTES_LAB`), `lab/celeris.clab.yml`
+- **Parámetros que el inventario no fija y el laboratorio necesita (solo Modo L, nada cambia el diseño):**
+  1. IP pública del FortiGate en el laboratorio: `198.51.100.10` sustituye a 203.0.113.10 (F4.1); `ext01` 198.51.100.100; `origin-sim` 198.51.100.110; IP pública de EC2-GW 198.51.100.30; extremos AWS 198.51.100.21 y .22.
+  2. `vgw-sim` toma 10.30.0.1 dentro de pub-a (junto a EC2-GW 10.30.0.10); la VPC real no tiene ese equipo.
+  3. Wi-Fi: `fgt-sim` 172.16.0.1 y `byod01` 172.16.0.50 dentro de 172.16.0.0/16 [S-28].
+  4. PC de prueba: `labcli02` 10.20.32.2 (LAB-01, control positivo de T52) y `labcli03` 10.20.32.130 (LAB-03, el laboratorio que T52 deshabilita). LABCLI01 sigue en 10.20.35.50 (rango de infraestructura).
+  5. Nombres de prueba: `descargas.example.com` (origin-sim, T55) y `panel.celeris.internal` (EC2-GW).
+- **Equivalencias distintas de D5.3:** `gw-sim` y `portal01` son nginx + ModSecurity + OWASP CRS, no Caddy + Coraza (la imagen base no los trae). `fgt-sim` no emula FortiGuard ni la inspección SSL, de modo que la exclusión de EDGE01/02 [S-29] no se puede probar en el Modo L. No hay sincronización NTS hacia arriba.
+- **Propuesta:** dar por buenos los parámetros 1–5 para el laboratorio; construir una imagen con Caddy + Coraza si el equipo quiere «mismo producto» en gw-sim.
+- **Decide:** equipo del proyecto

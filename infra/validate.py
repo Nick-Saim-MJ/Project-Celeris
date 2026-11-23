@@ -1107,9 +1107,15 @@ def vpn_contra_inventario(x: Infra, lado: str, swanctl_txt: str, frr_txt: str, v
         for k, esp in comprobar:
             if esp is not None and campo(k) != esp:
                 r.append(E(f"{pref} {nombre}: {k} = {campo(k)} y el inventario pide {esp}", "Regenere desde la sección vpn del inventario"))
+        on = v["extremo_onpremise"]
         propio = "local_addrs" if lado == "fw01" else "remote_addrs"
-        if campo(propio) != v["extremo_onpremise"]["ip_publica"]:
-            r.append(E(f"{pref} {nombre}: {propio} = {campo(propio)} y la IP pública de FW01 es {v['extremo_onpremise']['ip_publica']}", "Regenere"))
+        esperado_prop = on["ip_interna"] if (lado == "fw01" and on.get("nat_t")) else on["ip_publica"]     # NAT-T: FW01 escucha en su IP de tránsito
+        if campo(propio) != esperado_prop:
+            r.append(E(f"{pref} {nombre}: {propio} = {campo(propio)} y el inventario pide {esperado_prop}", "Regenere"))
+        if on.get("nat_t") and campo("encap") != "yes":
+            r.append(E(f"{pref} {nombre}: encap = {campo('encap')}; con NAT-T (D1.10) debe ser yes", "Regenere"))
+        if lado == "fw01" and re.search(r"local \{[^}]*id = ([^\n]+)", cuerpo, re.S) and re.search(r"local \{[^}]*id = ([^\n]+)", cuerpo, re.S).group(1).strip() != on["ip_publica"]:
+            r.append(E(f"{pref} {nombre}: la identidad IKE de FW01 debe ser la IP pública {on['ip_publica']}", "Regenere"))
     # ---- FRR
     asn = re.search(r"^router bgp (\d+)", frr_txt, re.M)
     if not asn or int(asn.group(1)) != mio["asn"]:

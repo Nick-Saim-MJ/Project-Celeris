@@ -98,7 +98,6 @@ case "${1:-}" in
     wazuh_config
     sh lab/generated/puentes.sh up
     containerlab deploy -t "$TOPO" --reconfigure
-    sh lab/generated/espejo.sh || echo "aviso: el espejo hacia ids01 no se pudo configurar" >&2
     esperar
     ;;
   down)

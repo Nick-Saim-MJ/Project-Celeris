@@ -1524,7 +1524,7 @@ flujos:
 
   - id: F2
     estado: activo
-    origen: [MGMT, SERVERS, LAB, DMZ-SVC, DMZ-HONEY, SECURITY, EDGE]
+    origen: [MGMT, SERVERS, LAB, DMZ-SVC, SECURITY, EDGE]
     destino: [FW01]
     destino_detalle: "FW01 (.1 de cada VLAN): Unbound con DNSSEC y NTP"
     protocolos: [{ proto: udp, puertos: [53, 123] }, { proto: tcp, puertos: [53] }]
@@ -1535,14 +1535,12 @@ flujos:
       detalle: "DNS interno sin cifrar con validación DNSSEC en el resolvedor; NTP interno sin autenticar (riesgo bajo, dentro de la LAN)"
     riesgo_residual: "Bajo: consultas DNS y NTP legibles y falsificables dentro de la LAN; el resolvedor valida DNSSEC"
     modo: ambos
-    regla_fw: "F2 ZONAS-INTERNAS > FW01 dns+ntp tcp,udp/53 udp/123"
+    regla_fw: "F2 ZONAS-INTERNAS(sin DMZ-HONEY) > FW01 dns+ntp tcp,udp/53 udp/123"
     figura: FIG-5.5a
     objetivos: [OD-04]
     adr: [D-05, D-28]
     req: []
-    pendiente: true
-    cambio: CI-47
-    nota: "v0.4: el destino es FW01 (D-28); sin LAB-TEST ni SVC01. «Zonas internas» incluye DMZ-HONEY, que D1.9 limita a enviar al SIEM (CI-47)"
+    nota: "v0.4: el destino es FW01 (D-28); sin LAB-TEST ni SVC01. DMZ-HONEY queda fuera: solo envía al SIEM (D1.9; CI-47 resuelto el 2026-11-22)"
     sin_prueba_justificacion: "D1.16 v0.4 no tiene una prueba propia de DNS y NTP hacia las zonas; lo ejercitan T09, T24, T33 y T42 desde FW01"
 
   - id: F3
@@ -1847,20 +1845,18 @@ flujos:
     origen: [JMP01]
     destino: ["ESX01:vmk0", IPMI01, SW-CORE01, UPS01, FW01, SERVERS, LAB, DMZ-SVC, DMZ-HONEY, SECURITY, EDGE]
     destino_detalle: "Hosts listados de cada zona"
-    protocolos: [{ proto: tcp, puertos: [22, 443] }]
+    protocolos: [{ proto: tcp, puertos: [22, 443, 9128] }]
     proposito: "Administración"
     accion: permitir
     proteccion: { tipo: ssh, detalle: "SSH con llave + MFA; interfaces web por HTTPS" }
     riesgo_residual: "Medio: JMP01 es un punto de alto valor; se mitiga con MFA, registro de sesiones y aprobación de cuatro ojos"
     modo: ambos
-    regla_fw: "F20 JMP01 > HOSTS-LISTADOS admin tcp/22,443"
+    regla_fw: "F20 JMP01 > HOSTS-LISTADOS admin tcp/22,443,9128"
     figura: FIG-5.5b
     objetivos: [OD-02]
     adr: []
     req: []
-    pendiente: true
-    cambio: CI-44
-    nota: "D1.11 v0.4 lista solo TCP 22 y 443; el código y T27 usan además 9128 (administración del nodo) y el dashboard de Wazuh podría usar 5601 (CI-44)"
+    nota: "D1.11 v0.4 lista TCP 22 y 443; se agrega 9128 (administración del nodo, REQ-NF-14, T27) por decisión del equipo (CI-44 resuelto el 2026-11-22)"
 
   - id: F21
     estado: activo
@@ -2093,7 +2089,7 @@ flujos:
 # Matriz zona × zona esperada (D1.8 v0.4), transcrita celda por celda. Fila = origen; columna = destino.
 # estado: permitido | denegado | no_aplica ("—" del documento). `bloqueados` = flujos bloqueados explícitos (✖ Fn).
 # La matriz no incluye una fila Perímetro ni Tránsito: los flujos que nacen o terminan en FW01 son locales al firewall y no se derivan.
-# WIFI-EST solo es fila en D1.8 v0.4; su columna se completó con «denegado» (CI-45). LAB-TEST, STORAGE y BACKUP salen de la matriz (retiradas, CI-39).
+# WIFI-EST solo es fila en D1.8 v0.4; su columna se acepta como «denegado» (CI-45, resuelto). LAB-TEST, STORAGE y BACKUP salen de la matriz (retiradas, CI-39).
 matriz_esperada:
   orden: [MGMT, SERVERS, LAB, WIFI-EST, DMZ-SVC, DMZ-HONEY, SECURITY, EDGE, AWS, INTERNET]
   celdas:
@@ -2101,7 +2097,7 @@ matriz_esperada:
       MGMT: { estado: no_aplica }
       SERVERS: { estado: permitido, flujos: [F20] }
       LAB: { estado: permitido, flujos: [F20] }
-      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se asume denegado (CI-45)", pendiente: true, cambio: CI-45 }
+      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se acepta denegado (CI-45 resuelto el 2026-11-22)" }
       DMZ-SVC: { estado: permitido, flujos: [F20] }
       DMZ-HONEY: { estado: permitido, flujos: [F20] }
       SECURITY: { estado: permitido, flujos: [F20] }
@@ -2112,7 +2108,7 @@ matriz_esperada:
       MGMT: { estado: denegado }
       SERVERS: { estado: no_aplica }
       LAB: { estado: denegado }
-      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se asume denegado (CI-45)", pendiente: true, cambio: CI-45 }
+      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se acepta denegado (CI-45 resuelto el 2026-11-22)" }
       DMZ-SVC: { estado: denegado }
       DMZ-HONEY: { estado: denegado }
       SECURITY: { estado: permitido, flujos: [F13] }
@@ -2123,7 +2119,7 @@ matriz_esperada:
       MGMT: { estado: denegado }
       SERVERS: { estado: permitido, flujos: [F28], nota: "solo ENC01" }
       LAB: { estado: no_aplica }
-      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se asume denegado (CI-45)", pendiente: true, cambio: CI-45 }
+      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se acepta denegado (CI-45 resuelto el 2026-11-22)" }
       DMZ-SVC: { estado: permitido, flujos: [F5] }
       DMZ-HONEY: { estado: denegado }
       SECURITY: { estado: permitido, flujos: [F13], nota: "solo HNY02" }
@@ -2145,7 +2141,7 @@ matriz_esperada:
       MGMT: { estado: denegado }
       SERVERS: { estado: denegado }
       LAB: { estado: denegado }
-      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se asume denegado (CI-45)", pendiente: true, cambio: CI-45 }
+      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se acepta denegado (CI-45 resuelto el 2026-11-22)" }
       DMZ-SVC: { estado: no_aplica }
       DMZ-HONEY: { estado: denegado }
       SECURITY: { estado: permitido, flujos: [F13] }
@@ -2156,7 +2152,7 @@ matriz_esperada:
       MGMT: { estado: denegado }
       SERVERS: { estado: denegado }
       LAB: { estado: denegado }
-      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se asume denegado (CI-45)", pendiente: true, cambio: CI-45 }
+      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se acepta denegado (CI-45 resuelto el 2026-11-22)" }
       DMZ-SVC: { estado: denegado }
       DMZ-HONEY: { estado: no_aplica }
       SECURITY: { estado: permitido, flujos: [F13] }
@@ -2167,7 +2163,7 @@ matriz_esperada:
       MGMT: { estado: denegado }
       SERVERS: { estado: denegado }
       LAB: { estado: denegado }
-      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se asume denegado (CI-45)", pendiente: true, cambio: CI-45 }
+      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se acepta denegado (CI-45 resuelto el 2026-11-22)" }
       DMZ-SVC: { estado: denegado }
       DMZ-HONEY: { estado: denegado }
       SECURITY: { estado: no_aplica }
@@ -2178,7 +2174,7 @@ matriz_esperada:
       MGMT: { estado: denegado }
       SERVERS: { estado: permitido, flujos: [F10] }
       LAB: { estado: denegado }
-      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se asume denegado (CI-45)", pendiente: true, cambio: CI-45 }
+      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se acepta denegado (CI-45 resuelto el 2026-11-22)" }
       DMZ-SVC: { estado: denegado }
       DMZ-HONEY: { estado: denegado }
       SECURITY: { estado: permitido, flujos: [F13] }
@@ -2189,7 +2185,7 @@ matriz_esperada:
       MGMT: { estado: denegado }
       SERVERS: { estado: permitido, flujos: [F30] }
       LAB: { estado: denegado }
-      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se asume denegado (CI-45)", pendiente: true, cambio: CI-45 }
+      WIFI-EST: { estado: denegado, nota: "D1.8 v0.4 no tiene columna WIFI-EST: se acepta denegado (CI-45 resuelto el 2026-11-22)" }
       DMZ-SVC: { estado: denegado }
       DMZ-HONEY: { estado: denegado }
       SECURITY: { estado: permitido, flujos: [F13] }
@@ -2200,7 +2196,7 @@ matriz_esperada:
       MGMT: { estado: denegado }
       SERVERS: { estado: denegado }
       LAB: { estado: denegado }
-      WIFI-EST: { estado: no_aplica, nota: "Fuera del proyecto", pendiente: true, cambio: CI-45 }
+      WIFI-EST: { estado: no_aplica, nota: "Fuera del proyecto" }
       DMZ-SVC: { estado: permitido, flujos: [F21] }
       DMZ-HONEY: { estado: permitido, flujos: [F24], nota: "ventana autorizada" }
       SECURITY: { estado: denegado }
@@ -2255,11 +2251,11 @@ aws:
     - id: nacl-private
       subredes: [AWS-APP-A]
       ingress:
-        - { accion: allow, proto: tcp, puertos: servicio, origen: "supernet:SEDE-JULIACA", nota: "D2.5: «puertos de servicio» sin definir (CI-46)", pendiente: true, cambio: CI-46 }
-        - { accion: allow, proto: tcp, puertos: servicio, origen: "componente:AWS-VPC", nota: "D2.5: «puertos de servicio» sin definir (CI-46)", pendiente: true, cambio: CI-46 }
-        - { accion: allow, proto: tcp, rango: [1024, 65535], origen: "supernet:SEDE-JULIACA", nota: "efímeros de retorno" }
-        - { accion: allow, proto: tcp, rango: [1024, 65535], origen: "componente:AWS-VPC", nota: "efímeros de retorno" }
-      egress: todo
+        - { accion: allow, proto: tcp, puertos: [443], origen: "componente:AWS-PUB-A", nota: "CI-46 (resuelto 2026-11-22): TCP 443 desde pub-a" }
+        - { accion: allow, proto: tcp, rango: [1024, 65535], origen: "cidr:0.0.0.0/0", nota: "efímeros de retorno; sin SSH" }
+      egress:
+        - { accion: allow, proto: tcp, puertos: [443], destino: "cidr:0.0.0.0/0", nota: "S3 por el Gateway Endpoint y NAT-DR en el simulacro" }
+        - { accion: allow, proto: tcp, rango: [1024, 65535], destino: "cidr:0.0.0.0/0", nota: "efímeros de retorno" }
   s3:
     componente: S3
     bucket: celeris-backups

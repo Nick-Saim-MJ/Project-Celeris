@@ -10,7 +10,7 @@
 # polaridad: positiva (se espera tráfico o resultado permitido), negativa (se espera denegación) o mixta (ambas).
 # ampliacion: true en T29+ (CI-27): pruebas que D1.16 no define; T01–T28 son el contrato.
 # critica: true si un FALLA invalida un límite de seguridad del diseño (V-42 lo exige en resultados.json). Regla adoptada: categoría
-#   segmentacion, vpn o cifrado (CI-26); el equipo puede cambiarla marcando la prueba a mano.
+#   segmentacion, vpn o cifrado (CI-26); excepción decidida el 2026-11-22: T56 (BYOD no se descifra) también es crítica.
 # Los comandos son los «comandos sugeridos» de D1.16; los argumentos añadidos solo hacen que terminen
 # o produzcan una salida verificable (-c, -w, -m, -o /dev/null -w). No añaden puertos ni IP.
 # `pendiente: true` = vacío o contradicción registrado en docs/infra/e1/CAMBIOS-INVENTARIO.md.
@@ -1615,7 +1615,7 @@ pruebas:
       - { tipo: regex, sobre: stdout, patron: "(?i)issuer:" }
       - { tipo: contador, metrica: certificados_emitidos_por_la_ca_del_proyecto, operador: "==", valor: 0 }
     automatizable: true
-    critica: false
+    critica: true
     polaridad: negativa
     evidencia_a_capturar: ["Salida de curl con el emisor del certificado", "Registro del nodo con la decisión passthrough para la red de origen WIFI-EST"]
     modos: [L, H]

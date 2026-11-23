@@ -72,10 +72,10 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-41 | decisión de transcripción | v0.4 (D7 CI-36): pruebas retiradas T12, T22, T37, T38, T39, T41, T44, T48; nuevas T50–T60; destinos de T01, T02, T20, T21, T29, T42, T46 | resuelto (2026-11-22, I1) |
 | CI-42 | supuesto nuevo | v0.4 (D7 CI-37): supuestos S-26…S-30 | resuelto (2026-11-22, I1) |
 | CI-43 | decisión de transcripción | v0.4 (D7 CI-38): trazabilidad OD-04, OD-08, OD-11, OD-12, AM-14…AM-18, DET-02, DET-10, DET-11 | resuelto (2026-11-22, I1) |
-| CI-44 | contradicción | F20 (D1.11 v0.4: TCP 22 y 443) frente a la administración del nodo en 9128 y el dashboard de Wazuh | abierto |
-| CI-45 | vacío | La matriz D1.8 v0.4 no tiene columna WIFI-EST | abierto |
-| CI-46 | vacío | nacl-private de D2.5: «puertos de servicio» sin definir | abierto |
-| CI-47 | contradicción | F2 «zonas internas» frente a DMZ-HONEY («solo envía al SIEM», D1.9) | abierto |
+| CI-44 | contradicción | F20 (D1.11 v0.4: TCP 22 y 443) frente a la administración del nodo en 9128 y el dashboard de Wazuh | resuelto (2026-11-22: F20 agrega TCP 9128) |
+| CI-45 | vacío | La matriz D1.8 v0.4 no tiene columna WIFI-EST | resuelto (2026-11-22: se acepta «denegado») |
+| CI-46 | vacío | nacl-private de D2.5: «puertos de servicio» sin definir | resuelto (2026-11-22: TCP 443 desde pub-a y efímeros) |
+| CI-47 | contradicción | F2 «zonas internas» frente a DMZ-HONEY («solo envía al SIEM», D1.9) | resuelto (2026-11-22: F2 excluye DMZ-HONEY) |
 
 ## Entradas
 
@@ -560,7 +560,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Estado:** resuelto (2026-11-22, I1)
 - **Tipo:** decisión de transcripción
 - **Contexto:** Varias pruebas apuntaban a piezas retiradas (STORAGE, SVC01, OTLP, base en red, NAS, NFS, peering).
-- **Cambio:** Las ocho pruebas quedan con `estado: retirado` y `retirado_por`. T50–T60 llevan `ampliacion: true`. T26 (privacidad) pasa a medir F8 (la petición saliente al origen) y deja de ser prueba de la VPN. T27 pasa a cubrir F20, F28 y F30. T56 sigue la regla de criticidad de CI-26 (categoría privacidad, no crítica); se propone revisarla porque un FALLA descifraría un equipo personal (REQ-F-36). Los IDs no se reutilizan.
+- **Cambio:** Las ocho pruebas quedan con `estado: retirado` y `retirado_por`. T50–T60 llevan `ampliacion: true`. T26 (privacidad) pasa a medir F8 (la petición saliente al origen) y deja de ser prueba de la VPN. T27 pasa a cubrir F20, F28 y F30. T56 es crítica por decisión del equipo (2026-11-22): un FALLA descifraría un equipo personal (REQ-F-36); es la única excepción a la regla de criticidad de CI-26. Los IDs no se reutilizan.
 - **Motivo:** Cobertura de las funciones nuevas (precarga, firma de configuración, acceso por laboratorio, panel remoto, BYOD, simulacro de recuperación, WPAD).
 - **ADR:** —
 - **Archivos afectados:** `infra/pruebas.yaml`, `infra/trazabilidad.yaml` (rúbrica R2–R8)
@@ -587,7 +587,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto
 
 ### CI-44 — F20: D1.11 v0.4 lista solo TCP 22 y 443, pero el nodo se administra por 9128
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-22, decisión del equipo: F20 agrega TCP 9128 (administración del nodo))
 - **Tipo:** contradicción
 - **Contexto:** CE03 D1.11 y la Arquitectura §7 dan F20 = TCP 22, 443. El repositorio usaba 22, 443, 3000, 5601 y 9128; T27 verifica el puerto 9128 (REQ-NF-14) y `e2e/` usa 9128. El dashboard de Wazuh escucha en 5601 si no se pone detrás de 443.
 - **Cambio:** F20 transcribe solo TCP 22 y 443 (D1.11 v0.4) y queda `pendiente: true`. T27 describe la sesión a 9128 y lo marca en su precondición.
@@ -599,7 +599,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Efecto al resolver:** corregir `protocolos` y `regla_fw` de F20 y quitar `pendiente`.
 
 ### CI-45 — La matriz D1.8 v0.4 no tiene columna WIFI-EST
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-22, decisión del equipo: se acepta «denegado» para la columna WIFI-EST)
 - **Tipo:** vacío
 - **Contexto:** D1.8 y la Arquitectura §6.3 incluyen WIFI-EST solo como fila (origen); ninguna celda dice qué pasa hacia el Wi-Fi.
 - **Cambio:** Para que V-12 pueda comprobar una matriz completa, `matriz_esperada` agrega la columna WIFI-EST con «denegado» (FW01 no enruta hacia el Wi-Fi) y «no_aplica» desde Internet; todas esas celdas llevan `pendiente: true`.
@@ -611,7 +611,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Efecto al resolver:** quitar `pendiente` de las celdas.
 
 ### CI-46 — nacl-private (D2.5): «puertos de servicio» sin definir
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-22, decisión del equipo: nacl-private: entrada TCP 443 desde pub-a y efímeros de retorno; salida TCP 443 y efímeros; sin SSH)
 - **Tipo:** vacío
 - **Contexto:** D2.5: «Permitir 10.20.0.0/16 y 10.30.0.0/16 en puertos de servicio y retorno efímero; denegar el resto». Con app-a vacía en operación normal, no hay servicio que abrir.
 - **Cambio:** El bloque `aws.nacl` conserva las reglas con `puertos: servicio` y `pendiente: true`; no se inventa un puerto.
@@ -623,7 +623,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Efecto al resolver:** reemplazar `puertos: servicio` en nacl-private y quitar `pendiente`.
 
 ### CI-47 — F2 «zonas internas» incluye DMZ-HONEY, que D1.9 limita a enviar al SIEM
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-22, decisión del equipo: F2 excluye DMZ-HONEY)
 - **Tipo:** contradicción
 - **Contexto:** D1.11 y la Arquitectura §7: F2 = «Zonas internas → FW01». D1.9: DMZ-HONEY «Solo envía al SIEM» y el honeypot no tiene salida.
 - **Cambio:** F2 lista todas las zonas internas (MGMT, SERVERS, LAB, DMZ-SVC, DMZ-HONEY, SECURITY, EDGE) como origen y FW01 como destino; no cambia la matriz zona × zona.

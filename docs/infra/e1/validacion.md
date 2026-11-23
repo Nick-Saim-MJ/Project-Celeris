@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.1 · fecha 2026-11-22
 - Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 8 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **7 FALLA**, 6 con advertencias, 36 PASA, 1 pendientes de P2–P5.
+- Resultado: **7 FALLA**, 5 con advertencias, 37 PASA, 1 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -50,7 +50,7 @@
 | V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA con advertencias | 0 errores, 2 advertencias |
 | V-44 | Un ID retirado no se reutiliza ni aparece en flujos, pruebas, componentes, zonas, rúbrica o textos vigentes | PASA | — |
 | V-45 | Ningún flujo permite descifrado con origen WIFI-EST (REQ-F-36, REQ-RN-11) | PASA | — |
-| V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA con advertencias | Detalle y matriz componente × figura en docs/infra/e1/cobertura-figuras.md |
+| V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA | Detalle y matriz componente × figura en docs/infra/e1/cobertura-figuras.md |
 | V-51 | Cobertura componente × figura igual al campo `figuras` del inventario | FALLA | 30 errores, 0 advertencias |
 | V-52 | Todo celeris_id es un ID del contrato | FALLA | 92 errores, 0 advertencias |
 | V-53 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | FALLA | 16 errores, 0 advertencias |
@@ -201,20 +201,20 @@
 - **V-53** — FIG-5.5a: «10.20.32.50» en LABCLI01 no está en infra/inventory.yaml. *Cómo corregir:* Corrija el generador o registre el CI-nn
 - **V-53** — FIG-5.5a: «10.20.31.60» en KALI01 no está en infra/inventory.yaml. *Cómo corregir:* Corrija el generador o registre el CI-nn
 - **V-53** — FIG-5.5b: la caja de FW01 rotula 203.0.113.10, que no es de FW01. *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
-- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
+- **V-54** — FIG-5.5b: F20 con etiqueta «F20 · TCP/22,443,3000,5601,9128 · SSH»; se espera «F20 · TCP/22,443,9128 · SSH». *Cómo corregir:* 
 - **V-54** — FIG-5.5a: falta F31. *Cómo corregir:* 
 - **V-54** — FIG-5.5a: falta F32. *Cómo corregir:* 
 - **V-54** — FIG-5.5b: falta F28. *Cómo corregir:* 
@@ -224,7 +224,7 @@
 - **V-56** — FIG-5.2: AWS-APP-A con criticidad Media; inventario: Baja. *Cómo corregir:* 
 - **V-56** — FIG-5.4: AWS-APP-A con criticidad Media; inventario: Baja. *Cómo corregir:* 
 - **V-60** — No existe entregables/CE0311/Matriz_Componentes_Red_v1.1.xlsx. *Cómo corregir:* make matrices (python infra/gen/xlsx_componentes.py --verificar)
-- **V-70** — No existe entregables\CE0311\Matriz_Pruebas_Conectividad_v1.2.xlsx. *Cómo corregir:* Genérelo con make matrices y versiónelo
+- **V-70** — No existe entregables/CE0311/Matriz_Pruebas_Conectividad_v1.2.xlsx. *Cómo corregir:* Genérelo con make matrices y versiónelo
 
 ## Advertencias (contradicciones y vacíos registrados)
 
@@ -245,27 +245,13 @@
 - **V-42** — 2026-11-21-L: T60 aplica al modo L y no está en los resultados
 - **V-43** — El generador de OpenTofu no puede leer el inventario v0.4 (ValueError('referencia de red desconocida: prefijo_s3')); queda pendiente de I3
 - **V-43** — El generador de containerlab no puede leer el inventario v0.4 (KeyError('LAB-TEST')); queda pendiente de I2
-- **V-50** — FIG-1.1.png es anterior a FIG-1.1.drawio
-- **V-50** — FIG-1.1.pdf es anterior a FIG-1.1.drawio
-- **V-50** — FIG-5.1.png es anterior a FIG-5.1.drawio
-- **V-50** — FIG-5.1.pdf es anterior a FIG-5.1.drawio
-- **V-50** — FIG-5.2.png es anterior a FIG-5.2.drawio
-- **V-50** — FIG-5.2.pdf es anterior a FIG-5.2.drawio
-- **V-50** — FIG-5.3.png es anterior a FIG-5.3.drawio
-- **V-50** — FIG-5.3.pdf es anterior a FIG-5.3.drawio
-- **V-50** — FIG-5.4.png es anterior a FIG-5.4.drawio
-- **V-50** — FIG-5.4.pdf es anterior a FIG-5.4.drawio
-- **V-50** — FIG-5.5a.png es anterior a FIG-5.5a.drawio
-- **V-50** — FIG-5.5a.pdf es anterior a FIG-5.5a.drawio
-- **V-50** — FIG-5.5b.png es anterior a FIG-5.5b.drawio
-- **V-50** — FIG-5.5b.pdf es anterior a FIG-5.5b.drawio
 
 ## Información
 
 - **V-16** — F2: sin prueba T-nn en D1.16 (justificado)
 - **V-16** — F32: sin prueba T-nn en D1.16 (justificado)
 - **V-27** — 28 de 59 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 39 elementos pendientes en los YAML; 47 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43']
+- **V-29** — 26 elementos pendientes en los YAML; 47 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47']
 - **V-42** — Resultados de 2026-11-21-L (commit e480bdc): {'PASA': 31, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-42** — 2026-11-21-L: T12 está retirada en la v0.4 y se ignora en los resultados del ensayo (v0.2)
 - **V-42** — 2026-11-21-L: T22 está retirada en la v0.4 y se ignora en los resultados del ensayo (v0.2)

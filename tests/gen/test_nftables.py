@@ -75,17 +75,19 @@ def test_f24_solo_con_ventana_autorizada(infra):
     assert "F24" in nftables.flujos_con_regla(con)
 
 
-def test_dnat_del_portal_apunta_a_waf01(infra):
+def test_dnat_del_portal_apunta_a_portal01(infra):
+    """v0.4: el FortiGate hace NAT 1:1 de 203.0.113.10 hacia la WAN de FW01 (10.20.0.2); FW01 hace DNAT hacia PORTAL01."""
     t = gen(infra)
-    assert "ip daddr 203.0.113.10 tcp dport 443 dnat to 10.20.40.10:443" in t
-    assert "ip daddr 203.0.113.10 tcp dport 80 dnat to 10.20.40.10:80" in t
+    assert "ip daddr 10.20.0.2 tcp dport 443 dnat to 10.20.40.10:443" in t
+    assert "ip daddr 10.20.0.2 tcp dport 80 dnat to 10.20.40.10:80" in t
 
 
-def test_flujos_intra_vlan_no_generan_regla(infra):
+def test_flujos_retirados_y_que_no_pasan_por_fw01_no_generan_regla(infra):
+    """v0.4: F15, F19 y F22 (intra-VLAN) están retirados; F29 entra por la IP pública de EC2-GW y no pasa por FW01."""
     t = gen(infra)
-    for fid in ("F15", "F19", "F22"):
+    for fid in ("F9", "F11", "F12", "F15", "F16", "F17", "F19", "F22", "F29"):
         assert fid not in nftables.flujos_con_regla(t)
-        assert f"# {fid}: dentro de una misma VLAN" in t
+    assert "# F29: no pasa por FW01" in t
 
 
 def test_lab_no_tiene_reglas_hacia_mgmt_storage_backup_aws(infra):
@@ -118,9 +120,9 @@ def test_regresion_cambiar_un_flujo_cambia_el_ruleset(infra, mutar):
 
 
 def test_regresion_quitar_un_flujo_quita_su_regla(infra, mutar):
-    x = mutar(lambda inv: inv["flujos"].__setitem__(slice(None), [f for f in inv["flujos"] if f["id"] != "F9"]))
-    assert "F9" in nftables.flujos_con_regla(gen(infra))
-    assert "F9" not in nftables.flujos_con_regla(gen(x))
+    x = mutar(lambda inv: inv["flujos"].__setitem__(slice(None), [f for f in inv["flujos"] if f["id"] != "F10"]))
+    assert "F10" in nftables.flujos_con_regla(gen(infra))
+    assert "F10" not in nftables.flujos_con_regla(gen(x))
 
 
 def test_regresion_un_flujo_nuevo_aparece_en_el_ruleset(infra, mutar):

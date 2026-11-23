@@ -17,7 +17,6 @@ SIN_WAZUH = "Wazuh (siem01) no está desplegado en el laboratorio: la alerta del
 # T-nn con Modo L en infra/pruebas.yaml que el laboratorio no puede ejecutar, y por qué (CI-16, CI-24)
 NO_APLICA_L = {
     "T23": "RA guard es un control del switch de acceso (SW-ACC, S-14); los puentes Linux del laboratorio no lo emulan",
-    "T25": "ESX01, IPMI01, BRK01 y SW-CORE01 no se emulan: el puerto break-glass no existe en F4.1 (CI-16)",
     # v0.4: dependen de la consola completa (CE02, S2). ctrl01 es solo una consola de prueba: aquí no se simulan ni se marcan PASA.
     "T50": ("requiere la consola (CE02, S2): la precarga programada con ventana horaria y límite de ancho de banda (REQ-F-34, REQ-RN-10) no existe en el nodo ni en ctrl01", ["H"]),
     "T53": ("requiere la consola (CE02, S2): el segundo factor, el límite de intentos y la auditoría de inicios de sesión (REQ-F-33, DET-10) no existen en ctrl01", ["A", "H"]),

@@ -15,9 +15,7 @@ meta:
     archivo: docs/Celeris-Edge-Documento-Maestro.md
     version_declarada_en_cabecera: "0.2"
     version_citada_en_reglas: "0.2.1"
-    nota: "La cabecera del documento dice 0.2 y el registro de cambios termina en 0.2; las reglas del proyecto citan v0.2.1. Ver CI-01."
-    pendiente: true
-    cambio: CI-01
+    nota: "No existe una v0.2.1: la cabecera y el registro de cambios del documento llegan a 0.2. Es la base histórica; el diseño vigente es el de documentos_v04 (CE03 v0.4). CI-01 resuelto."
   documentos_v04: [docs/celeris/Celeris-CE03-Infraestructura.md, docs/celeris/Celeris-Arquitectura-v0.4.md, docs/celeris/Celeris-00-Marco-Comun.md]
   entregable: "CE0311 — Análisis y Diseño de Red (S1, E1)"
   proyecto: "Celeris Edge — red de laboratorios del Campus Juliaca [S-01]"
@@ -379,10 +377,10 @@ componentes:
     funcion: "FortiGate existente: FortiGuard, NAT 1:1 (fuera de alcance)"
     criticidad: Alta
     estado: existente
-    por_que: "Ya filtra con FortiGuard y tiene la IP pública. Reemplazarlo sería sobreingeniería y no lo controla el equipo."
+    por_que: "Ya filtra con FortiGuard y tiene la IP pública 203.0.113.10; FW01 cuelga de su red de tránsito 10.20.0.0/29. Reemplazarlo sería sobreingeniería y no lo controla el equipo [S-29]."
     aporta_corto: "FortiGate existente: IP pública, NAT 1:1 y FortiGuard"
     aporta: "Conserva la IP pública 203.0.113.10 [S-15] y hace NAT 1:1 hacia 10.20.0.2 solo para UDP 500/4500 (IPsec con NAT-T) y TCP 80/443 (portal); excluye a EDGE01/02 de su inspección SSL profunda [S-29]; FortiGuard filtra la salida de los nodos; necesita una ruta estática a 10.20.0.0/16 vía 10.20.0.2."
-    si_falla: "Todo el campus sin Internet; no depende del proyecto."
+    si_falla: "Todo el campus sin Internet y FW01 (10.20.0.2) sin salida a la WAN, incluida la VPN a AWS (VTI1 y VTI2); no depende del proyecto."
     dependencias: []
     controles: "NAT 1:1 limitado a UDP 500/4500 y TCP 80/443; inspección SSL excluida para EDGE01/02; FortiGuard en la salida; cambios mínimos pedidos a la DTI (RE-11)"
     adr: [D-26]
@@ -469,8 +467,6 @@ componentes:
     supuestos: [S-14]
     flujos_justificacion: "Capa 2 existente fuera de alcance: transporta F1–F7 de los usuarios sin ser origen ni destino"
     emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "No aparece en la topología F4.1" }
-    pendiente: true
-    cambio: CI-12
 
   - id: BRK01
     nombre: "BRK01 — Puerto break-glass"
@@ -546,7 +542,7 @@ componentes:
     ips:
       - { interfaz: mgmt, ip: 10.20.10.40, zona: MGMT, nota: "Tarjeta de red (NUT)" }
     funcion: "Tarjeta de red de la UPS (NUT)"
-    criticidad: Media
+    criticidad: Alta
     estado: diseño
     por_que: "UPS online de 1,5 kVA con autonomía de 15–20 min a ≈ 480 W; alcanza para un apagado ordenado automatizado con NUT, no para operar en un corte largo."
     aporta_corto: "Apagado ordenado del servidor ante un corte"
@@ -559,10 +555,8 @@ componentes:
     objetivos: [OD-02]
     figuras: [FIG-5.1, FIG-5.2, FIG-5.3, FIG-5.5b]
     supuestos: []
-    flujos_justificacion: "El flujo NUT (UPS01 → JMP01 → ESX01 y VM) no tiene F-nn ni puerto en D1.11; la administración sí está en F20"
+    flujos_justificacion: "NUT es intrazona de MGMT: UPS01 (10.20.10.40) → JMP01 (10.20.10.20), que apaga por SSH las VM y luego ESXi (F20); no cruza FW01, por eso no tiene F-nn (CI-09)"
     emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "Sin equivalente en el laboratorio" }
-    pendiente: true
-    cambio: [CI-09, CI-15]
 
   - id: JMP01
     nombre: "JMP01 — Jump host de administración"
@@ -738,10 +732,10 @@ componentes:
     criticidad: Alta
     estado: diseño
     vm: { fase: F1, vcpu: 1, ram_gb: 2, disco_gb: 20, so: "Debian 13", port_group: "PG-DMZ-SVC" }
-    por_que: "El usuario debe poder leer qué se descifra y verificar la huella de la CA antes de usar el proxy. Es el servicio protegido que exige la DMZ de la rúbrica."
+    por_que: "El usuario debe poder leer qué se descifra y verificar la huella de la CA antes de usar el proxy. Es el servicio protegido que exige la DMZ-SVC de la rúbrica (R4-02)."
     aporta_corto: "Portal de transparencia protegido por WAF"
     aporta: "Caddy + Coraza (OWASP CRS) con certificado público que FW01 renueva por ACME y le entrega por SFTP (F33), TLS 1.3 y HSTS; sirve el sitio estático firmado que genera la consola (REQ-F-30) con sistema de archivos de solo lectura, sin base de datos ni login; recibe TCP 443 de LAB (F5), de WIFI-EST (F32) y de Internet por NAT 1:1 en el FortiGate (F21); no tiene salida a la WAN: solo el agente Wazuh hacia SIEM01 (F13); recibe el certificado de FW01 por SFTP en TCP 22 (F33)."
-    si_falla: "Las PCs ya enroladas siguen funcionando; no se pueden enrolar nuevas."
+    si_falla: "Las PCs ya enroladas siguen funcionando; no se pueden enrolar nuevas (F21, DMZ-SVC)."
     dependencias: [FW01, FGT-EXT, SIEM01]
     controles: "Caddy + Coraza + OWASP CRS; límite por IP; CSP default-src 'self', frame-ancestors 'none', nosniff y Referrer-Policy; sistema de archivos de solo lectura; sin salida a la WAN (solo Wazuh, F13); recibe el certificado por SFTP desde FW01 (F33), usuario chroot y llave dedicada; Suricata IPS inline y CrowdSec en FW01"
     adr: [D-15, D-28]
@@ -813,7 +807,7 @@ componentes:
     por_que: "Un honeypot está hecho para ser comprometido: vive en su propia VLAN 41 (D-16) y solo envía eventos al SIEM."
     aporta_corto: "Señuelo SSH/Telnet que alerta en el SIEM"
     aporta: "Cowrie y OpenCanary reciben TCP 22→2222 y 23 por DNAT (F24, solo con aprobación escrita de la DTI y en ventana definida); envía eventos a SIEM01 (F13)."
-    si_falla: "Se pierde la detección de fuerza bruta por señuelo; la DMZ de servicios y el resto de la red no se afectan."
+    si_falla: "Se pierde la detección de fuerza bruta por señuelo SSH/Telnet (F24, DET-04); DMZ-SVC y el resto de la red no se afectan porque HNY01 (10.20.41.20) vive en DMZ-HONEY."
     dependencias: [FW01, SIEM01]
     controles: "VLAN propia, sin salida a ninguna zona ni a Internet, ventana autorizada para publicar puertos"
     adr: [D-16]
@@ -920,8 +914,6 @@ componentes:
     figuras: []
     supuestos: [S-01]
     emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "No aparece en la topología F4.1" }
-    pendiente: true
-    cambio: CI-10
 
   - id: ENC01
     nombre: "ENC01 — Puesto del encargado"
@@ -982,7 +974,7 @@ componentes:
     por_que: "Está en el rango de infraestructura de LAB (10.20.35.0/24), apagado fuera de ventanas autorizadas, para que las pruebas de ataque crucen el firewall y se registren."
     aporta_corto: "Genera los escenarios de ataque controlados"
     aporta: "Origen del escaneo hacia SERVERS que valida a Suricata de FW01 (DET-02, T29); sus reglas de prueba en FW01 están deshabilitadas por defecto."
-    si_falla: "No hay generador de ataques; la red de producción no se afecta."
+    si_falla: "No hay generador de ataques para T29 desde 10.20.35.60; la red de producción no se afecta."
     dependencias: [FW01]
     controles: "Apagado fuera de ventana, reglas de prueba deshabilitadas por defecto, nunca apunta a IP reales sin autorización escrita"
     adr: []
@@ -1027,7 +1019,7 @@ componentes:
     por_que: "Es la red inalámbrica existente de la DTI: se documenta AS-IS y se aísla del resto sin descifrarla (D-27)."
     aporta_corto: "Equipos personales: proxy opcional, nunca descifrados"
     aporta: "Red de la DTI (172.16.0.0/16, provisional [S-28]); solo alcanza EDGE01/02 (TCP 3128 y 80, siempre passthrough, F31) y PORTAL01:443 (F32); el resto de su navegación sigue por el FortiGate sin pasar por el proyecto; se pide a la DTI aislamiento de clientes."
-    si_falla: "Sin efecto sobre los laboratorios; los equipos personales navegan por el FortiGate como hoy."
+    si_falla: "Sin efecto sobre los laboratorios (LAB); los equipos personales (172.16.0.0/16) navegan por el FortiGate como hoy."
     dependencias: [FGT-EXT, FW01]
     controles: "Passthrough obligatorio (REQ-F-36, REQ-RN-11); solo F31 y F32; denegado hacia CTRL01, MGMT y LAB (T57); aislamiento de clientes pedido a la DTI [S-28]"
     adr: [D-27]
@@ -1180,8 +1172,6 @@ componentes:
     figuras: []
     supuestos: [S-13]
     emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "No aparece en la topología F4.1" }
-    pendiente: true
-    cambio: CI-11
 
   - id: NAT01
     nombre: "NAT01 — Instancia NAT"
@@ -1222,7 +1212,7 @@ componentes:
     estado: diseño
     por_que: "Aísla los recursos del proyecto en AWS; región como variable var.region de OpenTofu [S-11]."
     aporta_corto: "Aislamiento de los recursos del proyecto en AWS"
-    aporta: "Tablas rt-public y rt-private; 10.20.0.0/16 propagada desde el VGW; Gateway Endpoint de S3; sg-gw, sg-dr (simulacro), nacl-public y nacl-private de D2.5."
+    aporta: "El Internet Gateway y las tablas de rutas se dibujan dentro de AWS-VPC y no tienen ID propio (CI-13). Tablas rt-public y rt-private; 10.20.0.0/16 propagada desde el VGW; Gateway Endpoint de S3; sg-gw, sg-dr (simulacro), nacl-public y nacl-private de D2.5."
     si_falla: "Se pierden los recursos de AWS; se recrean desde código (RTO 15 min, D2.9)."
     dependencias: []
     controles: "sg-gw, sg-dr, nacl-private, nacl-public, MFA en la cuenta, CloudTrail, AWS Budgets al 80 %, etiqueta Ttl en lo efímero"
@@ -1258,8 +1248,6 @@ componentes:
     supuestos: [S-13]
     flujos_justificacion: "Contenedor de red; aloja EC2-GW y, en el simulacro, NAT-DR"
     emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "Las subredes AWS se prueban en Modo A; el Modo L no las emula" }
-    pendiente: true
-    cambio: CI-13
 
   - id: AWS-PUB-B
     nombre: "pub-b — 10.30.1.0/24 (AZ b, pública)"
@@ -1286,8 +1274,6 @@ componentes:
     supuestos: [S-13]
     flujos_justificacion: "Subred de reserva sin recursos"
     emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "Las subredes AWS se prueban en Modo A; el Modo L no las emula" }
-    pendiente: true
-    cambio: CI-13
 
   - id: AWS-APP-A
     nombre: "app-a — 10.30.10.0/24 (AZ a, privada)"
@@ -1303,7 +1289,7 @@ componentes:
     por_que: "Vacía en operación normal; en el simulacro de recuperación (T59) aloja una EC2 temporal que restaura la consola desde S3."
     aporta_corto: "Vacía; aloja la EC2 temporal del simulacro"
     aporta: "rt-private: 10.20.0.0/16 → VGW y prefijo S3 por Gateway Endpoint; solo en el simulacro, 0.0.0.0/0 → instancia NAT temporal."
-    si_falla: "Sin efecto en operación normal; el simulacro de recuperación no puede ejecutarse."
+    si_falla: "Sin efecto en operación normal; el simulacro de recuperación (T59) no puede ejecutarse."
     dependencias: [AWS-VPC]
     controles: "nacl-private, sg-dr (simulacro)"
     adr: []
@@ -1313,8 +1299,6 @@ componentes:
     supuestos: [S-13]
     flujos_justificacion: "Contenedor de red; vacía en operación normal; aloja EC2-DR solo durante el simulacro"
     emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "Las subredes AWS se prueban en Modo A; el Modo L no las emula" }
-    pendiente: true
-    cambio: CI-13
 
   - id: EC2-GW
     nombre: "EC2-GW — Proxy inverso del panel remoto"
@@ -1377,7 +1361,7 @@ componentes:
     por_que: "La rúbrica de S2 pide recuperar un recurso en AWS: se crea solo durante el simulacro (T59), restaura la consola desde S3 y se destruye, sin pagar 24×7."
     aporta_corto: "Restaura la consola desde S3 durante el simulacro"
     aporta: "t3.small en app-a, sin entrada desde Internet; salida a S3 por el Gateway Endpoint y a NAT-DR (sg-dr); lleva la etiqueta Ttl y se destruye al terminar T59."
-    si_falla: "Sin efecto en operación normal; el simulacro no demostraría la recuperación."
+    si_falla: "Sin efecto en operación normal; el simulacro (T59) no demostraría la recuperación."
     dependencias: [AWS-APP-A, NAT-DR, S3]
     controles: "sg-dr; etiqueta Ttl; destrucción verificada tras el simulacro"
     adr: []
@@ -1439,8 +1423,6 @@ componentes:
     supuestos: [S-13]
     flujos_justificacion: "Contenedor de red; aloja EC2-CTRLR (D1.12 la ubica en «app-c»; D2.5 en app-b)"
     emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "Las subredes AWS se prueban en Modo A; el Modo L no las emula" }
-    pendiente: true
-    cambio: [CI-13, CI-14]
 
   - id: AWS-DATA-A
     nombre: "data-a — 10.30.20.0/24 (AZ a, privada)"
@@ -1467,8 +1449,6 @@ componentes:
     supuestos: [S-13]
     flujos_justificacion: "Subred de reserva sin recursos"
     emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "Las subredes AWS se prueban en Modo A; el Modo L no las emula" }
-    pendiente: true
-    cambio: CI-13
 
   - id: AWS-DATA-B
     nombre: "data-b — 10.30.21.0/24 (AZ b, privada)"
@@ -1495,8 +1475,6 @@ componentes:
     supuestos: [S-13]
     flujos_justificacion: "Subred de reserva sin recursos"
     emulacion_lab: { nodo: null, equivalencia: no_emulado, nota: "Las subredes AWS se prueban en Modo A; el Modo L no las emula" }
-    pendiente: true
-    cambio: CI-13
 
 # Flujos F1–F33 (D1.11 v0.4 + F33 de CI-52). Endpoint = ID de componente, "COMP:interfaz" o ID de zona.
 # v0.4: F9, F11, F12, F15, F16, F17, F19 y F22 quedan `estado: retirado` (no se borran ni se reutilizan); F28–F32 son nuevos.
@@ -1719,20 +1697,18 @@ flujos:
     estado: activo
     origen: [CTRL01, EDGE01, EDGE02, PORTAL01, HNY01, HNY02, EC2-GW]
     destino: [SIEM01]
-    destino_detalle: "10.20.50.10; «Todos los agentes» se concreta con la lista de origen (CI-07)"
+    destino_detalle: "10.20.50.10; «Todos los agentes» es la lista de origen: los agentes que enrola el Modo L más EC2-GW (CI-07)"
     protocolos: [{ proto: tcp, puertos: [1514, 1515] }]
     proposito: "Agentes Wazuh"
     accion: permitir
     proteccion: { tipo: cifrado_aplicacion, detalle: "Cifrado AES del protocolo Wazuh; enrolamiento con verificación del manager; desde EC2-GW, además dentro de IPsec" }
-    riesgo_residual: "Bajo: el enrolamiento depende de la verificación del manager; la lista de agentes se confirma en CI-07"
+    riesgo_residual: "Bajo: el enrolamiento depende de la verificación del manager"
     modo: ambos
     regla_fw: "F13 AGENTES > SIEM01 wazuh tcp/1514,1515"
     figura: FIG-5.5b
     objetivos: [OD-09]
     adr: [D-08]
     req: [REQ-F-14]
-    pendiente: true
-    cambio: CI-07
 
   - id: F14
     estado: activo
@@ -1927,9 +1903,8 @@ flujos:
     objetivos: [OD-09]
     adr: [D-16]
     req: []
-    pendiente: true
-    cambio: CI-49
-    nota: "F24 exige TCP 22 y 23 en el FortiGate durante la ventana; D1.8 y S-29 lo limitan a 500/4500 y 80/443 (CI-49)"
+    cambio: CI-60
+    nota: "El pedido a la DTI (S-29) incluye TCP 22 y 23 hacia HNY01 durante la ventana. Si la DTI lo niega, HNY01 solo ve tráfico interno (CI-49, CI-60)"
 
   - id: F25
     estado: activo

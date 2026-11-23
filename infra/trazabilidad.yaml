@@ -189,15 +189,11 @@ figuras:
     leyenda: "Figura 5.5a — Flujos de información planeados: usuarios, portal y servicios hacia Internet"
     seccion_docx: "5.5"
     muestra: "Origen, destino, protocolo y puerto de cada flecha con su ID F-nn (F1–F3, F5–F8, F21–F25)"
-    pendiente: true
-    cambio: CI-20
   - id: FIG-5.5b
     titulo: "Flujos de información planeados (b): control, observabilidad, seguridad, respaldo e híbrido"
     leyenda: "Figura 5.5b — Flujos de información planeados: plano de control, observabilidad, seguridad y respaldo"
     seccion_docx: "5.5"
     muestra: "Origen, destino, protocolo y puerto de cada flecha con su ID F-nn (F9–F20, F26)"
-    pendiente: true
-    cambio: CI-20
 
 # Artefactos derivados (los generan P2–P5)
 artefactos:
@@ -410,8 +406,6 @@ correspondencia_contenidos:
 correspondencia_adicional:
   - { d1: D1.16, contenido: "Matriz de pruebas de conectividad planeadas (producto obligatorio)", secciones_docx: ["6"], artefacto: XLSX-PRUEBAS }
   - { d1: D1.17, contenido: "Rúbrica E1 de red → evidencia", secciones_docx: [], nota: "Mapa interno; no es una sección del informe" }
-correspondencia_pendiente: true
-correspondencia_cambio: CI-02
 
 
 # ---- Catálogos de IDs (generados de A6, C3.4 y C1.2–C1.4 del documento maestro) ----
@@ -529,7 +523,7 @@ supuestos:
     responsable: Henyelrey
   S-29:
     supuesto: FortiGate
-    valor: Tiene la IP pública, hace NAT 1:1 a FW01 (UDP 500/4500, TCP 80/443) por la red de tránsito 10.20.0.0/29 y excluye EDGE01/02 de la inspección SSL
+    valor: Tiene la IP pública, hace NAT 1:1 a FW01 (UDP 500/4500, TCP 80/443) por la red de tránsito 10.20.0.0/29 y excluye EDGE01/02 de la inspección SSL. El pedido a la DTI incluye TCP 22 y 23 hacia HNY01 durante la ventana del señuelo (F24); si la DTI lo niega, HNY01 solo ve tráfico interno
     validacion: Reunión con la DTI
     responsable: Henyelrey
   S-30:
@@ -541,6 +535,11 @@ supuestos:
     supuesto: Certificado del portal
     valor: El FortiGate permite a FW01 llegar a los endpoints ACME de la CA elegida (TCP 443) y a su validación por HTTP (TCP 80, NAT 1:1 de S-29); PORTAL01 no sale a la WAN
     validacion: Reunión con la DTI y prueba de la renovación en el Modo H (T49)
+    responsable: Henyelrey
+  S-32:
+    supuesto: Nombre del portal
+    valor: El portal se publica con un FQDN público que entrega la DTI; hasta tenerlo, el diseño y las pruebas usan el nombre de trabajo portal.celeris.internal (el del Modo L) y el Modo H lo sustituye por el real al ejecutar
+    validacion: La DTI entrega el dominio y la CA de F33 lo emite por ACME (T16, T49)
     responsable: Henyelrey
 
 decisiones:
@@ -662,3 +661,17 @@ requisitos:
   REQ-RN-09: Bancos, inicios de sesión y servicios de identidad están en `nunca` por defecto y no se pueden mover a otro modo desde la consola
   REQ-RN-10: Una precarga no puede superar el límite de ancho de banda ni salir de la ventana horaria configurada por la DTI
   REQ-RN-11: Ninguna configuración puede habilitar el descifrado para redes de origen BYOD; el nodo la rechaza aunque llegue firmada
+
+# Capas de defensa en profundidad (D1.9 v0.4, tabla «Defensa en profundidad»). Antes vivían en infra/gen/drawio.py (CAPAS_D19, v0.2; CI-30, CI-63).
+defensa_profundidad:
+  - { capa: "Perímetro del campus", controles: "FortiGate existente con FortiGuard; NAT 1:1 solo para IPsec y portal", detalle: "D1.8" }
+  - { capa: "Perímetro del proyecto", controles: "FW01 deny-all, Suricata IPS (tránsito, DMZ-SVC y LAB), CrowdSec, filtrado de salida", detalle: "D1.13" }
+  - { capa: "Zona", controles: "7 VLAN, matriz zona × zona, DMZ dividida (D-16), Wi-Fi fuera de FW01", detalle: "D1.8" }
+  - { capa: "Laboratorio", controles: "Rangos /26 habilitados por el encargado; reservas DHCP", detalle: "D1.8" }
+  - { capa: "Capa 2", controles: "DHCP snooping, DAI, IP source guard, RA guard, port-security, BPDU/root guard, storm control, VLAN nativa 999", detalle: "D1.9, Capa 2" }
+  - { capa: "Host", controles: "nftables por servidor, endurecimiento CIS", detalle: "D2" }
+  - { capa: "Aplicación", controles: "Nodo con ACL, SSRF y puertos limitados; CA con Name Constraints; BYOD siempre passthrough (REQ-F-36); consola con segundo factor, RBAC y acciones críticas solo desde el campus (REQ-F-37); WAF delante del portal y del panel remoto", detalle: "CE02" }
+  - { capa: "Datos en tránsito", controles: "Una protección por flujo y por trayecto", detalle: "D1.11; Arquitectura v0.4 §8" }
+  - { capa: "Integridad de la configuración", controles: "Firma ed25519 verificada por el nodo", detalle: "REQ-F-17, RN-08" }
+  - { capa: "Detección", controles: "Suricata, honeypot, canary, detecciones del nodo, WAF, auditoría de la consola → Wazuh", detalle: "D1.14" }
+  - { capa: "Recuperación", controles: "Break-glass, configuración en Git, respaldos locales + S3 inmutable", detalle: "D2.9" }

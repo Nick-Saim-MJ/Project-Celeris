@@ -24,32 +24,30 @@ meta:
 pruebas:
   - id: T01
     categoria: vpn
-    nombre: "ON-PREM → AWS"
-    origen: CTRL01
-    destino: EC2-GW
-    flujos: []
-    flujos_justificacion: "ICMP no figura en F1–F26 (CI-08)"
-    componentes: [CTRL01, FW01, VTI1, VGW, EC2-GW]
-    objetivo_que_valida: "La VPN lleva tráfico de 10.20.0.0/16 a 10.30.0.0/16 (D1.10)"
-    precondicion: "Túnel 1 en estado ESTABLISHED y sesión BGP en Established"
-    comando: "ping -c 4 10.30.0.10"
+    nombre: "VPN: TCP entre AWS y el campus"
+    origen: EC2-GW
+    destino: CTRL01
+    flujos: [F30]
+    componentes: [EC2-GW, VGW, VTI1, FW01, CTRL01]
+    objetivo_que_valida: "La VPN lleva tráfico entre 10.30.0.0/16 y 10.20.0.0/16 (D1.10): una conexión TCP a CTRL01:443 se completa por el túnel 1, sin ICMP (CI-08)"
+    precondicion: "Túnel 1 en estado ESTABLISHED y sesión BGP en Established; CTRL01 escuchando en 10.20.20.10:443; ejecución desde EC2-GW"
+    comando: "nc -zv -w 5 10.20.20.10 443"
     resultado_esperado: "Permitido (VPN)"
     criterio_aprobacion:
       - { tipo: exit_code, valor: 0 }
-      - { tipo: regex, sobre: stdout, patron: "(?m)\\b0% packet loss" }
+      - { tipo: regex, sobre: stdout, patron: "(?i)(succeeded|open)" }
     automatizable: true
     critica: true
     polaridad: positiva
-    evidencia_a_capturar: ["Salida de ping", "swanctl --list-sas", "Resumen BGP (vtysh -c 'show bgp summary')"]
+    evidencia_a_capturar: ["Salida de nc", "swanctl --list-sas", "Resumen BGP (vtysh -c 'show bgp summary')"]
     modos: [A, H]
     semestre: S2
     criterios_rubrica: [R3]
     objetivos: [OD-05]
     amenazas: []
     detecciones: []
-    celdas_matriz: [SERVERS>AWS]
-    pendiente: true
-    cambio: CI-08
+    celdas_matriz: [AWS>SERVERS]
+    cambio: CI-58
 
   - id: T02
     categoria: vpn
@@ -349,8 +347,6 @@ pruebas:
     amenazas: []
     detecciones: []
     celdas_matriz: [LAB>STORAGE, SERVERS>STORAGE]
-    pendiente: true
-    cambio: CI-16
 
   - id: T13
     categoria: deteccion
@@ -438,8 +434,8 @@ pruebas:
     flujos: [F5, F21]
     componentes: [PORTAL01, FW01]
     objetivo_que_valida: "El portal cumple TLS ≥ 1.2, sin cifrados débiles, con HSTS y calificación ≥ A (OD-08)"
-    precondicion: "Certificado público emitido por ACME; nombre del portal pendiente en D1 (se escribe «portal»)"
-    comando: "testssl.sh --jsonfile tls.json https://portal"
+    precondicion: "Certificado público emitido por ACME en FW01 y entregado por F33; nombre del portal según [S-32]"
+    comando: "testssl.sh --jsonfile tls.json https://portal.celeris.internal"
     resultado_esperado: "Sin TLS < 1.2 ni cifrados débiles; HSTS presente; calificación ≥ A"
     criterio_aprobacion:
       - { tipo: regex, sobre: tls.json, patron: "\"id\"\\s*:\\s*\"overall_grade\"[^}]*\"finding\"\\s*:\\s*\"A[+-]?\"" }
@@ -456,8 +452,7 @@ pruebas:
     amenazas: []
     detecciones: []
     celdas_matriz: [LAB>DMZ-SVC]
-    pendiente: true
-    cambio: CI-21
+    cambio: CI-59
 
   - id: T17
     categoria: seguridad_web
@@ -468,7 +463,7 @@ pruebas:
     componentes: [PORTAL01, FW01]
     objetivo_que_valida: "El portal no presenta vulnerabilidades de severidad alta en un escaneo base"
     precondicion: "Portal publicado; ZAP baseline disponible"
-    comando: "zap-baseline.py -t https://portal -J zap.json"
+    comando: "zap-baseline.py -t https://portal.celeris.internal -J zap.json"
     resultado_esperado: "Sin alertas de severidad alta"
     criterio_aprobacion:
       - { tipo: regex, sobre: zap.json, patron: "\"riskcode\"\\s*:\\s*\"3\"", debe_coincidir: false }
@@ -483,8 +478,7 @@ pruebas:
     amenazas: [AM-05]
     detecciones: []
     celdas_matriz: []
-    pendiente: true
-    cambio: CI-21
+    cambio: CI-59
 
   - id: T18
     categoria: seguridad_web
@@ -495,7 +489,7 @@ pruebas:
     componentes: [PORTAL01, SIEM01]
     objetivo_que_valida: "El WAF bloquea inyección SQL con OWASP CRS y Wazuh correlaciona la alerta"
     precondicion: "PORTAL01 con OWASP CRS activo; agente Wazuh en PORTAL01"
-    comando: "curl -sk -o /dev/null -w \"%{http_code}\" \"https://portal/?q=' OR 1=1--\""
+    comando: "curl -sk -o /dev/null -w \"%{http_code}\" \"https://portal.celeris.internal/?q=' OR 1=1--\""
     resultado_esperado: "403 + alerta en Wazuh nivel ≥ 10"
     criterio_aprobacion:
       - { tipo: regex, sobre: stdout, patron: "^403$" }
@@ -511,8 +505,7 @@ pruebas:
     amenazas: [AM-05]
     detecciones: [DET-03, DET-09]
     celdas_matriz: []
-    pendiente: true
-    cambio: CI-21
+    cambio: CI-59
 
   - id: T19
     categoria: segmentacion
@@ -573,23 +566,21 @@ pruebas:
   - id: T21
     categoria: vpn
     nombre: "MTU del túnel"
-    origen: CTRL01
-    destino: EC2-GW
-    flujos: []
-    flujos_justificacion: "ICMP no figura en F1–F32 (CI-08)"
-    componentes: [CTRL01, FW01, VTI1, VGW, EC2-GW]
-    objetivo_que_valida: "MTU 1400 y MSS clamping 1360 evitan la fragmentación (D1.10)"
-    precondicion: "VPN establecida; el origen no está fijado en D1.16 y se usa el de T01"
-    comando: "ping -M do -s 1372 -c 3 10.30.0.10 ; ping -M do -s 1400 -c 3 10.30.0.10"
-    resultado_esperado: "El primero pasa; el segundo falla por tamaño, sin cortes de TCP"
+    origen: EC2-GW
+    destino: CTRL01
+    flujos: [F30]
+    componentes: [EC2-GW, VGW, VTI1, FW01, CTRL01]
+    objetivo_que_valida: "MTU 1400 y MSS clamping 1360 evitan la fragmentación: una conexión TCP a CTRL01:443 negocia un MSS ≤ 1360 y una descarga de 1 MiB termina completa (D1.10, CI-08)"
+    precondicion: "VPN establecida; CTRL01 escuchando en 10.20.20.10:443; ejecución desde EC2-GW; la consola sirve un objeto de al menos 1 MiB"
+    comando: "curl -sk --max-time 30 -o /dev/null -w \"%{size_download} %{num_connects}\" https://10.20.20.10/ ; ss -ti dst 10.20.20.10:443"
+    resultado_esperado: "El MSS negociado es ≤ 1360 y la descarga termina completa, sin cortes de TCP"
     criterio_aprobacion:
-      - { tipo: exit_code, valor: 0, comando_adicional: "ping -M do -s 1372 -c 3 10.30.0.10", nota: "1372 + 28 = 1400 = MTU" }
-      - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "ping -M do -s 1400 -c 3 10.30.0.10" }
-      - { tipo: regex, sobre: stdout, patron: "(?i)(message too long|frag needed)", comando_adicional: "ping -M do -s 1400 -c 3 10.30.0.10" }
+      - { tipo: exit_code, valor: 0, comando_adicional: "curl -sk --max-time 30 -o /dev/null https://10.20.20.10/", nota: "la descarga termina; sin PMTUD roto no hay cortes" }
+      - { tipo: regex, sobre: stdout, patron: "\\bmss:(1360|13[0-5][0-9]|1[0-2][0-9]{2}|[0-9]{1,3})\\b", comando_adicional: "ss -ti dst 10.20.20.10:443", nota: "MSS clamping 1360 = MTU 1400 − 40" }
     automatizable: true
     critica: true
     polaridad: positiva
-    evidencia_a_capturar: ["Salida de ambos ping", "Sesión TCP sostenida durante la prueba (sin reinicios)"]
+    evidencia_a_capturar: ["Salida de curl y de ss -ti", "Regla de MSS clamping de FW01 (contador)", "Sesión TCP sostenida durante la prueba (sin reinicios)"]
     modos: [A, H]
     semestre: S2
     criterios_rubrica: [R3]
@@ -597,8 +588,7 @@ pruebas:
     amenazas: []
     detecciones: []
     celdas_matriz: []
-    pendiente: true
-    cambio: CI-08
+    cambio: CI-58
 
   - id: T22
     categoria: disponibilidad
@@ -680,8 +670,6 @@ pruebas:
     amenazas: []
     detecciones: []
     celdas_matriz: [LAB>INTERNET]
-    pendiente: true
-    cambio: CI-19
 
   - id: T25
     categoria: disponibilidad
@@ -704,15 +692,14 @@ pruebas:
     critica: false
     polaridad: positiva
     evidencia_a_capturar: ["Salida de nc", "Cronometraje de la restauración", "Commit del XML restaurado"]
-    modos: [L, H]
+    modos: [H]
     semestre: S2
     criterios_rubrica: [R4]
     objetivos: [OD-02]
     amenazas: [AM-12]
     detecciones: []
     celdas_matriz: []
-    pendiente: true
-    cambio: CI-16
+    cambio: CI-62
 
   - id: T26
     categoria: privacidad
@@ -870,11 +857,11 @@ pruebas:
     flujos: [F1, F13]
     componentes: [LABCLI01, EDGE01, SIEM01]
     objetivo_que_valida: "Pedir una URL señuelo al proxy genera una alerta (DET-07, REQ-F-27)"
-    precondicion: "REQ-F-27 implementado en EDGE01; la ruta señuelo se define con él y no está en el inventario (CI-27)"
-    comando: "curl -sS -o /dev/null -w \"%{http_code}\" -x http://10.20.60.10:3128 <URL_SEÑUELO>"
+    precondicion: "REQ-F-27 implementado en EDGE01; ruta señuelo /admin-backup.zip [S-17] en un dominio de una fuente aprobada"
+    comando: "curl -sS -o /dev/null -w \"%{http_code}\" -x http://10.20.60.10:3128 https://<dominio de una fuente aprobada>/admin-backup.zip"
     resultado_esperado: "El nodo registra el evento de honey-URL y Wazuh genera una alerta de nivel ≥ 10 en menos de 60 s"
     criterio_aprobacion:
-      - { tipo: regex, sobre: registro_celeris, patron: "honey_url", nota: "nombre del evento a confirmar al implementar REQ-F-27" }
+      - { tipo: regex, sobre: registro_celeris, patron: "honey_url", nota: "evento honey_url del nodo (confirmado en el Modo L, CI-28)" }
       - { tipo: regex, sobre: alerta_wazuh, patron: "\"level\":\\s*(1[0-9]|[2-9][0-9])" }
       - { tipo: umbral, metrica: latencia_alerta_wazuh_s, operador: "<", valor: 60 }
     automatizable: true
@@ -889,7 +876,6 @@ pruebas:
     detecciones: [DET-07]
     celdas_matriz: []
     ampliacion: true
-    pendiente: true
     cambio: CI-27
 
   - id: T32
@@ -1276,8 +1262,6 @@ pruebas:
     detecciones: []
     celdas_matriz: ["EDGE>EDGE"]
     ampliacion: true
-    pendiente: true
-    cambio: CI-06
 
   - id: T45
     categoria: segmentacion

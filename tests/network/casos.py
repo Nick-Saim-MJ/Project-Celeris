@@ -437,7 +437,8 @@ def t19(c: Contexto) -> Medicion:
     objetivo = f"https://{c.P['dominio_generico']}/"
     acme = c.P["dominio_acme"]
     rc_ctrl, _ = L.ex("portal01", f"curl -sk -m6 -o /dev/null -w '%{{http_code}}' --resolve {acme}:443:{c.P['ext01']} https://{acme}/directory")
-    rc, out = L.ex("portal01", f"curl -sS -m6 --resolve {c.P['dominio_generico']}:443:{c.P['ext01']} {objetivo}")
+    # -k: lo que se mide es si FW01 deja pasar la conexión; sin -k, un certificado desconocido da código 60 (conexión hecha) y la prueba pasaría por la razón equivocada
+    rc, out = L.ex("portal01", f"curl -skS -m6 -o /dev/null --resolve {c.P['dominio_generico']}:443:{c.P['ext01']} {objetivo}")
     m.codigos["principal"] = rc
     if rc_ctrl != 0:
         m.vacia = "el control positivo falló: PORTAL01 tampoco alcanzó el endpoint ACME de laboratorio (F23), así que la denegación no es concluyente"
@@ -561,6 +562,7 @@ def _escuchas(nodos: dict[str, str], segundos: int = 90, puertos: tuple[int, ...
     """Abre los puertos indicados en cada nodo (control: sin un puerto abierto, que nmap no lo vea no demuestra nada)."""
     for clave, ip in nodos.items():
         nodo = clave.split("#")[0]
+        L.ex(nodo, "pkill -f /tmp/escucha.py; true")   # una escucha de una prueba anterior puede vencer a mitad de esta
         L.enviar(nodo, "/tmp/escucha.py", TCP_ESCUCHA_PY)
         L.fondo(nodo, " & ".join(f"python3 /tmp/escucha.py {ip} {p} {segundos}" for p in puertos) + " & wait")
     time.sleep(1)
@@ -619,16 +621,18 @@ def t30(c: Contexto) -> Medicion:
     m = Medicion()
     inicio = time.time()
     canario = c.ip("HNY02")
-    L.ex("hny02", "truncate -s 0 /var/log/canary.json")
+    # no se vacía el archivo: el agente de Wazuh lo sigue por posición y, tras un truncado, no siempre relee (T30 falló así en el segundo ensayo)
+    base = int((L.ex("hny02", "wc -l < /var/log/canary.json")[1].strip() or 0))
+    nuevas = lambda: chr(10).join(L.leer("hny02", "/var/log/canary.json").splitlines()[base:])
     L.enviar("fw01-sim", "/tmp/rx30.sh", f"timeout 40 tcpdump -ni vlan30 -c 1 'tcp and host {canario} and not port 1514' > /tmp/rx30.txt 2>&1\n")
     L.fondo("fw01-sim", "sh /tmp/rx30.sh")
     time.sleep(1)
     _, syn = L.ex("labcli01", f"nmap -n -Pn -sS -p 22,80,445,3389 --max-retries 1 {canario}", timeout=120)
     time.sleep(1)
-    con_syn = len([linea for linea in L.leer("hny02", "/var/log/canary.json").splitlines() if "conexion" in linea])
+    con_syn = len([linea for linea in nuevas().splitlines() if "conexion" in linea])
     rc, out = L.ex("labcli01", f"nmap -n -Pn -sT -p 22,80,445,3389 --max-retries 1 {canario}", timeout=120)
     time.sleep(2)
-    registro = L.leer("hny02", "/var/log/canary.json")
+    registro = nuevas()
     visto = L.leer("fw01-sim", "/tmp/rx30.txt")
     L.ex("fw01-sim", "pkill tcpdump; true")
     c.ev.guardar("nmap.txt", out)

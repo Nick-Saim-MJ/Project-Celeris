@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="celeris-modo-L" tests="52" failures="1" skipped="18" timestamp="2026-11-23">
+  <testcase classname="CE0311.vpn" name="T01 ON-PREM → AWS" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T01 (modos de la prueba: A, H); se ejecuta en A y H"/>
+  </testcase>
+  <testcase classname="CE0311.vpn" name="T02 AWS → ON-PREM" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T02 (modos de la prueba: A, H); se ejecuta en A y H"/>
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T03 DMZ → AWS" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T03 (modos de la prueba: A, H); se ejecuta en A y H"/>
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T04 Internet → subred privada AWS" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T04 (modos de la prueba: A, H); se ejecuta en A y H"/>
+  </testcase>
+  <testcase classname="CE0311.vpn" name="T05 Falla de un túnel" time="128.8">
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T06 LAB → MGMT" time="33.8">
+  </testcase>
+  <testcase classname="CE0311.conectividad" name="T07 LAB → EDGE 3128" time="0.8">
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T08 LAB → UDP 443" time="12.5">
+  </testcase>
+  <testcase classname="CE0311.disponibilidad" name="T09 Caída de EDGE01" time="48.5">
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T10 DMZ → LAN" time="7.9">
+  </testcase>
+  <testcase classname="CE0311.deteccion" name="T11 Internet → DMZ-HONEY" time="4.2">
+  </testcase>
+  <testcase classname="CE0311.deteccion" name="T13 Abuso del proxy" time="1.9">
+  </testcase>
+  <testcase classname="CE0311.deteccion" name="T14 Puerto no permitido" time="1.9">
+  </testcase>
+  <testcase classname="CE0311.seguridad_web" name="T15 Exposición del portal" time="5.1">
+  </testcase>
+  <testcase classname="CE0311.seguridad_web" name="T16 TLS del portal" time="42.2">
+  </testcase>
+  <testcase classname="CE0311.seguridad_web" name="T17 Escaneo web" time="57.9">
+  </testcase>
+  <testcase classname="CE0311.seguridad_web" name="T18 WAF" time="1.8">
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T19 Salida del portal" time="0.4">
+    <failure message="código de salida ≠ 0: salida 0"/>
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T20 Aislamiento del señuelo" time="3.4">
+  </testcase>
+  <testcase classname="CE0311.vpn" name="T21 MTU del túnel" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T21 (modos de la prueba: A, H); se ejecuta en A y H"/>
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T23 Fuga IPv6" time="0">
+    <skipped message="NO_APLICA: RA guard es un control del switch de acceso (SW-ACC, S-14); los puentes Linux del laboratorio no lo emulan; se ejecuta en Modo H"/>
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T24 DNS cifrado" time="5.1">
+  </testcase>
+  <testcase classname="CE0311.disponibilidad" name="T25 Break-glass" time="0">
+    <skipped message="NO_APLICA: ESX01, IPMI01, BRK01 y SW-CORE01 no se emulan: el puerto break-glass no existe en F4.1 (CI-16); se ejecuta en Modo H"/>
+  </testcase>
+  <testcase classname="CE0311.privacidad" name="T26 Privacidad hacia orígenes" time="11.0">
+  </testcase>
+  <testcase classname="CE0311.cifrado" name="T27 Administración y consola cifradas" time="24.8">
+  </testcase>
+  <testcase classname="CE0311.cifrado" name="T28 Syslog cifrado" time="15.7">
+  </testcase>
+  <testcase classname="CE0311.deteccion" name="T29 Escaneo lateral detectado por Suricata de FW01" time="68.9">
+  </testcase>
+  <testcase classname="CE0311.deteccion" name="T30 Canary interno detecta un barrido en LAB" time="5.8">
+  </testcase>
+  <testcase classname="CE0311.deteccion" name="T31 Honey-URL en el nodo de borde" time="3.5">
+  </testcase>
+  <testcase classname="CE0311.deteccion" name="T32 CrowdSec bloquea una IP abusiva en la WAN" time="24.7">
+  </testcase>
+  <testcase classname="CE0311.deteccion" name="T33 Toda denegación deja rastro con hora fiable" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T33 (modos de la prueba: H); se ejecuta en H"/>
+  </testcase>
+  <testcase classname="CE0311.conectividad" name="T34 Administración desde JMP01" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T34 (modos de la prueba: H); se ejecuta en H"/>
+  </testcase>
+  <testcase classname="CE0311.conectividad" name="T35 MGMT → Internet solo por 443" time="10.5">
+  </testcase>
+  <testcase classname="CE0311.cifrado" name="T36 Enrolamiento del nodo por mTLS" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T36 (modos de la prueba: H); se ejecuta en H"/>
+  </testcase>
+  <testcase classname="CE0311.disponibilidad" name="T40 Respaldo en S3 con Object Lock" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T40 (modos de la prueba: H); se ejecuta en H"/>
+  </testcase>
+  <testcase classname="CE0311.conectividad" name="T42 Hora NTS y DNS cifrado desde FW01" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T42 (modos de la prueba: H); se ejecuta en H"/>
+  </testcase>
+  <testcase classname="CE0311.conectividad" name="T43 Actualización de reglas de seguridad" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T43 (modos de la prueba: H); se ejecuta en H"/>
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T45 Internet → zonas internas" time="6.7">
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T46 DMZ-SVC → zonas internas" time="6.3">
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T47 DMZ-HONEY → cualquier zona" time="9.5">
+  </testcase>
+  <testcase classname="CE0311.conectividad" name="T49 Renovación ACME desde PORTAL01" time="5.3">
+  </testcase>
+  <testcase classname="CE0311.conectividad" name="T50 Precarga en ventana horaria con límite de ancho de banda" time="0">
+    <skipped message="NO_APLICA: requiere la consola (CE02, S2): la precarga programada con ventana horaria y límite de ancho de banda (REQ-F-34, REQ-RN-10) no existe en el nodo ni en ctrl01; se ejecuta en Modo H"/>
+  </testcase>
+  <testcase classname="CE0311.cifrado" name="T51 Cambio del encargado y configuración sin firma" time="36.9">
+  </testcase>
+  <testcase classname="CE0311.acceso" name="T52 Laboratorio deshabilitado" time="17.3">
+  </testcase>
+  <testcase classname="CE0311.seguridad_web" name="T53 Login remoto sin segundo factor y 10 intentos fallidos" time="0">
+    <skipped message="NO_APLICA: requiere la consola (CE02, S2): el segundo factor, el límite de intentos y la auditoría de inicios de sesión (REQ-F-33, DET-10) no existen en ctrl01; se ejecuta en Modo A y H"/>
+  </testcase>
+  <testcase classname="CE0311.acceso" name="T54 Acción crítica desde una sesión remota" time="0">
+    <skipped message="NO_APLICA: requiere la consola (CE02, S2): la aprobación de fuentes y el RBAC de la API (REQ-F-31, REQ-F-37); ctrl01 solo rechaza con 403 un POST /aprobar remoto de prueba; se ejecuta en Modo A y H"/>
+  </testcase>
+  <testcase classname="CE0311.conectividad" name="T55 Coalescencia de descargas simultáneas" time="4.8">
+  </testcase>
+  <testcase classname="CE0311.privacidad" name="T56 BYOD no se descifra" time="0.5">
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T57 WIFI-EST hacia CTRL01, MGMT y LAB" time="5.5">
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T58 EC2-GW solo alcanza CTRL01:443 y SIEM01" time="23.0">
+    <skipped message="PARCIAL: medición vacía: el Security Group sg-gw no existe en el Modo L: aquí solo se midió la denegación de FW01; la del SG se prueba en el Modo A (D5.4, make test-aws)"/>
+  </testcase>
+  <testcase classname="CE0311.continuidad" name="T59 Restaurar la consola desde S3" time="0">
+    <skipped message="NO_APLICA: el Modo L no ejecuta T59 (modos de la prueba: A, H); se ejecuta en A y H"/>
+  </testcase>
+  <testcase classname="CE0311.segmentacion" name="T60 Secuestro de WPAD" time="4.3">
+  </testcase>
+</testsuite>

@@ -538,6 +538,9 @@ pruebas:
     amenazas: []
     detecciones: []
     celdas_matriz: []
+    observacion_ensayo:
+      causa: "FW01 permite TCP 443 desde DMZ-SVC hacia cualquier destino (F23); D1.9 y D1.11 piden solo los endpoints ACME y el diseño no dice cómo limitar el destino (CI-50)"
+      accion: "Decidir CI-50: alias de FW01 por FQDN de la CA elegida o lista de IP en el FortiGate; luego repetir T19 con make test-lab"
 
   - id: T20
     categoria: segmentacion

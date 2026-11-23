@@ -317,10 +317,11 @@ mod tests {
             never_intercept: vec!["bank.example.com".into()],
             ..Default::default()
         };
-        assert!(cfg.should_intercept("cdn.example.com"));
-        assert!(!cfg.should_intercept("online.bank.example.com"));
-        assert!(cfg.is_never_intercept("BANK.example.com."));
-        assert!(!cfg.is_never_intercept("cdn.example.com"));
+        let p = crate::signed::Policy::from_config(&cfg).unwrap();
+        assert!(p.domain_allowed("cdn.example.com"));
+        assert!(!p.domain_allowed("online.bank.example.com"));
+        assert!(p.is_never_intercept("BANK.example.com."));
+        assert!(!p.is_never_intercept("cdn.example.com"));
     }
 
     #[test]

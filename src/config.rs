@@ -124,6 +124,17 @@ pub struct Config {
     /// REQ-F-27: rutas señuelo. Pedir una de ellas (por ella o por un prefijo) genera el evento `honey_url` y devuelve 404; ningún usuario
     /// legítimo las pide.
     pub honey_urls: Vec<String>,
+    /// REQ-F-36: redes de origen BYOD (el Wi-Fi de estudiantes). El tráfico de estos clientes nunca se descifra, aunque el dominio esté
+    /// en `intercept_domains`.
+    pub byod_networks: Vec<String>,
+    /// REQ-F-17: archivo `config.toml` firmado por la consola; la firma (ed25519, hex) está en `<archivo>.sig`. Se recarga por intervalo o con SIGHUP.
+    pub signed_config: Option<PathBuf>,
+    /// Llave pública ed25519 (32 bytes en hexadecimal) fijada en el arranque. Solo se lee de la configuración de arranque.
+    pub config_public_key: Option<PathBuf>,
+    /// Cada cuántos segundos se revisa `signed_config`.
+    pub config_reload_secs: u64,
+    /// Versión de la configuración. Una configuración firmada con una versión menor que la aplicada se rechaza.
+    pub config_version: u64,
     /// REQ-F-26: nodos del PAC, `ip:puerto`, en orden de preferencia. El PAC termina siempre en `DIRECT` como respaldo.
     pub pac_nodes: Vec<String>,
     /// REQ-F-26: redes (CIDR) que el PAC manda por `DIRECT` sin pasar por el proxy.
@@ -241,6 +252,11 @@ impl Default for Config {
             shield_key: "./ca/shield.key".into(),
             shield_client_ca: "./ca/shield-clients-ca.crt".into(),
             honey_urls: vec![],
+            byod_networks: vec![],
+            signed_config: None,
+            config_public_key: None,
+            config_reload_secs: 15,
+            config_version: 0,
             pac_nodes: vec![],
             pac_direct_networks: vec![],
             pac_host: String::new(),
@@ -265,20 +281,6 @@ impl Config {
             tracing::info!("config por defecto escrita en {}", path.display());
             Ok(cfg)
         }
-    }
-
-    pub fn should_intercept(&self, host: &str) -> bool {
-        if self.is_never_intercept(host) {
-            return false;
-        }
-        let host = canonical_host(host);
-        self.intercept_domains.iter().any(|s| matches_suffix(&host, s))
-    }
-
-    /// Dominios protegidos: no se descifran ni se cachean, tampoco por HTTP plano.
-    pub fn is_never_intercept(&self, host: &str) -> bool {
-        let host = canonical_host(host);
-        self.never_intercept.iter().any(|s| matches_suffix(&host, s))
     }
 }
 

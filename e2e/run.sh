@@ -885,6 +885,59 @@ expect "el nodo sirve /wpad.dat con su tipo"               "application/x-ns-pro
 expect "y es el mismo archivo que genera el subcomando"    "si" "$(curl -s --noproxy '*' http://127.0.0.1:3199/wpad.dat | cmp -s - pac.generado && echo si || echo no)"
 expect "otra ruta devuelve 404"                             "404" "$(curl -s --noproxy '*' -o /dev/null -w '%{http_code}' http://127.0.0.1:3199/otra)"
 
+section "35. BYOD: el Wi-Fi de estudiantes no se descifra (REQ-F-36)"
+# El cliente de la prueba es 127.0.0.1. Sin byod_networks el dominio de la lista se descifra (el certificado es el de la CA del nodo y curl lo acepta);
+# con su red en byod_networks pasa cifrado: el certificado es el del origen, que la CA del nodo no avala, y el túnel sigue funcionando.
+EXTRA='byod_networks = ["127.0.0.1/32"]' SECURITY=true start_proxy byod 3210
+byod_curl() { curl -s -g --noproxy "" -x http://127.0.0.1:3210 "$@"; }
+expect "sin byod_networks el dominio de la lista se descifra"      "200" "$(curlx -o /dev/null -w '%{http_code}' $L/blob/byod-control)"
+expect "un cliente BYOD no recibe el certificado de la CA del nodo" "000" "$(byod_curl --cacert ca/celeris-ca.crt -o /dev/null -w '%{http_code}' $L/blob/byod-1)"
+expect "pero el túnel cifrado funciona hasta el origen"             "200" "$(byod_curl -k -o /dev/null -w '%{http_code}' $L/blob/byod-2)"
+expect "el certificado que ve es el del origen, no el del nodo"     "si" "$(byod_curl -k -v -o /dev/null $L/blob/byod-3 2>&1 | grep -i 'issuer' | grep -qi 'celeris' && echo no || echo si)"
+expect "el origen sí recibió la petición (no se cachea ni se descifra)" "1" "$(origin_hits blob/byod-3)"
+EXTRA='byod_networks = ["172.16.0.0/16"]' start_proxy byod-otra 3211
+expect "otro cliente, con byod_networks de otra red, se descifra"   "200" "$(PX=http://127.0.0.1:3211 curlx -o /dev/null -w '%{http_code}' $L/blob/byod-4)"
+
+section "36. Configuración firmada (REQ-F-17)"
+openssl genpkey -algorithm ed25519 -out firma.key 2>/dev/null
+openssl pkey -in firma.key -pubout -outform DER 2>/dev/null | tail -c 32 | od -An -tx1 | tr -d ' \n' > firma.pub
+firmar() { openssl pkeyutl -sign -inkey firma.key -rawin -in "$1" 2>/dev/null | od -An -tx1 | tr -d ' \n' > "$1.sig"; }
+mkdir -p cfg-firmada
+escribir_firmada() { # versión, dominios (lista TOML)
+  printf 'config_version = %s\nallowed_clients = ["127.0.0.1/32"]\nintercept_domains = %s\n' "$1" "$2" > cfg-firmada/config.toml
+  firmar cfg-firmada/config.toml
+}
+escribir_firmada 1 '["localhost"]'
+EXTRA='signed_config = "./cfg-firmada/config.toml"
+config_public_key = "./firma.pub"
+config_reload_secs = 1' SECURITY=true start_proxy firmada 3212
+fx() { curl -s -g --noproxy "" -x http://127.0.0.1:3212 --cacert ca/celeris-ca.crt -o /dev/null -w '%{http_code}' "$@"; }
+eventos() { cat logs-firmada/security-*.jsonl 2>/dev/null | grep -c "\"event\":\"$1\""; }
+expect "con la configuración v1 el dominio se descifra"                      "200" "$(fx $L/blob/firmada-1)"
+escribir_firmada 2 '[]'
+sleep 3
+expect "la v2 firmada (sin dominios) se aplica en unos segundos: ya pasa cifrado" "000" "$(fx $L/blob/firmada-2)"
+expect "se emitió un evento config_applied"                                    "si" "$([ "$(eventos config_applied)" -ge 1 ] && echo si || echo no)"
+# un cambio sin volver a firmar
+printf 'config_version = 3\nallowed_clients = ["127.0.0.1/32"]\nintercept_domains = ["localhost"]\n' > cfg-firmada/config.toml
+sleep 3
+expect "una configuración alterada sin firma se rechaza y se conserva la anterior" "000" "$(fx $L/blob/firmada-3)"
+expect "con evento config_rejected por firma inválida"                         "si" "$(grep -h config_rejected logs-firmada/security-*.jsonl | grep -q firma_invalida && echo si || echo no)"
+# firmada, pero con versión menor que la aplicada (2)
+escribir_firmada 1 '["localhost"]'
+sleep 3
+expect "una versión menor que la aplicada se rechaza"                           "000" "$(fx $L/blob/firmada-4)"
+expect "con evento config_rejected por versión anterior"                       "si" "$(grep -h config_rejected logs-firmada/security-*.jsonl | grep -q version_anterior && echo si || echo no)"
+# firmada por otra llave
+cp firma.key firma-buena.key; openssl genpkey -algorithm ed25519 -out firma.key 2>/dev/null
+escribir_firmada 9 '["localhost"]'
+cp firma-buena.key firma.key
+sleep 3
+expect "una firma de otra llave no se acepta"                                    "000" "$(fx $L/blob/firmada-5)"
+escribir_firmada 5 '["localhost"]'
+sleep 3
+expect "la v5 firmada con la llave fijada vuelve a descifrar el dominio"        "200" "$(fx $L/blob/firmada-6)"
+
 echo
 if [ "$FAILS" -eq 0 ]; then
   echo "TODO OK"

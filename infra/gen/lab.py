@@ -136,6 +136,10 @@ def topologia(x: Infra) -> dict:
         imagen = IMAGEN_NODO if nombre in ("edge01", "edge02") else IMAGEN_BASE
         if nombre == "hny01":        # los registros de Cowrie (acompañante) los lee el agente de Wazuh de hny01
             extra = {"binds": [f"generated/{nombre}:/lab:ro", ".run/pki:/pki:ro", ".run/cowrie-log:/var/log/cowrie:ro"]}
+        if nombre == "ctrl01":       # REQ-F-17: la consola de prueba publica aquí la configuración firmada (config.toml + config.toml.sig)
+            extra = {"binds": [f"generated/{nombre}:/lab:ro", ".run/pki:/pki:ro", ".run/firmada:/firmada"]}
+        if nombre in ("edge01", "edge02"):
+            extra = {"binds": [f"generated/{nombre}:/lab:ro", ".run/pki:/pki:ro", ".run/firmada:/firmada:ro"]}
         linux(nombre, imagen, ["eth1"], extra)
         links.append({"endpoints": [f"{nombre}:eth1", f"{puente(x, zona)}:{_veth(nombre, str(x.zonas[zona]['vlan']))}"]})
 
@@ -377,6 +381,8 @@ def _config_edge(x: Infra, nodo: str) -> str:
             'security_log_enabled = true\nsecurity_log_dir = "/data/logs"\n'
             # REQ-F-27: ruta señuelo de laboratorio [S-17]
             f'honey_urls = ["{P["honey_url"]}"]\n'
+            # REQ-F-17: el nodo recarga la configuración que la consola de prueba firma (ctrl01); la llave pública queda fijada aquí, en el arranque
+            'signed_config = "/firmada/config.toml"\nconfig_public_key = "/pki/config-firma.pub"\nconfig_reload_secs = 5\n'
             # REQ-F-26: el PAC lo genera el binario desde estos valores (`celeris-cache pac`); nginx lo sirve por F3
             f'pac_nodes = {nodos_pac!r}\npac_direct_networks = {directas!r}\npac_host = "{pac_host}"\n'.replace("'", '"'))
 
@@ -494,6 +500,18 @@ c = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER); c.load_cert_chain("/pki/ctrl01.pem"
 c.load_verify_locations("/pki/nodos-ca.pem"); c.verify_mode = ssl.CERT_OPTIONAL
 srv = http.server.ThreadingHTTPServer(("0.0.0.0", 443), H); srv.socket = c.wrap_socket(srv.socket, server_side=True); srv.serve_forever()
 '''
+
+
+FIRMAR_SH = """#!/bin/sh
+# Ayudante de laboratorio de ctrl01 (REQ-F-17): firma con ed25519 la configuración que llega por la entrada estándar y la publica en /firmada.
+# Uso: firmar.sh < config.toml        La llave privada (/pki/config-firma.key) es de laboratorio y se genera en cada equipo; no está en el repositorio.
+set -eu
+tmp=/firmada/.config.toml.nuevo
+cat > "$tmp"
+openssl pkeyutl -sign -inkey /pki/config-firma.key -rawin -in "$tmp" | od -An -tx1 | tr -d ' \\n' > /firmada/config.toml.sig.nuevo
+mv "$tmp" /firmada/config.toml
+mv /firmada/config.toml.sig.nuevo /firmada/config.toml.sig
+"""
 
 
 def _arranque_fw(x: Infra) -> str:
@@ -699,7 +717,7 @@ def archivos_nodo(x: Infra, nodo: str, aviso_md: Path) -> dict[str, str]:
         # CTRL01 (D5.3): consola de prueba en 443 (F28, F30) y, en la etapa 3, firma de la configuración de los nodos
         base += ["touch /var/log/consola.log; chmod 666 /var/log/consola.log", "mkdir -p /firmada",
                  "python3 /lab/consola.py >> /var/log/consola.log 2>&1 &", "touch /run/lab-listo", ""]
-        return {"arranque.sh": "\n".join(base), "consola.py": CONSOLA_PY} | extra_agente
+        return {"arranque.sh": "\n".join(base), "consola.py": CONSOLA_PY, "firmar.sh": FIRMAR_SH} | extra_agente
     if rol == "edge":
         ip = _ip_de(x, comp)
         base += ["mkdir -p /data/store /data/ca /data/logs", "RUST_LOG=celeris_cache=info celeris-cache /lab/config.toml > /var/log/celeris.log 2>&1 &"]
@@ -773,6 +791,10 @@ def crear_pki(directorio: Path, x: Infra | None = None) -> None:
         cert("gw-sim-servidor", "ca", P["dominio_panel"], [f"DNS:{P['dominio_panel']}", f"IP:{P['gw_publica']}"], "serverAuth")
     for nodo in ("edge01", "edge02", "gw-sim"):          # certificados de cliente (mTLS): nodos hacia la consola (F10) y EC2-GW hacia CTRL01 (F30)
         cert(nodo, "nodos-ca", nodo, [], "clientAuth")
+    if not (directorio / "config-firma.key").exists():        # REQ-F-17: par ed25519 con que ctrl01 firma la configuración; la pública (32 bytes en hex) se fija en los nodos
+        sh("openssl", "genpkey", "-algorithm", "ed25519", "-out", "config-firma.key")
+        der = subprocess.run(["openssl", "pkey", "-in", "config-firma.key", "-pubout", "-outform", "DER"], check=True, capture_output=True, cwd=directorio).stdout
+        (directorio / "config-firma.pub").write_text(der[-32:].hex() + "\n")
     for f in directorio.glob("*.key"):
         f.chmod(0o644)       # los contenedores leen la llave desde un montaje de solo lectura; es de laboratorio y vive en lab/.run/
 
@@ -790,6 +812,9 @@ def generar_todo(x: Infra, lab_dir: Path, aviso_md: Path) -> list[Path]:
     for nombre, texto in (("puentes.sh", puentes_sh(x)),):
         escribir(gen / nombre, texto, 0o755)
         escritos.append(gen / nombre)
+    firmada = lab_dir / ".run" / "firmada"
+    firmada.mkdir(parents=True, exist_ok=True)
+    firmada.chmod(0o777)                # ctrl01 (root) escribe y los nodos EDGE leen
     pki = lab_dir / ".run" / "pki"
     crear_pki(pki, x)
     vpn.escribir_psk(pki, x, P["aws_peers"], P["fgt_wan"])

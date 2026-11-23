@@ -29,7 +29,7 @@ pub struct Shared {
     pub store: Store,
     pub stats: Arc<Stats>,
     pub normalizer: KeyNormalizer,
-    pub clients: ClientGate,
+    pub clients: Arc<ClientGate>,
     pub destinations: Arc<DestinationPolicy>,
     pub memory: MemoryBudget,
     pub flights: Flights,
@@ -38,6 +38,8 @@ pub struct Shared {
     pub detector: Arc<Detector>,
     pub live_log: Arc<LiveLog>,
     pub security: Arc<SecurityLog>,
+    /// Política que puede cambiar sin reiniciar (configuración firmada) y regla del Wi-Fi de estudiantes (REQ-F-36).
+    pub policy: Arc<crate::signed::LivePolicy>,
     /// Página de http://celeris.aviso/, generada al arrancar.
     pub notice: Bytes,
 }
@@ -314,7 +316,7 @@ impl CacheHandler {
         // Un túnel lo abre Hudsucker, que volvería a resolver el nombre y podría recibir una IP interna.
         // Por eso se fija la IP ya validada. A cambio, el túnel no prueba las demás IPs del nombre.
         // No afecta a TLS: el SNI y el certificado siguen siendo un asunto entre cliente y origen.
-        if !sh.cfg.should_intercept(host) {
+        if !sh.policy.current().should_intercept(host, client) {
             // Hudsucker no expone los bytes de un túnel: solo se puede registrar que se abrió.
             info.finish(sh, Outcome::Tunnel, None, None);
             let target = addrs.iter().find(|a| a.is_ipv4()).or_else(|| addrs.first());
@@ -328,9 +330,10 @@ impl CacheHandler {
 
 impl HttpHandler for CacheHandler {
     /// Intercepción selectiva en modo proxy explícito (CONNECT host:443).
-    async fn should_intercept_connect(&mut self, _ctx: &HttpContext, req: &Request<Body>) -> bool {
+    async fn should_intercept_connect(&mut self, ctx: &HttpContext, req: &Request<Body>) -> bool {
         let host = req.uri().host().unwrap_or_default();
-        let yes = self.shared.cfg.should_intercept(host);
+        // REQ-F-36: un cliente de una red BYOD nunca se descifra, aunque el dominio esté en la lista.
+        let yes = self.shared.policy.current().should_intercept(host, ctx.client_addr.ip());
         // Hudsucker solo lee el SNI si se intercepta: en los demás túneles no hay nada que comparar.
         self.connect_host = yes.then(|| host.to_owned());
         if !yes {
@@ -344,7 +347,7 @@ impl HttpHandler for CacheHandler {
     /// CONNECT, pasa cifrado (REQ-F-02). La intercepción se cuenta aquí porque recién en este punto queda decidida.
     async fn should_intercept_tls(&mut self, ctx: &HttpContext, hello: ClientHello<'_>) -> bool {
         let sni = hello.server_name();
-        let (yes, mismatch) = tls_decision(&self.shared.cfg, sni, self.connect_host.as_deref());
+        let (yes, mismatch) = tls_decision(&self.shared.policy.current(), ctx.client_addr.ip(), sni, self.connect_host.as_deref());
         let s = &self.shared.stats;
         Stats::inc(if yes { &s.tls_intercepted } else { &s.tls_passthrough });
         if mismatch {
@@ -451,7 +454,7 @@ impl HttpHandler for CacheHandler {
         let scope_ok = match url.scheme.as_str() {
             // HTTPS solo llega aquí si pasó el filtro de intercepción.
             "https" => true,
-            "http" => sh.cfg.cache_plain_http && !sh.cfg.is_never_intercept(url.hostname()),
+            "http" => sh.cfg.cache_plain_http && !sh.policy.current().is_never_intercept(url.hostname()),
             _ => false,
         };
         if !scope_ok || !policy::request_is_cacheable(&req) {
@@ -695,9 +698,9 @@ impl HttpHandler for CacheHandler {
 /// Decide si se descifra un túnel ya autorizado: el SNI debe estar en la lista y coincidir con el
 /// destino del CONNECT (REQ-F-02). Devuelve (descifrar, el SNI difiere del CONNECT).
 // req: REQ-F-02
-fn tls_decision(cfg: &Config, sni: Option<&str>, connect: Option<&str>) -> (bool, bool) {
+fn tls_decision(policy: &crate::signed::Policy, client: IpAddr, sni: Option<&str>, connect: Option<&str>) -> (bool, bool) {
     let mismatch = matches!((sni, connect), (Some(sni), Some(connect)) if canonical_host(sni) != canonical_host(connect));
-    let yes = !mismatch && sni.is_some_and(|sni| cfg.should_intercept(sni));
+    let yes = !mismatch && sni.is_some_and(|sni| policy.should_intercept(sni, client));
     (yes, mismatch)
 }
 
@@ -705,25 +708,27 @@ fn tls_decision(cfg: &Config, sni: Option<&str>, connect: Option<&str>) -> (bool
 mod tests {
     use super::*;
 
-    fn cfg_intercepta(dominios: &[&str]) -> Config {
-        Config { intercept_domains: dominios.iter().map(|d| d.to_string()).collect(), ..Default::default() }
+    const LAB: IpAddr = IpAddr::V4(std::net::Ipv4Addr::new(10, 20, 32, 5));
+
+    fn cfg_intercepta(dominios: &[&str]) -> crate::signed::Policy {
+        crate::signed::Policy::from_config(&Config { intercept_domains: dominios.iter().map(|d| d.to_string()).collect(), ..Default::default() }).unwrap()
     }
 
     // req: REQ-F-02
     #[test]
     fn sni_distinto_del_connect_no_se_descifra_aunque_ambos_esten_en_la_lista() {
         let cfg = cfg_intercepta(&["cdn.example", "otro.example"]);
-        assert_eq!(tls_decision(&cfg, Some("otro.example"), Some("cdn.example")), (false, true));
-        assert_eq!(tls_decision(&cfg, Some("fuera.invalid"), Some("cdn.example")), (false, true));
+        assert_eq!(tls_decision(&cfg, LAB, Some("otro.example"), Some("cdn.example")), (false, true));
+        assert_eq!(tls_decision(&cfg, LAB, Some("fuera.invalid"), Some("cdn.example")), (false, true));
     }
 
     // req: REQ-F-02
     #[test]
     fn sni_igual_al_connect_y_en_la_lista_se_descifra() {
         let cfg = cfg_intercepta(&["cdn.example"]);
-        assert_eq!(tls_decision(&cfg, Some("CDN.example."), Some("cdn.example")), (true, false));
-        assert_eq!(tls_decision(&cfg, None, Some("cdn.example")), (false, false));
-        assert_eq!(tls_decision(&cfg_intercepta(&[]), Some("cdn.example"), Some("cdn.example")), (false, false));
+        assert_eq!(tls_decision(&cfg, LAB, Some("CDN.example."), Some("cdn.example")), (true, false));
+        assert_eq!(tls_decision(&cfg, LAB, None, Some("cdn.example")), (false, false));
+        assert_eq!(tls_decision(&cfg_intercepta(&[]), LAB, Some("cdn.example"), Some("cdn.example")), (false, false));
     }
 
     #[test]

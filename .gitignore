@@ -42,3 +42,10 @@ crash.log
 
 # Herramientas descargadas (PlantUML); se obtienen con docs/software/e1/diagramas/render.py
 .tools/
+
+# e2e: llaves de la prueba de configuración firmada (REQ-F-17), generadas en cada ejecución
+e2e/firma*
+e2e/cfg-firmada/
+e2e/*-e2e.crt
+e2e/pac.err
+e2e/pac.generado

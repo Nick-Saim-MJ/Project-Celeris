@@ -23,6 +23,7 @@ mod policy;
 mod secure;
 mod security;
 mod shield;
+mod signed;
 mod stats;
 mod store;
 mod upstream;
@@ -52,7 +53,7 @@ async fn main() -> anyhow::Result<()> {
     let cfg = config::Config::load_or_create(&cfg_path)?;
     let addr: SocketAddr = cfg.listen.parse()?;
 
-    let clients = access::ClientGate::new(&cfg, addr)?;
+    let clients = Arc::new(access::ClientGate::new(&cfg, addr)?);
     let destinations = Arc::new(access::DestinationPolicy::new(&cfg)?);
     let stats = Arc::new(stats::Stats::default());
 
@@ -134,7 +135,15 @@ async fn main() -> anyhow::Result<()> {
     let final_stats = stats.clone();
     let memory = memory::MemoryBudget::new(cfg.max_buffered_bytes);
     let flights = coalesce::Flights::new(cfg.coalesce_wait_secs);
-    let shared = Arc::new(Shared { cfg, store, stats, normalizer, clients, destinations, memory, flights, access_log, client_stats, detector, live_log, security: security.clone(), notice });
+    // REQ-F-36 y REQ-F-17: política viva (BYOD, dominios, clientes) y configuración firmada con la llave pública fijada en el arranque
+    let policy = Arc::new(signed::LivePolicy::new(signed::Policy::from_config(&cfg)?));
+    if let Some(firmada) = signed::Firmada::desde_config(&cfg, ca_summary.permitted.clone())? {
+        let firmada = Arc::new(firmada);
+        firmada.recargar(&policy, &clients, &security);
+        signed::iniciar(firmada, policy.clone(), clients.clone(), security.clone(), cfg.config_reload_secs);
+        tracing::info!("configuración firmada activa: se revisa cada {} s y con SIGHUP", cfg.config_reload_secs);
+    }
+    let shared = Arc::new(Shared { cfg, store, stats, normalizer, clients, destinations, memory, flights, access_log, client_stats, detector, live_log, security: security.clone(), policy, notice });
 
     let proxy = Proxy::builder()
         .with_addr(addr)

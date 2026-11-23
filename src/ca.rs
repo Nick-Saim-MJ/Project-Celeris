@@ -143,7 +143,7 @@ fn permitted_domains(cert_pem: &str) -> anyhow::Result<Option<Vec<String>>> {
     }))
 }
 
-fn uncovered_domains(domains: &[String], permitted: &[String]) -> Vec<String> {
+pub(crate) fn uncovered_domains(domains: &[String], permitted: &[String]) -> Vec<String> {
     domains
         .iter()
         .filter(|d| {

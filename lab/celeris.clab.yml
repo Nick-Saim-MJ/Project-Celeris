@@ -84,6 +84,7 @@ topology:
       binds:
       - generated/ctrl01:/lab:ro
       - .run/pki:/pki:ro
+      - .run/firmada:/firmada
       env:
         ESPERA_IFACES: eth1
       cap-add:
@@ -169,6 +170,7 @@ topology:
       binds:
       - generated/edge01:/lab:ro
       - .run/pki:/pki:ro
+      - .run/firmada:/firmada:ro
       env:
         ESPERA_IFACES: eth1
       cap-add:
@@ -181,6 +183,7 @@ topology:
       binds:
       - generated/edge02:/lab:ro
       - .run/pki:/pki:ro
+      - .run/firmada:/firmada:ro
       env:
         ESPERA_IFACES: eth1
       cap-add:

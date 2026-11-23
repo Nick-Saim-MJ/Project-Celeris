@@ -216,3 +216,22 @@ def test_ningun_archivo_generado_contiene_llaves(infra):
     for nodo in lab.todos_los_nodos():
         for nombre, texto in lab.archivos_nodo(infra, nodo, AVISO).items():
             assert not patron.search(texto), f"{nodo}/{nombre}"
+
+
+def test_la_configuracion_firmada_llega_a_los_nodos_edge_desde_ctrl01(infra):
+    """REQ-F-17: ctrl01 escribe /firmada (config.toml + .sig); los EDGE la leen con la llave pública fijada en su configuración de arranque."""
+    import tomllib
+    nodos = lab.topologia(infra)["topology"]["nodes"]
+    assert ".run/firmada:/firmada" in nodos["ctrl01"]["binds"]
+    for n in ("edge01", "edge02"):
+        assert ".run/firmada:/firmada:ro" in nodos[n]["binds"]
+        cfg = tomllib.loads(lab.archivos_nodo(infra, n, AVISO)["config.toml"])
+        assert cfg["signed_config"] == "/firmada/config.toml" and cfg["config_public_key"] == "/pki/config-firma.pub"
+    firmar = lab.archivos_nodo(infra, "ctrl01", AVISO)["firmar.sh"]
+    assert "openssl pkeyutl -sign -inkey /pki/config-firma.key -rawin" in firmar and "PRIVATE" not in firmar
+
+
+def test_la_pki_de_laboratorio_genera_el_par_de_firma_fuera_del_repositorio(tmp_path):
+    lab.crear_pki(tmp_path)
+    pub = (tmp_path / "config-firma.pub").read_text().strip()
+    assert len(bytes.fromhex(pub)) == 32 and (tmp_path / "config-firma.key").exists()

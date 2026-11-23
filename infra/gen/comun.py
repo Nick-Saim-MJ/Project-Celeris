@@ -19,7 +19,8 @@ def cabecera(comentario: str = "#") -> str:
 
 def fw01_interfaces(x: Infra) -> dict[str, dict]:
     """zona → {interfaz, ip} de FW01 (el inventario nombra las interfaces: wan, vlan10, …)."""
-    return {i["zona"]: {"interfaz": i["interfaz"], "ip": i["ip"]} for i in x.componentes["FW01"]["ips"]}
+    # v0.4: la WAN de FW01 está en la red de tránsito (TRANSITO, 10.20.0.2); los generadores la llaman «PERIMETRO» como antes
+    return {("PERIMETRO" if i["interfaz"] == "wan" else i["zona"]): {"interfaz": i["interfaz"], "ip": i["ip"]} for i in x.componentes["FW01"]["ips"]}
 
 
 def ip_de(x: Infra, extremo) -> str | None:

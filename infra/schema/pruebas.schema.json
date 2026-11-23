@@ -58,7 +58,9 @@
               "deteccion",
               "disponibilidad",
               "privacidad",
-              "cifrado"
+              "cifrado",
+              "acceso",
+              "continuidad"
             ]
           },
           "nombre": {
@@ -101,7 +103,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "pattern": "^F([1-9]|1[0-9]|2[0-7])$"
+              "pattern": "^F([1-9]|[12][0-9]|3[0-2])$"
             }
           },
           "flujos_justificacion": {
@@ -161,17 +163,30 @@
             "description": "true si un FALLA de esta prueba invalida un límite de seguridad del diseño (V-42). Regla: categoría segmentacion, vpn o cifrado (CI-26)."
           },
           "polaridad": {
-            "enum": ["positiva", "negativa", "mixta"],
+            "enum": [
+              "positiva",
+              "negativa",
+              "mixta"
+            ],
             "description": "positiva: se espera tráfico permitido; negativa: se espera denegación; mixta: ambas."
           },
           "observacion_ensayo": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["causa", "accion"],
+            "required": [
+              "causa",
+              "accion"
+            ],
             "description": "Causa y acción de una FALLA en el ensayo del Modo L; V-73 la exige mientras la prueba falle.",
             "properties": {
-              "causa": {"type": "string", "minLength": 1},
-              "accion": {"type": "string", "minLength": 1}
+              "causa": {
+                "type": "string",
+                "minLength": 1
+              },
+              "accion": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           },
           "ampliacion": {
@@ -260,6 +275,16 @@
                 "minItems": 1
               }
             ]
+          },
+          "estado": {
+            "enum": [
+              "vigente",
+              "retirado"
+            ]
+          },
+          "retirado_por": {
+            "type": "string",
+            "pattern": "^CI-\\d{2}$"
           }
         }
       },

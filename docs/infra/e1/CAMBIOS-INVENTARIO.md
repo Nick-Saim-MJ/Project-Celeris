@@ -31,8 +31,8 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | --- | --- | --- | --- |
 | CI-01 | contradicción | Versión del documento maestro (0.2 vs 0.2.1) | abierto |
 | CI-02 | contradicción | «15 secciones» del documento vs 11 de la plantilla; falta la tabla de contenidos mínimos | abierto |
-| CI-03 | contradicción | F3 llega a EDGE01, la matriz LAB→EDGE solo lista F1 | abierto |
-| CI-04 | contradicción | F2 no tiene LAB-TEST de origen, la matriz LAB-TEST→SERVERS lista F2 | abierto |
+| CI-03 | contradicción | F3 llega a EDGE01, la matriz LAB→EDGE solo lista F1 | resuelto en CI-39 (D1.8 v0.4 lista F1 y F3) |
+| CI-04 | contradicción | F2 no tiene LAB-TEST de origen, la matriz LAB-TEST→SERVERS lista F2 | resuelto en CI-39 (LAB-TEST retirada) |
 | CI-05 | vacío | MGMT→Internet «443 actualizaciones» sin flujo F-nn | resuelto en CI-29 (F27) |
 | CI-06 | vacío | EDGE→EDGE «peering» sin flujo ni puertos | abierto |
 | CI-07 | contradicción | F13 «todos los agentes» frente a la matriz y a las reglas de zona | abierto |
@@ -63,6 +63,19 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-32 | texto genérico | 17 textos de componentes (por qué / aporta / si falla) sin dato verificable (V-66) | abierto |
 | CI-33 | contradicción | C4.3: celeris-control (CTRL01) publica el portal en WEB01, pero no existe flujo CTRL01 → WEB01; el sitio lo despliega JMP01 por SSH (F20) | abierto |
 | CI-34 | supuesto nuevo | S-20 (vigencia del token de enrolamiento) y S-21 (umbral de error del rollout), usados por el diseño detallado de CE02 | abierto |
+| CI-35 | decisión de transcripción | v0.4 (D7 CI-30): consola (SPA + API + PostgreSQL) en CTRL01; se retiran DB01 y F15 | resuelto (2026-11-22, I1) |
+| CI-36 | decisión de transcripción | v0.4 (D7 CI-31): EC2-GW, F29, F30, sg-gw; se retiran EC2-SHIELD, EC2-CTRLR, NAT01, F9, F16 y las subredes pub-b, app-b, data-a, data-b | resuelto (2026-11-22, I1) |
+| CI-37 | decisión de transcripción | v0.4 (D7 CI-32): FW01 detrás del FortiGate (FGT-EXT), tránsito 10.20.0.0/29, NAT-T; WAN de FW01 = 10.20.0.2 | resuelto (2026-11-22, I1) |
+| CI-38 | decisión de transcripción | v0.4 (D7 CI-33): zona WIFI-EST (172.16.0.0/16, provisional), F31, F32, T56, T57 | resuelto (2026-11-22, I1) |
+| CI-39 | decisión de transcripción | v0.4 (D7 CI-34): simplificación: se retiran SVC01, OBS01, IDS01, PROBE01, NAS01, WAF01, WEB01, ESX01 vmk1, VLAN 31, 70 y 71, F11, F12, F17, F19 y F22; PORTAL01; DNS y NTP en FW01 | resuelto (2026-11-22, I1) |
+| CI-40 | decisión de transcripción | v0.4 (D7 CI-35): ENC01 y F28; LABCLI01 y KALI01 a 10.20.35.0/24; rangos /26 de laboratorio | resuelto (2026-11-22, I1) |
+| CI-41 | decisión de transcripción | v0.4 (D7 CI-36): pruebas retiradas T12, T22, T37, T38, T39, T41, T44, T48; nuevas T50–T60; destinos de T01, T02, T20, T21, T29, T42, T46 | resuelto (2026-11-22, I1) |
+| CI-42 | supuesto nuevo | v0.4 (D7 CI-37): supuestos S-26…S-30 | resuelto (2026-11-22, I1) |
+| CI-43 | decisión de transcripción | v0.4 (D7 CI-38): trazabilidad OD-04, OD-08, OD-11, OD-12, AM-14…AM-18, DET-02, DET-10, DET-11 | resuelto (2026-11-22, I1) |
+| CI-44 | contradicción | F20 (D1.11 v0.4: TCP 22 y 443) frente a la administración del nodo en 9128 y el dashboard de Wazuh | abierto |
+| CI-45 | vacío | La matriz D1.8 v0.4 no tiene columna WIFI-EST | abierto |
+| CI-46 | vacío | nacl-private de D2.5: «puertos de servicio» sin definir | abierto |
+| CI-47 | contradicción | F2 «zonas internas» frente a DMZ-HONEY («solo envía al SIEM», D1.9) | abierto |
 
 ## Entradas
 
@@ -85,7 +98,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Efecto al resolver:** quitar `correspondencia_pendiente`; el chequeo V-26 deja de advertir.
 
 ### CI-03 — F3 llega a EDGE01, pero la matriz LAB→EDGE solo lista F1
-- **Estado:** abierto
+- **Estado:** resuelto en CI-39 (2026-11-22, I1): D1.8 v0.4 lista F1 y F3 en LAB → EDGE y F3 ya no incluye LAB-TEST
 - **Tipo:** contradicción
 - **Dónde:** D1.11 F3 (línea 1688), D1.8 matriz (filas LAB y LAB-TEST, columna EDGE, líneas 1563–1564), D1.9 «EDGE: solo recibe 3128 desde LAB» (línea 1602); `inventory.yaml` → `flujos[F3]`, `matriz_esperada` LAB→EDGE y LAB-TEST→EDGE
 - **Qué dice cada fuente:** F3 (PAC, TCP 80) tiene como destino `pac.celeris.internal` = SVC01 **y EDGE01**, y D1.12 dice que EDGE01 sirve una copia del PAC. La matriz solo permite F1 (TCP 3128) de LAB y LAB-TEST hacia EDGE, y la regla de la zona EDGE dice que solo recibe 3128.
@@ -94,7 +107,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Efecto al resolver:** corregir las dos celdas (o quitar EDGE01 del destino de F3); quitar `pendiente` de F3 y de las celdas. V-11 deja de advertir.
 
 ### CI-04 — F2 no incluye LAB-TEST de origen, pero la matriz lo lista
-- **Estado:** abierto
+- **Estado:** resuelto en CI-39 (2026-11-22, I1): la zona LAB-TEST se retira en la v0.4
 - **Tipo:** contradicción
 - **Dónde:** D1.11 F2 (línea 1687), D1.8 matriz fila LAB-TEST, columna SERVERS (línea 1564); `inventory.yaml` → `flujos[F2].origen`, `matriz_esperada` LAB-TEST→SERVERS
 - **Qué dice cada fuente:** el origen de F2 es «LAB, SECURITY, EDGE»; la matriz da `F2, F3` en LAB-TEST→SERVERS. Sin DNS, KALI01 y los equipos de LAB-TEST no resuelven nombres.
@@ -476,3 +489,147 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto
 - **Nota de integración (v0.4):** en CE02 se llamaban S-16 y S-17; esos números los usan otros supuestos de `infra/trazabilidad.yaml` (matriz de pruebas), así que se renumeraron a S-20 y S-21.
 - **Efecto al resolver:** agregar S-20 y S-21 a `infra/trazabilidad.yaml` y quitarlos de la tabla del README.
+
+## Entradas de la v0.4 (I1)
+
+> **Numeración.** CE03 D7 registra estos cambios como CI-30…CI-38, pero la integración de ramas (I0) ya ocupó CI-30…CI-34. Aquí llevan
+> CI-35…CI-43 (D7 + 5, en el mismo orden). Los documentos de `docs/celeris/` y el Marco común (M6: «CI-01…CI-38») usan la numeración de D7;
+> la equivalencia está en cada título. Lo retirado conserva su ID con `estado: retirado` y `retirado_por` y nunca se reutiliza (V-44).
+
+### CI-35 — Consola (SPA + API + PostgreSQL) en CTRL01; se retiran DB01 y F15 (D7 CI-30)
+- **Estado:** resuelto (2026-11-22, I1)
+- **Tipo:** decisión de transcripción
+- **Contexto:** En la v0.2 la base del plano de control vivía en DB01 (F15) y se replicaba a AWS (F16).
+- **Cambio:** CTRL01 aloja SPA + API + PostgreSQL local por socket (sin puerto en la red), 2 vCPU, 8 GB, 100 GB. DB01 y F15 pasan a `retirado`.
+- **Motivo:** Una base pequeña no justifica otra VM; la consola completa en el campus evita que el nodo dependa de Internet y deja la llave de firma y los datos dentro (Arquitectura §1.1 y §5).
+- **ADR:** D-25
+- **Archivos afectados:** `infra/inventory.yaml` (CTRL01, DB01, F15), `infra/pruebas.yaml`, `infra/trazabilidad.yaml`
+- **Decide:** equipo del proyecto
+
+### CI-36 — EC2-GW (10.30.0.10), F29, F30 y sg-gw; se retiran EC2-SHIELD, EC2-CTRLR, NAT01, F9, F16 y las subredes pub-b, app-b, data-a y data-b (D7 CI-31)
+- **Estado:** resuelto (2026-11-22, I1)
+- **Tipo:** decisión de transcripción
+- **Contexto:** La v0.2 tenía un shield de caché y una réplica de la consola en AWS, con NAT permanente.
+- **Cambio:** Nuevos EC2-GW (t3.micro, pub-a), S3 `celeris-backups` (Object Lock 30 días), EC2-DR y NAT-DR (estado `temporal`, simulacro T59), F29 (Internet → EC2-GW:443) y F30 (EC2-GW → CTRL01:443 por IPsec con mTLS), sg-gw y sg-dr. Quedan en AWS solo la VPC, pub-a y app-a. Las tablas de rutas citan 10.20.0.0/16 (D2.5), con lo que los textos de VGW y de las subredes ya no describen el /14 que observaba CI-31.
+- **Motivo:** Un segundo nivel de caché en AWS no ahorra enlace del campus (D-19); la continuidad por respaldo en S3 basta para un RTO de 2 h; el panel remoto entra por AWS sin publicar ningún puerto del campus (D-24).
+- **ADR:** D-24, D-19
+- **Archivos afectados:** `infra/inventory.yaml` (componentes AWS, F9, F16, F29, F30, bloque `aws`, `vpn`), `infra/pruebas.yaml` (T01–T05, T21, T26, T58, T59)
+- **Decide:** equipo del proyecto
+
+### CI-37 — FW01 detrás del FortiGate: FGT-EXT, tránsito 10.20.0.0/29 y NAT-T (D7 CI-32)
+- **Estado:** resuelto (2026-11-22, I1)
+- **Tipo:** decisión de transcripción
+- **Contexto:** La v0.2 daba a FW01 la IP pública 203.0.113.10 en su WAN.
+- **Cambio:** Nuevo componente FGT-EXT (existente, fuera de alcance; público 203.0.113.10 y tránsito 10.20.0.1) y nueva zona TRANSITO (10.20.0.0/29). La WAN de FW01 pasa a 10.20.0.2. `vpn` agrega `nat_t: true`, `ip_publica_en: FGT-EXT` e `identidad_ike` (la IP pública). El FortiGate hace NAT 1:1 hacia 10.20.0.2 solo para UDP 500/4500 y TCP 80/443 y excluye a EDGE01/02 de su inspección SSL [S-29].
+- **Motivo:** Respeta lo que la DTI ya opera: FortiGuard sigue filtrando la salida de los nodos; depende de cambios mínimos en el FortiGate (RE-11).
+- **ADR:** D-26
+- **Archivos afectados:** `infra/inventory.yaml` (zonas, FGT-EXT, FW01, `vpn`), `infra/trazabilidad.yaml` (S-29)
+- **Decide:** equipo del proyecto
+
+### CI-38 — Zona WIFI-EST (172.16.0.0/16, provisional), F31, F32, T56 y T57 (D7 CI-33)
+- **Estado:** resuelto (2026-11-22, I1)
+- **Tipo:** decisión de transcripción
+- **Contexto:** El diseño no incluía el Wi-Fi de estudiantes (BYOD).
+- **Cambio:** Nueva zona externa WIFI-EST (`supuesto: S-28`, color #F0E442) y componente-grupo WIFI-EST. F31 (WIFI-EST → EDGE01/02, TCP 3128 y 80, siempre passthrough) y F32 (→ PORTAL01:443). V-07 admite su red fuera de 10.20.0.0/16 y V-45 exige que ningún flujo con origen WIFI-EST permita descifrado (REQ-F-36).
+- **Motivo:** Privacidad: los equipos personales nunca se descifran y no alcanzan servidores ni laboratorios; el ahorro en BYOD es bajo y se declara.
+- **ADR:** D-27
+- **Archivos afectados:** `infra/inventory.yaml`, `infra/pruebas.yaml` (T56, T57), `infra/validate.py` (V-07, V-45)
+- **Decide:** equipo del proyecto
+
+### CI-39 — Simplificación: se retiran SVC01, OBS01, IDS01, PROBE01, NAS01, WAF01, WEB01, ESX01 vmk1, VLAN 31, 70 y 71, F11, F12, F17, F19 y F22 (D7 CI-34)
+- **Estado:** resuelto (2026-11-22, I1)
+- **Tipo:** decisión de transcripción
+- **Contexto:** La v0.2 tenía 10 VLAN y 17 VM en la fase F1.
+- **Cambio:** Quedan 7 VLAN (10, 20, 30, 40, 41, 50, 60). WAF01 + WEB01 pasan a PORTAL01 (10.20.40.10). DNS y NTP en FW01 (F2 con destino FW01; F25 con origen FW01); el PAC lo sirven EDGE01 y EDGE02. LAB-TEST, STORAGE y BACKUP pasan a `retirado`. DET-02 pasa a Suricata de FW01. OD-04 cambia de meta. El UPS apaga por NUT desde JMP01 (CI-09 sigue abierto: el flujo NUT no tiene puerto).
+- **Motivo:** 7 VM menos en la fase F1 (34 → 23 vCPU) sin perder criterios de la rúbrica: siguen habiendo IDS/IPS (Suricata en FW01), honeypot (HNY01, HNY02) y un servicio publicado detrás de un WAF.
+- **ADR:** D-28
+- **Archivos afectados:** `infra/inventory.yaml`, `infra/pruebas.yaml`, `infra/trazabilidad.yaml`; resuelve CI-03 y CI-04
+- **Decide:** equipo del proyecto
+
+### CI-40 — ENC01 (10.20.35.10) y F28; LABCLI01 y KALI01 al rango de infraestructura; rangos /26 de laboratorio (D7 CI-35)
+- **Estado:** resuelto (2026-11-22, I1)
+- **Tipo:** decisión de transcripción
+- **Contexto:** Los laboratorios no tenían rangos propios y KALI01 vivía en la VLAN 31.
+- **Cambio:** ENC01 10.20.35.10 (F28 → CTRL01:443), LABCLI01 → 10.20.35.50, KALI01 → 10.20.35.60 (zona LAB), HNY02 en 10.20.35.250. Nuevo bloque `rangos_lab`: LAB-01…LAB-10 (/26 desde 10.20.32.0), reserva 10.20.34.128/25 e infraestructura 10.20.35.0/24, con `habilitado`. Componente-grupo PCS-LAB.
+- **Motivo:** El encargado habilita accesos por laboratorio sin rediseñar la capa de acceso (REQ-F-10, F-32, OD-11); ENC01 queda fuera de MGMT para no recibir acceso de administración.
+- **ADR:** D-23
+- **Archivos afectados:** `infra/inventory.yaml` (`rangos_lab`, ENC01, PCS-LAB, LABCLI01, KALI01), `infra/pruebas.yaml` (T52)
+- **Decide:** equipo del proyecto
+
+### CI-41 — Pruebas: se retiran T12, T22, T37, T38, T39, T41, T44 y T48; se agregan T50–T60; cambian de destino T01, T02, T20, T21, T29, T42 y T46 (D7 CI-36)
+- **Estado:** resuelto (2026-11-22, I1)
+- **Tipo:** decisión de transcripción
+- **Contexto:** Varias pruebas apuntaban a piezas retiradas (STORAGE, SVC01, OTLP, base en red, NAS, NFS, peering).
+- **Cambio:** Las ocho pruebas quedan con `estado: retirado` y `retirado_por`. T50–T60 llevan `ampliacion: true`. T26 (privacidad) pasa a medir F8 (la petición saliente al origen) y deja de ser prueba de la VPN. T27 pasa a cubrir F20, F28 y F30. T56 sigue la regla de criticidad de CI-26 (categoría privacidad, no crítica); se propone revisarla porque un FALLA descifraría un equipo personal (REQ-F-36). Los IDs no se reutilizan.
+- **Motivo:** Cobertura de las funciones nuevas (precarga, firma de configuración, acceso por laboratorio, panel remoto, BYOD, simulacro de recuperación, WPAD).
+- **ADR:** —
+- **Archivos afectados:** `infra/pruebas.yaml`, `infra/trazabilidad.yaml` (rúbrica R2–R8)
+- **Decide:** equipo del proyecto
+
+### CI-42 — Supuestos S-26…S-30 (D7 CI-37)
+- **Estado:** resuelto (2026-11-22, I1)
+- **Tipo:** supuesto nuevo
+- **Contexto:** Marco común M5: los S-16…S-19 y S-25 ya tenían uso en el repositorio.
+- **Cambio:** S-26 (10 laboratorios × 40 PCs), S-27 (3 GB por PC), S-28 (Wi-Fi de la DTI), S-29 (FortiGate) y S-30 (IAM de solo escritura para respaldos). Los S-20 y S-21 de CE02 (token de enrolamiento y umbral del rollout) siguen sin registrarse en `trazabilidad.yaml` (CI-34).
+- **Motivo:** Todo supuesto se declara [S-xx]; los que no se validan se declaran como limitación en el informe.
+- **ADR:** —
+- **Archivos afectados:** `infra/trazabilidad.yaml` (`supuestos`)
+- **Decide:** equipo del proyecto
+
+### CI-43 — Trazabilidad: OD-11, OD-12, AM-14…AM-18, DET-10, DET-11; OD-04, OD-08 y DET-02 ajustados; AM-01, AM-02 y AM-11 con pruebas nuevas (D7 CI-38)
+- **Estado:** resuelto (2026-11-22, I1)
+- **Tipo:** decisión de transcripción
+- **Contexto:** La trazabilidad describía la v0.2.
+- **Cambio:** OD-11 (acceso por laboratorio, 10 de 10) y OD-12 (0 puertos del campus alcanzan CTRL01 desde Internet). AM-01 → T13, T52; AM-02 → T60; AM-11 → T06, T34, T57; AM-14…AM-18 nuevas. DET-10 (auditoría de la consola) y DET-11 (Coraza de EC2-GW). Se agregan D-24…D-28 y los requisitos REQ-F-31…37, REQ-NF-16 y REQ-RN-09…11 del contrato de IDs (Marco M6). OD-08 incluye ahora la calificación TLS de EC2-GW (D1.6 v0.4), cambio que D7 no lista. Las evidencias de la rúbrica se derivan de `criterios_rubrica` (V-21).
+- **Motivo:** Mantener la trazabilidad bidireccional entre pruebas, amenazas, detecciones y rúbrica.
+- **ADR:** D-23…D-28
+- **Archivos afectados:** `infra/trazabilidad.yaml`, `infra/pruebas.yaml`
+- **Decide:** equipo del proyecto
+
+### CI-44 — F20: D1.11 v0.4 lista solo TCP 22 y 443, pero el nodo se administra por 9128
+- **Estado:** abierto
+- **Tipo:** contradicción
+- **Contexto:** CE03 D1.11 y la Arquitectura §7 dan F20 = TCP 22, 443. El repositorio usaba 22, 443, 3000, 5601 y 9128; T27 verifica el puerto 9128 (REQ-NF-14) y `e2e/` usa 9128. El dashboard de Wazuh escucha en 5601 si no se pone detrás de 443.
+- **Cambio:** F20 transcribe solo TCP 22 y 443 (D1.11 v0.4) y queda `pendiente: true`. T27 describe la sesión a 9128 y lo marca en su precondición.
+- **Motivo:** No se elige en silencio: con 22/443 el firewall del laboratorio no abre 9128 desde JMP01 y la administración del nodo por su puerto actual no tendría flujo.
+- **ADR:** —
+- **Archivos afectados:** `infra/inventory.yaml` (F20), `infra/pruebas.yaml` (T27)
+- **Decide:** equipo del proyecto
+- **Propuesta:** agregar 9128 (administración del nodo, REQ-NF-14) a F20 o mover la administración al 443; confirmar si el dashboard de Wazuh va por 443 o 5601.
+- **Efecto al resolver:** corregir `protocolos` y `regla_fw` de F20 y quitar `pendiente`.
+
+### CI-45 — La matriz D1.8 v0.4 no tiene columna WIFI-EST
+- **Estado:** abierto
+- **Tipo:** vacío
+- **Contexto:** D1.8 y la Arquitectura §6.3 incluyen WIFI-EST solo como fila (origen); ninguna celda dice qué pasa hacia el Wi-Fi.
+- **Cambio:** Para que V-12 pueda comprobar una matriz completa, `matriz_esperada` agrega la columna WIFI-EST con «denegado» (FW01 no enruta hacia el Wi-Fi) y «no_aplica» desde Internet; todas esas celdas llevan `pendiente: true`.
+- **Motivo:** No hay flujo F-nn hacia WIFI-EST; el retorno de F31 y F32 lo cubre el firewall con estado.
+- **ADR:** —
+- **Archivos afectados:** `infra/inventory.yaml` (`matriz_esperada`)
+- **Decide:** equipo del proyecto
+- **Propuesta:** agregar la columna a D1.8 con ✖ en todas las filas salvo Internet (—).
+- **Efecto al resolver:** quitar `pendiente` de las celdas.
+
+### CI-46 — nacl-private (D2.5): «puertos de servicio» sin definir
+- **Estado:** abierto
+- **Tipo:** vacío
+- **Contexto:** D2.5: «Permitir 10.20.0.0/16 y 10.30.0.0/16 en puertos de servicio y retorno efímero; denegar el resto». Con app-a vacía en operación normal, no hay servicio que abrir.
+- **Cambio:** El bloque `aws.nacl` conserva las reglas con `puertos: servicio` y `pendiente: true`; no se inventa un puerto.
+- **Motivo:** La IaC (I3) necesita puertos concretos para el simulacro T59 (HTTPS hacia S3 y retorno efímero).
+- **ADR:** —
+- **Archivos afectados:** `infra/inventory.yaml` (`aws.nacl`)
+- **Decide:** equipo del proyecto
+- **Propuesta:** fijar la lista (por ejemplo TCP 443) en D2.5 para el simulacro.
+- **Efecto al resolver:** reemplazar `puertos: servicio` en nacl-private y quitar `pendiente`.
+
+### CI-47 — F2 «zonas internas» incluye DMZ-HONEY, que D1.9 limita a enviar al SIEM
+- **Estado:** abierto
+- **Tipo:** contradicción
+- **Contexto:** D1.11 y la Arquitectura §7: F2 = «Zonas internas → FW01». D1.9: DMZ-HONEY «Solo envía al SIEM» y el honeypot no tiene salida.
+- **Cambio:** F2 lista todas las zonas internas (MGMT, SERVERS, LAB, DMZ-SVC, DMZ-HONEY, SECURITY, EDGE) como origen y FW01 como destino; no cambia la matriz zona × zona.
+- **Motivo:** Transcripción literal de «zonas internas»; el DNS de HNY01 contradice «sin salida».
+- **ADR:** —
+- **Archivos afectados:** `infra/inventory.yaml` (F2)
+- **Decide:** equipo del proyecto
+- **Propuesta:** quitar DMZ-HONEY del origen de F2.
+- **Efecto al resolver:** corregir `origen` y `regla_fw` de F2 y quitar `pendiente`.

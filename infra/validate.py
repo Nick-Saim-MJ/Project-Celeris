@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validador de la fuente única de datos de red (CE0311, Entregable 1).
 
-Ejecuta los chequeos V-01…V-43 sobre infra/inventory.yaml, infra/pruebas.yaml e infra/trazabilidad.yaml,
+Ejecuta los chequeos V-01…V-45 sobre infra/inventory.yaml, infra/pruebas.yaml e infra/trazabilidad.yaml,
 ejecuta los ganchos de infra/checks/ (V-50+ diagramas, V-60+ XLSX componentes, V-70+ XLSX pruebas, V-80+ DOCX)
 y escribe docs/infra/e1/validacion.md.
 
@@ -234,7 +234,7 @@ def v04(x: Infra):
                 r.append(E(f"{cid}/{iface}: {ip} no está en {z['cidr']} ({zona})", f"Asigne una IP dentro de {z['cidr']} o cambie la zona"))
             elif a in (n.network_address, n.broadcast_address):
                 r.append(E(f"{cid}/{iface}: {ip} es la dirección de red o de difusión de {z['cidr']}", "Use una IP de host"))
-            elif z["gateway"] and ip == z["gateway"] and cid != "FW01":
+            elif z["gateway"] and ip == z["gateway"] and cid != "FW01" and z["tipo"] != "transito":
                 r.append(E(f"{cid}/{iface}: {ip} es el gateway de {zona}, reservado a FW01", "Use otra IP"))
         sub = x.componentes[cid].get("subred")
         if sub and a not in red(x.componentes[sub]["cidr"]):
@@ -256,18 +256,13 @@ def v05(x: Infra):
     return r
 
 
-@chequeo("V-06", "Gateways .1 (salvo VLAN 70, sin gateway) y coherentes con FW01")
+@chequeo("V-06", "Gateways .1 y coherentes con FW01; tránsito FW01 ↔ FortiGate (v0.4: 7 VLAN)")
 def v06(x: Infra):
     r = []
-    fw_if = {i["zona"]: i["ip"] for i in x.componentes["FW01"]["ips"] if i["zona"] != "PERIMETRO"}
-    for z in x.inv["zonas"]:
+    fw = x.componentes["FW01"]
+    fw_if = {i["zona"]: i["ip"] for i in fw["ips"] if x.zonas.get(i["zona"], {}).get("tipo") == "interna"}
+    for z in x.zonas.values():
         if z["tipo"] != "interna":
-            continue
-        if z["vlan"] == 70:
-            if z["gateway"] is not None:
-                r.append(E("VLAN 70 (STORAGE) debe tener gateway null (no enrutada)", "Ponga gateway: null"))
-            if "STORAGE" in fw_if:
-                r.append(E("FW01 no debe tener interfaz en STORAGE (VLAN 70)", "Quite la interfaz de FW01 en STORAGE"))
             continue
         esperado = str(red(z["cidr"]).network_address + 1)
         if z["gateway"] != esperado:
@@ -275,8 +270,18 @@ def v06(x: Infra):
         if fw_if.get(z["id"]) != z["gateway"]:
             r.append(E(f"{z['id']}: FW01 tiene {fw_if.get(z['id'])} en la zona, el gateway es {z['gateway']}", "FW01 debe tener la IP del gateway en cada VLAN"))
     vlans_fw = sorted(x.zonas[z]["vlan"] for z in fw_if)
-    if vlans_fw != [10, 20, 30, 31, 40, 41, 50, 60, 71]:
-        r.append(E(f"Subinterfaces de FW01 {vlans_fw} ≠ D1.13 [10, 20, 30, 31, 40, 41, 50, 60, 71]", "Ajuste las IP de FW01 al trunk de D1.13"))
+    if vlans_fw != [10, 20, 30, 40, 41, 50, 60]:
+        r.append(E(f"Subinterfaces de FW01 {vlans_fw} ≠ D1.13 v0.4 [10, 20, 30, 40, 41, 50, 60]", "Ajuste las IP de FW01 al trunk de D1.13"))
+    # D1.8 v0.4: tránsito 10.20.0.0/29, FortiGate .1 y FW01 .2 [S-29]
+    tr = x.zonas.get("TRANSITO")
+    if tr is None:
+        return r + [E("Falta la zona TRANSITO (10.20.0.0/29)", "Agréguela (CI-37)")]
+    wan = next((i for i in fw["ips"] if i["interfaz"] == "wan"), None)
+    if wan is None or wan["zona"] != "TRANSITO" or wan["ip"] != "10.20.0.2":
+        r.append(E(f"La WAN de FW01 debe ser 10.20.0.2 en TRANSITO y es {wan and wan['ip']} en {wan and wan['zona']}", "CI-37: la WAN de FW01 queda en la red de tránsito"))
+    fgt = x.componentes.get("FGT-EXT")
+    if fgt is None or next((i["ip"] for i in fgt["ips"] if i["zona"] == "TRANSITO"), None) != tr["gateway"]:
+        r.append(E(f"FGT-EXT debe tener la IP del gateway de tránsito ({tr['gateway']})", "CI-37"))
     return r
 
 
@@ -300,7 +305,7 @@ def v07(x: Infra):
     for nom, rd in sup:
         if nom == "AWS-CELERIS" and any(rd.overlaps(rs) for rs in resumen):
             r.append(E("La VPC de AWS se solapa con el resumen del campus", "Mantenga 10.30.0.0/16 fuera de 10.20.0.0/14"))
-    sede = [(z["id"], red(z["cidr"])) for z in x.inv["zonas"] if z["tipo"] == "interna" and z["cidr"]]
+    sede = [(z["id"], red(z["cidr"])) for z in x.zonas.values() if z["tipo"] in ("interna", "transito") and z["cidr"]]
     for nom, rd in sede:
         if not rd.subnet_of(por_id["SEDE-JULIACA"]):
             r.append(E(f"Zona {nom} ({rd}) fuera de 10.20.0.0/16", "Las zonas internas viven en la supernet de la sede"))
@@ -311,6 +316,32 @@ def v07(x: Infra):
     pares(sede + [(n, rd) for n, rd, p in reservas if p == "SEDE-JULIACA"], "10.20.0.0/16 (zonas y reservas)")
     aws = [(c["id"], red(c["cidr"])) for c in x.inv["componentes"] if c["tipo"] == "aws_subred"]
     pares(aws + [(n, rd) for n, rd, p in reservas if p == "AWS-CELERIS"], "10.30.0.0/16 (subredes y reservas)")
+    # Zonas externas con red propia (WIFI-EST, v0.4): quedan FUERA de 10.20.0.0/16 y del resumen, de AWS y de las demás
+    externas = [(z["id"], red(z["cidr"])) for z in x.zonas.values() if z["tipo"] == "externa" and z["cidr"]]
+    for nom, rd in externas:
+        for sn, sr in [(s_["id"], red(s_["cidr"])) for s_ in x.inv["supernets"]]:
+            if rd.overlaps(sr):
+                r.append(E(f"La zona externa {nom} ({rd}) se solapa con {sn} ({sr})", "La red del Wi-Fi debe quedar fuera de 10.20.0.0/16, del resumen del campus y de AWS (S-28)"))
+        for zn, zr in sede + aws:
+            if rd.overlaps(zr):
+                r.append(E(f"La zona externa {nom} ({rd}) se solapa con {zn} ({zr})", "Ajuste el CIDR"))
+    # Rangos de laboratorio (D1.8, D-23): /26 dentro de la VLAN 30, sin solapamientos, con la infraestructura en 10.20.35.0/24
+    rl = x.inv.get("rangos_lab")
+    if rl:
+        lab = red(x.zonas["LAB"]["cidr"])
+        items = [(l["id"], red(l["cidr"])) for l in rl["laboratorios"]] + [(rl["reserva"]["id"], red(rl["reserva"]["cidr"])), (rl["infraestructura"]["id"], red(rl["infraestructura"]["cidr"]))]
+        for nom, rd in items:
+            if not rd.subnet_of(lab):
+                r.append(E(f"{nom} ({rd}) no está dentro de LAB ({lab})", "Los rangos de laboratorio viven dentro de la VLAN 30"))
+        for l in rl["laboratorios"]:
+            if red(l["cidr"]).prefixlen != 26 or l["hosts_utiles"] != 62:
+                r.append(E(f"{l['id']}: debe ser un /26 con 62 hosts útiles", "D1.8: un /26 por laboratorio"))
+        pares(items, "rangos de laboratorio")
+        infra_r = red(rl["infraestructura"]["cidr"])
+        for cid in rl["infraestructura"]["componentes"]:
+            for i in x.componentes[cid]["ips"]:
+                if i["ip"] and ipaddress.ip_address(i["ip"]) not in infra_r:
+                    r.append(E(f"{cid}: {i['ip']} no está en el rango de infraestructura {infra_r}", "ENC01, LABCLI01, KALI01 y HNY02 viven en 10.20.35.0/24"))
     vpn_nets = [(t["id"], red(t["red_interna"])) for t in x.inv["vpn"]["tuneles"]]
     pares(vpn_nets, "enlaces internos de la VPN")
     for nom, rd in vpn_nets:
@@ -338,6 +369,9 @@ def v08(x: Infra):
     return r
 
 
+es_publica_ip = ci.es_publica
+
+
 @chequeo("V-09", "IP públicas solo de documentación (RFC 5737)")
 def v09(x: Infra):
     r = []
@@ -353,7 +387,7 @@ def v09(x: Infra):
             except ValueError:
                 continue
     for cid, iface, ip, zona in x.todas_las_ips():
-        if x.zonas[zona]["tipo"] in ("perimetro", "externa") and not ci.en_rfc5737(ip):
+        if x.zonas[zona]["tipo"] in ("perimetro", "externa") and es_publica_ip(ip) and not ci.en_rfc5737(ip):
             r.append(E(f"{cid}/{iface}: {ip} debe ser RFC 5737", "Use 203.0.113.0/24"))
     return r
 
@@ -531,6 +565,8 @@ def v17(x: Infra):
 def v18(x: Infra):
     r = []
     for c in x.componentes.values():
+        if c.get("estado") == "temporal":
+            continue                    # EC2-DR y NAT-DR solo existen en el simulacro: no son faltantes en figuras permanentes
         if not c["figuras"]:
             r.append(E(f"{c['id']}: sin figuras", "Indique en qué FIG debe aparecer"))
             continue
@@ -557,7 +593,7 @@ def v19(x: Infra):
 @chequeo("V-20", "Pruebas T01–T28 de D1.16 completas, ampliaciones T29+ registradas, con criterio verificable y modos válidos")
 def v20(x: Infra):
     r = []
-    ids = sorted(x.pruebas)
+    ids = sorted(list(x.pruebas) + list(x.pruebas_retiradas))          # los retirados conservan su número: no hay huecos ni reutilización
     faltan = sorted(set(ci.PRUEBAS_ESPERADAS) - set(ids))
     if faltan:
         r.append(E(f"Faltan pruebas de D1.16 (T01–T28): {faltan}", "Transcriba las 28 pruebas de D1.16"))
@@ -576,7 +612,7 @@ def v20(x: Infra):
         if not t["flujos"] and not t.get("flujos_justificacion"):
             r.append(E(f"{t['id']}: sin flujos ni `flujos_justificacion`", "Cite el F-nn o justifique (p. ej. prueba de denegación)"))
         if "H" not in t["modos"]:
-            r.append(E(f"{t['id']}: los modos no incluyen H; F3 ejecuta T01–T28 en el campus", "Agregue H"))
+            r.append(E(f"{t['id']}: los modos no incluyen H; F3 ejecuta las pruebas en el campus", "Agregue H"))
         for c in t["criterio_aprobacion"]:
             if c["tipo"] == "regex":
                 try:
@@ -687,21 +723,46 @@ def v27(x: Infra):
 # --------------------------------------------------------------------------------------------------
 
 
-@chequeo("V-28", "Inventario completo: D1.12, VPC/subredes D2.5, F1–F26, T01–T28, 10 VLAN")
+@chequeo("V-28", "Inventario v0.4 completo: D1.12, VPC/subredes D2.5, D1.11 (F1–F32), D1.16 (T01–T60), 7 VLAN")
 def v28(x: Infra):
     r = []
     faltan = [c for c in ci.COMPONENTES_D112 if c not in x.componentes]
     if faltan:
-        r.append(E(f"Faltan componentes de D1.12: {faltan}", "Agréguelos a inventory.yaml"))
+        r.append(E(f"Faltan componentes vigentes de D1.12 v0.4: {faltan}", "Agréguelos a inventory.yaml"))
+    for c in ci.COMPONENTES_TEMPORALES:
+        if x.componentes.get(c, {}).get("estado") != "temporal":
+            r.append(E(f"{c} debe existir con estado «temporal» (simulacro T59)", "Agréguelo (CI-36)"))
+    for c in ci.COMPONENTES_RETIRADOS:
+        if c not in x.componentes_retirados:
+            r.append(E(f"{c} debe quedar con estado «retirado» (no borrado, no vigente)", "Restituya el componente con `estado: retirado` y `retirado_por`"))
+    for e in list(x.zonas_retiradas.values()) + list(x.componentes_retirados.values()) + list(x.flujos_retirados.values()) + list(x.pruebas_retiradas.values()):
+        if not e.get("retirado_por"):
+            r.append(E(f"{e['id']}: retirado sin `retirado_por` (CI-nn)", "Indique la entrada de CAMBIOS-INVENTARIO.md que lo retira"))
     aws = [c for c in x.componentes.values() if c["tipo"] in ("aws_vpc", "aws_subred")]
-    if len(aws) != 7:
-        r.append(E(f"Grupos AWS: {len(aws)} (esperados: 1 VPC + 6 subredes de D2.5)", "Agregue VPC y subredes pub-a, pub-b, app-a, app-b, data-a, data-b"))
-    vlans = sorted(z["vlan"] for z in x.inv["zonas"] if z["tipo"] == "interna")
-    if vlans != [10, 20, 30, 31, 40, 41, 50, 60, 70, 71]:
-        r.append(E(f"VLAN internas {vlans} ≠ las 10 de D1.8", "Corrija las zonas"))
-    for z in ("MGMT", "SERVERS", "LAB", "LAB-TEST", "DMZ-SVC", "DMZ-HONEY", "SECURITY", "EDGE", "STORAGE", "BACKUP", "AWS", "INTERNET"):
+    if len(aws) != 3:
+        r.append(E(f"Grupos AWS vigentes: {len(aws)} (esperados: 1 VPC + pub-a y app-a de D2.5 v0.4)", "Deje AWS-VPC, AWS-PUB-A y AWS-APP-A"))
+    vlans = sorted(z["vlan"] for z in x.zonas.values() if z["tipo"] == "interna")
+    if vlans != [10, 20, 30, 40, 41, 50, 60]:
+        r.append(E(f"VLAN internas {vlans} ≠ las 7 de D1.8 v0.4", "Corrija las zonas"))
+    for z in ("MGMT", "SERVERS", "LAB", "DMZ-SVC", "DMZ-HONEY", "SECURITY", "EDGE", "TRANSITO", "WIFI-EST", "AWS", "INTERNET"):
         if z not in x.zonas:
             r.append(E(f"Falta la zona {z}", "Agréguela"))
+    for z in ("LAB-TEST", "STORAGE", "BACKUP"):
+        if z not in x.zonas_retiradas:
+            r.append(E(f"La zona {z} debe quedar «retirada»", "CI-39"))
+    esperados_f = [f"F{n}" for n in range(1, 33)]
+    ids_f = [f["id"] for f in x.inv["flujos"]]
+    if ids_f != esperados_f:
+        r.append(E(f"Los flujos deben ser F1…F32 sin huecos ni repeticiones y son {ids_f[0]}…{ids_f[-1]} ({len(ids_f)})", "Restituya los IDs (los retirados se conservan)"))
+    retirados_f = sorted(x.flujos_retirados, key=lambda i: int(i[1:]))
+    if retirados_f != ["F11", "F12", "F15", "F16", "F17", "F19", "F22", "F9"][:0] + sorted(["F9", "F11", "F12", "F15", "F16", "F17", "F19", "F22"], key=lambda i: int(i[1:])):
+        r.append(E(f"Flujos retirados {retirados_f} ≠ F9, F11, F12, F15, F16, F17, F19, F22 (D1.11 v0.4)", "CI-35, CI-36, CI-39"))
+    esperados_t = [f"T{n:02d}" for n in range(1, 61)]
+    ids_t = [t["id"] for t in x.pru["pruebas"]]
+    if ids_t != esperados_t:
+        r.append(E(f"Las pruebas deben ser T01…T60 sin huecos y son {ids_t[0]}…{ids_t[-1]} ({len(ids_t)})", "Restituya los IDs (los retirados se conservan)"))
+    if sorted(x.pruebas_retiradas) != ["T12", "T22", "T37", "T38", "T39", "T41", "T44", "T48"]:
+        r.append(E(f"Pruebas retiradas {sorted(x.pruebas_retiradas)} ≠ T12, T22, T37, T38, T39, T41, T44, T48 (D1.16 v0.4)", "CI-41"))
     return r
 
 
@@ -761,7 +822,7 @@ def v30(x: Infra):
     return r
 
 
-@chequeo("V-31", "VPN (D1.10): ASN, /30 de túnel, MTU/MSS, temporizadores y flujos sobre la VPN")
+@chequeo("V-31", "VPN (D1.10 v0.4): ASN, /30 de túnel, NAT-T, MTU/MSS, temporizadores y flujos sobre la VPN")
 def v31(x: Infra):
     r = []
     v = x.inv["vpn"]
@@ -769,9 +830,20 @@ def v31(x: Infra):
         r.append(E("Los ASN deben ser privados (64512–65534)", "Corrija el ASN"))
     if v["extremo_onpremise"]["asn"] == v["extremo_aws"]["asn"]:
         r.append(E("Los dos extremos tienen el mismo ASN (eBGP exige ASN distintos)", "Use 65020 y 64512"))
+    # v0.4: la IP pública es del FortiGate (NAT 1:1 hacia FW01) y FW01 usa NAT-T
+    fgt_pub = next((i["ip"] for i in x.componentes["FGT-EXT"]["ips"] if i["interfaz"] == "wan"), None)
     wan = next(i["ip"] for i in x.componentes["FW01"]["ips"] if i["interfaz"] == "wan")
-    if v["extremo_onpremise"]["ip_publica"] != wan:
-        r.append(E(f"IP pública de la VPN {v['extremo_onpremise']['ip_publica']} ≠ WAN de FW01 {wan}", "Use la misma IP"))
+    on = v["extremo_onpremise"]
+    if on["ip_publica"] != fgt_pub:
+        r.append(E(f"IP pública de la VPN {on['ip_publica']} ≠ IP pública de FGT-EXT {fgt_pub}", "Use la misma IP"))
+    if on.get("ip_publica_en") != "FGT-EXT":
+        r.append(E("vpn.extremo_onpremise.ip_publica_en debe ser FGT-EXT (D-26)", "Agréguelo"))
+    if on.get("ip_interna") != wan:
+        r.append(E(f"vpn.extremo_onpremise.ip_interna {on.get('ip_interna')} ≠ WAN de FW01 {wan}", "Haga coincidir ambos"))
+    if on.get("nat_t") is not True:
+        r.append(E("FW01 está detrás de NAT: nat_t debe ser true (D1.10)", "Agregue `nat_t: true`"))
+    if (on.get("identidad_ike") or {}).get("valor") != on["ip_publica"]:
+        r.append(E("La identidad IKE de FW01 debe ser la IP pública (D1.10)", "Agregue `identidad_ike`"))
     for t in v["tuneles"]:
         comp = x.componentes.get(t["id"])
         if comp is None or comp.get("cidr") != t["red_interna"]:
@@ -780,25 +852,30 @@ def v31(x: Infra):
         r.append(E(f"MSS {v['mss_clamping']} > MTU {v['mtu']} − 40", "El MSS debe caber en la MTU (IPv4 + TCP = 40 bytes)"))
     if v["bgp"]["hold_s"] < 3 * v["bgp"]["keepalive_s"]:
         r.append(E("El hold de BGP debe ser ≥ 3 × keepalive", "Use keepalive 10 s y hold 30 s"))
-    with_aws = {f["id"] for f in x.flujos.values() if f["estado"] == "activo" and any(
-        e.zona == "AWS" for lado in ("origen", "destino") for e in x.extremos(f, lado))}
+    # flujos que cruzan la VPN: los que tienen un extremo en AWS y no nacen en Internet (F29 entra por la IP pública de EC2-GW)
+    with_aws = {f["id"] for f in x.flujos.values() if f["estado"] == "activo"
+                and any(e.zona == "AWS" for lado in ("origen", "destino") for e in x.extremos(f, lado))
+                and not any(e.zona == "INTERNET" for e in x.extremos(f, "origen"))}
     if with_aws != set(v["flujos_sobre_vpn"]):
-        r.append(E(f"Flujos con extremo en AWS {sorted(with_aws)} ≠ vpn.flujos_sobre_vpn {sorted(v['flujos_sobre_vpn'])}", "Haga coincidir ambas listas"))
+        r.append(E(f"Flujos con extremo en AWS por la VPN {sorted(with_aws)} ≠ vpn.flujos_sobre_vpn {sorted(v['flujos_sobre_vpn'])}", "Haga coincidir ambas listas"))
     for t in v["pruebas"]:
         if t not in x.pruebas:
-            r.append(E(f"vpn.pruebas: {t} no existe", "Corrija el ID"))
+            r.append(E(f"vpn.pruebas: {t} no existe o está retirada", "Corrija el ID"))
     if v["convergencia_meta_s"] != 60:
         r.append(E("La meta de convergencia de D1.10/OD-05 es 60 s", "Use 60"))
     return r
 
 
-@chequeo("V-32", "Servicios base (DHCP, DNS, PAC, NTP, IPv6, DNS cifrado) consistentes con el inventario")
+@chequeo("V-32", "Servicios base (DHCP, DNS, PAC, NTP, IPv6, DNS cifrado, Wi-Fi) consistentes con el inventario (D-28)")
 def v32(x: Infra):
     r = []
     sb = x.inv["servicios_base"]
     ip = {c: {i["interfaz"]: i["ip"] for i in x.componentes[c]["ips"]} for c in x.componentes}
-    if sb["dns"]["primario"]["ip"] != ip["SVC01"]["eth0"]:
-        r.append(E("DNS primario ≠ IP de SVC01", "Use la IP de SVC01"))
+    if sb["dns"]["servidor"]["componente"] != "FW01" or sb["ntp"]["servidor"]["componente"] != "FW01":
+        r.append(E("DNS y NTP deben estar en FW01 (D-28)", "servicios_base.dns.servidor y .ntp.servidor = FW01"))
+    registros = [reg["componente"] for reg in sb["pac"]["registros_a"]]
+    if registros != ["EDGE01", "EDGE02"]:
+        r.append(E(f"El PAC lo sirven EDGE01 y EDGE02 con dos registros A y es {registros}", "Corrija registros_a"))
     for reg in sb["pac"]["registros_a"]:
         if reg["ip"] != ip[reg["componente"]]["eth0"]:
             r.append(E(f"PAC: {reg['componente']} {reg['ip']} ≠ IP del componente", "Haga coincidir la IP"))
@@ -811,6 +888,8 @@ def v32(x: Infra):
             _existe(r, f"servicios_base.{nombre}", od, set(x.objetivos), "objetivo")
         for cid in bloque.get("componentes", []):
             _existe(r, f"servicios_base.{nombre}", cid, set(x.componentes), "componente")
+        for sid in bloque.get("supuestos", []):
+            _existe(r, f"servicios_base.{nombre}", sid, set(x.supuestos), "supuesto")
     return r
 
 
@@ -875,6 +954,8 @@ def _cruza_fw01(x: Infra, f: dict) -> bool:
     """¿Algún par origen→destino del flujo pasa por FW01? (si todo es una misma VLAN, FW01 no ve el tráfico)."""
     for o in x.extremos(f, "origen"):
         for d in x.extremos(f, "destino"):
+            if o.zona == "INTERNET" and d.zona == "AWS":
+                continue          # F29 no pasa por FW01 (entra por la IP pública de EC2-GW)
             if o.es_firewall or d.es_firewall or o.zona != d.zona:
                 return True
     return False
@@ -1084,7 +1165,9 @@ def evaluar_resultados(x: Infra, datos: dict, origen: str) -> list[Hallazgo]:
     modo = str(datos.get("meta", {}).get("modo", ""))[:1]
     por_id = {t["id"]: t for t in datos["resultados"]}
     for tid in sorted(por_id):
-        if tid not in x.pruebas:
+        if tid in x.pruebas_retiradas:
+            r.append(I(f"{origen}: {tid} está retirada en la v0.4 y se ignora en los resultados del ensayo (v0.2)"))
+        elif tid not in x.pruebas:
             r.append(E(f"{origen}: {tid} no existe en pruebas.yaml", "Vuelva a ejecutar make test-lab con el inventario actual"))
     for t in x.pruebas.values():
         res = por_id.get(t["id"])
@@ -1120,12 +1203,99 @@ def v42(x: Infra):
 def v43(x: Infra):
     from gen import lab, tofu
     r = []
-    for ruta, texto in ((x.raiz / "deploy/opentofu/envs/demo/diseno.auto.tfvars.json", tofu.texto(x)),
-                        (x.raiz / "lab/celeris.clab.yml", lab.topologia_yaml(x))):
+    for etiqueta, ruta, generar, prompt in (("OpenTofu", x.raiz / "deploy/opentofu/envs/demo/diseno.auto.tfvars.json", lambda: tofu.texto(x), "I3"),
+                                            ("containerlab", x.raiz / "lab/celeris.clab.yml", lambda: lab.topologia_yaml(x), "I2")):
+        try:
+            texto = generar()
+        except Exception as exc:   # el generador aún lee la v0.2 (SVC01, WAF01, EC2-SHIELD…): lo actualiza el prompt I2/I3
+            r.append(W(f"El generador de {etiqueta} no puede leer el inventario v0.4 ({exc!r}); queda pendiente de {prompt}",
+                       f"Adaptar infra/gen/{'tofu' if prompt == 'I3' else 'lab'}.py a la v0.4 ({prompt}) y regenerar {ruta.relative_to(x.raiz)}"))
+            continue
         if not ruta.exists():
             r.append(W(f"Falta {ruta.relative_to(x.raiz)}", "Genérelo (make tofu-gen / make lab-gen) y versiónelo"))
         elif ruta.read_text(encoding="utf-8").replace("\r\n", "\n") != texto:
             r.append(E(f"{ruta.relative_to(x.raiz)} no coincide con el inventario", "Regénerelo (make tofu-gen / make lab-gen) y commitee el resultado"))
+    return r
+
+
+# --------------------------------------------------------------------------------------------------
+# V-44 … V-45: v0.4 (retirados y BYOD)
+# --------------------------------------------------------------------------------------------------
+
+CAMPOS_SIN_ESCANEO = {"nota", "nota_modos", "observacion_ensayo", "retirado_por", "cambio", "pendiente", "confianza_nota", "ip_publica_nota", "hold_nota", "asn_nota", "redes_internas_nota"}
+
+
+def _textos(nodo, ruta=""):
+    """(ruta, texto) de cada cadena de un nodo, saltando los campos de nota."""
+    if isinstance(nodo, dict):
+        for k, v in nodo.items():
+            if k in CAMPOS_SIN_ESCANEO:
+                continue
+            yield from _textos(v, f"{ruta}/{k}")
+    elif isinstance(nodo, list):
+        for i, v in enumerate(nodo):
+            yield from _textos(v, f"{ruta}[{i}]")
+    elif isinstance(nodo, str):
+        yield ruta, nodo
+
+
+@chequeo("V-44", "Un ID retirado no se reutiliza ni aparece en flujos, pruebas, componentes, zonas, rúbrica o textos vigentes")
+def v44(x: Infra):
+    r = []
+    ret = {"componente": set(x.componentes_retirados), "zona": set(x.zonas_retiradas), "flujo": set(x.flujos_retirados), "prueba": set(x.pruebas_retiradas)}
+    todos = set().union(*ret.values())
+    vigentes = set(x.componentes) | set(x.zonas) | set(x.flujos) | set(x.pruebas)
+    for i in sorted(todos & vigentes):
+        r.append(E(f"El ID retirado {i} también existe como vigente (reutilizado)", "Un ID retirado nunca se reutiliza: use el siguiente libre"))
+    patron = re.compile(r"(?<![A-Za-z0-9-])(" + "|".join(re.escape(i) for i in sorted(todos, key=len, reverse=True)) + r")(?![A-Za-z0-9-])")
+    fuentes = []
+    for z in x.zonas.values():
+        fuentes.append((f"zona {z['id']}", z))
+    for c in x.componentes.values():
+        fuentes.append((f"componente {c['id']}", c))
+    for f in x.flujos.values():
+        fuentes.append((f"flujo {f['id']}", f))
+    for t in x.pruebas.values():
+        fuentes.append((f"prueba {t['id']}", t))
+    for a in x.amenazas.values():
+        fuentes.append((f"amenaza {a['id']}", a))
+    for d in x.detecciones.values():
+        fuentes.append((f"detección {d['id']}", d))
+    for rid, rub in x.rubrica.items():
+        fuentes.append((f"rúbrica {rid}", {"elementos": rub.get("elementos_evaluados", []), "evidencias": rub["evidencias"]}))
+    for k in ("servicios_base", "rangos_lab", "vpn", "matriz_esperada", "aws"):
+        fuentes.append((k, x.inv[k]))
+    for origen, nodo in fuentes:
+        for ruta, texto in _textos(nodo):
+            for m in patron.finditer(texto):
+                r.append(E(f"{origen}{ruta}: menciona el ID retirado {m.group(1)}", "Quite la referencia o use el componente que lo reemplaza (CAMBIOS-INVENTARIO.md)"))
+    # una figura no puede dibujar un ID retirado: lo comprueba V-52 sobre los .drawio (pendiente de I4 mientras sean v0.2)
+    for e in list(x.componentes_retirados.values()):
+        if e.get("figuras"):
+            r.append(E(f"{e['id']} está retirado y todavía declara figuras {e['figuras']}", "Deje `figuras: []` en un componente retirado"))
+    return r
+
+
+@chequeo("V-45", "Ningún flujo permite descifrado con origen WIFI-EST (REQ-F-36, REQ-RN-11)")
+def v45(x: Infra):
+    r = []
+    for f in x.flujos.values():
+        if f["estado"] != "activo" or f["accion"] != "permitir":
+            continue
+        if not any(e.zona == "WIFI-EST" or e.componente == "WIFI-EST" for e in x.extremos(f, "origen")):
+            continue
+        detalle = f["proteccion"]["detalle"] if f.get("proteccion") else ""
+        destinos = {e.componente or e.zona for e in x.extremos(f, "destino")}
+        if destinos & {"EDGE01", "EDGE02", "EDGE"}:
+            if "passthrough" not in detalle.lower() or "nunca descifra" not in detalle.lower() and "sin descifr" not in detalle.lower():
+                r.append(E(f"{f['id']}: viene de WIFI-EST hacia el nodo y su protección no declara passthrough ni «nunca descifra»", "REQ-F-36: el nodo nunca descifra esta red"))
+            if "REQ-F-36" not in f["req"]:
+                r.append(E(f"{f['id']}: debe citar REQ-F-36", "Agregue REQ-F-36 a `req`"))
+        elif re.search(r"(?i)(CA limitada|certificado de la CA|descifra(r|do)?\b(?! esta)|intercept|mitm)", detalle):
+            r.append(E(f"{f['id']}: un flujo de WIFI-EST describe descifrado en su protección", "REQ-F-36: el Wi-Fi de estudiantes nunca se descifra"))
+    for cid in ("EDGE01", "EDGE02"):
+        if "REQ-F-36" not in x.componentes[cid]["req"]:
+            r.append(E(f"{cid}: debe citar REQ-F-36 (passthrough para WIFI-EST)", "Agregue REQ-F-36 a `req`"))
     return r
 
 
@@ -1191,8 +1361,10 @@ def informe_md(x: Infra, res: list[Resultado]) -> str:
     L.append("# Validación de la fuente única — CE0311 (Entregable 1)\n")
     L.append("> Generado por `infra/validate.py` (`make validate`). No editar a mano.\n")
     L.append(f"- Inventario: versión {inv['meta']['inventario_version']} · fecha {inv['meta']['fecha']}")
-    L.append(f"- Contenido cargado: **{len(x.zonas)} zonas**, **{len(x.componentes)} componentes**, "
-             f"**{len(x.flujos)} flujos** (F1–F26 de D1.11, F4 reservado, y {len(x.flujos) - 26} ampliaciones), **{len(x.pruebas)} pruebas** (T01–T28 de D1.16 y {len(x.pruebas) - 28} ampliaciones), "
+    act = sum(f["estado"] == "activo" for f in x.flujos.values())
+    L.append(f"- Contenido cargado (v0.4): **{len(x.zonas)} zonas vigentes** ({len(x.zonas_retiradas)} retiradas), **{len(x.componentes)} componentes vigentes** "
+             f"({len(x.componentes_retirados)} retirados; {sum(c['estado'] == 'temporal' for c in x.componentes.values())} temporales), "
+             f"**{len(x.flujos)} flujos vigentes** ({act} activos, F4 reservado) y {len(x.flujos_retirados)} retirados, **{len(x.pruebas)} pruebas vigentes** y {len(x.pruebas_retiradas)} retiradas, "
              f"{len(x.objetivos)} objetivos OD, {len(x.amenazas)} amenazas AM, {len(x.detecciones)} detecciones DET, "
              f"{len(x.figuras)} figuras, {len(x.rubrica)} criterios de rúbrica.")
     n = {k: sum(r.estado == k for r in res) for k in ("PASA", "ADVERTENCIA", "FALLA", "PENDIENTE")}
@@ -1241,7 +1413,8 @@ def informe_md(x: Infra, res: list[Resultado]) -> str:
 
 def consola(x: Infra, res: list[Resultado]) -> None:
     print(f"Celeris E1 — inventario {x.inv['meta']['inventario_version']}: {len(x.zonas)} zonas, {len(x.componentes)} componentes, "
-          f"{len(x.flujos)} flujos, {len(x.pruebas)} pruebas\n")
+          f"{len(x.flujos)} flujos, {len(x.pruebas)} pruebas (vigentes; {len(x.zonas_retiradas)} zonas, {len(x.componentes_retirados)} componentes, "
+          f"{len(x.flujos_retirados)} flujos y {len(x.pruebas_retiradas)} pruebas retirados)\n")
     for r in res:
         tag = {"PASA": "[ OK ]", "ADVERTENCIA": "[ AVISO ]", "FALLA": "[FALLA]", "PENDIENTE": "[PENDIENTE]"}[r.estado]
         print(f"{tag:11} {r.id}  {r.titulo}" + (f"  → {r.detalle}" if r.detalle else ""))

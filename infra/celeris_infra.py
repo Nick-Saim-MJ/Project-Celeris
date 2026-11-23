@@ -31,18 +31,23 @@ ARCHIVOS = {"inventory": "inventory", "pruebas": "pruebas", "trazabilidad": "tra
 # Rangos de documentación (RFC 5737): las únicas IP públicas admitidas en el repositorio.
 RFC5737 = [ipaddress.ip_network(n) for n in ("192.0.2.0/24", "198.51.100.0/24", "203.0.113.0/24")]
 
-# Componentes de D1.12 (el contrato). VTI1/VTI2 y ESX01 vmk0/vmk1 se desglosan como pide el inventario.
+# Componentes de D1.12 v0.4 vigentes (el contrato). VTI1/VTI2 se desglosan como pide el inventario; ESX01 solo tiene vmk0.
 COMPONENTES_D112 = [
-    "FW01", "SW-CORE01", "SW-ACC", "BRK01", "ESX01", "IPMI01", "UPS01", "JMP01", "CTRL01", "DB01", "OBS01", "SVC01",
-    "EDGE01", "EDGE02", "WAF01", "WEB01", "HNY01", "SIEM01", "IDS01", "HNY02", "PROBE01", "LABCLI01", "KALI01",
-    "NAS01", "VTI1", "VTI2", "VGW", "EC2-SHIELD", "EC2-CTRLR", "NAT01",
+    "FGT-EXT", "FW01", "SW-CORE01", "SW-ACC", "BRK01", "ESX01", "IPMI01", "UPS01", "JMP01", "CTRL01", "EDGE01", "EDGE02",
+    "PORTAL01", "HNY01", "SIEM01", "ENC01", "LABCLI01", "KALI01", "HNY02", "PCS-LAB", "WIFI-EST", "VTI1", "VTI2", "VGW",
+    "EC2-GW", "S3", "AWS-VPC", "AWS-PUB-A", "AWS-APP-A",
 ]
-FLUJOS_ESPERADOS = [f"F{n}" for n in range(1, 27)]
-PRUEBAS_ESPERADAS = [f"T{n:02d}" for n in range(1, 29)]       # D1.16; T29+ son ampliaciones registradas (CI-27)
+# Temporales (simulacro de recuperación): existen en el inventario pero no cuentan como faltantes en figuras permanentes.
+COMPONENTES_TEMPORALES = ["EC2-DR", "NAT-DR"]
+# Retirados en la v0.4 (CI-35, CI-36, CI-39): su ID no se reutiliza y no puede aparecer en nada vigente (V-44).
+COMPONENTES_RETIRADOS = ["DB01", "OBS01", "SVC01", "WAF01", "WEB01", "IDS01", "PROBE01", "NAS01", "EC2-SHIELD", "EC2-CTRLR", "NAT01",
+                         "AWS-PUB-B", "AWS-APP-B", "AWS-DATA-A", "AWS-DATA-B"]
+FLUJOS_ESPERADOS = [f"F{n}" for n in range(1, 27)]            # D1.11 original; F27+ son ampliaciones registradas (CI-29, CI-35…CI-38, CI-40)
+PRUEBAS_ESPERADAS = [f"T{n:02d}" for n in range(1, 29)]       # D1.16; T29+ son ampliaciones registradas (CI-27, CI-41)
 # «Interna» en la regla de celdas críticas de la matriz de pruebas: toda zona del campus salvo las DMZ y Perímetro.
 # Criterios de la rúbrica que se evalúan con el informe y no con pruebas (R1 contexto y alcance; R7 calidad documental).
 RUBRICA_SIN_PRUEBAS = ("R1", "R7")
-ZONAS_INTERNAS = ["MGMT", "SERVERS", "LAB", "LAB-TEST", "SECURITY", "EDGE", "STORAGE", "BACKUP"]
+ZONAS_INTERNAS = ["MGMT", "SERVERS", "LAB", "SECURITY", "EDGE"]
 
 
 def red(cidr: str):
@@ -123,10 +128,17 @@ class Infra:
     def __init__(self, inv: dict, pru: dict, traz: dict, raiz: Path = RAIZ):
         self.raiz = raiz
         self.inv, self.pru, self.traz = inv, pru, traz
-        self.zonas = {z["id"]: z for z in inv["zonas"]}
-        self.componentes = {c["id"]: c for c in inv["componentes"]}
-        self.flujos = {f["id"]: f for f in inv["flujos"]}
-        self.pruebas = {t["id"]: t for t in pru["pruebas"]}
+        # Lo retirado (v0.4) conserva su ID en el YAML pero no es vigente: `zonas`, `componentes`, `flujos` y `pruebas` solo traen
+        # lo vigente, de modo que cualquier referencia a un ID retirado falla V-03/V-44. Los retirados quedan en `*_retirados`.
+        vig = lambda e: e.get("estado") != "retirado"  # noqa: E731
+        self.zonas = {z["id"]: z for z in inv["zonas"] if vig(z)}
+        self.zonas_retiradas = {z["id"]: z for z in inv["zonas"] if not vig(z)}
+        self.componentes = {c["id"]: c for c in inv["componentes"] if vig(c)}
+        self.componentes_retirados = {c["id"]: c for c in inv["componentes"] if not vig(c)}
+        self.flujos = {f["id"]: f for f in inv["flujos"] if vig(f)}
+        self.flujos_retirados = {f["id"]: f for f in inv["flujos"] if not vig(f)}
+        self.pruebas = {t["id"]: t for t in pru["pruebas"] if vig(t)}
+        self.pruebas_retiradas = {t["id"]: t for t in pru["pruebas"] if not vig(t)}
         self.objetivos = {o["id"]: o for o in traz["objetivos"]}
         self.amenazas = {a["id"]: a for a in traz["amenazas"]}
         self.detecciones = {d["id"]: d for d in traz["detecciones"]}
@@ -272,6 +284,8 @@ class Infra:
 
     def figuras_requeridas(self, cid: str) -> set[str]:
         """FIG-5.1 siempre (D1.7: todo ID de D1.12 aparece) más la figura de cada flujo donde es extremo directo."""
+        if self.componentes[cid].get("estado") == "temporal":
+            return set()                 # recursos del simulacro: no cuentan como faltantes en figuras permanentes
         req = {"FIG-5.1"}
         for fid in self.flujos_de(cid, incluir_zona=False):
             if self.flujos[fid].get("figura"):
@@ -294,14 +308,14 @@ class Infra:
     # ------------------------------------------------- cobertura de la matriz de pruebas
     def celdas_denegadas_criticas(self) -> dict[str, str]:
         """Celdas «denegado» de la matriz cuya falla expone un límite del diseño, con el grupo al que pertenecen:
-        Internet → interna (y AWS), LAB → MGMT, DMZ → interna, DMZ-HONEY → cualquiera y cualquiera → STORAGE."""
+        Internet → interna (y AWS), LAB → MGMT, DMZ → interna, DMZ-HONEY → cualquiera y WIFI-EST → interna (v0.4: sin STORAGE)."""
         out = {}
         for (o, d), c in self.matriz_esperada().items():
             if c["estado"] != "denegado":
                 continue
             celda = f"{o}>{d}"
-            if d == "STORAGE":
-                out[celda] = "cualquiera → STORAGE"
+            if o == "WIFI-EST" and d in ZONAS_INTERNAS:
+                out[celda] = "WIFI-EST → interna"
             elif o == "DMZ-HONEY":
                 out[celda] = "DMZ-HONEY → cualquiera"
             elif o == "INTERNET" and d in ZONAS_INTERNAS + ["AWS"]:

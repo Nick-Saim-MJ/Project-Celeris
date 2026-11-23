@@ -227,7 +227,11 @@ def comprobar(x: Infra, dir_: Path = DIR) -> tuple[list[Chequeo], dict]:
             if not cid:
                 continue
             if cid not in validos:
-                c52.e(f"{fig}: celeris_id desconocido «{cid}»", "Use solo IDs de infra/*.yaml")
+                retirado = cid.split(":")[0] in set(x.componentes_retirados) | set(x.zonas_retiradas) | set(x.flujos_retirados)
+                if retirado:
+                    c52.e(f"{fig}: dibuja el ID retirado «{cid}» (v0.4); pendiente de I4: regenerar los diagramas", "Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)")
+                else:
+                    c52.e(f"{fig}: celeris_id desconocido «{cid}»", "Use solo IDs de infra/*.yaml")
                 continue
             base = cid.split(":")[0]
             # cobertura

@@ -57,6 +57,8 @@ def _particion(x: Infra, f: dict):
         for d in x.extremos(f, "destino"):
             if o.es_firewall and d.es_firewall:
                 continue
+            if o.zona == "INTERNET" and d.zona == "AWS":
+                continue          # F29: entra por la IP pública de EC2-GW en AWS; no pasa por FW01 (v0.4)
             if d.es_firewall:
                 a_fw.append(o)
             elif o.es_firewall:
@@ -195,6 +197,9 @@ def generar(x: Infra, modo: str = "piloto", ventana: bool = False, wan_ip: str |
         _, _, _, intra = _particion(x, f)
         if not (a or b or c) and intra:
             notas.append(f"# {f['id']}: dentro de una misma VLAN; no cruza FW01 (nftables de host): {f['regla_fw']}")
+            continue
+        if not (a or b or c or d) and not intra:
+            notas.append(f"# {f['id']}: no pasa por FW01 (entra por la IP pública de EC2-GW en AWS, v0.4): {f['regla_fw']}")
             continue
         fwd += a
         inp += b

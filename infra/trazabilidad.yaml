@@ -5,9 +5,9 @@
 # Los catálogos de supuestos, decisiones y requisitos (final del archivo) se generan de A6, C3.4 y C1.2–C1.4.
 
 meta:
-  version: "1.0"
-  fecha: "2026-11-18"
-  documento_base: "docs/Celeris-Edge-Documento-Maestro.md (D1.6, D1.9, D1.14, D1.17)"
+  version: "1.1"
+  fecha: "2026-11-22"
+  documento_base: "docs/celeris/Celeris-CE03-Infraestructura.md v0.4 (D1.6, D1.9, D1.14, D1.17, D3, D7); base v0.2: docs/Celeris-Edge-Documento-Maestro.md"
   plantilla: docs/fuentes/CE03/S1_E1_Analisis_y_Diseno_de_Red.docx
   rubrica_oficial: docs/fuentes/CE03/Rubrica_S1_E1_Diseno_de_Red.xlsx
 
@@ -16,56 +16,56 @@ objetivos:
   - { id: OD-01, objetivo: "Segmentar por zonas", indicador: "Servidores críticos en VLAN dedicadas", meta: "100 %", responsable: "Diseño de red" }
   - { id: OD-02, objetivo: "Aislar la gestión", indicador: "Interfaces de gestión alcanzables solo desde JMP01 (VLAN 10)", meta: "100 %", responsable: Seguridad }
   - { id: OD-03, objetivo: "Rutas alternas", indicador: "Rutas de salida para un usuario", meta: "≥ 3 (EDGE01, EDGE02, DIRECT)", responsable: "Diseño de red" }
-  - { id: OD-04, objetivo: "Resolución sin punto único", indicador: "Servidores DNS por cliente", meta: "2 (SVC01 + FW01)", responsable: "Diseño de red" }
+  - { id: OD-04, objetivo: "Resolución DNS confiable", indicador: "Resolvedor con DNSSEC en FW01; sin dependencia oculta (si FW01 cae, no hay ruteo)", meta: "1 resolvedor validado + `DIRECT` del PAC", responsable: "Diseño de red" }
   - { id: OD-05, objetivo: "Enlace híbrido redundante", indicador: "Túneles VPN configurados / convergencia medida", meta: "2 túneles; ≤ 60 s", responsable: Infraestructura }
   - { id: OD-06, objetivo: "Política por defecto", indicador: "Tráfico entre zonas con regla explícita y registro", meta: "100 %, deny-all en el resto", responsable: Seguridad }
   - { id: OD-07, objetivo: "Protección en tránsito", indicador: "Flujos con protección criptográfica o riesgo aceptado documentado", meta: "100 % de los flujos de D1.11", responsable: Seguridad }
-  - { id: OD-08, objetivo: "Servicio expuesto endurecido", indicador: "Calificación TLS del portal; puertos abiertos desde Internet", meta: "≥ A; solo 80/443 (+ señuelos en ventana autorizada)", responsable: Seguridad }
+  - { id: OD-08, objetivo: "Servicio expuesto endurecido", indicador: "Calificación TLS del portal y de EC2-GW; puertos abiertos desde Internet", meta: "≥ A; solo 80/443 (+ señuelos en ventana autorizada)", responsable: Seguridad }
   - { id: OD-09, objetivo: "Detección", indicador: "Escenarios de ataque planificados detectados en S2", meta: "≥ 90 %", responsable: Seguridad }
   - { id: OD-10, objetivo: "Adopción del proxy", indicador: "Bytes HTTP(S) de LAB que pasan por la caché", meta: "Se mide en el piloto; meta ≥ 90 % en modo gestionado", responsable: "Diseño de red" }
+  - { id: OD-11, objetivo: "Acceso por laboratorio", indicador: "Laboratorios con rango propio que el encargado habilita", meta: "10 de 10", responsable: "Diseño de red" }
+  - { id: OD-12, objetivo: "Panel remoto sin exponer el campus", indicador: "Puertos del campus que alcanzan CTRL01 desde Internet", meta: "0", responsable: Seguridad }
 
 # Modelo de amenazas STRIDE (D1.9). `pruebas` lista T-nn; si no hay, `prueba_justificacion`.
 amenazas:
-  - { id: AM-01, zona_activo: "LAB → proxy", stride: [S], amenaza: "Equipo no institucional usa el proxy", control: "Reservas DHCP + allowed_clients + port-security (802.1X en H2)", iso_27002: ["8.20", "8.22"], componentes: [EDGE01, EDGE02, FW01, SW-ACC], pruebas: [T13] }
-  - { id: AM-02, zona_activo: LAB, stride: [S], amenaza: "Secuestro de WPAD", control: "URL fija del PAC por GPO", iso_27002: ["8.20"], componentes: [SVC01, EDGE01], pruebas: [T22] }
-  - { id: AM-03, zona_activo: LAB, stride: [T], amenaza: "DHCP o RA falso", control: "DHCP snooping, RA guard", iso_27002: ["8.20"], componentes: [SW-ACC, SW-CORE01], pruebas: [T23] }
-  - { id: AM-04, zona_activo: Proxy, stride: [E], amenaza: "Usar el proxy para alcanzar redes internas (SSRF)", control: "allowed_internal_networks, puertos limitados", iso_27002: ["8.22"], componentes: [EDGE01, EDGE02], pruebas: [T13, T14] }
-  - { id: AM-05, zona_activo: Portal, stride: [T], amenaza: "Desfiguración o inyección", control: "WAF + sitio estático firmado + FS solo lectura", iso_27002: ["8.23", "8.26"], componentes: [WAF01, WEB01], pruebas: [T17, T18] }
-  - { id: AM-06, zona_activo: Portal, stride: [D], amenaza: "Saturación de peticiones", control: "Límite por IP en WAF, CrowdSec", iso_27002: ["8.20"], componentes: [WAF01, FW01], pruebas: [T15, T32] }
-  - { id: AM-07, zona_activo: "Túnel AWS", stride: [I], amenaza: "Datos personales hacia la nube", control: "Quitar cabeceras del cliente (REQ-F-28) + IPsec", iso_27002: ["5.14", "8.24"], componentes: [EDGE01, EDGE02, VTI1, VTI2, VGW, EC2-SHIELD], pruebas: [T26] }
-  - { id: AM-08, zona_activo: Métricas, stride: [I], amenaza: "Token de administración en claro", control: "TLS en 9128 (REQ-NF-14)", iso_27002: ["8.24"], componentes: [OBS01, EDGE01, EDGE02], pruebas: [T27] }
-  - { id: AM-09, zona_activo: Syslog, stride: [I, T], amenaza: "Logs del firewall leídos o alterados en tránsito", control: "Syslog sobre TLS 6514", iso_27002: ["8.15", "8.24"], componentes: [FW01, SIEM01], pruebas: [T28] }
-  - { id: AM-10, zona_activo: DMZ-HONEY, stride: [E], amenaza: "Honeypot comprometido como trampolín", control: "VLAN propia, sin salida", iso_27002: ["8.22"], componentes: [HNY01, FW01], pruebas: [T20, T47] }
-  - { id: AM-11, zona_activo: MGMT, stride: [E], amenaza: "Acceso administrativo desde LAB", control: "MGMT solo desde JMP01 + MFA", iso_27002: ["8.2", "8.22"], componentes: [JMP01, FW01], pruebas: [T06, T34] }
-  - { id: AM-12, zona_activo: FW01, stride: [D], amenaza: "Caída del firewall virtual", control: "Break-glass, XML en Git, CARP en H3", iso_27002: ["8.14"], componentes: [FW01, BRK01], pruebas: [T25] }
-  - id: AM-13
-    zona_activo: Cualquiera
-    stride: [R]
-    amenaza: "Acciones sin rastro"
-    control: "Registro en todas las denegaciones, auditoría de cambios, NTP/NTS"
-    iso_27002: ["8.15", "8.17"]
-    componentes: [FW01, SIEM01, SVC01]
-    pruebas: [T33]
+  - { id: AM-01, zona_activo: "LAB → proxy", stride: [S], amenaza: "Equipo no institucional o de un laboratorio deshabilitado usa la caché", control: "Rangos habilitados + reservas DHCP + port-security", iso_27002: ["8.20", "8.22"], componentes: [EDGE01, EDGE02, FW01, SW-ACC], pruebas: [T13, T52] }
+  - { id: AM-02, zona_activo: "LAB", stride: [S], amenaza: "Secuestro de WPAD", control: "URL fija del PAC por GPO", iso_27002: ["8.20"], componentes: [EDGE01, EDGE02], pruebas: [T60] }
+  - { id: AM-03, zona_activo: "LAB", stride: [T], amenaza: "DHCP o RA falso", control: "DHCP snooping, RA guard", iso_27002: ["8.20"], componentes: [SW-ACC, SW-CORE01], pruebas: [T23] }
+  - { id: AM-04, zona_activo: "Proxy", stride: [E], amenaza: "Usar el proxy para alcanzar redes internas (SSRF)", control: "allowed_internal_networks, puertos limitados", iso_27002: ["8.22"], componentes: [EDGE01, EDGE02], pruebas: [T13, T14] }
+  - { id: AM-05, zona_activo: "Portal", stride: [T], amenaza: "Desfiguración o inyección", control: "WAF + sitio estático firmado + FS solo lectura", iso_27002: ["8.23", "8.26"], componentes: [PORTAL01], pruebas: [T17, T18] }
+  - { id: AM-06, zona_activo: "Portal", stride: [D], amenaza: "Saturación de peticiones", control: "Límite por IP en WAF, CrowdSec", iso_27002: ["8.20"], componentes: [PORTAL01, FW01], pruebas: [T15, T32] }
+  - { id: AM-07, zona_activo: "Orígenes / nube", stride: [I], amenaza: "Datos personales hacia Internet o AWS", control: "Quitar cabeceras del cliente (REQ-F-28); KPI solo por laboratorio", iso_27002: ["5.14", "8.24"], componentes: [EDGE01, EDGE02], pruebas: [T26] }
+  - { id: AM-08, zona_activo: "Administración", stride: [I], amenaza: "Token o sesión en claro", control: "TLS obligatorio (REQ-NF-14)", iso_27002: ["8.24"], componentes: [EDGE01, EDGE02, CTRL01], pruebas: [T27] }
+  - { id: AM-09, zona_activo: "Syslog", stride: [I, T], amenaza: "Logs del firewall leídos o alterados en tránsito", control: "Syslog sobre TLS 6514", iso_27002: ["8.15", "8.24"], componentes: [FW01, SIEM01], pruebas: [T28] }
+  - { id: AM-10, zona_activo: "DMZ-HONEY", stride: [E], amenaza: "Honeypot comprometido como trampolín", control: "VLAN propia, sin salida", iso_27002: ["8.22"], componentes: [HNY01, FW01], pruebas: [T20, T47] }
+  - { id: AM-11, zona_activo: "MGMT", stride: [E], amenaza: "Acceso administrativo desde LAB o Wi-Fi", control: "MGMT solo desde JMP01 + MFA", iso_27002: ["8.2", "8.22"], componentes: [JMP01, FW01], pruebas: [T06, T34, T57] }
+  - { id: AM-12, zona_activo: "FW01", stride: [D], amenaza: "Caída del firewall virtual", control: "Break-glass, XML en Git, CARP en H3", iso_27002: ["8.14"], componentes: [FW01, BRK01], pruebas: [T25] }
+  - { id: AM-13, zona_activo: "Cualquiera", stride: [R], amenaza: "Acciones sin rastro", control: "Registro de denegaciones, auditoría de la consola, NTP/NTS", iso_27002: ["8.15", "8.17"], componentes: [FW01, SIEM01, CTRL01], pruebas: [T33] }
+  - { id: AM-14, zona_activo: "Panel remoto", stride: [S, E], amenaza: "Suplantar al encargado desde Internet o ampliar el descifrado con una sesión robada", control: "2FA, límite de intentos, WAF, acciones críticas solo desde el campus", iso_27002: ["5.15", "8.5"], componentes: [EC2-GW, CTRL01], pruebas: [T53, T54] }
+  - { id: AM-15, zona_activo: "Nodo", stride: [T], amenaza: "Configuración alterada en tránsito o inyectada", control: "Firma ed25519; rechazo de lo no firmado o más antiguo", iso_27002: ["8.24"], componentes: [CTRL01, EDGE01, EDGE02], pruebas: [T51] }
+  - { id: AM-16, zona_activo: "Enlace", stride: [D], amenaza: "Precarga satura el enlace en horario de clase", control: "Ventana horaria y límite (REQ-RN-10)", iso_27002: ["8.6"], componentes: [CTRL01, EDGE01, EDGE02], pruebas: [T50] }
+  - { id: AM-17, zona_activo: "BYOD", stride: [I, E], amenaza: "Descifrar tráfico de un equipo personal, o que un equipo personal alcance servidores o laboratorios", control: "REQ-F-36, RN-11; Wi-Fi solo a EDGE y portal", iso_27002: ["5.34", "8.22"], componentes: [WIFI-EST, EDGE01, EDGE02, FW01], pruebas: [T56, T57] }
+  - { id: AM-18, zona_activo: "EC2-GW", stride: [E], amenaza: "Gateway comprometido usado para pivotar al campus", control: "SG y FW01 solo permiten CTRL01:443 con mTLS; sin datos ni llaves en EC2-GW; recreable", iso_27002: ["8.22"], componentes: [EC2-GW, FW01], pruebas: [T58] }
 
 # Detecciones (D1.14). `ubicacion` es el componente donde reside el sensor o control.
 detecciones:
   - id: DET-01
     tecnologia: "Suricata IPS (FW01)"
     ubicacion: FW01
-    ubicacion_detalle: "Inline en WAN y DMZ-SVC"
+    ubicacion_detalle: "Inline en tránsito/WAN y DMZ-SVC"
     que_detecta: "Escaneos, explotación conocida (ET Open), protocolos anómalos"
     attack: [T1595, T1190]
     validacion: { escenario: "nmap -sS y nikto contra 203.0.113.10 desde fuera", pruebas: [T15] }
   - id: DET-02
-    tecnologia: "Suricata IDS (IDS01)"
-    ubicacion: IDS01
-    ubicacion_detalle: "Interfaces de captura en las VLAN 10, 20, 31 y 50 (no en 30/60)"
-    que_detecta: "Movimiento lateral, C2, DNS sospechoso, acceso a gestión"
-    attack: [T1046, T1021, T1071]
-    validacion: { escenario: "Escaneo desde KALI01 hacia SERVERS", pruebas: [T29] }
+    tecnologia: "Suricata IDS (FW01)"
+    ubicacion: FW01
+    ubicacion_detalle: "Interfaces LAB y SERVERS (v0.4: sustituye al sensor separado retirado, CI-39)"
+    que_detecta: "Escaneos hacia servidores y gestión, movimiento lateral entre zonas"
+    attack: [T1046, T1021]
+    validacion: { escenario: "Escaneo desde KALI01 (LAB) hacia SERVERS", pruebas: [T29] }
   - id: DET-03
-    tecnologia: "WAF (WAF01)"
-    ubicacion: WAF01
+    tecnologia: "WAF (PORTAL01)"
+    ubicacion: PORTAL01
     ubicacion_detalle: "Delante del portal"
     que_detecta: "Inyección SQL, XSS, recorrido de rutas, escáneres web"
     attack: [T1190]
@@ -101,7 +101,7 @@ detecciones:
   - id: DET-08
     tecnologia: "CrowdSec (FW01)"
     ubicacion: FW01
-    ubicacion_detalle: "WAN"
+    ubicacion_detalle: "Tránsito/WAN"
     que_detecta: "IP con comportamiento abusivo conocido"
     attack: [T1110, T1595]
     validacion: { escenario: "Simulación con su escenario de prueba", pruebas: [T32] }
@@ -112,6 +112,20 @@ detecciones:
     que_detecta: "Correlación de todo lo anterior; integridad de archivos del portal"
     attack: []
     validacion: { escenario: "Cada escenario produce una alerta con nivel ≥ 10", pruebas: [T11, T18] }
+  - id: DET-10
+    tecnologia: "Auditoría de la consola"
+    ubicacion: CTRL01
+    ubicacion_detalle: "CTRL01 (SERVERS)"
+    que_detecta: "Inicios de sesión fallidos, acciones críticas intentadas desde remoto, cambios fuera de horario"
+    attack: [T1078, T1110]
+    validacion: { escenario: "Login remoto sin segundo factor y aprobación de una fuente desde EC2-GW", pruebas: [T53, T54] }
+  - id: DET-11
+    tecnologia: "WAF de EC2-GW (Coraza)"
+    ubicacion: EC2-GW
+    ubicacion_detalle: "AWS, subred pub-a"
+    que_detecta: "Escaneos y ataques web contra el panel remoto"
+    attack: [T1190, T1595]
+    validacion: { escenario: "10 intentos de inicio de sesión fallidos contra EC2-GW", pruebas: [T53] }
 
 # Secciones de la plantilla oficial (11 secciones) — títulos tomados del DOCX.
 docx_secciones:
@@ -219,26 +233,23 @@ rubrica:
       - { tipo: prueba, ref: T06 }
       - { tipo: prueba, ref: T09 }
       - { tipo: prueba, ref: T10 }
-      - { tipo: prueba, ref: T12 }
-      - { tipo: prueba, ref: T22 }
       - { tipo: prueba, ref: T23 }
       - { tipo: prueba, ref: T34 }
-      - { tipo: prueba, ref: T41 }
-      - { tipo: prueba, ref: T44 }
-      - { tipo: prueba, ref: T48 }
+      - { tipo: prueba, ref: T52 }
+      - { tipo: prueba, ref: T60 }
   R3:
     nombre: "Diseño de conectividad híbrida (VPN)"
     peso: 15
     descriptor_nivel_4: "Especifica ambos extremos, redes anunciadas, tipo de túnel y cifrado previsto, con matriz de pruebas de conectividad planeadas coherente con el diseño."
     elementos_evaluados:
       - { id: R3-01, elemento: "Ida: ON-PREM → AWS por la VPN", pruebas: [T01] }
-      - { id: R3-02, elemento: "Vuelta: AWS → ON-PREM por la VPN, solo lo permitido (F16)", pruebas: [T02] }
+      - { id: R3-02, elemento: "Vuelta: AWS → ON-PREM por la VPN, solo EC2-GW → CTRL01:443 (F30)", pruebas: [T02] }
       - { id: R3-03, elemento: "Redundancia: falla de un túnel y convergencia BGP medida", pruebas: [T05] }
       - { id: R3-04, elemento: "MTU 1400 y MSS 1360 sin fragmentación", pruebas: [T21] }
-      - { id: R3-05, elemento: "Privacidad: sin cabeceras ni IP de clientes en el túnel", pruebas: [T26] }
+      - { id: R3-05, elemento: "Función real de la VPN: EC2-GW no es un pivote hacia el campus (F30, F13)", pruebas: [T58] }
       - { id: R3-06, elemento: "Sin exposición pública del lado AWS", pruebas: [T04] }
       - { id: R3-07, elemento: "Zonas no autorizadas (DMZ) no cruzan hacia AWS", pruebas: [T03] }
-      - { id: R3-08, elemento: "Protección de F9 y F16 en tránsito", pruebas: [T05, T26, T36] }
+      - { id: R3-08, elemento: "Protección de F13 y F30 en tránsito (IPsec + mTLS)", pruebas: [T05, T27, T58] }
     evidencias:
       - { tipo: seccion_docx, ref: "5.4", detalle: "D1.10 completa: activo/pasivo, MTU/MSS, BGP" }
       - { tipo: seccion_docx, ref: "6" }
@@ -249,7 +260,7 @@ rubrica:
       - { tipo: prueba, ref: T04 }
       - { tipo: prueba, ref: T05 }
       - { tipo: prueba, ref: T21 }
-      - { tipo: prueba, ref: T26 }
+      - { tipo: prueba, ref: T58 }
   R4:
     nombre: "Diseño de seguridad perimetral: firewall, DMZ y segmentación"
     peso: 20
@@ -259,12 +270,14 @@ rubrica:
       - { id: R4-02, elemento: "DMZ: el servicio web no alcanza el campus", pruebas: [T10, T46] }
       - { id: R4-03, elemento: "Honeypot sin salida", pruebas: [T20, T47] }
       - { id: R4-04, elemento: "Exposición a Internet: solo 80 y 443; nada hacia las zonas internas", pruebas: [T15, T45] }
-      - { id: R4-05, elemento: "Almacenamiento (VLAN 70) inalcanzable", pruebas: [T12, T48] }
-      - { id: R4-06, elemento: "Evasión de controles: QUIC, DNS cifrado e IPv6", pruebas: [T08, T23, T24] }
+      - { id: R4-05, elemento: "Wi-Fi de estudiantes (BYOD) aislado: sin descifrado y sin acceso a servidores", pruebas: [T56, T57] }
+      - { id: R4-06, elemento: "Evasión de controles: QUIC, DNS cifrado, IPv6 y WPAD", pruebas: [T08, T23, T24, T60] }
       - { id: R4-07, elemento: "Servicio expuesto: WAF e inyección", pruebas: [T17, T18] }
       - { id: R4-08, elemento: "Detección: IDS, canary, honeypot, honey-URL y CrowdSec", pruebas: [T11, T13, T14, T29, T30, T31, T32] }
       - { id: R4-09, elemento: "Rastro de las denegaciones y registros cifrados", pruebas: [T28, T33] }
       - { id: R4-10, elemento: "Recuperación del firewall", pruebas: [T25] }
+      - { id: R4-11, elemento: "Panel remoto: segundo factor, acciones críticas solo desde el campus y EC2-GW sin pivote", pruebas: [T53, T54, T58] }
+      - { id: R4-12, elemento: "Acceso por laboratorio: rango deshabilitado rechazado", pruebas: [T52] }
     evidencias:
       - { tipo: seccion_docx, ref: "5.3" }
       - { tipo: seccion_docx, ref: "7.1", detalle: "Producto, interfaces, política por defecto y criterio de reglas (D1.13)" }
@@ -287,6 +300,7 @@ rubrica:
       - { tipo: prueba, ref: T23 }
       - { tipo: prueba, ref: T24 }
       - { tipo: prueba, ref: T25 }
+      - { tipo: prueba, ref: T26 }
       - { tipo: prueba, ref: T29 }
       - { tipo: prueba, ref: T30 }
       - { tipo: prueba, ref: T31 }
@@ -300,8 +314,15 @@ rubrica:
       - { tipo: prueba, ref: T45 }
       - { tipo: prueba, ref: T46 }
       - { tipo: prueba, ref: T47 }
-      - { tipo: prueba, ref: T48 }
       - { tipo: prueba, ref: T49 }
+      - { tipo: prueba, ref: T51 }
+      - { tipo: prueba, ref: T52 }
+      - { tipo: prueba, ref: T53 }
+      - { tipo: prueba, ref: T54 }
+      - { tipo: prueba, ref: T56 }
+      - { tipo: prueba, ref: T57 }
+      - { tipo: prueba, ref: T58 }
+      - { tipo: prueba, ref: T60 }
   R5:
     nombre: "Diseño de detección: IDS/IPS y honeypot (planificación)"
     peso: 10
@@ -322,6 +343,7 @@ rubrica:
       - { tipo: prueba, ref: T32 }
       - { tipo: prueba, ref: T33 }
       - { tipo: prueba, ref: T43 }
+      - { tipo: prueba, ref: T53 }
   R6:
     nombre: "Diagrama de flujo de información y matriz de componentes"
     peso: 10
@@ -335,18 +357,16 @@ rubrica:
       - { tipo: prueba, ref: T02 }
       - { tipo: prueba, ref: T07 }
       - { tipo: prueba, ref: T09 }
-      - { tipo: prueba, ref: T22 }
       - { tipo: prueba, ref: T27 }
       - { tipo: prueba, ref: T28 }
       - { tipo: prueba, ref: T36 }
-      - { tipo: prueba, ref: T37 }
-      - { tipo: prueba, ref: T38 }
-      - { tipo: prueba, ref: T39 }
       - { tipo: prueba, ref: T40 }
-      - { tipo: prueba, ref: T41 }
       - { tipo: prueba, ref: T42 }
-      - { tipo: prueba, ref: T44 }
       - { tipo: prueba, ref: T49 }
+      - { tipo: prueba, ref: T50 }
+      - { tipo: prueba, ref: T51 }
+      - { tipo: prueba, ref: T55 }
+      - { tipo: prueba, ref: T59 }
   R7:
     nombre: "Calidad documental y trazabilidad del diseño"
     peso: 8
@@ -366,8 +386,8 @@ rubrica:
       - { tipo: prueba, ref: T06 }
       - { tipo: prueba, ref: T18 }
       - { tipo: prueba, ref: T26 }
-      - { tipo: prueba, ref: T39 }
       - { tipo: prueba, ref: T40 }
+      - { tipo: prueba, ref: T59 }
 
 # Correspondencia de los 15 contenidos mínimos de D1 con las secciones del DOCX.
 # El documento maestro no incluye la «tabla del inicio de D1» (CI-02): esta es la propuesta, por orden de contenido.
@@ -490,8 +510,33 @@ supuestos:
   S-19:
     supuesto: Destinos de actualización de MGMT (F27)
     valor: cualquier servidor TCP 443 de Internet hasta que se fije la lista de repositorios
-    validacion: La DTI entrega los repositorios de ESXi, OPNsense y NAS01 en S2; entonces F27 se limita a ellos
+    validacion: La DTI entrega los repositorios de ESXi y OPNsense en S2; entonces F27 se limita a ellos
     responsable: Equipo del proyecto
+  S-26:
+    supuesto: Laboratorios en alcance
+    valor: 10 laboratorios × 40 PCs
+    validacion: Inventario de la DTI
+    responsable: Henyelrey
+  S-27:
+    supuesto: Volumen de una actualización o instalación masiva
+    valor: 3 GB por PC
+    validacion: Registro de un ciclo real
+    responsable: Henyelrey
+  S-28:
+    supuesto: Wi-Fi de estudiantes
+    valor: Red de la DTI; valor provisional 172.16.0.0/16; la DTI decide si publica el PAC por DHCP (opción 252)
+    validacion: Levantamiento con la DTI
+    responsable: Henyelrey
+  S-29:
+    supuesto: FortiGate
+    valor: Tiene la IP pública, hace NAT 1:1 a FW01 (UDP 500/4500, TCP 80/443) por la red de tránsito 10.20.0.0/29 y excluye EDGE01/02 de la inspección SSL
+    validacion: Reunión con la DTI
+    responsable: Henyelrey
+  S-30:
+    supuesto: IAM para respaldos
+    valor: La cuenta permite una credencial de solo escritura en el bucket de respaldos
+    validacion: Confirmar con el docente (en AWS Academy puede no estar disponible)
+    responsable: Nick
 
 decisiones:
   D-01:
@@ -530,6 +575,20 @@ decisiones:
     decision: Todo tráfico entre zonas pasa por FW01, incluida la caché LAB→EDGE
   D-18:
     decision: 'Laboratorio efímero: misma imagen OCI e IaC en local (Modo L), AWS (Modo A) y campus (Modo H)'
+  D-19:
+    decision: Sin caché (shield) en AWS; el código queda desactivado (H3)
+  D-23:
+    decision: Rango /26 por laboratorio dentro de la VLAN 30
+  D-24:
+    decision: Acceso remoto al panel por EC2-GW (proxy inverso) a través de la VPN, en lugar de publicar la consola en el campus
+  D-25:
+    decision: Consola completa (SPA, API, base) en el campus
+  D-26:
+    decision: FW01 detrás del FortiGate existente (red de tránsito, NAT 1:1, NAT-T)
+  D-27:
+    decision: BYOD sin descifrado y proxy opcional
+  D-28:
+    decision: "Simplificación: DNS y NTP en FW01, PAC en el nodo, WAF y portal en una VM, sin NAS, sin OBS, sin IDS separado"
 
 requisitos:
   REQ-F-01: Atender como proxy explícito HTTP y HTTPS (CONNECT) en un puerto configurable
@@ -562,6 +621,13 @@ requisitos:
   REQ-F-28: Eliminar de forma explícita las cabeceras que identifican al cliente (X-Forwarded-For, Via, Forwarded) antes de enviar una petición al origen o al shield
   REQ-F-29: Enviar los MISS a un proxy padre (shield) configurable, con mTLS
   REQ-F-30: Exportar el aviso de transparencia como sitio estático firmado para el portal
+  REQ-F-31: Gestionar el catálogo de contenido (fuentes con dominios, categoría y modo) desde la consola
+  REQ-F-32: Gestionar el acceso por laboratorio (habilitar o deshabilitar un laboratorio, su rango de IP y su horario)
+  REQ-F-33: Autenticar usuarios de la consola con contraseña y segundo factor y aplicar RBAC por rol y laboratorio
+  REQ-F-34: Programar una precarga (URLs o fuente, laboratorio, fecha y ventana horaria) y ver su avance
+  REQ-F-35: Registrar solicitudes de los docentes para preparar un laboratorio y convertirlas en precargas
+  REQ-F-36: Tratar como passthrough todo el tráfico que llega desde redes de origen BYOD (WIFI-EST), aunque el dominio esté en una fuente a descifrar
+  REQ-F-37: Distinguir el origen de cada sesión (campus o remoto por EC2-GW) y rechazar desde remoto las acciones críticas
   REQ-NF-01: Latencia añadida p95 ≤ 5 ms en HIT desde memoria y ≤ 20 ms desde disco, en LAN
   REQ-NF-02: ≥ 5 000 conexiones concurrentes por nodo de 4 vCPU y 8 GB (meta a confirmar con prueba)
   REQ-NF-03: Disponibilidad para el usuario ≥ 99,5 % mensual gracias al DIRECT del PAC y al DNS secundario
@@ -577,6 +643,7 @@ requisitos:
   REQ-NF-13: Cada decisión (HIT, MISS, bypass, rechazo) produce una métrica
   REQ-NF-14: El puerto de administración y métricas solo acepta TLS (o mTLS); el token nunca viaja en claro
   REQ-NF-15: Imagen OCI sin privilegios (usuario no root), firmada y con SBOM
+  REQ-NF-16: Un cambio en la consola llega a los nodos en ≤ 60 s
   REQ-RN-01: 'Nunca se guarda una respuesta con Set-Cookie, Cache-Control: private o no-store'
   REQ-RN-02: Nunca se sirve desde caché una petición con Authorization o Cookie
   REQ-RN-03: Los dominios de never_intercept ganan siempre sobre intercept_domains
@@ -585,3 +652,6 @@ requisitos:
   REQ-RN-06: Los registros con IP real solo se activan con aviso actualizado y retención definida
   REQ-RN-07: Un cambio de configuración necesita aprobación de un segundo operador (cuatro ojos)
   REQ-RN-08: Un bundle de configuración sin firma válida se rechaza
+  REQ-RN-09: Bancos, inicios de sesión y servicios de identidad están en `nunca` por defecto y no se pueden mover a otro modo desde la consola
+  REQ-RN-10: Una precarga no puede superar el límite de ancho de banda ni salir de la ventana horaria configurada por la DTI
+  REQ-RN-11: Ninguna configuración puede habilitar el descifrado para redes de origen BYOD; el nodo la rechaza aunque llegue firmada

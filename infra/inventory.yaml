@@ -223,6 +223,7 @@ zonas:
     cidr: 10.30.0.0/16
     gateway: null
     confianza: Media
+    cambio: CI-72
     proposito: "VPC celeris (10.30.0.0/16): EC2-GW (panel remoto), S3 de respaldos y subred privada vacía para el simulacro de recuperación"
     regla_diseno: "Alcanzable solo por VPN desde el campus; desde Internet solo EC2-GW:443; Security Groups y NACL de D2.5"
     admin: "Equipo del proyecto (cuenta AWS [S-13])"
@@ -386,7 +387,7 @@ componentes:
     adr: [D-26]
     req: []
     objetivos: []
-    figuras: [FIG-1.1, FIG-5.1, FIG-5.2]
+    figuras: [FIG-1.1, FIG-5.1, FIG-5.2, FIG-5.3, FIG-5.4]
     supuestos: [S-15, S-29]
     flujos_justificacion: "Equipo existente fuera de alcance: transporta F8, F18, F21, F24 y F29 («vía FortiGate») sin ser origen ni destino de ninguna regla del proyecto"
     emulacion_lab: { nodo: fgt-sim, equivalencia: funcional, nota: "nftables con NAT 1:1 y NAT-T, sin FortiGuard (D5.3)" }
@@ -1025,7 +1026,7 @@ componentes:
     adr: [D-27]
     req: [REQ-F-36, REQ-RN-11]
     objetivos: [OD-06, OD-08]
-    figuras: [FIG-1.1, FIG-5.1, FIG-5.2, FIG-5.5a]
+    figuras: [FIG-1.1, FIG-5.1, FIG-5.2, FIG-5.3, FIG-5.5a]
     supuestos: [S-28]
     emulacion_lab: { nodo: byod01, equivalencia: funcional, nota: "Bridge wifi-sim 172.16.0.0/16 + byod01, sin APs (D5.3)" }
     cambio: CI-38

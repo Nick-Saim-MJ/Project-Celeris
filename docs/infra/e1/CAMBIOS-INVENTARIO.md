@@ -94,6 +94,9 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-61 | decisión de transcripción | UPS01 es Alta; NUT intrazona de MGMT (resuelve CI-15 y CI-09) | resuelto (2026-11-23) |
 | CI-62 | decisión de transcripción | T25 solo en el Modo H (resuelve CI-16) | resuelto (2026-11-23) |
 | CI-63 | decisión de transcripción | Capas de defensa en profundidad (D1.9) en la fuente única (resuelve la parte 1 de CI-30) | resuelto (2026-11-23) |
+| CI-70 | vacío | FGT-EXT sin FIG-5.3 ni FIG-5.4; WIFI-EST sin FIG-5.3 (H1) | resuelto (2026-11-23) |
+| CI-71 | contradicción | `muestra` de FIG-5.5a/b con los flujos de la v0.2 (H1) | resuelto (2026-11-23) |
+| CI-72 | contradicción | Confianza de la zona AWS: «Media» en el YAML, «Baja, expuesta» en D1.9 (H1) | abierto |
 
 ## Entradas
 
@@ -832,3 +835,32 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Qué cambia:** `trazabilidad.yaml → defensa_profundidad` transcribe las 11 capas de la tabla de D1.9 v0.4 (capa, controles, detalle). La lista de `drawio.py` (`CAPAS_D19`) era de la v0.2 y trae controles retirados (NAS01, IDS01): al regenerar la figura 5.3 (I4) se debe leer del YAML y borrar la constante.
 - **Dónde:** `infra/trazabilidad.yaml`, `infra/schema/trazabilidad.schema.json`
 - **Decide:** equipo del proyecto
+
+## Entradas de los diagramas v0.4 (H1, rango CI-70…CI-89)
+
+### CI-70 — FGT-EXT y WIFI-EST faltan en el campo `figuras` de FIG-5.3 y FIG-5.4
+- **Estado:** resuelto (2026-11-23, Henyelrey; lo revisa Nick en el PR de `v04/diagramas-red`)
+- **Tipo:** vacío
+- **Dónde:** `infra/inventory.yaml` → FGT-EXT y WIFI-EST (`figuras`); D1.8 («Posición frente al FortiGate», D-26), D1.9 (defensa en profundidad y zonas) y D1.10 (NAT-T) de `docs/celeris/Celeris-CE03-Infraestructura.md`
+- **Qué dice cada fuente:** D1.9 pone «FortiGate existente con FortiGuard» como primera capa de la defensa en profundidad y lista WIFI-EST entre las zonas por nivel de confianza; D1.10 ubica el extremo de la VPN en FW01 detrás del FortiGate (NAT 1:1 y NAT-T UDP 4500). El YAML dejaba a FGT-EXT solo en FIG-1.1, 5.1 y 5.2, y a WIFI-EST sin FIG-5.3, por lo que V-51 no permitía dibujarlos donde la figura los pide (en las figuras, el recuadro de la zona WIFI-EST cuenta como el componente del mismo ID).
+- **Decisión aplicada:** FGT-EXT → `[FIG-1.1, FIG-5.1, FIG-5.2, FIG-5.3, FIG-5.4]`; WIFI-EST → `[FIG-1.1, FIG-5.1, FIG-5.2, FIG-5.3, FIG-5.5a]`. No cambia ninguna IP, flujo ni componente.
+- **Efecto:** la matriz de componentes (H2) toma la cobertura de `docs/infra/e1/cobertura-figuras.json`.
+- **Decide:** equipo del proyecto
+
+### CI-71 — `muestra` de FIG-5.5a y FIG-5.5b con los flujos de la v0.2
+- **Estado:** resuelto (2026-11-23, Henyelrey)
+- **Tipo:** contradicción
+- **Dónde:** `infra/trazabilidad.yaml` → `figuras` (FIG-5.5a, FIG-5.5b, campo `muestra`)
+- **Qué dice cada fuente:** el campo `figura` de cada flujo del inventario asigna F1–F3, F5–F8, F21, F24, F25, F31 y F32 a FIG-5.5a, y F10, F13, F14, F18, F20, F26–F30 y F33 a FIG-5.5b. El texto `muestra` seguía citando «F1–F3, F5–F8, F21–F25» y «F9–F20, F26», que incluyen flujos retirados (F9, F11, F12, F15–F17, F19, F22, F23).
+- **Decisión aplicada:** se reescribe `muestra` con las listas del campo `figura`. Manda el campo `figura`; el texto es descriptivo (lo usará el informe, H3).
+- **Decide:** equipo del proyecto
+
+### CI-72 — Confianza de la zona AWS: «Media» en el YAML, «Baja, expuesta» en D1.9
+- **Estado:** abierto
+- **Tipo:** contradicción
+- **Dónde:** `infra/inventory.yaml` → zona AWS (`confianza`, marcada con `cambio: CI-72`); D1.9 «Zonas y su nivel de confianza» («AWS (EC2-GW) — Baja, expuesta»)
+- **Qué dice cada fuente:** el YAML da a la zona AWS la confianza «Media». La tabla de D1.9 v0.4 da «Baja, expuesta» a AWS (EC2-GW), igual que a DMZ-SVC, porque EC2-GW recibe F29 desde Internet.
+- **Propuesta:** «Baja» con `confianza_nota: expuesta` (como DMZ-SVC), porque EC2-GW es lo único del diseño expuesto a Internet además del portal. Mientras tanto, la FIG-5.3 dibuja el valor del YAML (Media) y ordena las zonas con él.
+- **Decide:** equipo del proyecto (Nick y Henyelrey)
+- **Efecto al resolver:** cambiar `confianza` de la zona AWS, quitar `cambio: CI-72` y regenerar FIG-5.3 (`make diagrams-check`).
+

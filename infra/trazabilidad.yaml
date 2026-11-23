@@ -188,12 +188,12 @@ figuras:
     titulo: "Flujos de información planeados (a): usuarios, portal, DMZ-HONEY y servicios hacia Internet"
     leyenda: "Figura 5.5a — Flujos de información planeados: usuarios, portal y servicios hacia Internet"
     seccion_docx: "5.5"
-    muestra: "Origen, destino, protocolo y puerto de cada flecha con su ID F-nn (F1–F3, F5–F8, F21–F25)"
+    muestra: "Origen, destino, protocolo y puerto de cada flecha con su ID F-nn (F1–F3, F5–F8, F21, F24, F25, F31, F32)"
   - id: FIG-5.5b
     titulo: "Flujos de información planeados (b): control, observabilidad, seguridad, respaldo e híbrido"
     leyenda: "Figura 5.5b — Flujos de información planeados: plano de control, observabilidad, seguridad y respaldo"
     seccion_docx: "5.5"
-    muestra: "Origen, destino, protocolo y puerto de cada flecha con su ID F-nn (F9–F20, F26)"
+    muestra: "Origen, destino, protocolo y puerto de cada flecha con su ID F-nn (F10, F13, F14, F18, F20, F26–F30, F33)"
 
 # Artefactos derivados (los generan P2–P5)
 artefactos:

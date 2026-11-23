@@ -584,6 +584,14 @@
           "retirado_por": {
             "type": "string",
             "pattern": "^CI-\\d{2}$"
+          },
+          "retirado_motivo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "retirado_cubre": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },

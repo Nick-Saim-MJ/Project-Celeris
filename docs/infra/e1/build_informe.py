@@ -1057,6 +1057,9 @@ try {{
         # Word a veces queda vivo (oculto) aunque se llame a Quit(): se cierra solo la instancia que abrió este script.
         for pid in _pids_word() - antes:
             subprocess.run(["taskkill", "/PID", str(pid), "/F"], capture_output=True)
+        bloqueo = docx.with_name("~$" + docx.name[2:])   # archivo de propietario que Word deja si se le cierra a la fuerza
+        if bloqueo.exists():
+            bloqueo.unlink()
     if r.returncode != 0 or not pdf.exists():
         raise RuntimeError(r.stderr.strip() or "Word no exportó el PDF")
     return json.loads(salida_json.read_text(encoding="utf-8-sig"))

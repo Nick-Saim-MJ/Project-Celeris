@@ -194,7 +194,7 @@ def conteo_estados(x: Infra) -> str:
     for c in x.componentes.values():
         e = ESTADO.get(c["estado"], c["estado"])
         n[e] = n.get(e, 0) + 1
-    return ", ".join(f"{v} {k.lower()}" for k, v in n.items())
+    return ", ".join(f"{k} {v}" for k, v in sorted(n.items(), key=lambda kv: -kv[1]))
 
 
 def hoja_portada(wb, x: Infra, fuente_fig: str, nombre: str):
@@ -212,7 +212,7 @@ def hoja_portada(wb, x: Infra, fuente_fig: str, nombre: str):
         ("Fuente de los datos", "infra/inventory.yaml, infra/pruebas.yaml, infra/trazabilidad.yaml; generado por "
                                 "infra/gen/xlsx_componentes.py (no editar a mano: make matrices lo regenera)"),
         ("Figuras", f"Columna «Figuras donde aparece» y hoja Cobertura: {fuente_fig}"),
-        ("Cómo leer la matriz", f"Una fila por componente vigente del inventario ({len(x.componentes)}: {conteo_estados(x)}); los "
+        ("Cómo leer la matriz", f"Una fila por componente no retirado del inventario ({len(x.componentes)}: {conteo_estados(x)}); los "
                                 f"{len(x.componentes_retirados)} retirados en la v0.4 están en la hoja «{HOJA_RETIRADOS}». "
                                 "Las cinco primeras columnas son las de la plantilla "
                                 "del informe (Componente, IP planeada, Zona, Función, Criticidad). Las siguientes explican por qué "

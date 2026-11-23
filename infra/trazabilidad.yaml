@@ -12,19 +12,28 @@ meta:
   rubrica_oficial: docs/fuentes/CE03/Rubrica_S1_E1_Diseno_de_Red.xlsx
 
 # Objetivos medibles (D1.6)
+# Objetivos del proyecto (CE01, resumidos en 00 Marco común M2.3) y la necesidad que expresa cada uno. Cada OD-xx los
+# cita en `objetivo_proyecto` (CE03 D1.6, columna «Objetivo del proyecto»; CI-75). OD-05 no cita ninguno en D1.6.
+objetivos_proyecto:
+  - { id: OB-1, necesidad: "Ahorro de Internet", indicador: "GB evitados por mes; BHR", meta: "BHR ≥ 25 % [S-04]" }
+  - { id: OB-2, necesidad: "Ahorro de tiempo", indicador: "Tiempo de descarga para dejar listo un laboratorio de 40 PCs", meta: "−70 %" }
+  - { id: OB-3, necesidad: "Autonomía del encargado", indicador: "Tiempo para habilitar una fuente o un laboratorio", meta: "≤ 5 min" }
+  - { id: OB-4, necesidad: "Transparencia", indicador: "PCs con aviso entregado antes de instalar la CA", meta: "100 %" }
+  - { id: OB-5, necesidad: "Seguridad del servicio", indicador: "Escenarios de abuso planificados detectados", meta: "≥ 90 % en S2" }
+
 objetivos:
-  - { id: OD-01, objetivo: "Segmentar por zonas", indicador: "Servidores críticos en VLAN dedicadas", meta: "100 %", responsable: "Diseño de red" }
-  - { id: OD-02, objetivo: "Aislar la gestión", indicador: "Interfaces de gestión alcanzables solo desde JMP01 (VLAN 10)", meta: "100 %", responsable: Seguridad }
-  - { id: OD-03, objetivo: "Rutas alternas", indicador: "Rutas de salida para un usuario", meta: "≥ 3 (EDGE01, EDGE02, DIRECT)", responsable: "Diseño de red" }
-  - { id: OD-04, objetivo: "Resolución DNS confiable", indicador: "Resolvedor con DNSSEC en FW01; sin dependencia oculta (si FW01 cae, no hay ruteo)", meta: "1 resolvedor validado + `DIRECT` del PAC", responsable: "Diseño de red" }
-  - { id: OD-05, objetivo: "Enlace híbrido redundante", indicador: "Túneles VPN configurados / convergencia medida", meta: "2 túneles; ≤ 60 s", responsable: Infraestructura }
-  - { id: OD-06, objetivo: "Política por defecto", indicador: "Tráfico entre zonas con regla explícita y registro", meta: "100 %, deny-all en el resto", responsable: Seguridad }
-  - { id: OD-07, objetivo: "Protección en tránsito", indicador: "Flujos con protección criptográfica o riesgo aceptado documentado", meta: "100 % de los flujos de D1.11", responsable: Seguridad }
-  - { id: OD-08, objetivo: "Servicio expuesto endurecido", indicador: "Calificación TLS del portal y de EC2-GW; puertos abiertos desde Internet", meta: "≥ A; solo 80/443 (+ señuelos en ventana autorizada)", responsable: Seguridad }
-  - { id: OD-09, objetivo: "Detección", indicador: "Escenarios de ataque planificados detectados en S2", meta: "≥ 90 %", responsable: Seguridad }
-  - { id: OD-10, objetivo: "Adopción del proxy", indicador: "Bytes HTTP(S) de LAB que pasan por la caché", meta: "Se mide en el piloto; meta ≥ 90 % en modo gestionado", responsable: "Diseño de red" }
-  - { id: OD-11, objetivo: "Acceso por laboratorio", indicador: "Laboratorios con rango propio que el encargado habilita", meta: "10 de 10", responsable: "Diseño de red" }
-  - { id: OD-12, objetivo: "Panel remoto sin exponer el campus", indicador: "Puertos del campus que alcanzan CTRL01 desde Internet", meta: "0", responsable: Seguridad }
+  - { id: OD-01, objetivo: "Segmentar por zonas", indicador: "Servidores críticos en VLAN dedicadas", meta: "100 %", responsable: "Diseño de red", objetivo_proyecto: [OB-5] }
+  - { id: OD-02, objetivo: "Aislar la gestión", indicador: "Interfaces de gestión alcanzables solo desde JMP01 (VLAN 10)", meta: "100 %", responsable: Seguridad, objetivo_proyecto: [OB-5] }
+  - { id: OD-03, objetivo: "Rutas alternas", indicador: "Rutas de salida para un usuario", meta: "≥ 3 (EDGE01, EDGE02, DIRECT)", responsable: "Diseño de red", objetivo_proyecto: [OB-1, OB-2] }
+  - { id: OD-04, objetivo: "Resolución DNS confiable", indicador: "Resolvedor con DNSSEC en FW01; sin dependencia oculta (si FW01 cae, no hay ruteo)", meta: "1 resolvedor validado + `DIRECT` del PAC", responsable: "Diseño de red", objetivo_proyecto: [OB-2] }
+  - { id: OD-05, objetivo: "Enlace híbrido redundante", indicador: "Túneles VPN configurados / convergencia medida", meta: "2 túneles; ≤ 60 s", responsable: Infraestructura, objetivo_proyecto: [] }
+  - { id: OD-06, objetivo: "Política por defecto", indicador: "Tráfico entre zonas con regla explícita y registro", meta: "100 %, deny-all en el resto", responsable: Seguridad, objetivo_proyecto: [OB-5] }
+  - { id: OD-07, objetivo: "Protección en tránsito", indicador: "Flujos con protección criptográfica o riesgo aceptado documentado", meta: "100 % de los flujos de D1.11", responsable: Seguridad, objetivo_proyecto: [OB-4] }
+  - { id: OD-08, objetivo: "Servicio expuesto endurecido", indicador: "Calificación TLS del portal y de EC2-GW; puertos abiertos desde Internet", meta: "≥ A; solo 80/443 (+ señuelos en ventana autorizada)", responsable: Seguridad, objetivo_proyecto: [OB-4] }
+  - { id: OD-09, objetivo: "Detección", indicador: "Escenarios de ataque planificados detectados en S2", meta: "≥ 90 %", responsable: Seguridad, objetivo_proyecto: [OB-5] }
+  - { id: OD-10, objetivo: "Adopción del proxy", indicador: "Bytes HTTP(S) de LAB que pasan por la caché", meta: "Se mide en el piloto; meta ≥ 90 % en modo gestionado", responsable: "Diseño de red", objetivo_proyecto: [OB-1] }
+  - { id: OD-11, objetivo: "Acceso por laboratorio", indicador: "Laboratorios con rango propio que el encargado habilita", meta: "10 de 10", responsable: "Diseño de red", objetivo_proyecto: [OB-3] }
+  - { id: OD-12, objetivo: "Panel remoto sin exponer el campus", indicador: "Puertos del campus que alcanzan CTRL01 desde Internet", meta: "0", responsable: Seguridad, objetivo_proyecto: [OB-3, OB-5] }
 
 # Modelo de amenazas STRIDE (D1.9). `pruebas` lista T-nn; si no hay, `prueba_justificacion`.
 amenazas:
@@ -501,6 +510,9 @@ supuestos:
     valor: respaldo y /srv/respaldo
     validacion: Solo el Modo L; la clave del repositorio se genera en cada ensayo y no se guarda
     responsable: Equipo del proyecto
+    estado: retirado
+    retirado_motivo: "NAS01 y T39 se retiraron en v0.4: el respaldo va a S3 (F18) y la copia local queda en el datastore"
+    cambio: CI-76
   S-19:
     supuesto: Destinos de actualización de MGMT (F27)
     valor: cualquier servidor TCP 443 de Internet hasta que se fije la lista de repositorios

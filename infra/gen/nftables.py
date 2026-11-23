@@ -41,6 +41,22 @@ def _proto_expr(protocolos: list[dict], dnat: dict[int, int] | None = None) -> s
     return "meta l4proto . th dport { " + ", ".join(f"{pr} . {pt}" for pr, pt in pares) + " }"
 
 
+def _bogons_wan(x: Infra) -> list[str]:
+    """Bogons de la WAN menos las excepciones de D1.13 v0.4: la red de tránsito (10.20.0.0/29) y la red del Wi-Fi (solo llega a F31/F32; el resto lo niega la política)."""
+    import ipaddress
+    excepciones = [ipaddress.ip_network(x.zonas["TRANSITO"]["cidr"]), ipaddress.ip_network(x.zonas["WIFI-EST"]["cidr"])]
+    out = []
+    for b in BOGONS_WAN:
+        redes = [ipaddress.ip_network(b)]
+        for e in excepciones:
+            nuevas = []
+            for r in redes:
+                nuevas += list(r.address_exclude(e)) if (e.subnet_of(r) and e != r) else [r]
+            redes = nuevas
+        out += [str(r) for r in sorted(redes, key=lambda n: (int(n.network_address), n.prefixlen))]
+    return out
+
+
 def _comentario(f: dict) -> str:
     c = f["regla_fw"]
     if len(c) > 120:
@@ -209,7 +225,7 @@ def generar(x: Infra, modo: str = "piloto", ventana: bool = False, wan_ip: str |
     vpn_in, vpn_out = _vpn(x, ifaces, aws_peers)
     mss = x.inv["vpn"]["mss_clamping"]
     vtis = "{ " + ", ".join(f'"{nombre_kernel(t["id"])}"' for t in x.inv["vpn"]["tuneles"]) + " }"
-    antispoof = f'iifname "{wan["interfaz"]}" ip saddr {{ ' + ", ".join(BOGONS_WAN) + ' } counter drop comment "Anti-spoofing WAN D1.13 (sin F-nn)"'
+    antispoof = f'iifname "{wan["interfaz"]}" ip saddr {{ ' + ", ".join(_bogons_wan(x)) + ' } counter drop comment "Anti-spoofing WAN D1.13 (sin F-nn)"'
 
     L = [cabecera("#").rstrip(), f"# modo={modo} ventana={'sí' if ventana else 'no'} wan={wan_ip}", "flush ruleset", ""]
     L += [f"table inet {TABLA} {{"]

@@ -142,3 +142,13 @@ def test_snapshot_del_ruleset(infra, nombre, kw):
 
 def test_la_salida_es_determinista(infra):
     assert gen(infra) == gen(infra)
+
+
+def test_antispoofing_de_la_wan_excluye_el_transito_y_el_wifi(infra):
+    """D1.13 v0.4: se bloquean bogons y redes privadas entrantes, excepto 10.20.0.0/29 y 172.16.0.0/16 (solo F31/F32)."""
+    import ipaddress
+    linea = next(l for l in gen(infra).splitlines() if "Anti-spoofing WAN" in l and "{" in l)
+    redes = [ipaddress.ip_network(r.strip()) for r in linea.split("{")[1].split("}")[0].split(",")]
+    cubre = lambda ip: any(ipaddress.ip_address(ip) in r for r in redes)
+    assert not cubre("10.20.0.1") and not cubre("172.16.0.50")
+    assert cubre("172.17.0.1") and cubre("192.168.1.1") and cubre("10.20.60.10") and cubre("10.1.1.1")

@@ -564,7 +564,10 @@ table ip fgt {{
   }}
 }}
 table ip filter {{
-  chain forward {{ type filter hook forward priority 0; policy accept; counter comment "FortiGate emulado: sin FortiGuard (D5.3)" }}
+  chain forward {{
+    type filter hook forward priority 0; policy accept;
+    counter comment "FortiGate emulado: sin FortiGuard (D5.3)"
+  }}
 }}
 """
 

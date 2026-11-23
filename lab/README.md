@@ -19,19 +19,26 @@ make lab-down    # destruye los contenedores y los puentes
 bash lab/lab.sh estado
 ```
 
-## Qué contiene (todo emulado)
+## Qué contiene (todo emulado, v0.4 según CE03 D5.3)
 
 | Nodo | Qué es |
 | --- | --- |
-| `fw01-sim`, `vgw-sim` | FW01 (nftables, Suricata, Unbound) y el VGW de AWS (strongSwan + FRR); `vgw-sim` también hace NAT de la VPC, como NAT01 |
-| `shield01` | EC2-SHIELD: `celeris-cache` en modo shield, con mTLS en el puerto 8443 (F9) |
-| `edge01`, `edge02` | Nodos de caché: envían los MISS al shield con mTLS (REQ-F-29), generan el PAC (REQ-F-26) y tienen una honey-URL (REQ-F-27) |
+| `fw01-sim` | FW01: nftables generado del inventario, strongSwan + FRR (VPN con NAT-T), Suricata IDS en LAB y SERVERS, Unbound con DNSSEC, NTP y CrowdSec. Su WAN es la red de tránsito 10.20.0.0/29 |
+| `fgt-sim` | FortiGate emulado: NAT 1:1 de la IP pública del laboratorio (198.51.100.10 en lugar de 203.0.113.10) hacia 10.20.0.2 solo para UDP 500/4500 y TCP 80/443, y ruta al Wi-Fi. Sin FortiGuard ni inspección SSL |
+| `byod01` | Equipo personal en el Wi-Fi de estudiantes (`br-wifi`, 172.16.0.0/16); solo alcanza EDGE y el portal (F31, F32) |
+| `vgw-sim`, `gw-sim` | El VGW de AWS (strongSwan + FRR, y NAT/IGW de la VPC) y EC2-GW (nginx + ModSecurity que reenvía a `ctrl01:443` con certificado de cliente, F29/F30) |
+| `ctrl01` | Consola de prueba en 443: marca las sesiones `campus` o `remoto` y rechaza con 403 las acciones críticas remotas (REQ-F-37). No es la consola de CE02 |
+| `edge01`, `edge02` | Nodos de caché: generan el PAC (REQ-F-26) y lo sirven, tienen una honey-URL (REQ-F-27) y aceptan solo los rangos /26 habilitados |
+| `portal01` | PORTAL01: WAF (nginx + ModSecurity + CRS) y sitio estático en una sola VM |
 | `siem01` + `siem01-wazuh` | Wazuh manager 4.9.2 (imagen fijada por digest) con su receptor de syslog por TLS en 6514 (F14); las reglas son las de `siem/wazuh/local_rules.xml` |
-| `nas01` | NAS01 con STORAGE (VLAN 70), BACKUP (VLAN 71) y MGMT: sshd + restic y un puerto 2049 que no es NFS |
-| `obs01`, `svc01`, `waf01`, `web01`, `hny01`, `hny02`, `ids01` | Con agente de Wazuh, que se enrola solo al arrancar (F13) |
-| `labcli01`, `kali01`, `jmp01`, `ext01` | Clientes de prueba (LABCLI01 con Chromium sin pantalla), administración y «Internet» |
+| `hny01`, `hny02`, `ctrl01`, `edge01`, `edge02`, `portal01`, `gw-sim` | Con agente de Wazuh, que se enrola solo al arrancar (F13) |
+| `labcli01`, `labcli02`, `labcli03`, `enc01`, `kali01`, `jmp01` | Clientes de prueba: LABCLI01 con Chromium; `labcli02` en LAB-01 y `labcli03` en LAB-03 (T52); ENC01, KALI01 y administración |
+| `ext01`, `origin-sim` | «Internet»: atacante externo y origen web, y origen con archivos de 100 MB a 1 GB |
 
-No se emulan ESX01, IPMI01, SW-CORE01, UPS01 ni BRK01 (CI-16), ni CrowdSec, NTS, S3 ni PostgreSQL: esas pruebas son del Modo H (CI-28).
+Ya no existen `svc01`, `obs01`, `ids01`, `nas01`, `probe01`, `shield01`, `waf01` ni `web01`, ni las VLAN 31, 70 y 71 (CI-39). Los parámetros que el inventario no fija están en CI-48.
+`make lab-up` necesita permisos de root para crear los puentes (en WSL: `wsl -u root`).
+
+No se emulan ESX01, IPMI01, SW-CORE01, UPS01 ni BRK01 (CI-16), ni NTS, S3 ni PostgreSQL: esas pruebas son del Modo H.
 
 ## Docker Desktop
 
@@ -42,7 +49,7 @@ Ejecute una sola vez, como root, `sh lab/docker-nativo.sh`: agrega un socket al 
 ## Desde un clon limpio
 
 `make lab-up` genera la topología y los certificados (en `lab/.run/`, fuera de git), construye las imágenes que falten, descarga la imagen del manager de Wazuh, crea los puentes,
-despliega y espera a que el manager y todos los agentes estén activos (unos 6 minutos la primera vez). Las llaves, certificados y la clave de restic son de laboratorio y se generan en cada
+despliega y espera a que el manager y todos los agentes estén activos (unos 6 minutos la primera vez). Las llaves y certificados son de laboratorio y se generan en cada
 equipo; no hay secretos en el repositorio. Si cambia `lab/images/base/Dockerfile`, borre la imagen (`docker rmi celeris-lab/base:dev`) para que se reconstruya.
 
 Requiere Linux con Docker y containerlab (en Windows, WSL2). Si falta alguno, `lab.sh` se detiene con un mensaje; no simula nada.

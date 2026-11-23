@@ -1,29 +1,29 @@
 <mxfile host="celeris-infra-gen" type="device" version="24.7.17">
   <diagram id="FIG-5.5a" name="FIG-5.5a">
-    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2376" pageHeight="1520" background="#FFFFFF" math="0" shadow="0">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2168" pageHeight="1234" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <object id="FIG-5.5a-1" label="&lt;b&gt;Figura 5.5a — Flujos de información planeados: usuarios, portal y servicios hacia Internet&lt;/b&gt;&lt;br&gt;FIG-5.5a · Inventario v1.0 · 2026-11-18 · commit de la fuente 64f21c1 · CE0311 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="FIG-5.5a" titulo="Figura 5.5a — Flujos de información planeados: usuarios, portal y servicios hacia Internet">
+        <object id="FIG-5.5a-1" label="&lt;b&gt;Figura 5.5a — Flujos de información planeados: usuarios, portal y servicios hacia Internet&lt;/b&gt;&lt;br&gt;FIG-5.5a · Inventario v1.1 · 2026-11-22 · commit de la fuente d92508b · CE0311 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="FIG-5.5a" titulo="Figura 5.5a — Flujos de información planeados: usuarios, portal y servicios hacia Internet">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;align=left;spacingLeft=10;fontSize=13;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="10" width="1836" height="44" as="geometry" />
+            <mxGeometry x="20" y="10" width="1628" height="44" as="geometry" />
           </mxCell>
         </object>
         <object id="FIG-5.5a-2" label="&lt;b&gt;INTERNET&lt;/b&gt; &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="INTERNET" celeris_tipo="zona" confianza="Nula" tooltip="INTERNET: Internet pública: ISP, orígenes web, ACME, feeds y S3 (bucket celeris-backups)">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F2F2;strokeColor=#4D4D4D;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="196" width="1836" height="34" as="geometry" />
+            <mxGeometry x="20" y="196" width="1628" height="34" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-3" label="&lt;b&gt;PERIMETRO&lt;/b&gt; &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="PERIMETRO" celeris_tipo="zona" confianza="Media" tooltip="PERIMETRO: Interfaz WAN de FW01 (203.0.113.10, documentación RFC 5737 [S-15]) e interfaces de túnel VTI1/VTI2">
+        <object id="FIG-5.5a-3" label="&lt;b&gt;PERIMETRO&lt;/b&gt; &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="PERIMETRO" celeris_tipo="zona" confianza="Media" tooltip="PERIMETRO: IP pública del FortiGate FGT-EXT (203.0.113.10, documentación RFC 5737 [S-15]) e interfaces de túnel VTI1/VTI2 de FW01">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F2F2;strokeColor=#4D4D4D;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="234" width="1836" height="64" as="geometry" />
+            <mxGeometry x="20" y="234" width="1628" height="64" as="geometry" />
           </mxCell>
         </object>
         <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-4" value="">
-          <mxGeometry x="24" y="266" width="1828" height="30" as="geometry" />
+          <mxGeometry x="24" y="266" width="1620" height="30" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-5" label="&lt;b&gt;FW01&lt;/b&gt; · Firewall OPNsense · &lt;b&gt;ALTA&lt;/b&gt; · WAN 203.0.113.10 · .1 en 9 VLAN" celeris_id="FW01" celeris_tipo="componente" ip="wan 203.0.113.10 · vlan10 10.20.10.1 · vlan20 10.20.20.1 · vlan30 10.20.32.1 · vlan31 10.20.31.1 · vlan40 10.20.40.1 · vlan41 10.20.41.1 · vlan50 10.20.50.1 · vlan60 10.20.60.1 · vlan71 10.20.71.1" zona="PERIMETRO, MGMT, SERVERS, LAB, LAB-TEST, DMZ-SVC, DMZ-HONEY, SECURITY, EDGE, BACKUP" criticidad="Alta" estado="diseño" por_que="Todo tráfico entre zonas pasa por FW01 (D-17), de modo que cada flujo tiene una regla y un registro. Además termina la VPN IPsec y ejecuta Suricata IPS y CrowdSec." aporta="Una subinterfaz VLAN por zona (10, 20, 30, 31, 40, 41, 50, 60, 71) en el trunk PG-FW-TRUNK; WAN por vSwitch1/vmnic2; VTI1 y VTI2 con BGP; Unbound como DNS secundario; DHCP. La VLAN 70 no existe en FW01." si_falla="Se pierde el ruteo entre VLAN, la salida a Internet y la VPN (punto único de falla, AM-12). Mitigación: BRK01 y restauración desde el XML en Git, RTO 1 h (D2.9); CARP en H3." flujos="F2, F14, F20, F26" pruebas="T01, T02, T03, T05, T06, T07, T08, T09, T10, T11, T12, T15, T16, T17, T19, T20, T21, T22, T24, T25, T26, T27, T28, T29, T30, T32, T33, T34, T35, T36, T37, T38, T39, T40, T42, T43, T45, T46, T47, T48, T49" placeholders="1" tooltip="FW01 · Alta&#10;Por qué: Todo tráfico entre zonas pasa por FW01 (D-17), de modo que cada flujo tiene una regla y un registro. Además termina la VPN IPsec y ejecuta Suricata IPS y CrowdSec.&#10;Aporta: Una subinterfaz VLAN por zona (10, 20, 30, 31, 40, 41, 50, 60, 71) en el trunk PG-FW-TRUNK; WAN por vSwitch1/vmnic2; VTI1 y VTI2 con BGP; Unbound como DNS secundario; DHCP. La VLAN 70 no existe en FW01.&#10;Si falla: Se pierde el ruteo entre VLAN, la salida a Internet y la VPN (punto único de falla, AM-12). Mitigación: BRK01 y restauración desde el XML en Git, RTO 1 h (D2.9); CARP en H3.">
-          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0072B2;strokeWidth=3;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
+        <object id="FIG-5.5a-5" label="&lt;b&gt;FW01&lt;/b&gt; · Firewall OPNsense · &lt;b&gt;ALTA&lt;/b&gt; · tránsito 10.20.0.2 · .1 en 7 VLAN" celeris_id="FW01" celeris_tipo="componente" ip="wan 10.20.0.2 · vlan10 10.20.10.1 · vlan20 10.20.20.1 · vlan30 10.20.32.1 · vlan40 10.20.40.1 · vlan41 10.20.41.1 · vlan50 10.20.50.1 · vlan60 10.20.60.1" zona="PERIMETRO, TRANSITO, MGMT, SERVERS, LAB, DMZ-SVC, DMZ-HONEY, SECURITY, EDGE" criticidad="Alta" estado="diseño" por_que="Todo tráfico entre zonas pasa por FW01 (D-17), de modo que cada flujo tiene una regla y un registro. Además termina la VPN IPsec, ejecuta Suricata y CrowdSec, y presta DNS (Unbound con DNSSEC), NTP y DHCP a las zonas (D-28)." aporta="Se conecta al FortiGate FGT-EXT por la red de tránsito 10.20.0.0/29 (WAN 10.20.0.2; FortiGate 10.20.0.1); una subinterfaz VLAN por zona (10, 20, 30, 40, 41, 50, 60) en el trunk PG-FW-TRUNK; VTI1 y VTI2 con BGP y NAT-T (identidad IKE 203.0.113.10); Unbound con DNSSEC y NTP en la interfaz .1 de cada VLAN (F2), NTS y DoT hacia arriba (F25); cliente ACME del certificado del portal, que entrega por SFTP a PORTAL01 (F33); Suricata IPS inline en tránsito y DMZ-SVC e IDS en las interfaces LAB y SERVERS (DET-02); CrowdSec; DHCP con reservas por rango de laboratorio." si_falla="Se pierde el ruteo entre VLAN, la salida a Internet, la VPN y el DNS y NTP de las zonas (punto único de falla, AM-12). Mitigación: BRK01 y restauración desde el XML en Git, RTO 1 h (D2.9); CARP en H3." flujos="F2, F14, F20, F25, F26, F33" pruebas="T01, T02, T03, T05, T06, T07, T08, T09, T10, T11, T15, T16, T17, T19, T20, T21, T24, T25, T26, T27, T28, T29, T30, T32, T33, T34, T35, T36, T40, T42, T43, T45, T46, T47, T49, T50, T51, T54, T55, T56, T57, T58, T60" placeholders="1" tooltip="FW01 · Alta&#10;Por qué: Todo tráfico entre zonas pasa por FW01 (D-17), de modo que cada flujo tiene una regla y un registro. Además termina la VPN IPsec, ejecuta Suricata y CrowdSec, y presta DNS (Unbound con DNSSEC), NTP y DHCP a las zonas (D-28).&#10;Aporta: Se conecta al FortiGate FGT-EXT por la red de tránsito 10.20.0.0/29 (WAN 10.20.0.2; FortiGate 10.20.0.1); una subinterfaz VLAN por zona (10, 20, 30, 40, 41, 50, 60) en el trunk PG-FW-TRUNK; VTI1 y VTI2 con BGP y NAT-T (identidad IKE 203.0.113.10); Unbound con DNSSEC y NTP en la interfaz .1 de cada VLAN (F2), NTS y DoT hacia arriba (F25); cliente ACME del certificado del portal, que entrega por SFTP a PORTAL01 (F33); Suricata IPS inline en tránsito y DMZ-SVC e IDS en las interfaces LAB y SERVERS (DET-02); CrowdSec; DHCP con reservas por rango de laboratorio.&#10;Si falla: Se pierde el ruteo entre VLAN, la salida a Internet, la VPN y el DNS y NTP de las zonas (punto único de falla, AM-12). Mitigación: BRK01 y restauración desde el XML en Git, RTO 1 h (D2.9); CARP en H3.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#999999;strokeWidth=3;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="36" y="268" width="340" height="26" as="geometry" />
           </mxCell>
         </object>
@@ -32,13 +32,13 @@
         </mxCell>
         <object id="FIG-5.5a-7" label="&lt;b&gt;VLAN 41 · DMZ-HONEY&lt;/b&gt; · 10.20.41.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="DMZ-HONEY" celeris_tipo="zona" cidr="10.20.41.0/24" confianza="Nula" tooltip="DMZ-HONEY: Señuelos expuestos (HNY01)">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F8ECF3;strokeColor=#CC79A7;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="302" width="1836" height="64" as="geometry" />
+            <mxGeometry x="20" y="302" width="1628" height="64" as="geometry" />
           </mxCell>
         </object>
         <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-8" value="">
-          <mxGeometry x="24" y="334" width="1828" height="30" as="geometry" />
+          <mxGeometry x="24" y="334" width="1620" height="30" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-9" label="&lt;b&gt;HNY01&lt;/b&gt; · Honeypot OpenCanary + Cowrie · &lt;b&gt;MEDIA&lt;/b&gt; · 10.20.41.20" celeris_id="HNY01" celeris_tipo="componente" ip="10.20.41.20" zona="DMZ-HONEY" criticidad="Media" estado="diseño" por_que="Un honeypot está hecho para ser comprometido: vive en su propia VLAN 41 (D-16) y solo envía eventos al SIEM." aporta="Cowrie y OpenCanary reciben TCP 22→2222 y 23 por DNAT (F24, solo con aprobación escrita de la DTI y en ventana definida); envía eventos a SIEM01 (F13)." si_falla="Se pierde la detección de fuerza bruta por señuelo; la DMZ de servicios y el resto de la red no se afectan." flujos="F13, F24" pruebas="T03, T10, T11, T15, T18, T20, T30, T31, T34, T47" placeholders="1" tooltip="HNY01 · Media&#10;Por qué: Un honeypot está hecho para ser comprometido: vive en su propia VLAN 41 (D-16) y solo envía eventos al SIEM.&#10;Aporta: Cowrie y OpenCanary reciben TCP 22→2222 y 23 por DNAT (F24, solo con aprobación escrita de la DTI y en ventana definida); envía eventos a SIEM01 (F13).&#10;Si falla: Se pierde la detección de fuerza bruta por señuelo; la DMZ de servicios y el resto de la red no se afectan.">
+        <object id="FIG-5.5a-9" label="&lt;b&gt;HNY01&lt;/b&gt; · Honeypot OpenCanary + Cowrie · &lt;b&gt;MEDIA&lt;/b&gt; · 10.20.41.20" celeris_id="HNY01" celeris_tipo="componente" ip="10.20.41.20" zona="DMZ-HONEY" criticidad="Media" estado="diseño" por_que="Un honeypot está hecho para ser comprometido: vive en su propia VLAN 41 (D-16) y solo envía eventos al SIEM." aporta="Cowrie y OpenCanary reciben TCP 22→2222 y 23 por DNAT (F24, solo con aprobación escrita de la DTI y en ventana definida); envía eventos a SIEM01 (F13)." si_falla="Se pierde la detección de fuerza bruta por señuelo SSH/Telnet (F24, DET-04); DMZ-SVC y el resto de la red no se afectan porque HNY01 (10.20.41.20) vive en DMZ-HONEY." flujos="F13, F24" pruebas="T03, T05, T10, T11, T15, T18, T19, T20, T30, T31, T34, T47, T58" placeholders="1" tooltip="HNY01 · Media&#10;Por qué: Un honeypot está hecho para ser comprometido: vive en su propia VLAN 41 (D-16) y solo envía eventos al SIEM.&#10;Aporta: Cowrie y OpenCanary reciben TCP 22→2222 y 23 por DNAT (F24, solo con aprobación escrita de la DTI y en ventana definida); envía eventos a SIEM01 (F13).&#10;Si falla: Se pierde la detección de fuerza bruta por señuelo SSH/Telnet (F24, DET-04); DMZ-SVC y el resto de la red no se afectan porque HNY01 (10.20.41.20) vive en DMZ-HONEY.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#CC79A7;strokeWidth=2;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="36" y="336" width="340" height="26" as="geometry" />
           </mxCell>
@@ -46,15 +46,15 @@
         <mxCell style="shape=mxgraph.networks.secured;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-10" value="">
           <mxGeometry x="41" y="340" width="18" height="18" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-11" label="&lt;b&gt;VLAN 40 · DMZ-SVC&lt;/b&gt; · 10.20.40.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="DMZ-SVC" celeris_tipo="zona" cidr="10.20.40.0/24" confianza="Baja" tooltip="DMZ-SVC: Servicios publicados: WAF01 y WEB01 (portal de transparencia)">
+        <object id="FIG-5.5a-11" label="&lt;b&gt;VLAN 40 · DMZ-SVC&lt;/b&gt; · 10.20.40.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="DMZ-SVC" celeris_tipo="zona" cidr="10.20.40.0/24" confianza="Baja" tooltip="DMZ-SVC: Servicio publicado: PORTAL01 (WAF + portal de transparencia estático)">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F9E8DB;strokeColor=#D55E00;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="370" width="1836" height="94" as="geometry" />
+            <mxGeometry x="20" y="370" width="1628" height="64" as="geometry" />
           </mxCell>
         </object>
         <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-12" value="">
-          <mxGeometry x="24" y="402" width="1828" height="30" as="geometry" />
+          <mxGeometry x="24" y="402" width="1620" height="30" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-13" label="&lt;b&gt;WAF01&lt;/b&gt; · WAF / proxy inverso del portal · &lt;b&gt;ALTA&lt;/b&gt; · 10.20.40.10" celeris_id="WAF01" celeris_tipo="componente" ip="10.20.40.10" zona="DMZ-SVC" criticidad="Alta" estado="diseño" por_que="Es el único punto expuesto a Internet (DNAT 443 desde 203.0.113.10); filtra ataques web con OWASP CRS antes de que lleguen a WEB01 y entrega el aviso antes de que el usuario use el proxy (D-15, REQ-RN-05)." aporta="Caddy o Nginx con Coraza/ModSecurity y OWASP CRS, límite de peticiones por IP, TLS 1.3 con certificado público ACME; hacia WEB01 en TCP 8080 (F22); solo sale a los endpoints ACME (F23)." si_falla="El portal no es accesible desde Internet; los usuarios dentro del campus también lo usan (F5). Mitigación: el portal se regenera desde la política vigente, RTO 30 min (D2.9)." flujos="F5, F13, F21, F22, F23" pruebas="T11, T15, T16, T17, T18, T19, T30, T31, T34, T46, T47, T49" placeholders="1" tooltip="WAF01 · Alta&#10;Por qué: Es el único punto expuesto a Internet (DNAT 443 desde 203.0.113.10); filtra ataques web con OWASP CRS antes de que lleguen a WEB01 y entrega el aviso antes de que el usuario use el proxy (D-15, REQ-RN-05).&#10;Aporta: Caddy o Nginx con Coraza/ModSecurity y OWASP CRS, límite de peticiones por IP, TLS 1.3 con certificado público ACME; hacia WEB01 en TCP 8080 (F22); solo sale a los endpoints ACME (F23).&#10;Si falla: El portal no es accesible desde Internet; los usuarios dentro del campus también lo usan (F5). Mitigación: el portal se regenera desde la política vigente, RTO 30 min (D2.9).">
+        <object id="FIG-5.5a-13" label="&lt;b&gt;PORTAL01&lt;/b&gt; · WAF y portal de transparencia · &lt;b&gt;ALTA&lt;/b&gt; · 10.20.40.10" celeris_id="PORTAL01" celeris_tipo="componente" ip="10.20.40.10" zona="DMZ-SVC" criticidad="Alta" estado="diseño" por_que="El usuario debe poder leer qué se descifra y verificar la huella de la CA antes de usar el proxy. Es el servicio protegido que exige la DMZ-SVC de la rúbrica (R4-02)." aporta="Caddy + Coraza (OWASP CRS) con certificado público que FW01 renueva por ACME y le entrega por SFTP (F33), TLS 1.3 y HSTS; sirve el sitio estático firmado que genera la consola (REQ-F-30) con sistema de archivos de solo lectura, sin base de datos ni login; recibe TCP 443 de LAB (F5), de WIFI-EST (F32) y de Internet por NAT 1:1 en el FortiGate (F21); no tiene salida a la WAN: solo el agente Wazuh hacia SIEM01 (F13); recibe el certificado de FW01 por SFTP en TCP 22 (F33)." si_falla="Las PCs ya enroladas siguen funcionando; no se pueden enrolar nuevas (F21, DMZ-SVC)." flujos="F5, F13, F21, F32, F33" pruebas="T03, T05, T10, T11, T15, T16, T17, T18, T19, T20, T30, T31, T34, T46, T47, T49, T57, T58" placeholders="1" tooltip="PORTAL01 · Alta&#10;Por qué: El usuario debe poder leer qué se descifra y verificar la huella de la CA antes de usar el proxy. Es el servicio protegido que exige la DMZ-SVC de la rúbrica (R4-02).&#10;Aporta: Caddy + Coraza (OWASP CRS) con certificado público que FW01 renueva por ACME y le entrega por SFTP (F33), TLS 1.3 y HSTS; sirve el sitio estático firmado que genera la consola (REQ-F-30) con sistema de archivos de solo lectura, sin base de datos ni login; recibe TCP 443 de LAB (F5), de WIFI-EST (F32) y de Internet por NAT 1:1 en el FortiGate (F21); no tiene salida a la WAN: solo el agente Wazuh hacia SIEM01 (F13); recibe el certificado de FW01 por SFTP en TCP 22 (F33).&#10;Si falla: Las PCs ya enroladas siguen funcionando; no se pueden enrolar nuevas (F21, DMZ-SVC).">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D55E00;strokeWidth=3;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="36" y="404" width="340" height="26" as="geometry" />
           </mxCell>
@@ -62,77 +62,75 @@
         <mxCell style="shape=mxgraph.networks.proxy_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-14" value="">
           <mxGeometry x="41" y="408" width="18" height="18" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-15" label="&lt;b&gt;WEB01&lt;/b&gt; · Sitio estático del portal · &lt;b&gt;ALTA&lt;/b&gt; · 10.20.40.20" celeris_id="WEB01" celeris_tipo="componente" ip="10.20.40.20" zona="DMZ-SVC" criticidad="Alta" estado="diseño" por_que="Sirve el aviso de transparencia como sitio estático firmado (REQ-F-30), sin base de datos ni login: lo que no existe no se puede explotar." aporta="Atiende TCP 8080 solo desde WAF01 (F22); contenedor sin root con sistema de archivos de solo lectura; syscheck de Wazuh sobre los archivos." si_falla="El portal queda sin contenido. Mitigación: se regenera desde la política vigente, RTO 30 min (D2.9)." flujos="F13, F22" pruebas="T03, T10, T11, T17, T18, T19, T20, T30, T31, T46, T47" placeholders="1" tooltip="WEB01 · Alta&#10;Por qué: Sirve el aviso de transparencia como sitio estático firmado (REQ-F-30), sin base de datos ni login: lo que no existe no se puede explotar.&#10;Aporta: Atiende TCP 8080 solo desde WAF01 (F22); contenedor sin root con sistema de archivos de solo lectura; syscheck de Wazuh sobre los archivos.&#10;Si falla: El portal queda sin contenido. Mitigación: se regenera desde la política vigente, RTO 30 min (D2.9).">
-          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D55E00;strokeWidth=3;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="36" y="434" width="340" height="26" as="geometry" />
-          </mxCell>
-        </object>
-        <mxCell style="shape=mxgraph.networks.web_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-16" value="">
-          <mxGeometry x="41" y="438" width="18" height="18" as="geometry" />
-        </mxCell>
-        <object id="FIG-5.5a-17" label="&lt;b&gt;VLAN 30 · LAB&lt;/b&gt; · 10.20.32.0/22 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="LAB" celeris_tipo="zona" cidr="10.20.32.0/22" confianza="Baja" tooltip="LAB: PCs de laboratorio. Reserva contigua 10.20.36.0/22 para crecer a /21">
-          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FCF2DB;strokeColor=#E69F00;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="468" width="1836" height="124" as="geometry" />
-          </mxCell>
-        </object>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-18" value="">
-          <mxGeometry x="24" y="500" width="1828" height="30" as="geometry" />
-        </mxCell>
-        <object id="FIG-5.5a-19" label="&lt;b&gt;LABCLI01&lt;/b&gt; · Cliente de prueba Windows 11 · &lt;b&gt;BAJA&lt;/b&gt; · 10.20.32.50" celeris_id="LABCLI01" celeris_tipo="componente" ip="10.20.32.50" zona="LAB" criticidad="Baja" estado="diseño" por_que="Representa un PC de laboratorio: aplica el PAC por GPO y desde él se ejecutan las pruebas de segmentación hacia MGMT, STORAGE, DMZ y QUIC." aporta="Origen de T06, T07, T08, T12, T23 y T24; usa PAC por GPO y proxy 10.20.60.10:3128." si_falla="Se pierde el cliente de prueba; los PC reales de laboratorio no se afectan. La validación también se hace en 2–3 PC reales con consentimiento (D2.4)." flujos="" pruebas="T06, T07, T08, T09, T10, T12, T13, T14, T22, T23, T24, T30, T31, T33, T34, T39, T45" placeholders="1" tooltip="LABCLI01 · Baja&#10;Por qué: Representa un PC de laboratorio: aplica el PAC por GPO y desde él se ejecutan las pruebas de segmentación hacia MGMT, STORAGE, DMZ y QUIC.&#10;Aporta: Origen de T06, T07, T08, T12, T23 y T24; usa PAC por GPO y proxy 10.20.60.10:3128.&#10;Si falla: Se pierde el cliente de prueba; los PC reales de laboratorio no se afectan. La validación también se hace en 2–3 PC reales con consentimiento (D2.4).">
-          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E69F00;strokeWidth=1;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="36" y="502" width="340" height="26" as="geometry" />
-          </mxCell>
-        </object>
-        <mxCell style="shape=mxgraph.networks.pc;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-20" value="">
-          <mxGeometry x="41" y="506" width="18" height="18" as="geometry" />
-        </mxCell>
-        <object id="FIG-5.5a-21" label="&lt;b&gt;PROBE01&lt;/b&gt; · Sondeo sintético · &lt;b&gt;BAJA&lt;/b&gt; · 10.20.32.251" celeris_id="PROBE01" celeris_tipo="componente" ip="10.20.32.251" zona="LAB" criticidad="Baja" estado="diseño" por_que="Mide la disponibilidad que ve el usuario (REQ-NF-03 ≥ 99,5 %) desde el mismo segmento de LAB, cada minuto." aporta="blackbox_exporter navega a través del PAC como un usuario (F1, F2, F3); su serie alimenta el indicador de disponibilidad de OBS01." si_falla="Se pierde la medición de disponibilidad, no el servicio." flujos="" pruebas="" placeholders="1" tooltip="PROBE01 · Baja&#10;Por qué: Mide la disponibilidad que ve el usuario (REQ-NF-03 ≥ 99,5 %) desde el mismo segmento de LAB, cada minuto.&#10;Aporta: blackbox_exporter navega a través del PAC como un usuario (F1, F2, F3); su serie alimenta el indicador de disponibilidad de OBS01.&#10;Si falla: Se pierde la medición de disponibilidad, no el servicio.">
-          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E69F00;strokeWidth=1;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="36" y="532" width="340" height="26" as="geometry" />
-          </mxCell>
-        </object>
-        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-22" value="">
-          <mxGeometry x="41" y="536" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-23" value="">
-          <mxGeometry x="24" y="560" width="1828" height="30" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-24" value="HNY02 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="562" width="340" height="26" as="geometry" />
-        </mxCell>
-        <object id="FIG-5.5a-25" label="&lt;b&gt;VLAN 31 · LAB-TEST&lt;/b&gt; · 10.20.31.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="LAB-TEST" celeris_tipo="zona" cidr="10.20.31.0/24" confianza="Baja" tooltip="LAB-TEST: Equipos de prueba y ataque controlado (KALI01). Separado de LAB para que las pruebas crucen el firewall">
+        <object id="FIG-5.5a-15" label="&lt;b&gt;WIFI-EST&lt;/b&gt; · 172.16.0.0/16 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="WIFI-EST" celeris_tipo="zona" cidr="172.16.0.0/16" confianza="Muy baja" tooltip="WIFI-EST: Wi-Fi de estudiantes (BYOD): red de la DTI que FW01 no enruta; valor provisional 172.16.0.0/16">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FDFBE5;strokeColor=#F0E442;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="596" width="1836" height="64" as="geometry" />
+            <mxGeometry x="20" y="438" width="1628" height="64" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-26" value="">
-          <mxGeometry x="24" y="628" width="1828" height="30" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-16" value="">
+          <mxGeometry x="24" y="470" width="1620" height="30" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-27" label="&lt;b&gt;KALI01&lt;/b&gt; · Equipo de pruebas de ataque · &lt;b&gt;BAJA&lt;/b&gt; · 10.20.31.60" celeris_id="KALI01" celeris_tipo="componente" ip="10.20.31.60" zona="LAB-TEST" criticidad="Baja" estado="diseño" por_que="Está en una VLAN propia (31) para que las pruebas de ataque cruzen el firewall y se registren; solo se enciende en ventanas autorizadas." aporta="Origen del escaneo hacia SERVERS que valida a IDS01 (DET-02); sus reglas de prueba en FW01 están deshabilitadas por defecto." si_falla="No hay generador de ataques; la red de producción no se afecta." flujos="" pruebas="T29, T34, T45, T46, T47, T48" placeholders="1" tooltip="KALI01 · Baja&#10;Por qué: Está en una VLAN propia (31) para que las pruebas de ataque cruzen el firewall y se registren; solo se enciende en ventanas autorizadas.&#10;Aporta: Origen del escaneo hacia SERVERS que valida a IDS01 (DET-02); sus reglas de prueba en FW01 están deshabilitadas por defecto.&#10;Si falla: No hay generador de ataques; la red de producción no se afecta.">
-          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F0E442;strokeWidth=1;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
+        <object id="FIG-5.5a-17" label="&lt;b&gt;WIFI-EST&lt;/b&gt; · Wi-Fi de estudiantes (BYOD) · &lt;b&gt;MEDIA&lt;/b&gt; · &lt;i&gt;existente&lt;/i&gt; · 172.16.0.0/16 (provisional [S-28]) · red de la DTI" celeris_id="WIFI-EST" celeris_tipo="componente" ip="172.16.0.0/16 (provisional [S-28]) · red de la DTI" zona="WIFI-EST" criticidad="Media" estado="existente" por_que="Es la red inalámbrica existente de la DTI: se documenta AS-IS y se aísla del resto sin descifrarla (D-27)." aporta="Red de la DTI (172.16.0.0/16, provisional [S-28]); solo alcanza EDGE01/02 (TCP 3128 y 80, siempre passthrough, F31) y PORTAL01:443 (F32); el resto de su navegación sigue por el FortiGate sin pasar por el proyecto; se pide a la DTI aislamiento de clientes." si_falla="Sin efecto sobre los laboratorios (LAB); los equipos personales (172.16.0.0/16) navegan por el FortiGate como hoy." flujos="" pruebas="T56, T57" placeholders="1" tooltip="WIFI-EST · Media&#10;Por qué: Es la red inalámbrica existente de la DTI: se documenta AS-IS y se aísla del resto sin descifrarla (D-27).&#10;Aporta: Red de la DTI (172.16.0.0/16, provisional [S-28]); solo alcanza EDGE01/02 (TCP 3128 y 80, siempre passthrough, F31) y PORTAL01:443 (F32); el resto de su navegación sigue por el FortiGate sin pasar por el proyecto; se pide a la DTI aislamiento de clientes.&#10;Si falla: Sin efecto sobre los laboratorios (LAB); los equipos personales (172.16.0.0/16) navegan por el FortiGate como hoy.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#F0E442;strokeWidth=2;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=9;fontColor=#1A1A1A;dashed=1;dashPattern=6 3;" parent="1" vertex="1">
+            <mxGeometry x="36" y="472" width="340" height="26" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.wireless_hub;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-18" value="">
+          <mxGeometry x="41" y="476" width="18" height="18" as="geometry" />
+        </mxCell>
+        <object id="FIG-5.5a-19" label="&lt;b&gt;VLAN 30 · LAB&lt;/b&gt; · 10.20.32.0/22 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="LAB" celeris_tipo="zona" cidr="10.20.32.0/22" confianza="Baja" tooltip="LAB: PCs de los 10 laboratorios (un rango /26 cada uno) e infraestructura de laboratorio (ENC01, LABCLI01, KALI01, HNY02); detalle en rangos_lab">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FCF2DB;strokeColor=#E69F00;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="20" y="506" width="1628" height="184" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-20" value="">
+          <mxGeometry x="24" y="538" width="1620" height="30" as="geometry" />
+        </mxCell>
+        <object id="FIG-5.5a-21" label="&lt;b&gt;PCS-LAB&lt;/b&gt; · PCs de laboratorio (grupo) · &lt;b&gt;ALTA&lt;/b&gt; · &lt;i&gt;existente&lt;/i&gt; · LAB-01…LAB-10: 10 rangos /26 · DHCP con reservas" celeris_id="PCS-LAB" celeris_tipo="componente" ip="LAB-01…LAB-10: 10 rangos /26 · DHCP con reservas" zona="LAB" criticidad="Alta" estado="existente" por_que="Son los usuarios del servicio: 10 laboratorios de 40 PCs [S-26], cuyas descargas repetidas el diseño mantiene dentro de la LAN." aporta="Cada laboratorio tiene un rango /26 (rangos_lab, LAB-01 a LAB-10) con reservas DHCP; usan el PAC por GPO (F3), el proxy en TCP 3128 (F1), el portal (F5) y, solo en el piloto, DIRECT (F6); el encargado habilita o deshabilita cada rango (REQ-F-32)." si_falla="Un laboratorio sin conectividad no afecta a los demás; la capa de acceso existente está fuera de alcance [S-14]." flujos="" pruebas="" placeholders="1" tooltip="PCS-LAB · Alta&#10;Por qué: Son los usuarios del servicio: 10 laboratorios de 40 PCs [S-26], cuyas descargas repetidas el diseño mantiene dentro de la LAN.&#10;Aporta: Cada laboratorio tiene un rango /26 (rangos_lab, LAB-01 a LAB-10) con reservas DHCP; usan el PAC por GPO (F3), el proxy en TCP 3128 (F1), el portal (F5) y, solo en el piloto, DIRECT (F6); el encargado habilita o deshabilita cada rango (REQ-F-32).&#10;Si falla: Un laboratorio sin conectividad no afecta a los demás; la capa de acceso existente está fuera de alcance [S-14].">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E69F00;strokeWidth=3;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=9;fontColor=#1A1A1A;dashed=1;dashPattern=6 3;" parent="1" vertex="1">
+            <mxGeometry x="36" y="540" width="340" height="26" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.pc;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-22" value="">
+          <mxGeometry x="41" y="544" width="18" height="18" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-23" value="ENC01 · sin flujos aquí (ver FIG-5.5b)">
+          <mxGeometry x="36" y="570" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-24" value="">
+          <mxGeometry x="24" y="598" width="1620" height="30" as="geometry" />
+        </mxCell>
+        <object id="FIG-5.5a-25" label="&lt;b&gt;LABCLI01&lt;/b&gt; · Cliente de prueba Windows 11 · &lt;b&gt;BAJA&lt;/b&gt; · 10.20.35.50" celeris_id="LABCLI01" celeris_tipo="componente" ip="10.20.35.50" zona="LAB" criticidad="Baja" estado="diseño" por_que="Representa un PC de laboratorio: aplica el PAC por GPO y desde él se ejecutan las pruebas de segmentación hacia MGMT, DMZ y QUIC." aporta="Origen de T06, T07, T08, T23 y T24; usa PAC por GPO y proxy 10.20.60.10:3128." si_falla="Se pierde el cliente de prueba; los PC reales de laboratorio no se afectan. La validación también se hace en 2–3 PC reales con consentimiento (D2.4)." flujos="" pruebas="T06, T07, T08, T09, T10, T13, T14, T23, T24, T30, T31, T33, T34, T45, T47, T52, T55, T57, T60" placeholders="1" tooltip="LABCLI01 · Baja&#10;Por qué: Representa un PC de laboratorio: aplica el PAC por GPO y desde él se ejecutan las pruebas de segmentación hacia MGMT, DMZ y QUIC.&#10;Aporta: Origen de T06, T07, T08, T23 y T24; usa PAC por GPO y proxy 10.20.60.10:3128.&#10;Si falla: Se pierde el cliente de prueba; los PC reales de laboratorio no se afectan. La validación también se hace en 2–3 PC reales con consentimiento (D2.4).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E69F00;strokeWidth=1;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="36" y="600" width="340" height="26" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.pc;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-26" value="">
+          <mxGeometry x="41" y="604" width="18" height="18" as="geometry" />
+        </mxCell>
+        <object id="FIG-5.5a-27" label="&lt;b&gt;KALI01&lt;/b&gt; · Equipo de pruebas de ataque · &lt;b&gt;BAJA&lt;/b&gt; · 10.20.35.60" celeris_id="KALI01" celeris_tipo="componente" ip="10.20.35.60" zona="LAB" criticidad="Baja" estado="diseño" por_que="Está en el rango de infraestructura de LAB (10.20.35.0/24), apagado fuera de ventanas autorizadas, para que las pruebas de ataque crucen el firewall y se registren." aporta="Origen del escaneo hacia SERVERS que valida a Suricata de FW01 (DET-02, T29); sus reglas de prueba en FW01 están deshabilitadas por defecto." si_falla="No hay generador de ataques para T29 desde 10.20.35.60; la red de producción no se afecta." flujos="" pruebas="T29, T34" placeholders="1" tooltip="KALI01 · Baja&#10;Por qué: Está en el rango de infraestructura de LAB (10.20.35.0/24), apagado fuera de ventanas autorizadas, para que las pruebas de ataque crucen el firewall y se registren.&#10;Aporta: Origen del escaneo hacia SERVERS que valida a Suricata de FW01 (DET-02, T29); sus reglas de prueba en FW01 están deshabilitadas por defecto.&#10;Si falla: No hay generador de ataques para T29 desde 10.20.35.60; la red de producción no se afecta.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E69F00;strokeWidth=1;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="36" y="630" width="340" height="26" as="geometry" />
           </mxCell>
         </object>
         <mxCell style="shape=mxgraph.networks.pc;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-28" value="">
           <mxGeometry x="41" y="634" width="18" height="18" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-29" label="&lt;b&gt;VLAN 60 · EDGE&lt;/b&gt; · 10.20.60.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="EDGE" celeris_tipo="zona" cidr="10.20.60.0/24" confianza="Media" tooltip="EDGE: Nodos Celeris">
+        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-29" value="">
+          <mxGeometry x="24" y="658" width="1620" height="30" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-30" value="HNY02 · sin flujos aquí (ver FIG-5.5b)">
+          <mxGeometry x="36" y="660" width="340" height="26" as="geometry" />
+        </mxCell>
+        <object id="FIG-5.5a-31" label="&lt;b&gt;VLAN 60 · EDGE&lt;/b&gt; · 10.20.60.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="EDGE" celeris_tipo="zona" cidr="10.20.60.0/24" confianza="Media" tooltip="EDGE: Nodos Celeris">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E6E6E6;strokeColor=#4D4D4D;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="664" width="1836" height="94" as="geometry" />
+            <mxGeometry x="20" y="694" width="1628" height="94" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-30" value="">
-          <mxGeometry x="24" y="696" width="1828" height="30" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-32" value="">
+          <mxGeometry x="24" y="726" width="1620" height="30" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-31" label="&lt;b&gt;EDGE01&lt;/b&gt; · Nodo Celeris 1 · &lt;b&gt;ALTA&lt;/b&gt; · 10.20.60.10" celeris_id="EDGE01" celeris_tipo="componente" ip="10.20.60.10" zona="EDGE" criticidad="Alta" estado="diseño" por_que="Es el proxy de caché que reduce las descargas repetidas por el enlace de 300 Mbps [S-02]; atiende TCP 3128 de LAB y LAB-TEST (F1)." aporta="Cachea según RFC 9111, descifra solo dominios listados, sale a Internet por TCP 80/443 (F8) y al shield por 8443 (F9); administración y métricas en 9128; sirve una copia del PAC (F3)." si_falla="El PAC conmuta a EDGE02 y, si ambos caen, a DIRECT (T09); en el piloto F6 lo permite. Mitigación: dos nodos y DIRECT." flujos="F1, F3, F13" pruebas="T07, T09, T11, T13, T14, T18, T22, T26, T27, T30, T31, T34, T36, T37, T44, T45, T46, T47, T48" placeholders="1" tooltip="EDGE01 · Alta&#10;Por qué: Es el proxy de caché que reduce las descargas repetidas por el enlace de 300 Mbps [S-02]; atiende TCP 3128 de LAB y LAB-TEST (F1).&#10;Aporta: Cachea según RFC 9111, descifra solo dominios listados, sale a Internet por TCP 80/443 (F8) y al shield por 8443 (F9); administración y métricas en 9128; sirve una copia del PAC (F3).&#10;Si falla: El PAC conmuta a EDGE02 y, si ambos caen, a DIRECT (T09); en el piloto F6 lo permite. Mitigación: dos nodos y DIRECT.">
-          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=3;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="36" y="698" width="340" height="26" as="geometry" />
-          </mxCell>
-        </object>
-        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-32" value="">
-          <mxGeometry x="41" y="702" width="18" height="18" as="geometry" />
-        </mxCell>
-        <object id="FIG-5.5a-33" label="&lt;b&gt;EDGE02&lt;/b&gt; · Nodo Celeris 2 · &lt;b&gt;ALTA&lt;/b&gt; · 10.20.60.11" celeris_id="EDGE02" celeris_tipo="componente" ip="10.20.60.11" zona="EDGE" criticidad="Alta" estado="diseño" por_que="Segunda ruta de salida del PAC: cumple la meta de ≥ 3 rutas por usuario (EDGE01, EDGE02, DIRECT) y cubre el mantenimiento de EDGE01." aporta="Misma función y puertos que EDGE01 (F1, F8, F9, F10, F11), con su propio datastore NVMe de caché; se despliega en la fase F2." si_falla="El PAC usa EDGE01; con ambos caídos, DIRECT (T09)." flujos="F1, F13" pruebas="T07, T09, T11, T13, T14, T18, T22, T30, T31, T44, T47" placeholders="1" tooltip="EDGE02 · Alta&#10;Por qué: Segunda ruta de salida del PAC: cumple la meta de ≥ 3 rutas por usuario (EDGE01, EDGE02, DIRECT) y cubre el mantenimiento de EDGE01.&#10;Aporta: Misma función y puertos que EDGE01 (F1, F8, F9, F10, F11), con su propio datastore NVMe de caché; se despliega en la fase F2.&#10;Si falla: El PAC usa EDGE01; con ambos caídos, DIRECT (T09).">
+        <object id="FIG-5.5a-33" label="&lt;b&gt;EDGE01&lt;/b&gt; · Nodo Celeris 1 · &lt;b&gt;ALTA&lt;/b&gt; · 10.20.60.10" celeris_id="EDGE01" celeris_tipo="componente" ip="10.20.60.10" zona="EDGE" criticidad="Alta" estado="diseño" por_que="Es el proxy de caché que reduce las descargas repetidas por el enlace de 300 Mbps [S-02]; atiende TCP 3128 de LAB (F1) y, sin descifrar, de WIFI-EST (F31)." aporta="Cachea según RFC 9111, descifra solo dominios listados, sale a Internet por TCP 80/443 vía el FortiGate (F8) y recibe configuración firmada de CTRL01 por 8443 (F10); sirve el PAC en TCP 80 (F3) con dos registros A (EDGE01 y EDGE02); para WIFI-EST siempre passthrough (REQ-F-36); administración y métricas en 9128." si_falla="El PAC conmuta a EDGE02 y, si ambos caen, a DIRECT (T09); en el piloto F6 lo permite. Mitigación: dos nodos y DIRECT." flujos="F1, F3, F13, F31" pruebas="T05, T07, T09, T11, T13, T14, T18, T19, T26, T27, T30, T31, T34, T36, T45, T46, T47, T50, T51, T52, T55, T56, T57, T58, T60" placeholders="1" tooltip="EDGE01 · Alta&#10;Por qué: Es el proxy de caché que reduce las descargas repetidas por el enlace de 300 Mbps [S-02]; atiende TCP 3128 de LAB (F1) y, sin descifrar, de WIFI-EST (F31).&#10;Aporta: Cachea según RFC 9111, descifra solo dominios listados, sale a Internet por TCP 80/443 vía el FortiGate (F8) y recibe configuración firmada de CTRL01 por 8443 (F10); sirve el PAC en TCP 80 (F3) con dos registros A (EDGE01 y EDGE02); para WIFI-EST siempre passthrough (REQ-F-36); administración y métricas en 9128.&#10;Si falla: El PAC conmuta a EDGE02 y, si ambos caen, a DIRECT (T09); en el piloto F6 lo permite. Mitigación: dos nodos y DIRECT.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=3;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="36" y="728" width="340" height="26" as="geometry" />
           </mxCell>
@@ -140,661 +138,605 @@
         <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-34" value="">
           <mxGeometry x="41" y="732" width="18" height="18" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-35" label="&lt;b&gt;VLAN 20 · SERVERS&lt;/b&gt; · 10.20.20.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="SERVERS" celeris_tipo="zona" cidr="10.20.20.0/24" confianza="Alta" tooltip="SERVERS: Plano de control, base de datos, observabilidad, DNS/PAC/NTP">
-          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DBF1EB;strokeColor=#009E73;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="762" width="1836" height="154" as="geometry" />
+        <object id="FIG-5.5a-35" label="&lt;b&gt;EDGE02&lt;/b&gt; · Nodo Celeris 2 · &lt;b&gt;ALTA&lt;/b&gt; · 10.20.60.11" celeris_id="EDGE02" celeris_tipo="componente" ip="10.20.60.11" zona="EDGE" criticidad="Alta" estado="diseño" por_que="Segunda ruta de salida del PAC: cumple la meta de ≥ 3 rutas por usuario (EDGE01, EDGE02, DIRECT) y cubre el mantenimiento de EDGE01." aporta="Misma función y puertos que EDGE01 (F1, F3, F8, F10, F31), con su propio datastore NVMe de caché; se despliega en la fase F2 y sirve el segundo registro A del PAC." si_falla="El PAC usa EDGE01; con ambos caídos, DIRECT (T09)." flujos="F1, F3, F13, F31" pruebas="T05, T07, T09, T11, T13, T14, T18, T19, T30, T31, T47, T51, T52, T55, T56, T57, T58, T60" placeholders="1" tooltip="EDGE02 · Alta&#10;Por qué: Segunda ruta de salida del PAC: cumple la meta de ≥ 3 rutas por usuario (EDGE01, EDGE02, DIRECT) y cubre el mantenimiento de EDGE01.&#10;Aporta: Misma función y puertos que EDGE01 (F1, F3, F8, F10, F31), con su propio datastore NVMe de caché; se despliega en la fase F2 y sirve el segundo registro A del PAC.&#10;Si falla: El PAC usa EDGE01; con ambos caídos, DIRECT (T09).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=3;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="36" y="758" width="340" height="26" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-36" value="">
-          <mxGeometry x="24" y="794" width="1828" height="30" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-36" value="">
+          <mxGeometry x="41" y="762" width="18" height="18" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-37" value="CTRL01 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="796" width="340" height="26" as="geometry" />
+        <object id="FIG-5.5a-37" label="&lt;b&gt;VLAN 20 · SERVERS&lt;/b&gt; · 10.20.20.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="SERVERS" celeris_tipo="zona" cidr="10.20.20.0/24" confianza="Alta" tooltip="SERVERS: Consola del encargado (CTRL01: SPA, API y PostgreSQL local, sin red) y CA interna">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DBF1EB;strokeColor=#009E73;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="20" y="792" width="1628" height="64" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-38" value="">
+          <mxGeometry x="24" y="824" width="1620" height="30" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-38" value="DB01 · sin flujos aquí (ver FIG-5.5b)">
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-39" value="CTRL01 · sin flujos aquí (ver FIG-5.5b)">
           <mxGeometry x="36" y="826" width="340" height="26" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-39" value="">
-          <mxGeometry x="24" y="854" width="1828" height="30" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-40" value="OBS01 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="856" width="340" height="26" as="geometry" />
-        </mxCell>
-        <object id="FIG-5.5a-41" label="&lt;b&gt;SVC01&lt;/b&gt; · DNS, PAC y NTP · &lt;b&gt;ALTA&lt;/b&gt; · 10.20.20.30" celeris_id="SVC01" celeris_tipo="componente" ip="10.20.20.30" zona="SERVERS" criticidad="Alta" estado="diseño" por_que="Sin DNS ni PAC no funcionan ni el proxy ni DIRECT; por eso hay un segundo resolvedor (FW01) y una copia del PAC en EDGE01." aporta="Unbound con validación DNSSEC (F2), PAC en http://pac.celeris.internal/wpad.dat (F3), chrony con NTS hacia arriba (F25)." si_falla="Los clientes resuelven con FW01 y obtienen el PAC de EDGE01; la navegación continúa (T22). Pérdida solo de NTS y de DNSSEC primario." flujos="F2, F3, F13, F17, F25" pruebas="T09, T11, T18, T22, T30, T31, T33, T39, T42, T47" placeholders="1" tooltip="SVC01 · Alta&#10;Por qué: Sin DNS ni PAC no funcionan ni el proxy ni DIRECT; por eso hay un segundo resolvedor (FW01) y una copia del PAC en EDGE01.&#10;Aporta: Unbound con validación DNSSEC (F2), PAC en http://pac.celeris.internal/wpad.dat (F3), chrony con NTS hacia arriba (F25).&#10;Si falla: Los clientes resuelven con FW01 y obtienen el PAC de EDGE01; la navegación continúa (T22). Pérdida solo de NTS y de DNSSEC primario.">
-          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#009E73;strokeWidth=3;align=left;verticalAlign=middle;spacingLeft=28;spacingTop=1;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="36" y="886" width="340" height="26" as="geometry" />
+        <object id="FIG-5.5a-40" label="&lt;b&gt;VLAN 50 · SECURITY&lt;/b&gt; · 10.20.50.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="SECURITY" celeris_tipo="zona" cidr="10.20.50.0/24" confianza="Alta" tooltip="SECURITY: Wazuh (SIEM01); la detección de red es Suricata de FW01">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E7F4FC;strokeColor=#56B4E9;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="20" y="860" width="1628" height="64" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-42" value="">
-          <mxGeometry x="41" y="890" width="18" height="18" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-41" value="">
+          <mxGeometry x="24" y="892" width="1620" height="30" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-43" label="&lt;b&gt;VLAN 50 · SECURITY&lt;/b&gt; · 10.20.50.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="SECURITY" celeris_tipo="zona" cidr="10.20.50.0/24" confianza="Alta" tooltip="SECURITY: Wazuh, sensor Suricata">
-          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E7F4FC;strokeColor=#56B4E9;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="920" width="1836" height="94" as="geometry" />
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-42" value="SIEM01 · sin flujos aquí (ver FIG-5.5b)">
+          <mxGeometry x="36" y="894" width="340" height="26" as="geometry" />
+        </mxCell>
+        <object id="FIG-5.5a-43" label="&lt;b&gt;VLAN 10 · MGMT&lt;/b&gt; · 10.20.10.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="MGMT" celeris_tipo="zona" cidr="10.20.10.0/24" confianza="Máxima" tooltip="MGMT: Gestión de ESXi, switch, IPMI, UPS, JMP01; puerto break-glass">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DBEBF4;strokeColor=#0072B2;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="20" y="928" width="1628" height="184" as="geometry" />
           </mxCell>
         </object>
         <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-44" value="">
-          <mxGeometry x="24" y="952" width="1828" height="30" as="geometry" />
+          <mxGeometry x="24" y="960" width="1620" height="30" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-45" value="SIEM01 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="954" width="340" height="26" as="geometry" />
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-45" value="JMP01 · sin flujos aquí (ver FIG-5.5b)">
+          <mxGeometry x="36" y="962" width="340" height="26" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-46" value="IDS01 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="984" width="340" height="26" as="geometry" />
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-46" value="SW-CORE01 · sin flujos aquí (ver FIG-5.5b)">
+          <mxGeometry x="36" y="992" width="340" height="26" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-47" label="&lt;b&gt;VLAN 71 · BACKUP&lt;/b&gt; · 10.20.71.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="BACKUP" celeris_tipo="zona" cidr="10.20.71.0/24" confianza="Alta" tooltip="BACKUP: Interfaz de respaldo del NAS, enrutada con lista de permitidos (restic por SFTP desde SERVERS)">
-          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EEEEEE;strokeColor=#888888;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="1018" width="1836" height="64" as="geometry" />
-          </mxCell>
-        </object>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-48" value="">
-          <mxGeometry x="24" y="1050" width="1828" height="30" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-47" value="">
+          <mxGeometry x="24" y="1020" width="1620" height="30" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-49" value="NAS01:respaldo · sin flujos aquí (ver FIG-5.5b)">
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-48" value="ESX01 · sin flujos aquí (ver FIG-5.5b)">
+          <mxGeometry x="36" y="1022" width="340" height="26" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-49" value="IPMI01 · sin flujos aquí (ver FIG-5.5b)">
           <mxGeometry x="36" y="1052" width="340" height="26" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-50" label="&lt;b&gt;VLAN 70 · STORAGE&lt;/b&gt; · 10.20.70.0/24 · sin gateway &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="STORAGE" celeris_tipo="zona" cidr="10.20.70.0/24" confianza="Aislada" tooltip="STORAGE: Solo NFS entre el vmkernel de ESXi y el NAS. Sin gateway (no enrutada); no existe interfaz en FW01">
-          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#BBBBBB;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="1086" width="1836" height="94" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-50" value="">
+          <mxGeometry x="24" y="1080" width="1620" height="30" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-51" value="UPS01 · sin flujos aquí (ver FIG-5.5b)">
+          <mxGeometry x="36" y="1082" width="340" height="26" as="geometry" />
+        </mxCell>
+        <object id="FIG-5.5a-52" label="&lt;b&gt;AWS&lt;/b&gt; · 10.30.0.0/16 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="AWS" celeris_tipo="zona" cidr="10.30.0.0/16" confianza="Media" tooltip="AWS: VPC celeris (10.30.0.0/16): EC2-GW (panel remoto), S3 de respaldos y subred privada vacía para el simulacro de recuperación">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF5E6;strokeColor=#232F3E;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="20" y="1116" width="1628" height="94" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-51" value="">
-          <mxGeometry x="24" y="1118" width="1828" height="30" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-53" value="">
+          <mxGeometry x="24" y="1148" width="1620" height="30" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-52" value="NAS01 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="1120" width="340" height="26" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-53" value="ESX01:vmk1 · sin flujos aquí (ver FIG-5.5b)">
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-54" value="EC2-GW · sin flujos aquí (ver FIG-5.5b)">
           <mxGeometry x="36" y="1150" width="340" height="26" as="geometry" />
         </mxCell>
-        <object id="FIG-5.5a-54" label="&lt;b&gt;VLAN 10 · MGMT&lt;/b&gt; · 10.20.10.0/24 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="MGMT" celeris_tipo="zona" cidr="10.20.10.0/24" confianza="Máxima" tooltip="MGMT: Gestión de ESXi, switch, IPMI, UPS, JMP01; puerto break-glass">
-          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DBEBF4;strokeColor=#0072B2;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="1184" width="1836" height="214" as="geometry" />
-          </mxCell>
-        </object>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-55" value="">
-          <mxGeometry x="24" y="1216" width="1828" height="30" as="geometry" />
+        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-55" value="S3 · sin flujos aquí (ver FIG-5.5b)">
+          <mxGeometry x="36" y="1180" width="340" height="26" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-56" value="JMP01 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="1218" width="340" height="26" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-57" value="SW-CORE01 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="1248" width="340" height="26" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-58" value="">
-          <mxGeometry x="24" y="1276" width="1828" height="30" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-59" value="ESX01 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="1278" width="340" height="26" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-60" value="IPMI01 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="1308" width="340" height="26" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-61" value="">
-          <mxGeometry x="24" y="1336" width="1828" height="30" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-62" value="UPS01 · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="1338" width="340" height="26" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-63" value="NAS01:gestion · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="1368" width="340" height="26" as="geometry" />
-        </mxCell>
-        <object id="FIG-5.5a-64" label="&lt;b&gt;AWS&lt;/b&gt; · 10.30.0.0/16 &lt;i&gt;(toda la zona)&lt;/i&gt;" celeris_id="AWS" celeris_tipo="zona" cidr="10.30.0.0/16" confianza="Media" tooltip="AWS: VPC celeris (10.30.0.0/16): Shield de caché, réplica del plano de control, salida NAT">
-          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF5E6;strokeColor=#232F3E;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="1402" width="1836" height="94" as="geometry" />
-          </mxCell>
-        </object>
-        <mxCell style="rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;" parent="1" vertex="1" id="FIG-5.5a-65" value="">
-          <mxGeometry x="24" y="1434" width="1828" height="30" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-66" value="EC2-SHIELD · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="1436" width="340" height="26" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;" parent="1" vertex="1" id="FIG-5.5a-67" value="EC2-CTRLR · sin flujos aquí (ver FIG-5.5b)">
-          <mxGeometry x="36" y="1466" width="340" height="26" as="geometry" />
-        </mxCell>
-        <object id="FIG-5.5a-68" label="&lt;b&gt;F1 · TCP/3128 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Proxy explícito&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F1" etiqueta="F1 · TCP/3128 · TLS">
+        <object id="FIG-5.5a-56" label="&lt;b&gt;F1 · TCP/3128 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Proxy explícito&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F1" etiqueta="F1 · TCP/3128 · TLS">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="392" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-69" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-57" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="442" y="190" as="sourcePoint" />
-            <mxPoint x="442" y="1500" as="targetPoint" />
+            <mxPoint x="442" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-70" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F1" lado="origen">
+        <object id="FIG-5.5a-58" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F1" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="437" y="480.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="437" y="518.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-71" label="" celeris_rol="extremo" celeris_ref="LAB-TEST" flujo="F1" lado="origen">
-          <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="437" y="608.0" width="10" height="10" as="geometry" />
-          </mxCell>
-        </object>
-        <object id="FIG-5.5a-72" label="" celeris_rol="extremo" celeris_ref="EDGE01" flujo="F1" lado="destino">
-          <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
-            <mxGeometry x="441" y="710.0" width="2" height="2" as="geometry" />
-          </mxCell>
-        </object>
-        <object id="FIG-5.5a-73" label="F1 · TCP/3128 · TLS" celeris_id="F1" celeris_tipo="flujo" etiqueta="F1 · TCP/3128 · TLS" proposito="Proxy explícito" origen="LAB, LAB-TEST" destino="EDGE01, EDGE02" proteccion="Contenido: TLS de extremo a extremo (passthrough) o TLS con certificado de la CA limitada (dominios listados). El CONNECT revela el nombre en la LAN (aceptado; proxy HTTPS en evaluación para S2)" riesgo_residual="El CONNECT revela el nombre del destino en la LAN: aceptado; proxy HTTPS en evaluación para S2" regla_fw="F1 LAB,LAB-TEST &gt; EDGE01,EDGE02 proxy tcp/3128" tooltip="F1 · TCP/3128 · TLS&#10;Proxy explícito&#10;Contenido: TLS de extremo a extremo (passthrough) o TLS con certificado de la CA limitada (dominios listados). El CONNECT revela el nombre en la LAN (aceptado; proxy HTTPS en evaluación para S2)">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-70" target="FIG-5.5a-72">
-            <mxGeometry relative="1" as="geometry" />
-          </mxCell>
-        </object>
-        <object id="FIG-5.5a-74" label="" celeris_rol="extremo" celeris_ref="EDGE02" flujo="F1" lado="destino">
+        <object id="FIG-5.5a-59" label="" celeris_rol="extremo" celeris_ref="EDGE01" flujo="F1" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
             <mxGeometry x="441" y="740.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-75" label="F1 · TCP/3128 · TLS" celeris_id="F1" celeris_tipo="flujo" etiqueta="F1 · TCP/3128 · TLS" proposito="Proxy explícito" origen="LAB, LAB-TEST" destino="EDGE01, EDGE02" proteccion="Contenido: TLS de extremo a extremo (passthrough) o TLS con certificado de la CA limitada (dominios listados). El CONNECT revela el nombre en la LAN (aceptado; proxy HTTPS en evaluación para S2)" riesgo_residual="El CONNECT revela el nombre del destino en la LAN: aceptado; proxy HTTPS en evaluación para S2" regla_fw="F1 LAB,LAB-TEST &gt; EDGE01,EDGE02 proxy tcp/3128" tooltip="F1 · TCP/3128 · TLS&#10;Proxy explícito&#10;Contenido: TLS de extremo a extremo (passthrough) o TLS con certificado de la CA limitada (dominios listados). El CONNECT revela el nombre en la LAN (aceptado; proxy HTTPS en evaluación para S2)">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-70" target="FIG-5.5a-74">
+        <object id="FIG-5.5a-60" label="F1 · TCP/3128 · TLS" celeris_id="F1" celeris_tipo="flujo" etiqueta="F1 · TCP/3128 · TLS" proposito="Proxy explícito" origen="LAB" destino="EDGE01, EDGE02" proteccion="Contenido: TLS de extremo a extremo (passthrough) o TLS con certificado de la CA limitada (dominios listados). El CONNECT revela el nombre en la LAN (aceptado; proxy HTTPS en evaluación para S2)" riesgo_residual="El CONNECT revela el nombre del destino en la LAN: aceptado; proxy HTTPS en evaluación para S2" regla_fw="F1 LAB &gt; EDGE01,EDGE02 proxy tcp/3128" tooltip="F1 · TCP/3128 · TLS&#10;Proxy explícito&#10;Contenido: TLS de extremo a extremo (passthrough) o TLS con certificado de la CA limitada (dominios listados). El CONNECT revela el nombre en la LAN (aceptado; proxy HTTPS en evaluación para S2)">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-58" target="FIG-5.5a-59">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-76" label="&lt;b&gt;F2 · UDP/53,&amp;#8203;123 + TCP/53 · sin cifrar (riesgo aceptado)&lt;/b&gt;&lt;br&gt;&lt;i&gt;DNS primario y secundario, NTP&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F2" etiqueta="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)">
+        <object id="FIG-5.5a-61" label="" celeris_rol="extremo" celeris_ref="EDGE02" flujo="F1" lado="destino">
+          <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
+            <mxGeometry x="441" y="770.0" width="2" height="2" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-5.5a-62" label="F1 · TCP/3128 · TLS" celeris_id="F1" celeris_tipo="flujo" etiqueta="F1 · TCP/3128 · TLS" proposito="Proxy explícito" origen="LAB" destino="EDGE01, EDGE02" proteccion="Contenido: TLS de extremo a extremo (passthrough) o TLS con certificado de la CA limitada (dominios listados). El CONNECT revela el nombre en la LAN (aceptado; proxy HTTPS en evaluación para S2)" riesgo_residual="El CONNECT revela el nombre del destino en la LAN: aceptado; proxy HTTPS en evaluación para S2" regla_fw="F1 LAB &gt; EDGE01,EDGE02 proxy tcp/3128" tooltip="F1 · TCP/3128 · TLS&#10;Proxy explícito&#10;Contenido: TLS de extremo a extremo (passthrough) o TLS con certificado de la CA limitada (dominios listados). El CONNECT revela el nombre en la LAN (aceptado; proxy HTTPS en evaluación para S2)">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-58" target="FIG-5.5a-61">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-5.5a-63" label="&lt;b&gt;F2 · UDP/53,&amp;#8203;123 + TCP/53 · sin cifrar (riesgo aceptado)&lt;/b&gt;&lt;br&gt;&lt;i&gt;DNS y NTP&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F2" etiqueta="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="496" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-77" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-64" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="546" y="190" as="sourcePoint" />
-            <mxPoint x="546" y="1500" as="targetPoint" />
+            <mxPoint x="546" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-78" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F2" lado="origen">
+        <object id="FIG-5.5a-65" label="" celeris_rol="extremo" celeris_ref="DMZ-SVC" flujo="F2" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="541" y="480.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="541" y="382.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-79" label="" celeris_rol="extremo" celeris_ref="EDGE" flujo="F2" lado="origen">
+        <object id="FIG-5.5a-66" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F2" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="541" y="676.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="541" y="518.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-80" label="" celeris_rol="extremo" celeris_ref="SECURITY" flujo="F2" lado="origen">
+        <object id="FIG-5.5a-67" label="" celeris_rol="extremo" celeris_ref="EDGE" flujo="F2" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="541" y="932.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="541" y="706.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-81" label="" celeris_rol="extremo" celeris_ref="FW01" flujo="F2" lado="destino">
+        <object id="FIG-5.5a-68" label="" celeris_rol="extremo" celeris_ref="SERVERS" flujo="F2" lado="origen">
+          <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="541" y="804.0" width="10" height="10" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-5.5a-69" label="" celeris_rol="extremo" celeris_ref="SECURITY" flujo="F2" lado="origen">
+          <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="541" y="872.0" width="10" height="10" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-5.5a-70" label="" celeris_rol="extremo" celeris_ref="MGMT" flujo="F2" lado="origen">
+          <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="541" y="940.0" width="10" height="10" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-5.5a-71" label="" celeris_rol="extremo" celeris_ref="FW01" flujo="F2" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
             <mxGeometry x="545" y="280.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-82" label="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)" celeris_id="F2" celeris_tipo="flujo" etiqueta="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)" proposito="DNS primario y secundario, NTP" origen="LAB, SECURITY, EDGE" destino="SVC01, FW01" proteccion="DNS interno sin cifrar con validación DNSSEC en el resolvedor; NTP interno sin autenticar (riesgo bajo, dentro de la LAN)" riesgo_residual="Bajo: consultas DNS y NTP legibles y falsificables dentro de la LAN; el resolvedor valida DNSSEC" regla_fw="F2 LAB,SECURITY,EDGE &gt; SVC01,FW01 dns+ntp tcp,udp/53 udp/123" tooltip="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)&#10;DNS primario y secundario, NTP&#10;DNS interno sin cifrar con validación DNSSEC en el resolvedor; NTP interno sin autenticar (riesgo bajo, dentro de la LAN)">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-80" target="FIG-5.5a-81">
+        <object id="FIG-5.5a-72" label="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)" celeris_id="F2" celeris_tipo="flujo" etiqueta="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)" proposito="DNS y NTP" origen="MGMT, SERVERS, LAB, DMZ-SVC, SECURITY, EDGE" destino="FW01" proteccion="DNS interno sin cifrar con validación DNSSEC en el resolvedor; NTP interno sin autenticar (riesgo bajo, dentro de la LAN)" riesgo_residual="Bajo: consultas DNS y NTP legibles y falsificables dentro de la LAN; el resolvedor valida DNSSEC" regla_fw="F2 ZONAS-INTERNAS(sin DMZ-HONEY) &gt; FW01 dns+ntp tcp,udp/53 udp/123" tooltip="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)&#10;DNS y NTP&#10;DNS interno sin cifrar con validación DNSSEC en el resolvedor; NTP interno sin autenticar (riesgo bajo, dentro de la LAN)">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-70" target="FIG-5.5a-71">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-83" label="" celeris_rol="extremo" celeris_ref="SVC01" flujo="F2" lado="destino">
-          <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
-            <mxGeometry x="545" y="898.0" width="2" height="2" as="geometry" />
-          </mxCell>
-        </object>
-        <object id="FIG-5.5a-84" label="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)" celeris_id="F2" celeris_tipo="flujo" etiqueta="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)" proposito="DNS primario y secundario, NTP" origen="LAB, SECURITY, EDGE" destino="SVC01, FW01" proteccion="DNS interno sin cifrar con validación DNSSEC en el resolvedor; NTP interno sin autenticar (riesgo bajo, dentro de la LAN)" riesgo_residual="Bajo: consultas DNS y NTP legibles y falsificables dentro de la LAN; el resolvedor valida DNSSEC" regla_fw="F2 LAB,SECURITY,EDGE &gt; SVC01,FW01 dns+ntp tcp,udp/53 udp/123" tooltip="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)&#10;DNS primario y secundario, NTP&#10;DNS interno sin cifrar con validación DNSSEC en el resolvedor; NTP interno sin autenticar (riesgo bajo, dentro de la LAN)">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-78" target="FIG-5.5a-83">
-            <mxGeometry relative="1" as="geometry" />
-          </mxCell>
-        </object>
-        <object id="FIG-5.5a-85" label="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)" celeris_id="F2" celeris_tipo="flujo" etiqueta="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)" proposito="DNS primario y secundario, NTP" origen="LAB, SECURITY, EDGE" destino="SVC01, FW01" proteccion="DNS interno sin cifrar con validación DNSSEC en el resolvedor; NTP interno sin autenticar (riesgo bajo, dentro de la LAN)" riesgo_residual="Bajo: consultas DNS y NTP legibles y falsificables dentro de la LAN; el resolvedor valida DNSSEC" regla_fw="F2 LAB,SECURITY,EDGE &gt; SVC01,FW01 dns+ntp tcp,udp/53 udp/123" tooltip="F2 · UDP/53,123 + TCP/53 · sin cifrar (riesgo aceptado)&#10;DNS primario y secundario, NTP&#10;DNS interno sin cifrar con validación DNSSEC en el resolvedor; NTP interno sin autenticar (riesgo bajo, dentro de la LAN)">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-80" target="FIG-5.5a-83">
-            <mxGeometry relative="1" as="geometry" />
-          </mxCell>
-        </object>
-        <object id="FIG-5.5a-86" label="&lt;b&gt;F3 · TCP/80 · sin cifrar (riesgo aceptado)&lt;/b&gt;&lt;br&gt;&lt;i&gt;PAC (wpad.dat)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F3" etiqueta="F3 · TCP/80 · sin cifrar (riesgo aceptado)">
+        <object id="FIG-5.5a-73" label="&lt;b&gt;F3 · TCP/80 · sin cifrar (riesgo aceptado)&lt;/b&gt;&lt;br&gt;&lt;i&gt;PAC (wpad.dat)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F3" etiqueta="F3 · TCP/80 · sin cifrar (riesgo aceptado)">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="600" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-87" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-74" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="650" y="190" as="sourcePoint" />
-            <mxPoint x="650" y="1500" as="targetPoint" />
+            <mxPoint x="650" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-88" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F3" lado="origen">
+        <object id="FIG-5.5a-75" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F3" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="645" y="480.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="645" y="518.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-89" label="" celeris_rol="extremo" celeris_ref="LAB-TEST" flujo="F3" lado="origen">
-          <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="645" y="608.0" width="10" height="10" as="geometry" />
-          </mxCell>
-        </object>
-        <object id="FIG-5.5a-90" label="" celeris_rol="extremo" celeris_ref="EDGE01" flujo="F3" lado="destino">
+        <object id="FIG-5.5a-76" label="" celeris_rol="extremo" celeris_ref="EDGE01" flujo="F3" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
-            <mxGeometry x="649" y="710.0" width="2" height="2" as="geometry" />
+            <mxGeometry x="649" y="740.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-91" label="F3 · TCP/80 · sin cifrar (riesgo aceptado)" celeris_id="F3" celeris_tipo="flujo" etiqueta="F3 · TCP/80 · sin cifrar (riesgo aceptado)" proposito="PAC (wpad.dat)" origen="LAB, LAB-TEST" destino="SVC01, EDGE01" proteccion="URL fija por GPO (sin autodescubrimiento). HTTPS en evaluación para S2" riesgo_residual="El PAC viaja por HTTP: un atacante en la LAN podría alterarlo; se mitiga con URL fija por GPO y se evalúa HTTPS en S2" regla_fw="F3 LAB,LAB-TEST &gt; SVC01,EDGE01 pac tcp/80" tooltip="F3 · TCP/80 · sin cifrar (riesgo aceptado)&#10;PAC (wpad.dat)&#10;URL fija por GPO (sin autodescubrimiento). HTTPS en evaluación para S2">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-88" target="FIG-5.5a-90">
+        <object id="FIG-5.5a-77" label="F3 · TCP/80 · sin cifrar (riesgo aceptado)" celeris_id="F3" celeris_tipo="flujo" etiqueta="F3 · TCP/80 · sin cifrar (riesgo aceptado)" proposito="PAC (wpad.dat)" origen="LAB" destino="EDGE01, EDGE02" proteccion="URL fija por GPO (sin autodescubrimiento). HTTPS en evaluación para S2" riesgo_residual="El PAC viaja por HTTP: un atacante en la LAN podría alterarlo; se mitiga con URL fija por GPO y se evalúa HTTPS en S2" regla_fw="F3 LAB &gt; EDGE01,EDGE02 pac tcp/80" tooltip="F3 · TCP/80 · sin cifrar (riesgo aceptado)&#10;PAC (wpad.dat)&#10;URL fija por GPO (sin autodescubrimiento). HTTPS en evaluación para S2">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-75" target="FIG-5.5a-76">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-92" label="" celeris_rol="extremo" celeris_ref="SVC01" flujo="F3" lado="destino">
+        <object id="FIG-5.5a-78" label="" celeris_rol="extremo" celeris_ref="EDGE02" flujo="F3" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
-            <mxGeometry x="649" y="898.0" width="2" height="2" as="geometry" />
+            <mxGeometry x="649" y="770.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-93" label="F3 · TCP/80 · sin cifrar (riesgo aceptado)" celeris_id="F3" celeris_tipo="flujo" etiqueta="F3 · TCP/80 · sin cifrar (riesgo aceptado)" proposito="PAC (wpad.dat)" origen="LAB, LAB-TEST" destino="SVC01, EDGE01" proteccion="URL fija por GPO (sin autodescubrimiento). HTTPS en evaluación para S2" riesgo_residual="El PAC viaja por HTTP: un atacante en la LAN podría alterarlo; se mitiga con URL fija por GPO y se evalúa HTTPS en S2" regla_fw="F3 LAB,LAB-TEST &gt; SVC01,EDGE01 pac tcp/80" tooltip="F3 · TCP/80 · sin cifrar (riesgo aceptado)&#10;PAC (wpad.dat)&#10;URL fija por GPO (sin autodescubrimiento). HTTPS en evaluación para S2">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-88" target="FIG-5.5a-92">
+        <object id="FIG-5.5a-79" label="F3 · TCP/80 · sin cifrar (riesgo aceptado)" celeris_id="F3" celeris_tipo="flujo" etiqueta="F3 · TCP/80 · sin cifrar (riesgo aceptado)" proposito="PAC (wpad.dat)" origen="LAB" destino="EDGE01, EDGE02" proteccion="URL fija por GPO (sin autodescubrimiento). HTTPS en evaluación para S2" riesgo_residual="El PAC viaja por HTTP: un atacante en la LAN podría alterarlo; se mitiga con URL fija por GPO y se evalúa HTTPS en S2" regla_fw="F3 LAB &gt; EDGE01,EDGE02 pac tcp/80" tooltip="F3 · TCP/80 · sin cifrar (riesgo aceptado)&#10;PAC (wpad.dat)&#10;URL fija por GPO (sin autodescubrimiento). HTTPS en evaluación para S2">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-75" target="FIG-5.5a-78">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-94" label="&lt;b&gt;F5 · TCP/443 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Portal de transparencia&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F5" etiqueta="F5 · TCP/443 · TLS">
+        <object id="FIG-5.5a-80" label="&lt;b&gt;F5 · TCP/443 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Portal de transparencia&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F5" etiqueta="F5 · TCP/443 · TLS">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="704" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-95" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-81" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="754" y="190" as="sourcePoint" />
-            <mxPoint x="754" y="1500" as="targetPoint" />
+            <mxPoint x="754" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-96" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F5" lado="origen">
+        <object id="FIG-5.5a-82" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F5" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="749" y="480.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="749" y="518.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-97" label="" celeris_rol="extremo" celeris_ref="LAB-TEST" flujo="F5" lado="origen">
-          <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="749" y="608.0" width="10" height="10" as="geometry" />
-          </mxCell>
-        </object>
-        <object id="FIG-5.5a-98" label="" celeris_rol="extremo" celeris_ref="WAF01" flujo="F5" lado="destino">
+        <object id="FIG-5.5a-83" label="" celeris_rol="extremo" celeris_ref="PORTAL01" flujo="F5" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
             <mxGeometry x="753" y="416.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-99" label="F5 · TCP/443 · TLS" celeris_id="F5" celeris_tipo="flujo" etiqueta="F5 · TCP/443 · TLS" proposito="Portal de transparencia" origen="LAB, LAB-TEST" destino="WAF01" proteccion="TLS 1.3 con certificado público" riesgo_residual="Bajo: certificado público ACME; el portal es contenido estático sin datos personales" regla_fw="F5 LAB,LAB-TEST &gt; WAF01 portal tcp/443" tooltip="F5 · TCP/443 · TLS&#10;Portal de transparencia&#10;TLS 1.3 con certificado público">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-97" target="FIG-5.5a-98">
+        <object id="FIG-5.5a-84" label="F5 · TCP/443 · TLS" celeris_id="F5" celeris_tipo="flujo" etiqueta="F5 · TCP/443 · TLS" proposito="Portal de transparencia" origen="LAB" destino="PORTAL01" proteccion="TLS 1.3 con certificado público" riesgo_residual="Bajo: certificado público ACME; el portal es contenido estático sin datos personales" regla_fw="F5 LAB &gt; PORTAL01 portal tcp/443" tooltip="F5 · TCP/443 · TLS&#10;Portal de transparencia&#10;TLS 1.3 con certificado público">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-82" target="FIG-5.5a-83">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-100" label="&lt;b&gt;F6 · TCP/80,&amp;#8203;443 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Respaldo DIRECT (fail-open, solo piloto)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F6" etiqueta="F6 · TCP/80,443 · TLS">
+        <object id="FIG-5.5a-85" label="&lt;b&gt;F6 · TCP/80,&amp;#8203;443 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Respaldo DIRECT (fail-open, solo piloto)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F6" etiqueta="F6 · TCP/80,443 · TLS">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="808" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-101" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-86" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="858" y="190" as="sourcePoint" />
-            <mxPoint x="858" y="1500" as="targetPoint" />
+            <mxPoint x="858" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-102" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F6" lado="origen">
+        <object id="FIG-5.5a-87" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F6" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="853" y="480.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="853" y="518.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-103" label="" celeris_rol="extremo" celeris_ref="LAB-TEST" flujo="F6" lado="origen">
-          <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="853" y="608.0" width="10" height="10" as="geometry" />
-          </mxCell>
-        </object>
-        <object id="FIG-5.5a-104" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F6" lado="destino">
+        <object id="FIG-5.5a-88" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F6" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
             <mxGeometry x="857" y="212.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-105" label="F6 · TCP/80,443 · TLS" celeris_id="F6" celeris_tipo="flujo" etiqueta="F6 · TCP/80,443 · TLS" proposito="Respaldo DIRECT (fail-open, solo piloto)" origen="LAB, LAB-TEST" destino="INTERNET" proteccion="TLS del propio sitio" riesgo_residual="El tráfico no pasa por la caché ni por la inspección de Celeris. Excepción con dueño (DTI), plazo (fin del piloto) y registro en la matriz de riesgos" regla_fw="F6 LAB,LAB-TEST &gt; INTERNET direct-failopen tcp/80,443 (solo piloto)" tooltip="F6 · TCP/80,443 · TLS&#10;Respaldo DIRECT (fail-open, solo piloto)&#10;TLS del propio sitio">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-103" target="FIG-5.5a-104">
+        <object id="FIG-5.5a-89" label="F6 · TCP/80,443 · TLS" celeris_id="F6" celeris_tipo="flujo" etiqueta="F6 · TCP/80,443 · TLS" proposito="Respaldo DIRECT (fail-open, solo piloto)" origen="LAB" destino="INTERNET" proteccion="TLS del propio sitio" riesgo_residual="El tráfico no pasa por la caché ni por la inspección de Celeris. Excepción con dueño (DTI), plazo (fin del piloto) y registro en la matriz de riesgos" regla_fw="F6 LAB &gt; INTERNET direct-failopen tcp/80,443 (solo piloto)" tooltip="F6 · TCP/80,443 · TLS&#10;Respaldo DIRECT (fail-open, solo piloto)&#10;TLS del propio sitio">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-87" target="FIG-5.5a-88">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-106" label="&lt;b&gt;F7 · UDP/443 + TCP/853 + UDP/853 + IPv6 · ✖ BLOQUEADO&lt;/b&gt;&lt;br&gt;&lt;i&gt;Bloqueado (QUIC, DoT, fuga IPv6)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F7" etiqueta="F7 · UDP/443 + TCP/853 + UDP/853 + IPv6 · ✖ BLOQUEADO">
+        <object id="FIG-5.5a-90" label="&lt;b&gt;F7 · UDP/443 + TCP/853 + UDP/853 + IPv6 · ✖ BLOQUEADO&lt;/b&gt;&lt;br&gt;&lt;i&gt;Bloqueado (QUIC, DoT, fuga IPv6)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F7" etiqueta="F7 · UDP/443 + TCP/853 + UDP/853 + IPv6 · ✖ BLOQUEADO">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="912" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-107" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-91" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="962" y="190" as="sourcePoint" />
-            <mxPoint x="962" y="1500" as="targetPoint" />
+            <mxPoint x="962" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-108" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F7" lado="origen">
+        <object id="FIG-5.5a-92" label="" celeris_rol="extremo" celeris_ref="LAB" flujo="F7" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="957" y="480.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="957" y="518.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-109" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F7" lado="destino">
+        <object id="FIG-5.5a-93" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F7" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
             <mxGeometry x="961" y="212.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-110" label="F7 · UDP/443 + TCP/853 + UDP/853 + IPv6 · ✖ BLOQUEADO" celeris_id="F7" celeris_tipo="flujo" etiqueta="F7 · UDP/443 + TCP/853 + UDP/853 + IPv6 · ✖ BLOQUEADO" proposito="Bloqueado (QUIC, DoT, fuga IPv6)" origen="LAB" destino="INTERNET" proteccion="Flujo bloqueado" riesgo_residual="DoH hacia resolvedores públicos no se bloquea en el firewall: lo cubre la política del navegador (GPO)" regla_fw="F7 LAB &gt; INTERNET BLOQUEAR udp/443 tcp,udp/853 ipv6" tooltip="F7 · UDP/443 + TCP/853 + UDP/853 + IPv6 · ✖ BLOQUEADO&#10;Bloqueado (QUIC, DoT, fuga IPv6)&#10;Flujo bloqueado">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=1 4;strokeWidth=2;endArrow=cross;endFill=0;endSize=10;" parent="1" edge="1" source="FIG-5.5a-108" target="FIG-5.5a-109">
+        <object id="FIG-5.5a-94" label="F7 · UDP/443 + TCP/853 + UDP/853 + IPv6 · ✖ BLOQUEADO" celeris_id="F7" celeris_tipo="flujo" etiqueta="F7 · UDP/443 + TCP/853 + UDP/853 + IPv6 · ✖ BLOQUEADO" proposito="Bloqueado (QUIC, DoT, fuga IPv6)" origen="LAB" destino="INTERNET" proteccion="Flujo bloqueado" riesgo_residual="DoH hacia resolvedores públicos no se bloquea en el firewall: lo cubre la política del navegador (GPO)" regla_fw="F7 LAB &gt; INTERNET BLOQUEAR udp/443 tcp,udp/853 ipv6" tooltip="F7 · UDP/443 + TCP/853 + UDP/853 + IPv6 · ✖ BLOQUEADO&#10;Bloqueado (QUIC, DoT, fuga IPv6)&#10;Flujo bloqueado">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=1 4;strokeWidth=2;endArrow=cross;endFill=0;endSize=10;" parent="1" edge="1" source="FIG-5.5a-92" target="FIG-5.5a-93">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-111" label="&lt;b&gt;F8 · TCP/80,&amp;#8203;443 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Descargas MISS&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F8" etiqueta="F8 · TCP/80,443 · TLS">
+        <object id="FIG-5.5a-95" label="&lt;b&gt;F8 · TCP/80,&amp;#8203;443 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Descargas MISS&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F8" etiqueta="F8 · TCP/80,443 · TLS">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1016" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-112" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-96" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1066" y="190" as="sourcePoint" />
-            <mxPoint x="1066" y="1500" as="targetPoint" />
+            <mxPoint x="1066" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-113" label="" celeris_rol="extremo" celeris_ref="EDGE" flujo="F8" lado="origen">
+        <object id="FIG-5.5a-97" label="" celeris_rol="extremo" celeris_ref="EDGE" flujo="F8" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="1061" y="676.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="1061" y="706.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-114" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F8" lado="destino">
+        <object id="FIG-5.5a-98" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F8" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
             <mxGeometry x="1065" y="212.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-115" label="F8 · TCP/80,443 · TLS" celeris_id="F8" celeris_tipo="flujo" etiqueta="F8 · TCP/80,443 · TLS" proposito="Descargas MISS" origen="EDGE" destino="INTERNET" proteccion="TLS verificado contra raíces públicas (webpki-roots)" riesgo_residual="Los orígenes HTTP (puerto 80) viajan sin cifrar; el nodo solo cachea respuestas compartibles (REQ-RN-01)" regla_fw="F8 EDGE &gt; INTERNET miss tcp/80,443" tooltip="F8 · TCP/80,443 · TLS&#10;Descargas MISS&#10;TLS verificado contra raíces públicas (webpki-roots)">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-113" target="FIG-5.5a-114">
+        <object id="FIG-5.5a-99" label="F8 · TCP/80,443 · TLS" celeris_id="F8" celeris_tipo="flujo" etiqueta="F8 · TCP/80,443 · TLS" proposito="Descargas MISS" origen="EDGE" destino="INTERNET" proteccion="TLS verificado contra raíces públicas (webpki-roots); sin cabeceras del cliente (REQ-F-28)" riesgo_residual="Los orígenes HTTP (puerto 80) viajan sin cifrar; el nodo solo cachea respuestas compartibles (REQ-RN-01)" regla_fw="F8 EDGE &gt; INTERNET miss tcp/80,443" tooltip="F8 · TCP/80,443 · TLS&#10;Descargas MISS&#10;TLS verificado contra raíces públicas (webpki-roots); sin cabeceras del cliente (REQ-F-28)">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-97" target="FIG-5.5a-98">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-116" label="&lt;b&gt;F21 · TCP/443 + TCP/80 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Portal público&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F21" etiqueta="F21 · TCP/443 + TCP/80 · TLS">
+        <object id="FIG-5.5a-100" label="&lt;b&gt;F21 · TCP/443 + TCP/80 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Portal público&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F21" etiqueta="F21 · TCP/443 + TCP/80 · TLS">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1120" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-117" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-101" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1170" y="190" as="sourcePoint" />
-            <mxPoint x="1170" y="1500" as="targetPoint" />
+            <mxPoint x="1170" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-118" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F21" lado="origen">
+        <object id="FIG-5.5a-102" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F21" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1165" y="208.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-119" label="" celeris_rol="extremo" celeris_ref="WAF01" flujo="F21" lado="destino">
+        <object id="FIG-5.5a-103" label="" celeris_rol="extremo" celeris_ref="PORTAL01" flujo="F21" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
             <mxGeometry x="1169" y="416.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-120" label="F21 · TCP/443 + TCP/80 · TLS" celeris_id="F21" celeris_tipo="flujo" etiqueta="F21 · TCP/443 + TCP/80 · TLS" proposito="Portal público" origen="INTERNET" destino="WAF01" proteccion="TLS 1.3, HSTS" riesgo_residual="Bajo: única superficie expuesta; WAF + Suricata IPS inline + CrowdSec; el portal no tiene base de datos ni login" regla_fw="F21 INTERNET &gt; WAF01 portal-dnat tcp/443 (80 redirige y ACME)" tooltip="F21 · TCP/443 + TCP/80 · TLS&#10;Portal público&#10;TLS 1.3, HSTS">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-118" target="FIG-5.5a-119">
+        <object id="FIG-5.5a-104" label="F21 · TCP/443 + TCP/80 · TLS" celeris_id="F21" celeris_tipo="flujo" etiqueta="F21 · TCP/443 + TCP/80 · TLS" proposito="Portal público" origen="INTERNET" destino="PORTAL01" proteccion="TLS 1.3, HSTS" riesgo_residual="Bajo: única superficie expuesta del campus; WAF + Suricata IPS inline + CrowdSec; el portal no tiene base de datos ni login" regla_fw="F21 INTERNET &gt; PORTAL01 portal-dnat tcp/443 (80 redirige y ACME)" tooltip="F21 · TCP/443 + TCP/80 · TLS&#10;Portal público&#10;TLS 1.3, HSTS">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-102" target="FIG-5.5a-103">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-121" label="&lt;b&gt;F22 · TCP/8080 · sin cifrar (riesgo aceptado)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Origen del portal (intra-VLAN)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F22" etiqueta="F22 · TCP/8080 · sin cifrar (riesgo aceptado)">
+        <object id="FIG-5.5a-105" label="&lt;b&gt;F24 · TCP/22,&amp;#8203;23 · sin cifrar (riesgo aceptado)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Señuelo (solo con aprobación de la DTI)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F24" etiqueta="F24 · TCP/22,23 · sin cifrar (riesgo aceptado)">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1224" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-122" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-106" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1274" y="190" as="sourcePoint" />
-            <mxPoint x="1274" y="1500" as="targetPoint" />
+            <mxPoint x="1274" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-123" label="" celeris_rol="extremo" celeris_ref="WAF01" flujo="F22" lado="origen">
+        <object id="FIG-5.5a-107" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F24" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="1269" y="412.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="1269" y="208.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-124" label="" celeris_rol="extremo" celeris_ref="WEB01" flujo="F22" lado="destino">
+        <object id="FIG-5.5a-108" label="" celeris_rol="extremo" celeris_ref="HNY01" flujo="F24" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
-            <mxGeometry x="1273" y="446.0" width="2" height="2" as="geometry" />
+            <mxGeometry x="1273" y="348.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-125" label="F22 · TCP/8080 · sin cifrar (riesgo aceptado)" celeris_id="F22" celeris_tipo="flujo" etiqueta="F22 · TCP/8080 · sin cifrar (riesgo aceptado)" proposito="Origen del portal (intra-VLAN)" origen="WAF01" destino="WEB01" proteccion="Sin cifrar dentro de DMZ-SVC; nftables en WEB01 solo acepta desde WAF01" riesgo_residual="Aceptado: tráfico conmutado en capa 2 dentro de DMZ-SVC; un WAF01 comprometido llegaría a WEB01 (sin salida de WEB01)" regla_fw="F22 WAF01 &gt; WEB01 origen tcp/8080 (intra-VLAN: nftables de host)" tooltip="F22 · TCP/8080 · sin cifrar (riesgo aceptado)&#10;Origen del portal (intra-VLAN)&#10;Sin cifrar dentro de DMZ-SVC; nftables en WEB01 solo acepta desde WAF01">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-123" target="FIG-5.5a-124">
+        <object id="FIG-5.5a-109" label="F24 · TCP/22,23 · sin cifrar (riesgo aceptado)" celeris_id="F24" celeris_tipo="flujo" etiqueta="F24 · TCP/22,23 · sin cifrar (riesgo aceptado)" proposito="Señuelo (solo con aprobación de la DTI)" origen="INTERNET" destino="HNY01" proteccion="En claro a propósito (es un señuelo)" riesgo_residual="Aceptado solo con autorización escrita de la DTI y ventana definida: atrae tráfico hostil hacia la IP del campus y consume enlace" regla_fw="F24 INTERNET &gt; HNY01 senuelo tcp/22&gt;2222,23 (solo ventana autorizada)" tooltip="F24 · TCP/22,23 · sin cifrar (riesgo aceptado)&#10;Señuelo (solo con aprobación de la DTI)&#10;En claro a propósito (es un señuelo)">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-107" target="FIG-5.5a-108">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-126" label="&lt;b&gt;F23 · TCP/443 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Renovación del certificado&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F23" etiqueta="F23 · TCP/443 · TLS">
+        <object id="FIG-5.5a-110" label="&lt;b&gt;F25 · TCP/4460,&amp;#8203;853 + UDP/123 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;NTS y DNS hacia arriba (DoT)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F25" etiqueta="F25 · TCP/4460,853 + UDP/123 · TLS">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1328" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-127" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-111" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1378" y="190" as="sourcePoint" />
-            <mxPoint x="1378" y="1500" as="targetPoint" />
+            <mxPoint x="1378" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-128" label="" celeris_rol="extremo" celeris_ref="WAF01" flujo="F23" lado="origen">
+        <object id="FIG-5.5a-112" label="" celeris_rol="extremo" celeris_ref="FW01" flujo="F25" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="1373" y="412.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="1373" y="276.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-129" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F23" lado="destino">
+        <object id="FIG-5.5a-113" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F25" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
             <mxGeometry x="1377" y="212.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-130" label="F23 · TCP/443 · TLS" celeris_id="F23" celeris_tipo="flujo" etiqueta="F23 · TCP/443 · TLS" proposito="Renovación del certificado" origen="WAF01" destino="INTERNET" proteccion="TLS" riesgo_residual="Bajo: solo hacia los endpoints ACME" regla_fw="F23 WAF01 &gt; INTERNET acme tcp/443" tooltip="F23 · TCP/443 · TLS&#10;Renovación del certificado&#10;TLS">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-128" target="FIG-5.5a-129">
+        <object id="FIG-5.5a-114" label="F25 · TCP/4460,853 + UDP/123 · TLS" celeris_id="F25" celeris_tipo="flujo" etiqueta="F25 · TCP/4460,853 + UDP/123 · TLS" proposito="NTS y DNS hacia arriba (DoT)" origen="FW01" destino="INTERNET" proteccion="NTS / TLS" riesgo_residual="Bajo: sin el DoT las consultas upstream saldrían sin cifrar; el NTS protege la hora" regla_fw="F25 FW01 &gt; INTERNET nts+dot tcp/4460,853 udp/123" tooltip="F25 · TCP/4460,853 + UDP/123 · TLS&#10;NTS y DNS hacia arriba (DoT)&#10;NTS / TLS">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-112" target="FIG-5.5a-113">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-131" label="&lt;b&gt;F24 · TCP/22,&amp;#8203;23 · sin cifrar (riesgo aceptado)&lt;/b&gt;&lt;br&gt;&lt;i&gt;Señuelo (solo con aprobación de la DTI)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F24" etiqueta="F24 · TCP/22,23 · sin cifrar (riesgo aceptado)">
+        <object id="FIG-5.5a-115" label="&lt;b&gt;F31 · TCP/3128,&amp;#8203;80 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Proxy y PAC para BYOD (opcional)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F31" etiqueta="F31 · TCP/3128,80 · TLS">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1432" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-132" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-116" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1482" y="190" as="sourcePoint" />
-            <mxPoint x="1482" y="1500" as="targetPoint" />
+            <mxPoint x="1482" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-133" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F24" lado="origen">
+        <object id="FIG-5.5a-117" label="" celeris_rol="extremo" celeris_ref="WIFI-EST" flujo="F31" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="1477" y="208.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="1477" y="480.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-134" label="" celeris_rol="extremo" celeris_ref="HNY01" flujo="F24" lado="destino">
+        <object id="FIG-5.5a-118" label="" celeris_rol="extremo" celeris_ref="EDGE01" flujo="F31" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
-            <mxGeometry x="1481" y="348.0" width="2" height="2" as="geometry" />
+            <mxGeometry x="1481" y="740.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-135" label="F24 · TCP/22,23 · sin cifrar (riesgo aceptado)" celeris_id="F24" celeris_tipo="flujo" etiqueta="F24 · TCP/22,23 · sin cifrar (riesgo aceptado)" proposito="Señuelo (solo con aprobación de la DTI)" origen="INTERNET" destino="HNY01" proteccion="En claro a propósito (es un señuelo)" riesgo_residual="Aceptado solo con autorización escrita de la DTI y ventana definida: atrae tráfico hostil hacia la IP del campus y consume enlace" regla_fw="F24 INTERNET &gt; HNY01 senuelo tcp/22&gt;2222,23 (solo ventana autorizada)" tooltip="F24 · TCP/22,23 · sin cifrar (riesgo aceptado)&#10;Señuelo (solo con aprobación de la DTI)&#10;En claro a propósito (es un señuelo)">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-133" target="FIG-5.5a-134">
+        <object id="FIG-5.5a-119" label="F31 · TCP/3128,80 · TLS" celeris_id="F31" celeris_tipo="flujo" etiqueta="F31 · TCP/3128,80 · TLS" proposito="Proxy y PAC para BYOD (opcional)" origen="WIFI-EST" destino="EDGE01, EDGE02" proteccion="Siempre passthrough: el nodo nunca descifra esta red (REQ-F-36, REQ-RN-11)" riesgo_residual="Medio: equipos no administrados; sin descifrado, el ahorro en BYOD es bajo y se declara (D-27)" regla_fw="F31 WIFI-EST &gt; EDGE01,EDGE02 proxy-byod tcp/3128,80" tooltip="F31 · TCP/3128,80 · TLS&#10;Proxy y PAC para BYOD (opcional)&#10;Siempre passthrough: el nodo nunca descifra esta red (REQ-F-36, REQ-RN-11)">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-117" target="FIG-5.5a-118">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-136" label="&lt;b&gt;F25 · TCP/4460,&amp;#8203;853 + UDP/123 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;NTS hacia servidores públicos; DNS hacia arriba por DoT (opcional)&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F25" etiqueta="F25 · TCP/4460,853 + UDP/123 · TLS">
+        <object id="FIG-5.5a-120" label="" celeris_rol="extremo" celeris_ref="EDGE02" flujo="F31" lado="destino">
+          <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
+            <mxGeometry x="1481" y="770.0" width="2" height="2" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-5.5a-121" label="F31 · TCP/3128,80 · TLS" celeris_id="F31" celeris_tipo="flujo" etiqueta="F31 · TCP/3128,80 · TLS" proposito="Proxy y PAC para BYOD (opcional)" origen="WIFI-EST" destino="EDGE01, EDGE02" proteccion="Siempre passthrough: el nodo nunca descifra esta red (REQ-F-36, REQ-RN-11)" riesgo_residual="Medio: equipos no administrados; sin descifrado, el ahorro en BYOD es bajo y se declara (D-27)" regla_fw="F31 WIFI-EST &gt; EDGE01,EDGE02 proxy-byod tcp/3128,80" tooltip="F31 · TCP/3128,80 · TLS&#10;Proxy y PAC para BYOD (opcional)&#10;Siempre passthrough: el nodo nunca descifra esta red (REQ-F-36, REQ-RN-11)">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-117" target="FIG-5.5a-120">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="FIG-5.5a-122" label="&lt;b&gt;F32 · TCP/443 · TLS&lt;/b&gt;&lt;br&gt;&lt;i&gt;Aviso para BYOD&lt;/i&gt;" celeris_rol="etiqueta_flujo" celeris_ref="F32" etiqueta="F32 · TCP/443 · TLS">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;align=center;spacing=3;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1536" y="64" width="100" height="126" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-137" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;" parent="1" edge="1" id="FIG-5.5a-123" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1586" y="190" as="sourcePoint" />
-            <mxPoint x="1586" y="1500" as="targetPoint" />
+            <mxPoint x="1586" y="1214" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <object id="FIG-5.5a-138" label="" celeris_rol="extremo" celeris_ref="SVC01" flujo="F25" lado="origen">
+        <object id="FIG-5.5a-124" label="" celeris_rol="extremo" celeris_ref="WIFI-EST" flujo="F32" lado="origen">
           <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="1581" y="894.0" width="10" height="10" as="geometry" />
+            <mxGeometry x="1581" y="480.0" width="10" height="10" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-139" label="" celeris_rol="extremo" celeris_ref="INTERNET" flujo="F25" lado="destino">
+        <object id="FIG-5.5a-125" label="" celeris_rol="extremo" celeris_ref="PORTAL01" flujo="F32" lado="destino">
           <mxCell style="rounded=0;html=1;fillColor=none;strokeColor=none;" parent="1" vertex="1">
-            <mxGeometry x="1585" y="212.0" width="2" height="2" as="geometry" />
+            <mxGeometry x="1585" y="416.0" width="2" height="2" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-140" label="F25 · TCP/4460,853 + UDP/123 · TLS" celeris_id="F25" celeris_tipo="flujo" etiqueta="F25 · TCP/4460,853 + UDP/123 · TLS" proposito="NTS hacia servidores públicos; DNS hacia arriba por DoT (opcional)" origen="SVC01" destino="INTERNET" proteccion="NTS / TLS" riesgo_residual="Bajo: el DoT hacia arriba es opcional; sin él las consultas upstream salen sin cifrar" regla_fw="F25 SVC01 &gt; INTERNET nts+dot tcp/4460,853 udp/123" tooltip="F25 · TCP/4460,853 + UDP/123 · TLS&#10;NTS hacia servidores públicos; DNS hacia arriba por DoT (opcional)&#10;NTS / TLS">
-          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-138" target="FIG-5.5a-139">
+        <object id="FIG-5.5a-126" label="F32 · TCP/443 · TLS" celeris_id="F32" celeris_tipo="flujo" etiqueta="F32 · TCP/443 · TLS" proposito="Aviso para BYOD" origen="WIFI-EST" destino="PORTAL01" proteccion="TLS 1.3" riesgo_residual="Bajo: portal estático sin datos personales, con certificado público" regla_fw="F32 WIFI-EST &gt; PORTAL01 portal tcp/443" tooltip="F32 · TCP/443 · TLS&#10;Aviso para BYOD&#10;TLS 1.3">
+          <mxCell style="html=1;noLabel=1;strokeColor=#1A1A1A;strokeWidth=2;endArrow=block;endFill=1;" parent="1" edge="1" source="FIG-5.5a-124" target="FIG-5.5a-125">
             <mxGeometry relative="1" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-141" label="&lt;b&gt;Qué aporta y qué pasa si falla&lt;/b&gt;&lt;br&gt;&lt;b&gt;FW01&lt;/b&gt; — Ruteo entre zonas, política deny-all, IPS y VPN. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde el ruteo entre VLAN, la salida a Internet y la VPN…&lt;br&gt;&lt;b&gt;SVC01&lt;/b&gt; — DNS primario con DNSSEC, PAC y hora con NTS. &lt;i&gt;Si falla:&lt;/i&gt; Los clientes resuelven con FW01 y obtienen el PAC de EDGE01&lt;br&gt;&lt;b&gt;EDGE01&lt;/b&gt; — Proxy de caché explícito en TCP 3128. &lt;i&gt;Si falla:&lt;/i&gt; El PAC conmuta a EDGE02 y, si ambos caen, a DIRECT (T09)&lt;br&gt;&lt;b&gt;EDGE02&lt;/b&gt; — Redundancia del proxy: segunda ruta del PAC. &lt;i&gt;Si falla:&lt;/i&gt; El PAC usa EDGE01&lt;br&gt;&lt;b&gt;WAF01&lt;/b&gt; — WAF con OWASP CRS delante del portal. &lt;i&gt;Si falla:&lt;/i&gt; El portal no es accesible desde Internet&lt;br&gt;&lt;b&gt;WEB01&lt;/b&gt; — Portal estático firmado, sin base de datos. &lt;i&gt;Si falla:&lt;/i&gt; El portal queda sin contenido&lt;br&gt;&lt;b&gt;HNY01&lt;/b&gt; — Señuelo SSH/Telnet que alerta en el SIEM. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde la detección de fuerza bruta por señuelo&lt;br&gt;&lt;b&gt;PROBE01&lt;/b&gt; — Mide la disponibilidad desde la VLAN de usuario. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde la medición de disponibilidad, no el servicio&lt;br&gt;&lt;b&gt;LABCLI01&lt;/b&gt; — PC de laboratorio de referencia para las pruebas. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde el cliente de prueba&lt;br&gt;&lt;b&gt;KALI01&lt;/b&gt; — Genera los escenarios de ataque controlados. &lt;i&gt;Si falla:&lt;/i&gt; No hay generador de ataques" celeris_rol="panel" componentes="FW01, SVC01, EDGE01, EDGE02, WAF01, WEB01, HNY01, PROBE01, LABCLI01, KALI01">
+        <object id="FIG-5.5a-127" label="&lt;b&gt;Qué aporta y qué pasa si falla&lt;/b&gt;&lt;br&gt;&lt;b&gt;FW01&lt;/b&gt; — Ruteo entre zonas, deny-all, IPS, VPN, DNS y NTP. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde el ruteo entre VLAN, la salida a Internet, la VPN y…&lt;br&gt;&lt;b&gt;EDGE01&lt;/b&gt; — Proxy de caché explícito en TCP 3128. &lt;i&gt;Si falla:&lt;/i&gt; El PAC conmuta a EDGE02 y, si ambos caen, a DIRECT (T09)&lt;br&gt;&lt;b&gt;EDGE02&lt;/b&gt; — Redundancia del proxy: segunda ruta del PAC. &lt;i&gt;Si falla:&lt;/i&gt; El PAC usa EDGE01&lt;br&gt;&lt;b&gt;PORTAL01&lt;/b&gt; — Portal de transparencia protegido por WAF. &lt;i&gt;Si falla:&lt;/i&gt; Las PCs ya enroladas siguen funcionando&lt;br&gt;&lt;b&gt;HNY01&lt;/b&gt; — Señuelo SSH/Telnet que alerta en el SIEM. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde la detección de fuerza bruta por señuelo SSH/Telnet…&lt;br&gt;&lt;b&gt;LABCLI01&lt;/b&gt; — PC de laboratorio de referencia para las pruebas. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde el cliente de prueba&lt;br&gt;&lt;b&gt;KALI01&lt;/b&gt; — Genera los escenarios de ataque controlados. &lt;i&gt;Si falla:&lt;/i&gt; No hay generador de ataques para T29 desde 10.20.35.60&lt;br&gt;&lt;b&gt;PCS-LAB&lt;/b&gt; — Usuarios del proxy: 10 laboratorios de 40 PCs. &lt;i&gt;Si falla:&lt;/i&gt; Un laboratorio sin conectividad no afecta a los demás&lt;br&gt;&lt;b&gt;WIFI-EST&lt;/b&gt; — Equipos personales: proxy opcional, nunca descifrados. &lt;i&gt;Si falla:&lt;/i&gt; Sin efecto sobre los laboratorios (LAB)" celeris_rol="panel" componentes="FW01, EDGE01, EDGE02, PORTAL01, HNY01, LABCLI01, KALI01, PCS-LAB, WIFI-EST">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="1866" y="10" width="500" height="222" as="geometry" />
+            <mxGeometry x="1658" y="10" width="500" height="234" as="geometry" />
           </mxCell>
         </object>
-        <object id="FIG-5.5a-142" label="&lt;b&gt;Leyenda&lt;/b&gt;" celeris_rol="leyenda">
+        <object id="FIG-5.5a-128" label="&lt;b&gt;Leyenda&lt;/b&gt;" celeris_rol="leyenda">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="1866" y="242" width="500" height="396" as="geometry" />
+            <mxGeometry x="1658" y="254" width="500" height="400" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-143" value="&lt;b&gt;Zonas&lt;/b&gt; (color + nombre):">
-          <mxGeometry x="1874" y="268" width="300" height="16" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-129" value="&lt;b&gt;Zonas&lt;/b&gt; (color + nombre):">
+          <mxGeometry x="1666" y="280" width="300" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#F8ECF3;strokeColor=#CC79A7;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-144" value="">
-          <mxGeometry x="1874" y="286" width="16" height="16" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#F8ECF3;strokeColor=#CC79A7;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-130" value="">
+          <mxGeometry x="1666" y="298" width="16" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-145" value="DMZ-HONEY (VLAN 41)">
-          <mxGeometry x="1894" y="284" width="139" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-131" value="DMZ-HONEY (VLAN 41)">
+          <mxGeometry x="1686" y="296" width="139" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#F9E8DB;strokeColor=#D55E00;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-146" value="">
-          <mxGeometry x="2035" y="286" width="16" height="16" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#F9E8DB;strokeColor=#D55E00;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-132" value="">
+          <mxGeometry x="1827" y="298" width="16" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-147" value="DMZ-SVC (VLAN 40)">
-          <mxGeometry x="2055" y="284" width="139" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-133" value="DMZ-SVC (VLAN 40)">
+          <mxGeometry x="1847" y="296" width="139" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#FCF2DB;strokeColor=#E69F00;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-148" value="">
-          <mxGeometry x="2196" y="286" width="16" height="16" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#FDFBE5;strokeColor=#F0E442;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-134" value="">
+          <mxGeometry x="1988" y="298" width="16" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-149" value="LAB (VLAN 30)">
-          <mxGeometry x="2216" y="284" width="139" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-135" value="WIFI-EST">
+          <mxGeometry x="2008" y="296" width="139" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#FDFBE5;strokeColor=#F0E442;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-150" value="">
-          <mxGeometry x="1874" y="308" width="16" height="16" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#FCF2DB;strokeColor=#E69F00;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-136" value="">
+          <mxGeometry x="1666" y="320" width="16" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-151" value="LAB-TEST (VLAN 31)">
-          <mxGeometry x="1894" y="306" width="139" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-137" value="LAB (VLAN 30)">
+          <mxGeometry x="1686" y="318" width="139" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#E6E6E6;strokeColor=#4D4D4D;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-152" value="">
-          <mxGeometry x="2035" y="308" width="16" height="16" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#E6E6E6;strokeColor=#4D4D4D;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-138" value="">
+          <mxGeometry x="1827" y="320" width="16" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-153" value="EDGE (VLAN 60)">
-          <mxGeometry x="2055" y="306" width="139" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-139" value="EDGE (VLAN 60)">
+          <mxGeometry x="1847" y="318" width="139" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#DBF1EB;strokeColor=#009E73;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-154" value="">
-          <mxGeometry x="2196" y="308" width="16" height="16" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#DBF1EB;strokeColor=#009E73;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-140" value="">
+          <mxGeometry x="1988" y="320" width="16" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-155" value="SERVERS (VLAN 20)">
-          <mxGeometry x="2216" y="306" width="139" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-141" value="SERVERS (VLAN 20)">
+          <mxGeometry x="2008" y="318" width="139" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#E7F4FC;strokeColor=#56B4E9;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-156" value="">
-          <mxGeometry x="1874" y="330" width="16" height="16" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#E7F4FC;strokeColor=#56B4E9;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-142" value="">
+          <mxGeometry x="1666" y="342" width="16" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-157" value="SECURITY (VLAN 50)">
-          <mxGeometry x="1894" y="328" width="139" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-143" value="SECURITY (VLAN 50)">
+          <mxGeometry x="1686" y="340" width="139" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#EEEEEE;strokeColor=#888888;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-158" value="">
-          <mxGeometry x="2035" y="330" width="16" height="16" as="geometry" />
+        <mxCell style="rounded=0;html=1;fillColor=#DBEBF4;strokeColor=#0072B2;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-144" value="">
+          <mxGeometry x="1827" y="342" width="16" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-159" value="BACKUP (VLAN 71)">
-          <mxGeometry x="2055" y="328" width="139" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-145" value="MGMT (VLAN 10)">
+          <mxGeometry x="1847" y="340" width="139" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#F5F5F5;strokeColor=#BBBBBB;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-160" value="">
-          <mxGeometry x="2196" y="330" width="16" height="16" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-146" value="&lt;b&gt;Criticidad&lt;/b&gt; (grosor del borde + etiqueta):">
+          <mxGeometry x="1666" y="370" width="360" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-161" value="STORAGE (VLAN 70)">
-          <mxGeometry x="2216" y="328" width="139" height="20" as="geometry" />
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-147" value="&lt;b&gt;ALTA&lt;/b&gt; · borde 3 px">
+          <mxGeometry x="1666" y="390" width="150" height="28" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=0;html=1;fillColor=#DBEBF4;strokeColor=#0072B2;strokeWidth=2;" parent="1" vertex="1" id="FIG-5.5a-162" value="">
-          <mxGeometry x="1874" y="352" width="16" height="16" as="geometry" />
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-148" value="&lt;b&gt;MEDIA&lt;/b&gt; · borde 2 px">
+          <mxGeometry x="1824" y="390" width="150" height="28" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-163" value="MGMT (VLAN 10)">
-          <mxGeometry x="1894" y="350" width="139" height="20" as="geometry" />
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-149" value="&lt;b&gt;BAJA&lt;/b&gt; · borde 1 px">
+          <mxGeometry x="1982" y="390" width="150" height="28" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-164" value="&lt;b&gt;Criticidad&lt;/b&gt; (grosor del borde + etiqueta):">
-          <mxGeometry x="1874" y="380" width="360" height="16" as="geometry" />
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;dashed=1;dashPattern=2 2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-150" value="interfaz de un equipo en otra zona">
+          <mxGeometry x="1666" y="424" width="229" height="26" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-165" value="&lt;b&gt;ALTA&lt;/b&gt; · borde 3 px">
-          <mxGeometry x="1874" y="400" width="150" height="28" as="geometry" />
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=6 3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-151" value="existente, fuera de alcance">
+          <mxGeometry x="1903" y="424" width="229" height="26" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-166" value="&lt;b&gt;MEDIA&lt;/b&gt; · borde 2 px">
-          <mxGeometry x="2032" y="400" width="150" height="28" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-152" value="&lt;b&gt;Flujos&lt;/b&gt; «F-nn · protocolo/puerto · protección»:">
+          <mxGeometry x="1666" y="458" width="484" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-167" value="&lt;b&gt;BAJA&lt;/b&gt; · borde 1 px">
-          <mxGeometry x="2190" y="400" width="150" height="28" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;dashed=1;dashPattern=2 2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-168" value="interfaz de un equipo en otra zona">
-          <mxGeometry x="1874" y="434" width="229" height="26" as="geometry" />
-        </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=6 3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-169" value="existente, fuera de alcance">
-          <mxGeometry x="2111" y="434" width="229" height="26" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-170" value="&lt;b&gt;Flujos&lt;/b&gt; «F-nn · protocolo/puerto · protección»:">
-          <mxGeometry x="1874" y="468" width="484" height="16" as="geometry" />
-        </mxCell>
-        <mxCell style="html=1;strokeColor=#1A1A1A;strokeWidth=1.5;endArrow=block;endFill=1;" parent="1" edge="1" id="FIG-5.5a-171" value="">
+        <mxCell style="html=1;strokeColor=#1A1A1A;strokeWidth=1.5;endArrow=block;endFill=1;" parent="1" edge="1" id="FIG-5.5a-153" value="">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="1874" y="498" as="sourcePoint" />
-            <mxPoint x="1920" y="498" as="targetPoint" />
+            <mxPoint x="1666" y="488" as="sourcePoint" />
+            <mxPoint x="1712" y="488" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-172" value="cifrado (TLS, mTLS, SSH, IPsec)">
-          <mxGeometry x="1926" y="490" width="107" height="18" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-154" value="cifrado (TLS, mTLS, SSH, IPsec)">
+          <mxGeometry x="1718" y="480" width="107" height="18" as="geometry" />
         </mxCell>
-        <mxCell style="html=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=1.5;endArrow=block;endFill=1;" parent="1" edge="1" id="FIG-5.5a-173" value="">
+        <mxCell style="html=1;strokeColor=#1A1A1A;dashed=1;dashPattern=8 4;strokeWidth=1.5;endArrow=block;endFill=1;" parent="1" edge="1" id="FIG-5.5a-155" value="">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="2035" y="498" as="sourcePoint" />
-            <mxPoint x="2081" y="498" as="targetPoint" />
+            <mxPoint x="1827" y="488" as="sourcePoint" />
+            <mxPoint x="1873" y="488" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-174" value="sin cifrar, riesgo aceptado">
-          <mxGeometry x="2087" y="490" width="107" height="18" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-156" value="sin cifrar, riesgo aceptado">
+          <mxGeometry x="1879" y="480" width="107" height="18" as="geometry" />
         </mxCell>
-        <mxCell style="html=1;strokeColor=#1A1A1A;dashed=1;dashPattern=1 4;strokeWidth=2;endArrow=cross;endFill=0;" parent="1" edge="1" id="FIG-5.5a-175" value="">
+        <mxCell style="html=1;strokeColor=#1A1A1A;dashed=1;dashPattern=1 4;strokeWidth=2;endArrow=cross;endFill=0;" parent="1" edge="1" id="FIG-5.5a-157" value="">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="2196" y="498" as="sourcePoint" />
-            <mxPoint x="2242" y="498" as="targetPoint" />
+            <mxPoint x="1988" y="488" as="sourcePoint" />
+            <mxPoint x="2034" y="488" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-176" value="✖ BLOQUEADO">
-          <mxGeometry x="2248" y="490" width="107" height="18" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-158" value="✖ BLOQUEADO">
+          <mxGeometry x="2040" y="480" width="107" height="18" as="geometry" />
         </mxCell>
-        <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-177" value="">
-          <mxGeometry x="1874" y="520" width="14" height="14" as="geometry" />
+        <mxCell style="ellipse;html=1;fillColor=#1A1A1A;strokeColor=#1A1A1A;" parent="1" vertex="1" id="FIG-5.5a-159" value="">
+          <mxGeometry x="1666" y="510" width="14" height="14" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-178" value="● origen del flujo · punta de flecha = destino · cada columna es un flujo y su encabezado es la etiqueta de la flecha · fila gris = componente sin flujos en esta figura">
-          <mxGeometry x="1894" y="516" width="464" height="30" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-160" value="● origen del flujo · punta de flecha = destino · cada columna es un flujo y su encabezado es la etiqueta de la flecha · fila gris = componente sin flujos en esta figura">
+          <mxGeometry x="1686" y="506" width="464" height="30" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-179" value="&lt;b&gt;Íconos&lt;/b&gt; (draw.io redes / AWS4):">
-          <mxGeometry x="1874" y="556" width="300" height="16" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-161" value="&lt;b&gt;Íconos&lt;/b&gt; (draw.io redes / AWS4):">
+          <mxGeometry x="1666" y="546" width="300" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.pc;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-180" value="">
-          <mxGeometry x="1874" y="576" width="20" height="20" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.pc;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-162" value="">
+          <mxGeometry x="1666" y="566" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-181" value="Equipo de prueba">
-          <mxGeometry x="1898" y="576" width="135" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-163" value="Equipo de prueba">
+          <mxGeometry x="1690" y="566" width="135" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-182" value="">
-          <mxGeometry x="2035" y="576" width="20" height="20" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-164" value="">
+          <mxGeometry x="1827" y="566" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-183" value="Firewall">
-          <mxGeometry x="2059" y="576" width="135" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-165" value="Firewall">
+          <mxGeometry x="1851" y="566" width="135" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.secured;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-184" value="">
-          <mxGeometry x="2196" y="576" width="20" height="20" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.pc;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-166" value="">
+          <mxGeometry x="1988" y="566" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-185" value="Honeypot / canary">
-          <mxGeometry x="2220" y="576" width="135" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-167" value="Grupo de PCs existentes">
+          <mxGeometry x="2012" y="566" width="135" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-186" value="">
-          <mxGeometry x="1874" y="602" width="20" height="20" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.secured;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-168" value="">
+          <mxGeometry x="1666" y="592" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-187" value="Servidor / VM">
-          <mxGeometry x="1898" y="602" width="135" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-169" value="Honeypot / canary">
+          <mxGeometry x="1690" y="592" width="135" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.proxy_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-188" value="">
-          <mxGeometry x="2035" y="602" width="20" height="20" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.wireless_hub;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-170" value="">
+          <mxGeometry x="1827" y="592" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-189" value="WAF">
-          <mxGeometry x="2059" y="602" width="135" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-171" value="Red Wi-Fi existente (DTI)">
+          <mxGeometry x="1851" y="592" width="135" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.web_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-190" value="">
-          <mxGeometry x="2196" y="602" width="20" height="20" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-172" value="">
+          <mxGeometry x="1988" y="592" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-191" value="Servidor web">
-          <mxGeometry x="2220" y="602" width="135" height="20" as="geometry" />
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-173" value="Servidor / VM">
+          <mxGeometry x="2012" y="592" width="135" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.networks.proxy_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="FIG-5.5a-174" value="">
+          <mxGeometry x="1666" y="618" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="FIG-5.5a-175" value="WAF">
+          <mxGeometry x="1690" y="618" width="135" height="20" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

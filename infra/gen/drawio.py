@@ -14,9 +14,11 @@ Reglas:
 - Ningún dato de red se escribe aquí: IP, CIDR, VLAN, puertos, nombres, criticidad, textos «aporta»/«si falla»
   y la lista de componentes de cada figura salen de infra/*.yaml (campo `figuras` de cada componente).
 - Lo único que este módulo fija es la DISPOSICIÓN (coordenadas) y el estilo visual de CLAUDE.md.
-- Lo que la figura pide y el inventario no trae (capas de defensa en profundidad de D1.9, ruta por defecto hacia
-  el ISP) se rotula con la entrada de docs/infra/e1/CAMBIOS-INVENTARIO.md que lo registra (CI-30).
+- Disposición v0.4 (H1): FW01 detrás de FGT-EXT por la red de tránsito, 7 VLAN, WIFI-EST fuera de FW01, VPC con
+  EC2-GW y app-a vacía, S3 fuera de la VPC. Las capas de defensa en profundidad salen de trazabilidad.yaml (CI-63).
+- Lo que la figura pide y el inventario no trae se registra en docs/infra/e1/CAMBIOS-INVENTARIO.md (CI-70…CI-89).
 - Todo componente, zona y flecha de flujo lleva el atributo `celeris_id` (validado por V-50+).
+- Cada página cabe en 2^25 píxeles a escala 3: más allá, draw.io deja el final del PNG en blanco (ver `generar`).
 
     python infra/gen/drawio.py [--salida entregables/CE0311/diagramas]
 """
@@ -62,14 +64,22 @@ ICONO = {
     "interfaz_tunel": "shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpn_connection;fillColor=#8C4FFF;strokeColor=#FFFFFF;",
     "vpn_gateway": "shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpn_gateway;fillColor=#8C4FFF;strokeColor=#FFFFFF;",
     "aws_instancia": "shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;fillColor=#ED7100;strokeColor=#FFFFFF;",
+    "aws_s3": "shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;fillColor=#7AA116;strokeColor=#FFFFFF;",
+    "firewall_existente": "shape=mxgraph.networks.firewall;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;",
+    "grupo_pcs": "shape=mxgraph.networks.pc;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;",
+    "red_externa": "shape=mxgraph.networks.wireless_hub;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;",
+    "puesto_encargado": "shape=mxgraph.networks.monitor;fillColor=#CCCCCC;strokeColor=#4D4D4D;",
 }
 NOMBRE_ICONO = {
     "firewall": "Firewall", "switch": "Switch", "switch_existente": "Switch existente (fuera de alcance)",
     "puerto_emergencia": "Puerto break-glass (laptop)", "hipervisor": "Hipervisor", "gestion_fuera_banda": "Gestión fuera de banda",
     "ups": "UPS", "servidor": "Servidor / VM", "waf": "WAF", "web": "Servidor web", "honeypot": "Honeypot / canary",
     "ids": "Sensor IDS", "cliente_prueba": "Equipo de prueba", "nas": "NAS", "interfaz_tunel": "Interfaz de túnel (VTI)",
-    "vpn_gateway": "VGW de AWS", "aws_instancia": "Instancia EC2",
+    "vpn_gateway": "VGW de AWS", "aws_instancia": "Instancia EC2", "aws_s3": "Bucket S3",
+    "firewall_existente": "Firewall existente (DTI)", "grupo_pcs": "Grupo de PCs existentes",
+    "red_externa": "Red Wi-Fi existente (DTI)", "puesto_encargado": "Puesto del encargado",
 }
+EXISTENTES = {"existente", "fuera_de_alcance"}
 AWS_GRUPO = {
     "nube": "shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud_alt;strokeColor=#232F3E;fillColor=none;",
     "aws_vpc": "shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc2;strokeColor=#8C4FFF;fillColor=none;",
@@ -83,18 +93,7 @@ PROTECCION = {
 }
 CIFRADOS = {"tls", "mtls", "mtls_en_ipsec", "tls_en_ipsec", "ssh", "cifrado_aplicacion"}
 
-# Capas de defensa en profundidad de D1.9 (tabla «Defensa en profundidad»). No están en infra/*.yaml: CI-30.
-CAPAS_D19 = [
-    ("Perímetro", "FW01 deny-all, Suricata IPS inline WAN y DMZ, CrowdSec, filtrado de salida"),
-    ("Zona", "10 VLAN, matriz zona × zona, DMZ dividida (D-16), STORAGE sin ruteo"),
-    ("Capa 2", "DHCP snooping, DAI, IP source guard, RA guard, port-security, BPDU/root guard, nativa 999"),
-    ("Host", "nftables por servidor, CIS, sin ip_forward en NAS01 e IDS01"),
-    ("Aplicación", "WAF con OWASP CRS; nodo Celeris con ACL y SSRF; CA con Name Constraints"),
-    ("Datos en tránsito", "Una protección por flujo (D1.11)"),
-    ("Detección", "Suricata, honeypots, canary, detecciones Celeris, honey-URLs, WAF → Wazuh"),
-    ("Respuesta", "Bloquear IP en OPNsense, aislar VLAN, revocar CA de un nodo"),
-    ("Recuperación", "Break-glass, configuraciones en Git, respaldos 3-2-1-1-0"),
-]
+# Las capas de defensa en profundidad de D1.9 se leen de trazabilidad.yaml → defensa_profundidad (CI-63).
 
 W, H = 180, 84          # caja de componente
 WP, HP = 180, 40        # caja de interfaz (componente con varias zonas)
@@ -154,6 +153,15 @@ def etiqueta_flujo(f: dict) -> str:
     return f"{f['id']} · {protocolos_texto(f)} · {prot}"
 
 
+def estilo_flujo(f: dict) -> str:
+    """Estilo de línea de CLAUDE.md: cifrado = continua; sin cifrar = discontinua; bloqueado = punteada con ✖."""
+    if f["accion"] == "bloquear":
+        return "dashed=1;dashPattern=1 4;strokeWidth=2;endArrow=cross;endFill=0;"
+    if f["proteccion"]["tipo"] in CIFRADOS:
+        return "strokeWidth=1.5;endArrow=block;endFill=1;"
+    return "dashed=1;dashPattern=8 4;strokeWidth=1.5;endArrow=block;endFill=1;"
+
+
 def ip_texto(x: Infra, comp: dict, detalle: bool = False) -> str:
     """IP (o rango) que se rotula en la segunda línea de la caja del componente."""
     if comp.get("cidr"):
@@ -161,10 +169,19 @@ def ip_texto(x: Infra, comp: dict, detalle: bool = False) -> str:
     ips = [i for i in comp["ips"] if i["ip"]]
     if comp["id"] == "FW01" and not detalle:
         wan = next(i["ip"] for i in ips if i["interfaz"] == "wan")
-        return f"WAN {wan} · .1 en {len(ips) - 1} VLAN"
-    if comp["id"] == "IDS01":
-        cap = [i["interfaz"].split("-")[1] for i in comp["ips"] if i["interfaz"].startswith("captura")]
-        return f"{ips[0]['ip']} · captura VLAN {'/'.join(cap)}"
+        return f"tránsito {wan} · .1 en {len(ips) - 1} VLAN"
+    if comp["tipo"] == "grupo_pcs":
+        labs = x.inv["rangos_lab"]["laboratorios"]
+        return f"{labs[0]['id']}…{labs[-1]['id']}: {len(labs)} rangos /26 · DHCP con reservas"
+    if comp["tipo"] == "red_externa":
+        z = x.zonas[comp["zonas"][0]]
+        return f"{z['cidr']} (provisional {z['supuesto'] and '[' + z['supuesto'] + ']'}) · red de la DTI"
+    if comp["tipo"] == "aws_s3":
+        s3 = x.inv["aws"]["s3"]
+        return f"bucket {s3['bucket']} · Object Lock {s3['object_lock']['dias']} días"
+    if comp["tipo"] == "firewall_existente":
+        nombres = {"wan": "WAN", "transito": "tránsito"}
+        return " · ".join(f"{nombres.get(i['interfaz'], i['interfaz'])} {i['ip']}" for i in ips)
     if not ips:
         if comp["tipo"] == "vpn_gateway":
             return "IP públicas asignadas por AWS (1 por túnel)"
@@ -292,9 +309,9 @@ class Diagrama:
         lineas = [f"<b>{esc(cid)}</b> · {esc(nombre_corto(comp))} · <b>{tag}</b>", esc(ip)]
         if not compacto:
             lineas.append(f"<i>{esc(comp['aporta_corto'])}</i>")
-        fuera = comp["estado"] == "fuera_de_alcance"
+        fuera = comp["estado"] in EXISTENTES
         if fuera:
-            lineas[0] += " · <i>fuera de alcance</i>"
+            lineas[0] += " · <i>" + ("fuera de alcance" if comp["estado"] == "fuera_de_alcance" else "existente") + "</i>"
         icono = h - 8 if una_linea else 22
         fuente = tam_fuente(lineas if not una_linea else [" · ".join(lineas)], w - icono - 14, h - 4)
         estilo = (f"rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor={color};strokeWidth={grosor};"
@@ -335,9 +352,16 @@ class Diagrama:
             estilo = (AWS_GRUPO["nube"] + "html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacingLeft=30;fontSize=11;"
                       f"fontColor={AWS_TINTA};container=0;dashed=0;")
             label = f"<b>AWS</b> · zona {esc(z['nombre'])} · confianza {esc(z['confianza'])}{extra}"
-        elif z["tipo"] == "externa":
+        elif z["tipo"] == "externa" and not z.get("color"):
             estilo = f"ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#4D4D4D;fontSize=11;fontColor={TEXTO};"
             label = f"<b>{esc(z['nombre'])}</b>{extra}"
+        elif z["tipo"] == "externa":
+            # Red externa con color propio (WIFI-EST): rectángulo discontinuo, red de la DTI que FW01 no enruta.
+            color = z["color"]
+            estilo = (f"rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor={aclarar(color, 0.75)};strokeColor={color};strokeWidth=2;"
+                      f"dashed=1;dashPattern=8 4;verticalAlign=top;align=left;spacingLeft=6;spacingTop=2;fontSize=11;fontColor={TEXTO};")
+            label = (f"<b>{esc(z['id'])}</b> · {esc(z['cidr'])} · confianza {esc(z['confianza'])} · "
+                     f"<i>red de la DTI, fuera de FW01</i>{extra}")
         else:
             color = z["color"]
             vlan = f"VLAN {z['vlan']} · " if z.get("vlan") is not None else ""
@@ -394,6 +418,25 @@ class Diagrama:
                      "regla_fw": f.get("regla_fw", ""), "tooltip": f"{etiqueta_flujo(f)}\n{f['proposito']}\n{f['proteccion']['detalle']}"}
             hechos.append(self.flecha(o, d, estilo, label, attrs))
         return hechos
+
+    def flecha_flujo(self, fid: str, src: str, dst: str, label: str | None = None, extra="", puntos=None) -> str:
+        """Una flecha del flujo F-nn entre dos celdas cualesquiera (p. ej. hacia la zona que contiene al destino)."""
+        f = self.x.flujos[fid]
+        estilo = ("edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=9;labelBackgroundColor=#FFFFFF;"
+                  f"strokeColor={FLECHA};fontColor={TEXTO};jumpStyle=gap;" + estilo_flujo(f) + extra)
+        attrs = {"celeris_id": fid, "celeris_tipo": "flujo", "etiqueta": etiqueta_flujo(f), "proposito": f["proposito"],
+                 "proteccion": f["proteccion"]["detalle"], "riesgo_residual": f.get("riesgo_residual", ""),
+                 "regla_fw": f.get("regla_fw", ""), "tooltip": f"{etiqueta_flujo(f)}\n{f['proposito']}\n{f['proteccion']['detalle']}"}
+        return self.flecha(src, dst, estilo, label or etiqueta_flujo(f), attrs, puntos=puntos)
+
+    def nota_d25(self, x0, y0, w, h=58):
+        """Nota visible de FIG-1.1 y FIG-5.1: la consola vive en el campus (D-25)."""
+        d25 = self.x.decisiones["D-25"]["decision"]
+        nube = [c for c in self.x.componentes.values() if "AWS" in c["zonas"] and c["tipo"] in ("aws_instancia", "aws_s3")
+                and c["estado"] != "temporal"]
+        return self.nota(x0, y0, w, h, f"<b>La consola no está en la nube: ver D-25</b> ({esc(d25)}). En AWS solo "
+                         + " y ".join(esc(c["id"]) for c in nube) + ".", {"celeris_rol": "nota_d25", "celeris_ref": "D-25"},
+                         color="#FFF8E1", borde="#1A1A1A", tam=11)
 
     def _resolver_nodo(self, crudo: str) -> str | None:
         if crudo in self.nodos:
@@ -506,19 +549,58 @@ def orden_inventario(x: Infra, ids) -> list[str]:
 
 
 # --------------------------------------------------------------------------------------------------
-# FIG-5.1 — disposición por zonas
+# Utilidades de disposición (v0.4)
 # --------------------------------------------------------------------------------------------------
-# filas de zonas: (zona, columnas, filas, ocupantes). Un ocupante «ID:interfaz» es una interfaz de otra zona.
+GRIS = "html=1;endArrow=none;strokeColor=#7F7F7F;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;"
+VIOLETA = "html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;fontSize=10;labelBackgroundColor=#FFFFFF;"
+TRUNK = "rounded=0;whiteSpace=wrap;html=1;fillColor=#4D4D4D;strokeColor=#1A1A1A;fontColor=#FFFFFF;fontSize=10;"
+
+
+def alto_texto(lineas: list[str], ancho: float, fuente: int = 10, extra: int = 26) -> int:
+    return extra + sum(int(fuente * 1.4) * lineas_estimadas(l, ancho - 14, fuente) for l in lineas)
+
+
+def vlans_fw(x: Infra) -> list[str]:
+    fw = x.componentes["FW01"]
+    return [str(x.zonas[i["zona"]]["vlan"]) for i in fw["ips"] if x.zonas[i["zona"]].get("vlan") is not None]
+
+
+def destino_ruta(x: Infra, d: str) -> str:
+    if d.startswith("supernet:"):
+        sid = d.split(":", 1)[1]
+        return next(s["cidr"] for s in x.inv["supernets"] if s["id"] == sid) + f" ({sid})"
+    return {"prefijo_s3": "prefijo de S3"}.get(d, d)
+
+
+SALTOS = {"internet_gateway": "Internet Gateway", "vgw": "VGW", "gateway_endpoint_s3": "Gateway Endpoint de S3"}
+
+
+def tablas_rutas(x: Infra) -> list[str]:
+    filas = []
+    for rt in x.inv["aws"]["tablas_de_rutas"]:
+        rutas = []
+        for r in rt["rutas"]:
+            salto = SALTOS.get(r["salto"], r["salto"].split(":", 1)[-1])
+            extra = " (solo en el simulacro)" if r.get("solo_en_simulacro") else (f" ({r['nota']})" if r.get("nota") else "")
+            rutas.append(f"{destino_ruta(x, r['destino'])} → {salto}{extra}")
+        filas.append(f"<b>{esc(rt['id'])}</b> ({esc(', '.join(rt['subredes']))}): " + esc("; ".join(rutas)))
+    return filas
+
+
+def frase_con(texto: str, clave: str) -> str:
+    return next((s.strip().rstrip(".") for s in re.split(r"(?<=[.;])\s", texto) if clave in s), "")
+
+
+# --------------------------------------------------------------------------------------------------
+# FIG-5.1 — topología general
+# --------------------------------------------------------------------------------------------------
+# filas de zonas: (y, [(zona, columnas, filas, ocupantes)]). La VLAN 30 agrupa los rangos y la infraestructura de LAB.
 FILAS_51 = [
-    (300, [("DMZ-HONEY", 1, 1, ["HNY01"]), ("DMZ-SVC", 2, 1, ["WAF01", "WEB01"]),
-           ("EDGE", 2, 1, ["EDGE01", "EDGE02"]), ("SECURITY", 2, 1, ["SIEM01", "IDS01"])]),
-    (470, [("LAB", 2, 2, ["LABCLI01", "PROBE01", "HNY02", "SW-ACC"]), ("LAB-TEST", 1, 1, ["KALI01"]),
-           ("SERVERS", 2, 2, ["CTRL01", "DB01", "OBS01", "SVC01"]), ("BACKUP", 1, 1, ["NAS01:respaldo"])]),
-    (734, [("MGMT", 4, 2, ["JMP01", "SW-CORE01", "BRK01", "ESX01", "IPMI01", "UPS01", "NAS01:gestion"]),
-           ("STORAGE", 2, 1, ["NAS01", "ESX01:vmk1"])]),
+    (520, [("DMZ-SVC", 1, 1, ["PORTAL01"]), ("DMZ-HONEY", 1, 1, ["HNY01"]), ("EDGE", 2, 1, ["EDGE01", "EDGE02"]),
+           ("SECURITY", 1, 1, ["SIEM01"]), ("SERVERS", 1, 1, ["CTRL01"])]),
+    (690, [("LAB", 3, 2, ["PCS-LAB", "SW-ACC", "ENC01", "LABCLI01", "KALI01", "HNY02"]),
+           ("MGMT", 3, 2, ["JMP01", "SW-CORE01", "BRK01", "ESX01", "IPMI01", "UPS01"])]),
 ]
-# Interfaz principal que se rotula en la caja de un componente con varias zonas (las demás van en su zona).
-IFACE_PRINCIPAL = {"NAS01": "almacenamiento", "ESX01": "vmk0"}
 
 
 def tam_zona(cols, filas):
@@ -527,50 +609,64 @@ def tam_zona(cols, filas):
 
 def fig_5_1(x: Infra) -> Diagrama:
     ids = set(componentes_de(x, "FIG-5.1"))
-    d = Diagrama(x, "FIG-5.1", 2290, 1260)
-    d.titulo(w=1720)
-    d.zona("INTERNET", 520, 62, 300, 84, "<br>ISP, orígenes web, ACME, feeds, S3")
-    fw = d.componente("FW01", 590, 172, w=220)
-    d.flecha(d.nodos["INTERNET"], fw, "html=1;endArrow=none;strokeColor=#4D4D4D;strokeWidth=2;fontSize=10;labelBackgroundColor=#FFFFFF;", "WAN")
-    trunk = d.caja(20, 268, 1440, 22, "rounded=0;whiteSpace=wrap;html=1;fillColor=#4D4D4D;strokeColor=#1A1A1A;fontColor=#FFFFFF;fontSize=10;",
-                   "<b>Trunk 802.1Q</b> FW01 ↔ SW-CORE01 (PG-FW-TRUNK): una subinterfaz .1 de FW01 por VLAN · la VLAN 70 no llega al firewall",
-                   {"celeris_rol": "trunk", "celeris_ref": "SW-CORE01"})
+    d = Diagrama(x, "FIG-5.1", 2290, 1300)
+    d.titulo(w=1710)
+    d.nota_d25(20, 62, 520, 52)
+    d.zona("INTERNET", 600, 62, 260, 80, "<br>orígenes web, ACME, feeds, S3")
+    d.zona("WIFI-EST", 20, 150, 430, 150, "")
+    wifi = d.componente("WIFI-EST", 30, 200, w=410)
+    fgt = d.componente("FGT-EXT", 600, 170, w=260)
+    d.flecha(d.nodos["INTERNET"], fgt, GRIS + "strokeColor=#4D4D4D;strokeWidth=2;", "WAN")
+    d.flecha(wifi, fgt, GRIS + "dashed=1;", "BYOD por el FortiGate")
+    fgt_c, fw_c = x.componentes["FGT-EXT"], x.componentes["FW01"]
+    ip_fgt = next(i["ip"] for i in fgt_c["ips"] if i["interfaz"] == "transito")
+    ip_fw = next(i["ip"] for i in fw_c["ips"] if i["interfaz"] == "wan")
+    tz = d.zona("TRANSITO", 480, 276, 500, 64, f"<br>FGT-EXT {ip_fgt} ↔ FW01 {ip_fw}")
+    fw = d.componente("FW01", 600, 360, w=260)
+    d.flecha(fgt, tz, GRIS + "strokeColor=#999999;strokeWidth=3;")
+    d.flecha(tz, fw, GRIS + "strokeColor=#999999;strokeWidth=3;")
+    on = x.inv["vpn"]["extremo_onpremise"]
+    d.nota(900, 150, 360, 96, f"<b>NAT 1:1 en FGT-EXT</b>: {esc(on['ip_publica'])} → {esc(on['ip_interna'])}<br>"
+           f"{esc(on['nat_t_nota'])}<br>{esc(frase_con(fgt_c['aporta'], 'ruta estática'))}",
+           {"celeris_rol": "nat", "celeris_ref": "FGT-EXT"}, tam=10)
+    trunk = d.caja(20, 476, 1440, 24, TRUNK,
+                   f"<b>Trunk 802.1Q</b> FW01 ↔ SW-CORE01: una subinterfaz .1 de FW01 por VLAN ({', '.join(vlans_fw(x))}) · "
+                   f"nativa {x.zonas['BLACKHOLE']['vlan']} (BLACKHOLE, sin uso)", {"celeris_rol": "trunk", "celeris_ref": "SW-CORE01"})
     d.flecha(fw, trunk, "html=1;endArrow=none;strokeColor=#4D4D4D;strokeWidth=3;")
     for fy, zonas in FILAS_51:
         zx = 20
         for zid, cols, filas, occ in zonas:
             zw, zh = tam_zona(cols, filas)
-            extra = " · <b>sin gateway, no enrutada</b>" if x.zonas[zid]["gateway"] is None else ""
-            d.zona(zid, zx, fy, zw, zh, extra)
+            d.zona(zid, zx, fy, zw, zh, f" · GW {x.zonas[zid]['gateway']}")
             for i, o in enumerate(occ):
-                if o.split(":")[0] not in ids:
+                if o not in ids:
                     continue
-                cx, cy = zx + PAD + (i % cols) * (W + GAP), fy + CAB + (i // cols) * (H + GAP)
-                if ":" in o:
-                    d.interfaz(o, cx, cy + (H - HP) // 2)
-                else:
-                    d.componente(o, cx, cy, solo_iface=IFACE_PRINCIPAL.get(o))
+                d.componente(o, zx + PAD + (i % cols) * (W + GAP), fy + CAB + (i // cols) * (H + GAP))
             zx += zw + 20
     # VTI y AWS (columna derecha)
-    d.componente("VTI1", 1060, 150, w=200, h=54, compacto=True)
-    d.componente("VTI2", 1060, 210, w=200, h=54, compacto=True)
+    d.componente("VTI1", 1000, 352, w=220, h=54, compacto=True)
+    d.componente("VTI2", 1000, 412, w=220, h=54, compacto=True)
     for v in ("VTI1", "VTI2"):
-        d.flecha(fw, d.nodos[v], "edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#7F7F7F;")
-    d.zona("AWS", 1480, 62, 250, 900, f"<br>{x.zonas['AWS']['cidr']}")
-    d.componente("VGW", 1495, 120, w=220)
-    d.grupo_aws("AWS-VPC", 1490, 222, 230, 728)
-    y = 262
-    for sid, occ in [("AWS-PUB-A", "NAT01"), ("AWS-PUB-B", None), ("AWS-APP-A", "EC2-SHIELD"), ("AWS-APP-B", "EC2-CTRLR"),
-                     ("AWS-DATA-A", None), ("AWS-DATA-B", None)]:
-        h = 130 if occ else 48
-        d.grupo_aws(sid, 1498, y, 214, h)
-        if occ:
-            d.componente(occ, 1505, y + 38, w=200)
-        y += h + 10
+        d.flecha(fw, d.nodos[v], "edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#7F7F7F;exitX=1;exitY=0.5;entryX=0;entryY=0.5;")
+    d.zona("AWS", 1480, 62, 250, 880, f"<br>{x.zonas['AWS']['cidr']}")
+    d.componente("VGW", 1495, 110, w=220)
+    d.grupo_aws("AWS-VPC", 1490, 214, 230, 410)
+    d.grupo_aws("AWS-PUB-A", 1498, 254, 214, 150)
+    d.componente("EC2-GW", 1505, 294, w=200)
+    d.grupo_aws("AWS-APP-A", 1498, 414, 214, 120)
+    d.nota(1505, 452, 200, 72, esc(x.componentes["AWS-APP-A"]["aporta_corto"]), {"celeris_rol": "nota", "celeris_ref": "AWS-APP-A"},
+           color="#FFFFFF", borde="#BBBBBB")
+    res = next(r for r in x.inv["reservas"] if r["dentro_de"] == "AWS-CELERIS")
+    d.nota(1498, 544, 214, 70, f"Reservado {esc(res['cidr'])}: {esc(res['descripcion'])}", {"celeris_rol": "nota"},
+           color="#FFFFFF", borde="#BBBBBB")
+    d.componente("S3", 1495, 660, w=220)
+    d.nota(1495, 754, 220, 90, f"Servicio regional, fuera de la VPC. Recibe el respaldo de CTRL01 por Internet "
+           f"({esc(x.inv['aws']['s3']['flujo'])}), no por la VPN.", {"celeris_rol": "nota", "celeris_ref": "S3"},
+           color="#FFFFFF", borde="#BBBBBB")
     tuneles(d)
-    alto_l = d.leyenda(20, 990, w=1440)
-    d.panel(1750, 10, 530, orden_inventario(x, d.presentes), max_si_falla=72)
-    d.alto = max(d.alto, 990 + alto_l + 20)
+    alto_l = d.leyenda(20, 960, w=1440, flujos=False)
+    alto_p = d.panel(1750, 10, 530, orden_inventario(x, d.presentes), max_si_falla=72)
+    d.alto = max(d.alto, 960 + alto_l + 20, 10 + alto_p + 20)
     return d
 
 
@@ -584,7 +680,7 @@ def tuneles(d: Diagrama, grosor_activo=3):
             continue
         activo = t["rol"] == "activo"
         extra = " · prepending" if t.get("bgp_as_path_prepending") else ""
-        label = f"{t['id']} {'ACTIVO' if activo else 'RESPALDO'} · IPsec{extra}"
+        label = f"{t['id']} {'ACTIVO' if activo else 'RESPALDO'} · IPsec + BGP{extra}"
         estilo = (f"edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=9;labelBackgroundColor=#FFFFFF;fontColor={TEXTO};"
                   f"strokeColor={'#8C4FFF' if activo else '#7F7F7F'};strokeWidth={grosor_activo if activo else 1.5};"
                   f"endArrow=none;startArrow=none;exitX=1;exitY=0.5;entryX=0;entryY={0.35 if activo else 0.8};")
@@ -598,12 +694,11 @@ def tuneles(d: Diagrama, grosor_activo=3):
 # Mismas filas, en la misma posición, en las dos figuras. Fila «zona» = la zona completa como extremo.
 FILAS_FLUJO = [
     ("INTERNET", []), ("PERIMETRO", ["FW01"]),
-    ("DMZ-HONEY", ["HNY01"]), ("DMZ-SVC", ["WAF01", "WEB01"]),
-    ("LAB", ["LABCLI01", "PROBE01", "HNY02"]), ("LAB-TEST", ["KALI01"]),
-    ("EDGE", ["EDGE01", "EDGE02"]), ("SERVERS", ["CTRL01", "DB01", "OBS01", "SVC01"]),
-    ("SECURITY", ["SIEM01", "IDS01"]), ("BACKUP", ["NAS01:respaldo"]), ("STORAGE", ["NAS01", "ESX01:vmk1"]),
-    ("MGMT", ["JMP01", "SW-CORE01", "ESX01", "IPMI01", "UPS01", "NAS01:gestion"]),
-    ("AWS", ["EC2-SHIELD", "EC2-CTRLR"]),
+    ("DMZ-HONEY", ["HNY01"]), ("DMZ-SVC", ["PORTAL01"]), ("WIFI-EST", ["WIFI-EST"]),
+    ("LAB", ["PCS-LAB", "ENC01", "LABCLI01", "KALI01", "HNY02"]),
+    ("EDGE", ["EDGE01", "EDGE02"]), ("SERVERS", ["CTRL01"]), ("SECURITY", ["SIEM01"]),
+    ("MGMT", ["JMP01", "SW-CORE01", "ESX01", "IPMI01", "UPS01"]),
+    ("AWS", ["EC2-GW", "S3"]),
 ]
 RP = 30            # alto de fila
 X_COL0 = 390       # primera columna de flujo
@@ -618,7 +713,7 @@ def fig_5_5(x: Infra, fig: str) -> Diagrama:
     x_fin = X_COL0 + n_max * WC + 10          # mismo ancho en ambas figuras
     d = Diagrama(x, fig, x_fin + 520, 1500)
     d.titulo(w=x_fin - 20)
-    # filas
+    otra = "FIG-5.5b" if fig == "FIG-5.5a" else "FIG-5.5a"
     fila_y: dict[str, float] = {}
     y = Y_FILAS
     for zid, occ in FILAS_FLUJO:
@@ -632,35 +727,31 @@ def fig_5_5(x: Infra, fig: str) -> Diagrama:
             color, fill = z["color"], aclarar(z["color"], 0.86)
         vlan = f"VLAN {z['vlan']} · " if z.get("vlan") is not None else ""
         cidr = f" · {z['cidr']}" if z.get("cidr") else ""
-        gw = " · sin gateway" if zid == "STORAGE" else ""
-        etiqueta = f"<b>{vlan}{esc(zid)}</b>{cidr}{gw} <i>(toda la zona)</i>"
-        nid = d.caja(20, y, x_fin - 20, alto, f"rounded=0;whiteSpace=wrap;html=1;fillColor={fill};strokeColor={color};strokeWidth=2;"
-                     f"align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor={TEXTO};", etiqueta,
-                     {"celeris_id": zid, "celeris_tipo": "zona", "cidr": z.get("cidr"), "confianza": z["confianza"],
-                      "tooltip": f"{zid}: {z['proposito']}"})
+        etiqueta = f"<b>{vlan}{esc(zid)}</b>{cidr} <i>(toda la zona)</i>"
+        estilo = (f"rounded=0;whiteSpace=wrap;html=1;fillColor={fill};strokeColor={color};strokeWidth=2;"
+                  f"align=left;verticalAlign=top;spacingLeft=6;spacingTop=6;fontSize=10;fontColor={TEXTO};")
+        # Una zona con el mismo ID que un componente (WIFI-EST) solo lleva celeris_id donde el componente se dibuja.
+        if zid in x.componentes and zid not in ids:
+            nid = d.caja(20, y, x_fin - 20, alto, estilo, etiqueta)
+        else:
+            nid = d.caja(20, y, x_fin - 20, alto, estilo, etiqueta,
+                         {"celeris_id": zid, "celeris_tipo": "zona", "cidr": z.get("cidr"), "confianza": z["confianza"],
+                          "tooltip": f"{zid}: {z['proposito']}"})
+            d.zonas_dibujadas.append(zid)
         d.nodos[zid] = nid
-        d.zonas_dibujadas.append(zid)
         fila_y[zid] = y + RP / 2 + 2
         for k, o in enumerate(occ):
             fy = y + RP * (k + 1) + 2
             fila_y[o] = fy + RP / 2
-            # franja alterna para leer la fila de lado a lado
             if k % 2 == 0:
                 d.caja(24, fy, x_fin - 28, RP, "rounded=0;html=1;fillColor=#FFFFFF;strokeColor=none;opacity=55;")
-            cid = o.split(":")[0]
-            if cid in ids:
-                if ":" in o:
-                    d.interfaz(o, 36, fy + 2, w=X_COL0 - 50, h=RP - 4)
-                else:
-                    d.componente(cid, 36, fy + 2, w=X_COL0 - 50, h=RP - 4, compacto=True, una_linea=True,
-                                 solo_iface=IFACE_PRINCIPAL.get(cid))
+            if o in ids:
+                d.componente(o, 36, fy + 2, w=X_COL0 - 50, h=RP - 4, compacto=True, una_linea=True)
             else:
-                otra = "FIG-5.5b" if fig == "FIG-5.5a" else "FIG-5.5a"
                 d.caja(36, fy + 2, X_COL0 - 50, RP - 4, "rounded=1;html=1;fillColor=none;strokeColor=#BBBBBB;dashed=1;dashPattern=2 2;"
                        "align=left;spacingLeft=6;fontSize=9;fontColor=#7F7F7F;", f"{esc(o)} · sin flujos aquí (ver {otra})")
         y += alto + 4
     y_fin = y
-    # columnas de flujo
     puertos: dict[tuple[str, str], str] = {}
 
     def puerto(fid, fila, xc, origen):
@@ -677,9 +768,7 @@ def fig_5_5(x: Infra, fig: str) -> Diagrama:
         return pid
 
     def fila_de(crudo: str) -> str:
-        if crudo in fila_y:
-            return crudo
-        return crudo.split(":")[0]
+        return crudo if crudo in fila_y else crudo.split(":")[0]
 
     for i, fid in enumerate(flujos):
         f = x.flujos[fid]
@@ -690,12 +779,9 @@ def fig_5_5(x: Infra, fig: str) -> Diagrama:
                f"<b>{esc(etiqueta_flujo(f)).replace(',', ',&#8203;')}</b><br><i>{esc(f['proposito'])}</i>",
                {"celeris_rol": "etiqueta_flujo", "celeris_ref": fid, "etiqueta": etiqueta_flujo(f)})
         d.linea_libre((xc, Y_FILAS - 6), (xc, y_fin), "html=1;endArrow=none;strokeColor=#BBBBBB;strokeWidth=1;dashed=1;dashPattern=1 3;")
+        est = estilo_flujo(f).replace("strokeWidth=1.5", "strokeWidth=2")
         if f["accion"] == "bloquear":
-            est = "dashed=1;dashPattern=1 4;strokeWidth=2;endArrow=cross;endFill=0;endSize=10;"
-        elif f["proteccion"]["tipo"] in CIFRADOS:
-            est = "strokeWidth=2;endArrow=block;endFill=1;"
-        else:
-            est = "dashed=1;dashPattern=8 4;strokeWidth=2;endArrow=block;endFill=1;"
+            est += "endSize=10;"
         estilo = f"html=1;noLabel=1;strokeColor={FLECHA};" + est
         origenes = sorted({fila_de(o) for o in f["origen"]}, key=lambda r: fila_y[r])
         destinos = sorted({fila_de(t) for t in f["destino"]}, key=lambda r: fila_y[r])
@@ -713,7 +799,11 @@ def fig_5_5(x: Infra, fig: str) -> Diagrama:
                 d.flecha(puertos[(fid, arriba[0])], dst, estilo, etiqueta_flujo(f), attrs)
             if abajo:
                 d.flecha(puertos[(fid, abajo[-1])], dst, estilo, etiqueta_flujo(f), attrs)
-    # leyenda y panel a la derecha
+    if "S3" in ids:
+        s3 = x.inv["aws"]["s3"]
+        d.nota(20, y_fin + 6, x_fin - 20, 24, f"S3 ({esc(s3['bucket'])}) recibe {esc(s3['flujo'])} por Internet, no por la VPN: "
+               f"el inventario lo modela como {esc(s3['flujo'])} → INTERNET. {esc(s3['cifrado'])}.", {"celeris_rol": "nota", "celeris_ref": "S3"})
+        y_fin += 34
     xp = x_fin + 10
     alto_p = d.panel(xp, 10, 500, orden_inventario(x, d.presentes), max_si_falla=62)
     alto_l = d.leyenda(xp, 10 + alto_p + 10, w=500, carriles=True)
@@ -726,85 +816,96 @@ def fig_5_5(x: Infra, fig: str) -> Diagrama:
 # --------------------------------------------------------------------------------------------------
 def fig_5_2(x: Infra) -> Diagrama:
     ids = set(componentes_de(x, "FIG-5.2"))
-    d = Diagrama(x, "FIG-5.2", 2290, 1400)
+    d = Diagrama(x, "FIG-5.2", 2290, 1500)
     d.titulo(w=1740)
-    fw = x.componentes["FW01"]
-    wan = next(i for i in fw["ips"] if i["interfaz"] == "wan")
-    d.zona("INTERNET", 20, 62, 240, 96, f"<br>ISP · WAN {wan['ip']}")
-    d.componente("FW01", 320, 68, w=240)
+    fgt_c, fw = x.componentes["FGT-EXT"], x.componentes["FW01"]
+    wan_pub = next(i["ip"] for i in fgt_c["ips"] if i["interfaz"] == "wan")
+    d.zona("INTERNET", 20, 62, 220, 96, f"<br>ISP · IP pública {wan_pub}")
+    d.componente("FGT-EXT", 270, 68, w=250)
+    t = x.zonas["TRANSITO"]
+    d.zona("TRANSITO", 550, 62, 340, 96, f"<br>GW {t['gateway']} (FGT-EXT) · {t['hosts_utiles']} hosts útiles<br>"
+           f"FW01 {next(i['ip'] for i in fw['ips'] if i['interfaz'] == 'wan')}")
+    d.componente("FW01", 920, 68, w=250)
+    d.flecha(d.nodos["INTERNET"], d.nodos["FGT-EXT"], GRIS + "strokeColor=#4D4D4D;strokeWidth=2;", "WAN")
+    d.flecha(d.nodos["FGT-EXT"], d.nodos["TRANSITO"], GRIS + "strokeColor=#999999;strokeWidth=3;")
+    d.flecha(d.nodos["TRANSITO"], d.nodos["FW01"], GRIS + "strokeColor=#999999;strokeWidth=3;")
     filas = [f"{esc(i['interfaz'])} · {esc(i['ip'])} · {esc(i['zona'])}" for i in fw["ips"]]
-    d.nota(1180, 62, 290, 20 + 13 * len(filas), "<b>FW01: subinterfaces (gateway .1 de cada VLAN)</b><br>" + "<br>".join(filas),
+    d.nota(1196, 62, 290, 22 + 13 * len(filas), "<b>FW01: interfaces (gateway .1 de cada VLAN)</b><br>" + "<br>".join(filas),
            {"celeris_rol": "tabla", "celeris_ref": "FW01"})
-    d.flecha(d.nodos["INTERNET"], d.nodos["FW01"], "html=1;endArrow=none;strokeColor=#4D4D4D;strokeWidth=2;fontSize=10;labelBackgroundColor=#FFFFFF;", "WAN")
-    vlans = [str(x.zonas[i["zona"]]["vlan"]) for i in fw["ips"] if x.zonas[i["zona"]].get("vlan") is not None]
-    nativa = x.zonas["BLACKHOLE"]["vlan"]
-    est_trunk = "rounded=0;whiteSpace=wrap;html=1;fillColor=#4D4D4D;strokeColor=#1A1A1A;fontColor=#FFFFFF;fontSize=10;"
-    trunk = d.caja(20, 200, 1740, 24, est_trunk,
-                   f"<b>Trunk 802.1Q</b> FW01 ↔ SW-CORE01 (PG-FW-TRUNK) · VLAN permitidas {', '.join(vlans)} · nativa {nativa} (BLACKHOLE, sin uso) · "
-                   "la VLAN 70 no viaja al firewall", {"celeris_rol": "trunk", "celeris_ref": "SW-CORE01"})
-    trunk2 = d.caja(366, 480, 1394, 20, est_trunk, "<b>Trunk 802.1Q</b> (continuación, mismo enlace) · VLAN 50, 60, 71",
-                    {"celeris_rol": "trunk", "celeris_ref": "SW-CORE01"})
-    d.flecha(trunk, trunk2, "edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#4D4D4D;strokeWidth=3;exitX=1;exitY=0.5;entryX=1;entryY=0.5;",
-             puntos=[(1775, 212), (1775, 490)])
+    d.zona("WIFI-EST", 1510, 62, 250, 176, "<br>Entra por FGT-EXT; FW01 solo recibe F31 y F32")
+    d.componente("WIFI-EST", 1520, 152, w=230, h=78, compacto=True)
+    trunk = d.caja(20, 246, 1740, 24, TRUNK,
+                   f"<b>Trunk 802.1Q</b> FW01 ↔ SW-CORE01 · VLAN permitidas {', '.join(vlans_fw(x))} · "
+                   f"nativa {x.zonas['BLACKHOLE']['vlan']} (BLACKHOLE, sin uso)", {"celeris_rol": "trunk", "celeris_ref": "SW-CORE01"})
     d.flecha(d.nodos["FW01"], trunk, "edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#4D4D4D;strokeWidth=3;")
     BW, BH = 158, 56
-    disp = [
-        ("MGMT", 20, 248, 2, ["JMP01", "SW-CORE01", "BRK01", "ESX01", "IPMI01", "UPS01", "NAS01:gestion"], trunk),
-        ("SERVERS", 366, 248, 2, ["CTRL01", "DB01", "OBS01", "SVC01"], trunk),
-        ("LAB", 712, 248, 2, ["LABCLI01", "PROBE01", "HNY02", "SW-ACC"], trunk),
-        ("LAB-TEST", 1058, 248, 1, ["KALI01"], trunk),
-        ("DMZ-SVC", 1240, 248, 2, ["WAF01", "WEB01"], trunk),
-        ("DMZ-HONEY", 1586, 248, 1, ["HNY01"], trunk),
-        ("SECURITY", 366, 520, 2, ["SIEM01", "IDS01"], trunk2),
-        ("EDGE", 712, 520, 2, ["EDGE01", "EDGE02"], trunk2),
-        ("STORAGE", 1058, 520, 2, ["ESX01:vmk1", "NAS01"], None),
-        ("BACKUP", 1404, 520, 1, ["NAS01:respaldo"], trunk2),
-    ]
-    for zid, zx, zy, cols, occ, bus in disp:
+    disp = [("MGMT", 20, 2, ["JMP01", "SW-CORE01", "ESX01", "IPMI01", "UPS01"]), ("SERVERS", 384, 1, ["CTRL01"]),
+            ("DMZ-SVC", 582, 1, ["PORTAL01"]), ("DMZ-HONEY", 780, 1, ["HNY01"]), ("SECURITY", 978, 1, ["SIEM01"]),
+            ("EDGE", 1176, 2, ["EDGE01", "EDGE02"])]
+    zy = 300
+    for zid, zx, cols, occ in disp:
         z = x.zonas[zid]
-        occ = [o for o in occ if o.split(":")[0] in ids]
-        filas_z = (len(occ) + cols - 1) // cols
+        occ = [o for o in occ if o in ids]
         zw = PAD + cols * (BW + 8) + 2
-        zh = 48 + filas_z * (BH + 8) + 4
-        gw = f"GW {z['gateway']}" if z["gateway"] else "<b>sin gateway, no enrutada</b>"
-        zc = d.zona(zid, zx, zy, zw, zh, f"<br>{gw} · {z['hosts_utiles']} hosts útiles")
+        zh = 62 + ((len(occ) + cols - 1) // cols) * (BH + 8) + 4
+        zc = d.zona(zid, zx, zy, zw, zh, f"<br>GW {z['gateway']} · {z['hosts_utiles']} hosts")
         for i, o in enumerate(occ):
-            cx, cy = zx + PAD + (i % cols) * (BW + 8), zy + 48 + (i // cols) * (BH + 8)
-            if ":" in o:
-                d.interfaz(o, cx, cy + 6, w=BW, h=HP)
-            else:
-                d.componente(o, cx, cy, w=BW, h=BH, compacto=True, solo_iface=IFACE_PRINCIPAL.get(o))
-        if bus and z["gateway"]:
-            d.flecha(zc, bus, "edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#4D4D4D;strokeWidth=1.5;fontSize=9;"
-                     "labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=0;", f"VLAN {z['vlan']} · .1")
+            d.componente(o, zx + PAD + (i % cols) * (BW + 8), zy + 62 + (i // cols) * (BH + 8), w=BW, h=BH, compacto=True)
+        d.flecha(zc, trunk, "edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#4D4D4D;strokeWidth=1.5;fontSize=9;"
+                 "labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=0;", f"VLAN {z['vlan']} · .1")
+    pac = x.inv["servicios_base"]["pac"]
+    d.nota(1530, 300, 200, 150, f"<b>PAC</b> {esc(pac['url'])}<br>servido por {esc(pac['servido_por'])}: "
+           + ", ".join(f"{esc(r['componente'])} {esc(r['ip'])}" for r in pac["registros_a"]) + f"<br>{esc(pac['distribucion'])}",
+           {"celeris_rol": "pac", "celeris_ref": "EDGE01"}, borde="#4D4D4D", tam=9)
+    # VLAN 30: los 10 rangos /26, la reserva y el rango de infraestructura
+    rl, lab = x.inv["rangos_lab"], x.zonas["LAB"]
+    ly = 580
+    zc = d.zona("LAB", 20, ly, 1740, 250, f"<br>GW {lab['gateway']} · {lab['hosts_utiles']} hosts · "
+                f"{esc(primera_frase(x.inv['servicios_base']['dhcp']['diseno'], 120))} · el nodo solo acepta los rangos habilitados "
+                "(allowed_clients)")
+    d.flecha(zc, trunk, "edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#4D4D4D;strokeWidth=1.5;fontSize=9;"
+             "labelBackgroundColor=#FFFFFF;exitX=0.993;exitY=0;entryX=0.993;entryY=1;", f"VLAN {lab['vlan']} · .1")
+    rangos = rl["laboratorios"] + [rl["reserva"]]
+    rw = (1720 - 6 * (len(rangos) - 1)) // len(rangos)
+    for i, r in enumerate(rangos):
+        nombre = r["id"] if r in rl["laboratorios"] else f"Reserva ({r['descripcion']})"
+        d.nota(30 + i * (rw + 6), ly + 54, rw, 44, f"<b>{esc(nombre)}</b><br>{esc(r['cidr'])} · {r['hosts_utiles']} hosts",
+               {"celeris_rol": "rango_lab", "celeris_ref": r["id"]}, color="#FFFFFF" if r in rl["laboratorios"] else "#EEEEEE",
+               borde=lab["color"], tam=9)
+    inf = rl["infraestructura"]
+    iw = PAD + len(inf["componentes"]) * (BW + 8) + 2
+    d.nota(30, ly + 108, iw, 132, f"<b>{esc(inf['id'])}</b> · {esc(inf['cidr'])} · infraestructura de laboratorio",
+           {"celeris_rol": "rango_lab", "celeris_ref": inf["id"]}, color="#FFFFFF", borde=lab["color"], tam=10)
+    for i, o in enumerate(c for c in inf["componentes"] if c in ids):
+        d.componente(o, 30 + PAD + i * (BW + 8), ly + 140, w=BW, h=BH + 20, compacto=True)
+    d.componente("PCS-LAB", 30 + iw + 20, ly + 140, w=330, h=BH + 20, compacto=True)
+    d.componente("SW-ACC", 30 + iw + 370, ly + 140, w=260, h=BH + 20, compacto=True)
     # AWS: VPC, subredes y tablas de rutas
-    ya = 700
-    d.zona("AWS", 20, ya, 580, 450, "")
-    d.grupo_aws("AWS-VPC", 32, ya + 34, 556, 406)
-    ocupa = {"AWS-PUB-A": "NAT01", "AWS-APP-A": "EC2-SHIELD", "AWS-APP-B": "EC2-CTRLR"}
-    rejilla = [("AWS-PUB-A", 0, 0), ("AWS-APP-A", 1, 0), ("AWS-DATA-A", 2, 0), ("AWS-PUB-B", 0, 1), ("AWS-APP-B", 1, 1), ("AWS-DATA-B", 2, 1)]
-    for sid, col, fila in rejilla:
-        sx, sy = 42 + col * 180, ya + 70 + fila * 116
-        d.grupo_aws(sid, sx, sy, 172, 108)
-        if sid in ocupa and ocupa[sid] in ids:
-            d.componente(ocupa[sid], sx + 6, sy + 44, w=160, h=BH, compacto=True)
-    rt = [esc(x.componentes["AWS-PUB-A"]["aporta"]), esc(x.componentes["AWS-APP-A"]["aporta"]),
-          "AWS-APP-B: " + esc(x.componentes["AWS-APP-B"]["aporta"]),
-          f"Reservado: {esc(next(r['cidr'] for r in x.inv['reservas'] if r['id'] == 'RES-AWS-CRECIMIENTO'))} (crecimiento)"]
-    d.nota(42, ya + 306, 532, 124, "<b>Tablas de rutas de la VPC</b> (texto del inventario; IGW y tablas sin ID: CI-13)<br>" + "<br>".join(rt),
-           {"celeris_rol": "tablas_rutas", "celeris_ref": "AWS-VPC"}, tam=10)
+    ya = 860
+    rt = tablas_rutas(x)
+    res = next(r for r in x.inv["reservas"] if r["dentro_de"] == "AWS-CELERIS")
+    rt.append(f"Reservado: {esc(res['cidr'])} ({esc(res['descripcion'])})")
+    h_rt = alto_texto(rt, 536)
+    d.zona("AWS", 20, ya, 580, 254 + h_rt, "")
+    d.grupo_aws("AWS-VPC", 32, ya + 34, 556, 210 + h_rt)
+    d.grupo_aws("AWS-PUB-A", 42, ya + 70, 260, 120)
+    d.componente("EC2-GW", 52, ya + 112, w=240, h=BH + 10, compacto=True)
+    d.grupo_aws("AWS-APP-A", 314, ya + 70, 264, 120)
+    d.nota(324, ya + 112, 244, 66, esc(x.componentes["AWS-APP-A"]["aporta_corto"]), {"celeris_rol": "nota", "celeris_ref": "AWS-APP-A"},
+           color="#FFFFFF", borde="#BBBBBB")
+    d.nota(42, ya + 200, 536, h_rt, "<b>Tablas de rutas de la VPC</b><br>" + "<br>".join(rt), {"celeris_rol": "tablas_rutas", "celeris_ref": "AWS-VPC"}, tam=10)
     # Resumen zona × zona (matriz_esperada)
     orden_m = x.orden_matriz
     celdas = x.matriz_esperada()
-    cw, ch, mx, my = 50, 24, 620, 726
-    d.nota(mx, ya, 12 * cw + 92, 24, "<b>Resumen zona × zona</b> (fila = origen, columna = destino; ✔ permitido, ✖ denegado; detalle en el Anexo A)",
+    cw, ch, mx, my = 52, 24, 620, ya + 26
+    d.nota(mx, ya, len(orden_m) * cw + 92, 24, "<b>Resumen zona × zona</b> (fila = origen, columna = destino; ✔ permitido, ✖ denegado; detalle en el Anexo A)",
            {"celeris_rol": "matriz"}, color="#FFFFFF", borde="#FFFFFF", tam=10)
-    abrev = {"SERVERS": "SRV", "LAB-TEST": "L-TST", "DMZ-SVC": "D-SVC", "DMZ-HONEY": "D-HNY", "SECURITY": "SEC", "STORAGE": "STOR",
-             "BACKUP": "BKP", "INTERNET": "INET"}
+    abrev = {"SERVERS": "SRV", "WIFI-EST": "WIFI", "DMZ-SVC": "D-SVC", "DMZ-HONEY": "D-HNY", "SECURITY": "SEC", "INTERNET": "INET"}
     celda_txt = f"rounded=0;html=1;whiteSpace=wrap;fontSize=9;fontColor={TEXTO};strokeColor=#BBBBBB;align=center;verticalAlign=middle;"
     d.caja(mx, my, 92, ch, celda_txt + "fillColor=#EEEEEE;", "<b>origen \\ destino</b>")
     for j, zd in enumerate(orden_m):
         d.caja(mx + 92 + j * cw, my, cw, ch, celda_txt + "fillColor=#EEEEEE;", f"<b>{abrev.get(zd, zd)}</b>")
+    hay_pendiente = False
     for i, zo in enumerate(orden_m):
         col = x.zonas[zo].get("color")
         d.caja(mx, my + (i + 1) * ch, 92, ch, celda_txt + f"fillColor={aclarar(col, 0.8) if col else '#EEEEEE'};", f"<b>{zo}</b>")
@@ -819,155 +920,164 @@ def fig_5_2(x: Infra) -> Diagrama:
                 txt, fill = "—", "#DDDDDD"
             if c.get("pendiente"):
                 txt += "*"
+                hay_pendiente = True
             d.caja(mx + 92 + j * cw, my + (i + 1) * ch, cw, ch, celda_txt + f"fillColor={fill};", txt,
                    {"celeris_rol": "celda", "par": f"{zo}>{zd}", "estado": c["estado"], "flujos": fl})
-    d.nota(mx, my + 13 * ch + 4, 12 * cw + 92, 34, "* observación abierta en CAMBIOS-INVENTARIO.md (CI-03…CI-07) · «F…»: varios flujos (ver Anexo A) · "
-           "— : intra-zona (capa 2) o no aplica", {"celeris_rol": "nota"}, color="#FFFFFF", borde="#FFFFFF", tam=9)
+    nota_m = "«F…»: varios flujos (ver Anexo A) · —: intra-zona o no aplica · F2 (DNS y NTP hacia FW01) no se repite"
+    if hay_pendiente:
+        nota_m = "* observación abierta en CAMBIOS-INVENTARIO.md · " + nota_m
+    yme = my + (len(orden_m) + 1) * ch + 4
+    d.nota(mx, yme, len(orden_m) * cw + 92, 34, nota_m, {"celeris_rol": "nota"}, color="#FFFFFF", borde="#FFFFFF", tam=9)
     # Ruteo y servicios base
     vpn = x.inv["vpn"]
     on, aws = vpn["extremo_onpremise"], vpn["extremo_aws"]
     ruteo = [
-        f"0.0.0.0/0 → ISP por la WAN {wan['ip']} (salto del ISP no definido: CI-30)",
-        f"{', '.join(aws['redes_anunciadas'])} → AWS por BGP (VTI1 activo, VTI2 respaldo) · ASN {on['asn']} ↔ {aws['asn']}",
-        f"FW01 anuncia {', '.join(on['redes_anunciadas'])} (futuro {on['redes_anunciadas_futuro']}; CI-31)",
-        "Entre VLAN: FW01 router-on-a-stick, deny-all con registro",
-        f"VLAN {x.zonas['STORAGE']['vlan']} {x.zonas['STORAGE']['cidr']}: sin gateway, no enrutada",
+        f"FW01: 0.0.0.0/0 → FGT-EXT {t['gateway']} (red de tránsito {t['cidr']})",
+        f"FW01: {', '.join(aws['redes_anunciadas'])} → AWS por BGP (VTI1 activo, VTI2 respaldo) · ASN {on['asn']} ↔ {aws['asn']}",
+        f"FW01 anuncia {', '.join(on['redes_anunciadas'])} (futuro {on['redes_anunciadas_futuro']})",
+        "Entre VLAN: FW01 con una subinterfaz .1 por VLAN; deny-all con registro",
+        f"FGT-EXT: {frase_con(fgt_c['aporta'], 'ruta estática')}",
     ]
-    d.nota(1312, ya, 448, 22 + 15 * len(ruteo) + 8, "<b>Ruteo</b><br>" + "<br>".join(esc(r) for r in ruteo),
+    xr, wr = 1250, 510
+    hr = alto_texto(ruteo, wr)
+    d.nota(xr, ya, wr, hr, "<b>Ruteo</b><br>" + "<br>".join(esc(r) for r in ruteo),
            {"celeris_rol": "ruteo", "celeris_ref": "FW01"}, borde="#1A1A1A", tam=10)
     sb = x.inv["servicios_base"]
+    dns, ntp = sb["dns"], sb["ntp"]
     serv = [
-        f"DHCP: pools por VLAN en FW01 o DHCP existente de la DTI [S-14]; {', '.join(sb['dhcp']['controles'])}",
-        f"DNS primario: {sb['dns']['primario']['componente']} {sb['dns']['primario']['ip']} ({sb['dns']['primario']['software']}, DNSSEC)",
-        f"DNS secundario: {sb['dns']['secundario']['componente']} ({sb['dns']['secundario']['ip']})",
-        f"PAC: {sb['pac']['url']} → " + ", ".join(f"{r['componente']} {r['ip']}" for r in sb['pac']['registros_a']),
-        f"NTP: {sb['ntp']['servidor']['componente']} ({sb['ntp']['servidor']['software']}); hacia arriba {sb['ntp']['hacia_arriba']}",
+        f"DHCP: {primera_frase(sb['dhcp']['diseno'], 110)}; {', '.join(sb['dhcp']['controles'])}",
+        f"DNS: {dns['servidor']['componente']} ({dns['servidor']['software']}, DNSSEC) en la {dns['servidor']['ip']}; "
+        f"hacia arriba {dns['hacia_arriba']}",
+        f"NTP: {ntp['servidor']['componente']} ({ntp['servidor']['software']}); clientes {ntp['clientes']}; hacia arriba {ntp['hacia_arriba']}",
+        f"PAC: {pac['url']} → " + ", ".join(f"{r['componente']} {r['ip']}" for r in pac["registros_a"]),
         f"IPv6: {sb['ipv6']['postura']} ({', '.join(sb['ipv6']['controles'])})",
-        f"DNS cifrado: {sb['dns_cifrado']['dot']}",
+        f"DNS cifrado: {sb['dns_cifrado']['dot']}; {sb['dns_cifrado']['doh']}",
+        f"Wi-Fi: {primera_frase(sb['wifi']['diseno'], 150)}",
     ]
-    d.nota(1312, ya + 130, 448, 22 + 15 * len(serv) + 44, "<b>Servicios base</b><br>" + "<br>".join(esc(s) for s in serv),
+    hs = alto_texto(serv, wr)
+    d.nota(xr, ya + hr + 10, wr, hs, "<b>Servicios base</b> (D-28)<br>" + "<br>".join(esc(s) for s in serv),
            {"celeris_rol": "servicios_base"}, borde="#1A1A1A", tam=10)
-    alto_l = d.leyenda(20, 1170, w=1740, flujos=False)
-    d.panel(1780, 10, 500, orden_inventario(x, d.presentes), max_si_falla=68)
-    d.alto = max(d.alto, 1170 + alto_l + 20)
+    yl = max(ya + 264 + h_rt, yme + 44, ya + hr + 10 + hs + 10)
+    alto_l = d.leyenda(20, yl, w=1740, flujos=False)
+    alto_p = d.panel(1780, 10, 500, orden_inventario(x, d.presentes), max_si_falla=68)
+    d.alto = max(yl + alto_l + 20, 10 + alto_p + 20)
     return d
 
 
 # --------------------------------------------------------------------------------------------------
 # FIG-5.3 — seguridad y zonas
 # --------------------------------------------------------------------------------------------------
+# Filas de arriba abajo: lo expuesto, el perímetro y las zonas internas de menor a mayor confianza.
+BANDAS_53 = [
+    [("INTERNET", []), ("AWS", ["EC2-GW"])],
+    [("PERIMETRO", ["FGT-EXT", "FW01", "VTI1", "VTI2"])],
+    [("DMZ-HONEY", ["HNY01"]), ("WIFI-EST", ["WIFI-EST"]), ("DMZ-SVC", ["PORTAL01"])],
+    [("LAB", ["PCS-LAB", "SW-ACC", "ENC01", "LABCLI01", "KALI01", "HNY02"])],
+    [("EDGE", ["EDGE01", "EDGE02"]), ("SERVERS", ["CTRL01"]), ("SECURITY", ["SIEM01"])],
+    [("MGMT", ["JMP01", "SW-CORE01", "BRK01", "ESX01", "IPMI01", "UPS01"])],
+]
+H53 = H + 98
+
+
 def fig_5_3(x: Infra) -> Diagrama:
     ids = set(componentes_de(x, "FIG-5.3"))
-    d = Diagrama(x, "FIG-5.3", 2290, 1300)
+    d = Diagrama(x, "FIG-5.3", 2290, 1700)
     d.titulo(w=1740)
-    bandas = [
-        ("INTERNET", [], []),
-        ("PERIMETRO", ["FW01", "VTI1", "VTI2"], []),
-        ("DMZ-HONEY", ["HNY01"], [("DMZ-SVC", ["WAF01", "WEB01"])]),
-        ("LAB", ["LABCLI01", "PROBE01", "HNY02", "SW-ACC"], [("LAB-TEST", ["KALI01"])]),
-        ("EDGE", ["EDGE01", "EDGE02"], []),
-        ("SERVERS", ["CTRL01", "DB01", "OBS01", "SVC01"], [("SECURITY", ["SIEM01", "IDS01"])]),
-        ("BACKUP", ["NAS01:respaldo"], [("STORAGE", ["NAS01", "ESX01:vmk1"])]),
-        ("MGMT", ["JMP01", "SW-CORE01", "BRK01", "ESX01", "IPMI01", "UPS01", "NAS01:gestion"], []),
-    ]
     am_por_comp: dict[str, list[str]] = {}
     for am in x.amenazas.values():
         punto = next((c for c in am["componentes"] if c in ids), None)
         if punto:
             am_por_comp.setdefault(punto, []).append(am["id"])
     d.caja(20, 62, 1400, 22, f"text;html=1;align=left;fontSize=11;fontColor={TEXTO};",
-           "<b>De menor a mayor confianza</b> (arriba: Internet, confianza Nula → abajo: MGMT, confianza Máxima). "
-           "Etiquetas negras AM-xx = amenaza STRIDE mitigada en ese punto.")
+           "<b>Recorrido del tráfico de arriba abajo</b>: lo expuesto (Internet, AWS) → perímetro (FGT-EXT, FW01) → zonas internas "
+           "de menor a mayor confianza (MGMT, Máxima, al final). Etiquetas negras AM-xx = amenaza STRIDE mitigada en ese componente.")
     y = 90
-    for zid, occ, adicionales in bandas:
-        h = 64 if zid == "INTERNET" else (H + 62)
-        segmentos = [(zid, occ)] + adicionales
+    pos_portal = (0, 0)
+    for segmentos in BANDAS_53:
         xs = 20
         for zz, oo in segmentos:
             z = x.zonas[zz]
-            ancho = max(PAD + len(oo) * (W + GAP), 380) if oo else 560
+            ancho = max(PAD + len(oo) * (W + GAP), 380)
             conf = f"confianza <b>{esc(z['confianza'])}</b>" + (f" ({esc(z['confianza_nota'])})" if z.get("confianza_nota") else "")
             regla = f"<br><i>{esc(z['regla_diseno'])}</i>"
             if zz == "PERIMETRO":
-                d.caja(xs, y, ancho, h, "rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F2F2;strokeColor=#1A1A1A;strokeWidth=2;"
+                d.caja(xs, y, ancho, H53, "rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F2F2;strokeColor=#1A1A1A;strokeWidth=2;"
                        f"verticalAlign=top;align=left;spacingLeft=6;fontSize=10;fontColor={TEXTO};",
-                       f"<b>PERIMETRO</b> · {conf} · <i>{esc(z['regla_diseno'])}</i>",
+                       f"<b>PERIMETRO</b> · {conf} · {esc(z['regla_diseno'])}<br><i>{esc(x.zonas['TRANSITO']['proposito'])}</i>",
                        {"celeris_id": "PERIMETRO", "celeris_tipo": "zona", "confianza": z["confianza"]})
                 d.nodos["PERIMETRO"] = d.celdas[-1].get("id")
-                d.zonas_dibujadas.append("PERIMETRO")
-            elif zz == "INTERNET":
-                d.zona("INTERNET", xs, y, ancho, h, f" · {conf}<br><i>{esc(z['regla_diseno'])}</i>")
+            elif z["tipo"] in ("externa", "nube"):
+                d.zona(zz, xs, y, ancho, H53, f" · {conf}" if z["tipo"] == "externa" and not z.get("color") else regla)
             else:
-                gw = " · <b>sin gateway, no enrutada</b>" if z["gateway"] is None else ""
                 vlan = f"VLAN {z['vlan']} · " if z.get("vlan") is not None else ""
-                d.caja(xs, y, ancho, h, f"rounded=0;whiteSpace=wrap;html=1;fillColor={aclarar(z['color'], 0.86)};strokeColor={z['color']};strokeWidth=2;"
+                d.caja(xs, y, ancho, H53, f"rounded=0;whiteSpace=wrap;html=1;fillColor={aclarar(z['color'], 0.86)};strokeColor={z['color']};strokeWidth=2;"
                        f"verticalAlign=top;align=left;spacingLeft=6;spacingTop=1;fontSize=10;fontColor={TEXTO};",
-                       f"<b>{vlan}{esc(zz)}</b> · {esc(z['cidr'])} · {conf}{gw}{regla}",
+                       f"<b>{vlan}{esc(zz)}</b> · {esc(z['cidr'])} · {conf}{regla}",
                        {"celeris_id": zz, "celeris_tipo": "zona", "cidr": z["cidr"], "confianza": z["confianza"],
                         "tooltip": f"{zz}: {z['proposito']}. Regla: {z['regla_diseno']}"})
                 d.nodos[zz] = d.celdas[-1].get("id")
                 d.zonas_dibujadas.append(zz)
             for i, o in enumerate(oo):
-                cx, cy = xs + PAD + i * (W + GAP), y + 58
-                if ":" in o:
-                    d.interfaz(o, cx, cy + 20)
-                    continue
-                d.componente(o, cx, cy, compacto=True, h=H - 20, solo_iface=IFACE_PRINCIPAL.get(o))
+                cx, cy = xs + PAD + i * (W + GAP), y + 74
+                d.componente(o, cx, cy, compacto=True, h=H - 20)
+                if o == "PORTAL01":
+                    pos_portal = (cx, cy)
                 for j, am in enumerate(am_por_comp.get(o, [])):
                     a = x.amenazas[am]
-                    d.caja(cx + W - 46 - j * 47, cy + H - 18, 44, 16,
+                    d.caja(cx + (j % 4) * 45, cy + H - 16 + (j // 4) * 19, 43, 16,
                            "rounded=1;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#FFFFFF;fontSize=9;fontStyle=1;",
                            esc(am), {"celeris_id": am, "celeris_tipo": "amenaza", "stride": "".join(a["stride"]),
                                      "amenaza": a["amenaza"], "control": a["control"],
                                      "tooltip": f"{am} ({''.join(a['stride'])}): {a['amenaza']} → {a['control']}"})
             xs += ancho + 12
-        if zid == "PERIMETRO":
-            d.nota(xs, y, 1420 - xs, h, f"<b>Controles de FW01</b>: {esc(x.componentes['FW01']['controles'])}",
-                   {"celeris_rol": "controles", "celeris_ref": "FW01"}, color="#FFFFFF", borde="#1A1A1A", tam=10)
-        y += h + 8
+        if segmentos[0][0] == "PERIMETRO":
+            ctl = (f"<b>Controles de FGT-EXT</b>: {esc(x.componentes['FGT-EXT']['controles'])}<br>"
+                   f"<b>Controles de FW01</b>: {esc(x.componentes['FW01']['controles'])}")
+            d.nota(xs, y, 1420 - xs, H53, ctl, {"celeris_rol": "controles", "celeris_ref": "FW01"}, color="#FFFFFF", borde="#1A1A1A", tam=9)
+        y += H53 + 8
     y_bandas = y
+    # El portal no sale a la WAN (D-29): el certificado llega desde FW01 por F33.
+    if "PORTAL01" in d.nodos:
+        stub = d.nota(pos_portal[0] + W + 14, pos_portal[1], 166, H + 6,
+                      "<b>WAN / Internet</b><br>✖ BLOQUEADO: PORTAL01 no inicia conexiones hacia la WAN (D-29); solo envía a Wazuh (F13). El certificado llega desde FW01 por F33 (SFTP)",
+                      {"celeris_rol": "sin_salida", "celeris_ref": "PORTAL01"}, color="#FFFFFF", borde="#1A1A1A", tam=9)
+        d.flecha(d.nodos["PORTAL01"], stub, "html=1;strokeColor=#1A1A1A;dashed=1;dashPattern=1 4;strokeWidth=2;endArrow=cross;endFill=0;"
+                 "endSize=10;exitX=1;exitY=0.5;entryX=0;entryY=0.5;")
+        d.flecha_flujo("F33", d.nodos["FW01"], d.nodos["PORTAL01"], "F33",
+                       "exitX=0.5;exitY=1;entryX=0.5;entryY=0;")
     # Detecciones DET-xx (columna derecha), recolectadas en SIEM01
     x_det, w_det = 1440, 320
     d.nota(x_det, 62, w_det, 22, "<b>Detecciones (D1.14) → recolectadas en SIEM01</b>", {"celeris_rol": "titulo_det"}, color="#FFFFFF", tam=10)
     yd = 88
     for det in x.detecciones.values():
-        pruebas = ", ".join(det["validacion"]["pruebas"]) or "sin T-nn (CI-17)"
+        pruebas = ", ".join(det["validacion"]["pruebas"]) or "—"
         texto = (f"<b>{esc(det['id'])}</b> · {esc(det['tecnologia'])} · {esc(det['ubicacion_detalle'])}<br>"
                  f"{esc(det['que_detecta'])} · ATT&amp;CK {esc(', '.join(det['attack']) or '—')} · valida {esc(pruebas)}")
-        nid = d.nota(x_det, yd, w_det, 66, texto, {"celeris_id": det["id"], "celeris_tipo": "deteccion", "ubicacion": det["ubicacion"]},
+        hd = max(62, alto_texto([texto], w_det, 9, 10))
+        nid = d.nota(x_det, yd, w_det, hd, texto, {"celeris_id": det["id"], "celeris_tipo": "deteccion", "ubicacion": det["ubicacion"]},
                      color="#E8F4FB", borde="#56B4E9", tam=9)
         d.nodos[det["id"]] = nid
-        yd += 72
-    # Capturas de IDS01 (interfaces captura-NN)
-    ids01 = d.nodos.get("IDS01")
-    vlan_zona = {str(z["vlan"]): zid for zid, z in x.zonas.items() if z.get("vlan") is not None}
-    for i in x.componentes["IDS01"]["ips"]:
-        if i["interfaz"].startswith("captura") and ids01:
-            vl = i["interfaz"].split("-")[1]
-            zona = vlan_zona[vl]
-            if zona in d.nodos and zona != "SECURITY":
-                lados = ("exitX=0.5;exitY=1;entryX=0.95;entryY=1;" if zona == "SERVERS"
-                         else "exitX=1;exitY=0.5;entryX=1;entryY=0.5;")
-                d.flecha(ids01, d.nodos[zona], "edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#56B4E9;strokeWidth=2;dashed=1;dashPattern=1 2;"
-                         "endArrow=oval;endFill=1;fontSize=9;labelBackgroundColor=#FFFFFF;" + lados,
-                         f"captura VLAN {vl} (DET-02)")
-    # La recolección hacia SIEM01 (F13 agentes, F14 syslog de FW01) se dibuja en FIG-5.5b; aquí va en el título de DET-xx.
-    # Defensa en profundidad (D1.9; CI-30)
+        yd += hd + 6
+    # Defensa en profundidad (D1.9; trazabilidad.yaml → defensa_profundidad, CI-63)
+    capas = x.traz["defensa_profundidad"]
     yb = max(y_bandas, yd) + 6
     d.caja(20, yb, 1740, 20, f"text;html=1;align=left;fontSize=11;fontColor={TEXTO};",
-           "<b>Defensa en profundidad</b> (capas de D1.9; la tabla no está en infra/*.yaml: CI-30)", {"celeris_rol": "defensa"})
-    cw = 1740 // len(CAPAS_D19)
-    for i, (capa, control) in enumerate(CAPAS_D19):
-        d.nota(20 + i * cw, yb + 22, cw - 6, 76, f"<b>{i + 1}. {esc(capa)}</b><br>{esc(control)}", {"celeris_rol": "capa"},
+           "<b>Defensa en profundidad</b> (D1.9, de afuera hacia adentro)", {"celeris_rol": "defensa"})
+    por_fila = (len(capas) + 1) // 2
+    cw = 1740 // por_fila
+    hc = max(alto_texto([f"<b>{c['capa']}</b> {c['controles']} ({c['detalle']})"], cw - 6, 9, 22) for c in capas)
+    for i, c in enumerate(capas):
+        d.nota(20 + (i % por_fila) * cw, yb + 22 + (i // por_fila) * (hc + 6), cw - 6, hc,
+               f"<b>{i + 1}. {esc(c['capa'])}</b><br>{esc(c['controles'])} <i>({esc(c['detalle'])})</i>", {"celeris_rol": "capa"},
                color="#F7F7F7", borde="#4D4D4D", tam=9)
-    ya = yb + 108
-    alto_l = d.leyenda(20, ya, w=1100)
-    filas_am = [f"<b>{esc(a['id'])}</b> ({esc(''.join(a['stride']))}) {esc(a['amenaza'])} → {esc(a['control'])}" for a in x.amenazas.values()]
-    alto_am = 24 + 13 * len(filas_am) + 6
-    d.nota(1130, ya, 630, alto_am, "<b>Amenazas STRIDE (AM-xx), marcadas en su punto de mitigación</b><br>" + "<br>".join(filas_am),
-           {"celeris_rol": "amenazas"}, tam=9)
+    y_fin = yb + 22 + 2 * (hc + 6)
     alto_p = d.panel(1780, 10, 500, orden_inventario(x, d.presentes), max_si_falla=62)
-    d.alto = max(ya + max(alto_l, alto_am) + 20, 10 + alto_p + 20)
+    filas_am = [f"<b>{esc(a['id'])}</b> ({esc(''.join(a['stride']))}) {esc(a['amenaza'])} → {esc(a['control'])}" for a in x.amenazas.values()]
+    alto_am = alto_texto(filas_am, 500, 9, 30)
+    d.nota(1780, 20 + alto_p, 500, alto_am, "<b>Amenazas STRIDE (AM-xx), marcadas en su punto de mitigación</b><br>" + "<br>".join(filas_am),
+           {"celeris_rol": "amenazas"}, tam=9)
+    alto_l = d.leyenda(1780, 30 + alto_p + alto_am, w=500)
+    d.alto = max(y_fin + 20, 50 + alto_p + alto_am + alto_l)
     return d
 
 
@@ -976,42 +1086,65 @@ def fig_5_3(x: Infra) -> Diagrama:
 # --------------------------------------------------------------------------------------------------
 def fig_5_4(x: Infra) -> Diagrama:
     vpn = x.inv["vpn"]
-    d = Diagrama(x, "FIG-5.4", 2200, 1100)
+    d = Diagrama(x, "FIG-5.4", 2200, 1300)
     d.titulo(w=1660)
     on, aws = vpn["extremo_onpremise"], vpn["extremo_aws"]
-    d.caja(20, 70, 500, 430, "rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F2F2;strokeColor=#1A1A1A;strokeWidth=2;verticalAlign=top;"
+    d.caja(20, 70, 580, 520, "rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#1A1A1A;strokeWidth=1;verticalAlign=top;"
            f"align=left;spacingLeft=8;spacingTop=4;fontSize=11;fontColor={TEXTO};",
-           f"<b>On-premise · Campus Juliaca (PERIMETRO)</b><br>Redes anunciadas por BGP: {esc(', '.join(on['redes_anunciadas']))} "
-           f"(futuro {esc(on['redes_anunciadas_futuro'])}) · ASN {on['asn']}",
-           {"celeris_id": "PERIMETRO", "celeris_tipo": "zona"})
+           f"<b>On-premise · Campus Juliaca</b> · anuncia por BGP {esc(', '.join(on['redes_anunciadas']))} "
+           f"(futuro {esc(on['redes_anunciadas_futuro'])}) · ASN {on['asn']}", {"celeris_rol": "campus"})
+    p = x.zonas["PERIMETRO"]
+    d.caja(30, 100, 560, 240, "rounded=0;whiteSpace=wrap;html=1;fillColor=#F2F2F2;strokeColor=#1A1A1A;strokeWidth=2;verticalAlign=top;"
+           f"align=left;spacingLeft=6;fontSize=10;fontColor={TEXTO};", f"<b>PERIMETRO</b> · confianza {esc(p['confianza'])}",
+           {"celeris_id": "PERIMETRO", "celeris_tipo": "zona", "confianza": p["confianza"]})
     d.nodos["PERIMETRO"] = d.celdas[-1].get("id")
-    d.componente("FW01", 40, 140, w=240)
-    d.componente("VTI1", 320, 250, w=180)
-    d.componente("VTI2", 320, 360, w=180)
+    d.componente("FW01", 40, 140, w=250)
+    d.componente("VTI1", 340, 130, w=230)
+    d.componente("VTI2", 340, 240, w=230)
     for v in ("VTI1", "VTI2"):
         d.flecha(d.nodos["FW01"], d.nodos[v], "edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;strokeColor=#7F7F7F;exitX=1;exitY=0.5;entryX=0;entryY=0.5;")
-    d.nota(40, 250, 260, 120, f"<b>Extremo on-premise</b><br>{esc(on['dispositivo'])}<br>IP pública {esc(on['ip_publica'])} ({esc(on['ip_publica_nota'])})",
+    d.nota(40, 276, 250, 56, f"<b>Identidad IKE</b>: {esc(on['identidad_ike']['tipo'])} {esc(on['identidad_ike']['valor'])}<br>"
+           f"IP interna de FW01: {esc(on['ip_interna'])} (tránsito)", {"celeris_rol": "extremo", "celeris_ref": "FW01"}, tam=10)
+    d.nota(30, 350, 560, 110, f"<b>Extremo on-premise</b>: {esc(on['dispositivo'])}<br>IP pública {esc(on['ip_publica'])} en "
+           f"{esc(on['ip_publica_en'])}: {esc(on['ip_publica_nota'])}<br>NAT-T: {esc(on['nat_t_nota'])}",
            {"celeris_rol": "extremo", "celeris_ref": "FW01"}, tam=10)
-    d.zona("INTERNET", 570, 260, 270, 150, "<br>transporte de los túneles")
-    d.zona("AWS", 890, 70, 790, 760, f" · {x.zonas['AWS']['cidr']}")
-    d.componente("VGW", 910, 270, w=220)
-    d.nota(910, 110, 220, 140, f"<b>Extremo AWS</b><br>{esc(aws['dispositivo'])}<br>{esc(aws['ip_publica'])}<br>Anuncia {esc(', '.join(aws['redes_anunciadas']))} · "
-           f"ASN {aws['asn']} ({esc(aws['asn_nota'])})", {"celeris_rol": "extremo", "celeris_ref": "VGW"}, tam=10)
-    rt = d.nota(910, 420, 230, 390, "<b>Propagación de rutas (BGP → tablas de la VPC)</b><br>" + esc(x.componentes["VGW"]["aporta"]) + "<br><br>"
-                + esc(x.componentes["AWS-PUB-A"]["aporta"]) + "<br><br>" + esc(x.componentes["AWS-APP-A"]["aporta"])
-                + "<br><br><b>Observación CI-31</b>: FW01 anuncia " + esc(", ".join(on["redes_anunciadas"])) + "; las tablas citan "
-                + esc(on["redes_anunciadas_futuro"]) + ".", {"celeris_rol": "rutas", "celeris_ref": "AWS-VPC"}, tam=10)
-    d.flecha(d.nodos["VGW"], rt, "edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#8C4FFF;strokeWidth=1.5;dashed=1;dashPattern=4 3;endArrow=block;"
-             "fontSize=9;labelBackgroundColor=#FFFFFF;", "propaga")
-    d.grupo_aws("AWS-VPC", 1160, 110, 500, 700)
-    for k, (sid, occ) in enumerate([("AWS-PUB-A", "NAT01"), ("AWS-APP-A", "EC2-SHIELD"), ("AWS-APP-B", "EC2-CTRLR")]):
-        sy = 150 + k * 215
-        d.grupo_aws(sid, 1175, sy, 470, 200)
-        d.componente(occ, 1190, sy + 40, w=200)
-        titulo = "Controles" if occ == "NAT01" else "Security Group"
-        d.nota(1400, sy + 40, 230, 145, f"<b>{titulo} de {occ}</b><br>" + esc(x.componentes[occ]["controles"]),
-               {"celeris_rol": "sg", "celeris_ref": occ}, tam=10)
+    ctrl, siem = x.componentes["CTRL01"], x.componentes["SIEM01"]
+    srv = d.zona("SERVERS", 30, 476, 270, 100, f"<br>CTRL01 {ctrl['ips'][0]['ip']}: destino de F30")
+    sec = d.zona("SECURITY", 320, 476, 270, 100, f"<br>SIEM01 {siem['ips'][0]['ip']}: destino de F13")
+    fgt = d.componente("FGT-EXT", 640, 330, w=230)
+    d.nota(640, 424, 230, 56, f"<b>NAT 1:1</b>: {esc(primera_frase(x.componentes['FGT-EXT']['controles'], 90))}",
+           {"celeris_rol": "nat", "celeris_ref": "FGT-EXT"}, tam=10)
+    d.flecha(d.nodos["PERIMETRO"], fgt, GRIS + "strokeColor=#999999;strokeWidth=3;exitX=1;exitY=0.9;", f"tránsito {x.zonas['TRANSITO']['cidr']}")
+    inet = d.zona("INTERNET", 900, 330, 190, 110, "<br>transporte de los túneles")
+    d.flecha(fgt, inet, GRIS + "strokeColor=#4D4D4D;strokeWidth=2;", "WAN")
+    d.zona("AWS", 1120, 70, 560, 760, f" · {x.zonas['AWS']['cidr']}")
+    d.componente("VGW", 1140, 110, w=220)
+    d.nota(1380, 110, 280, 120, f"<b>Extremo AWS</b><br>{esc(aws['dispositivo'])}<br>{esc(aws['ip_publica'])}<br>Anuncia "
+           f"{esc(', '.join(aws['redes_anunciadas']))} · ASN {aws['asn']} ({esc(aws['asn_nota'])})", {"celeris_rol": "extremo", "celeris_ref": "VGW"}, tam=10)
+    d.grupo_aws("AWS-VPC", 1140, 250, 520, 560)
+    d.grupo_aws("AWS-PUB-A", 1150, 290, 500, 230)
+    gw = d.componente("EC2-GW", 1165, 330, w=200)
+    sg = next(s for s in x.inv["aws"]["security_groups"] if s["componente"] == "EC2-GW")
+
+    def regla(r, lado):
+        pts = r.get("puertos") or [r.get("puerto")]
+        extremo = (r.get("origen") or r.get("destino")).split(":", 1)[-1]
+        cola = f" ({r['flujo']})" if r.get("flujo") else (f" ({r['nota']})" if r.get("nota") else "")
+        return f"{lado} {r['proto'].upper()}/{','.join(str(p) for p in pts)} {'desde' if lado == 'entrada' else 'hacia'} {extremo}{cola}"
+    sg_txt = [regla(r, "entrada") for r in sg["ingress"]] + [regla(r, "salida") for r in sg["egress"]]
+    d.nota(1375, 330, 265, 180, f"<b>Security Group {esc(sg['id'])}</b><br>" + "<br>".join(esc(s) for s in sg_txt),
+           {"celeris_rol": "sg", "celeris_ref": "EC2-GW"}, tam=10)
+    d.grupo_aws("AWS-APP-A", 1375, 535, 275, 90)
+    d.nota(1385, 572, 255, 44, esc(x.componentes["AWS-APP-A"]["aporta_corto"]), {"celeris_rol": "nota", "celeris_ref": "AWS-APP-A"},
+           color="#FFFFFF", borde="#BBBBBB")
+    rt = tablas_rutas(x)
+    d.nota(1375, 640, 275, alto_texto(rt, 275) + 40, "<b>Rutas previstas (BGP → tablas de la VPC)</b><br>" + "<br>".join(rt),
+           {"celeris_rol": "rutas", "celeris_ref": "AWS-VPC"}, tam=10)
     tuneles(d)
+    # Qué viaja por la VPN: F29 llega a EC2-GW por Internet; F30 y F13 van de EC2-GW al campus dentro de IPsec.
+    d.flecha_flujo("F29", inet, gw, None, "exitX=1;exitY=0.5;entryX=0;entryY=0.5;")
+    d.flecha_flujo("F30", gw, srv, None, "exitX=0.3;exitY=1;entryX=0.5;entryY=1;", puntos=[(1225, 860), (165, 860)])
+    d.flecha_flujo("F13", gw, sec, None, "exitX=0.7;exitY=1;entryX=0.5;entryY=1;", puntos=[(1305, 890), (455, 890)])
     f1, f2, bgp, dpd = vpn["fase1"], vpn["fase2"], vpn["bgp"], vpn["dpd"]
     params = [
         f"Tipo: {vpn['tipo']}",
@@ -1019,17 +1152,19 @@ def fig_5_4(x: Infra) -> Diagrama:
         f"Fase 2 (ESP): {f2['cifrado']} · PFS {f2['pfs']} · vida {f2['vida_s']} s",
         f"DPD: cada {dpd['intervalo_s']} s, acción {dpd['accion']}",
         f"BGP: keepalive {bgp['keepalive_s']} s · hold {bgp['hold_s']} s ({bgp['hold_nota']}) · {bgp['respaldo']}",
-        f"MTU {vpn['mtu']} · MSS clamping {vpn['mss_clamping']} · {vpn['capacidad_gbps_por_tunel']} Gbps por túnel",
+        "Direcciones internas: " + "; ".join(f"{t['id']} {t['red_interna']} ({t['rol']})" for t in vpn["tuneles"]),
+        f"MTU {vpn['mtu']} · MSS clamping {vpn['mss_clamping']} ({vpn['mss_nota']}) · {vpn['capacidad_gbps_por_tunel']} Gbps por túnel",
         f"IPv6: {vpn['ipv6']} · Convergencia meta ≤ {vpn['convergencia_meta_s']} s (prueba {vpn['convergencia_prueba']})",
         f"Secretos: {vpn['secretos']}",
-        "Flujos sobre la VPN: " + "; ".join(etiqueta_flujo(x.flujos[f]) for f in vpn["flujos_sobre_vpn"]),
+        "Por la VPN viaja: " + "; ".join(etiqueta_flujo(x.flujos[f]) for f in vpn["flujos_sobre_vpn"]),
         f"Pruebas: {', '.join(vpn['pruebas'])} · Escalamiento: {vpn['escalamiento']}",
     ]
-    d.nota(20, 520, 850, 24 + 15 * len(params) + 30, "<b>Parámetros de la VPN (D1.10, sin secretos)</b><br>" + "<br>".join(esc(p) for p in params),
+    hp = alto_texto(params, 1100)
+    d.nota(20, 920, 1100, hp, "<b>Parámetros de la VPN (D1.10, sin secretos)</b><br>" + "<br>".join(esc(p) for p in params),
            {"celeris_rol": "parametros_vpn", "celeris_ref": vpn["id"]}, color="#F3EDFF", borde="#8C4FFF", tam=10)
-    alto_l = d.leyenda(20, 850, w=1660, flujos=False)
+    alto_l = d.leyenda(1140, 920, w=540)
     alto_p = d.panel(1700, 10, 490, orden_inventario(x, d.presentes), max_si_falla=62)
-    d.alto = max(850 + alto_l + 20, alto_p + 30)
+    d.alto = max(920 + max(hp, alto_l) + 20, alto_p + 30)
     return d
 
 
@@ -1037,13 +1172,14 @@ def fig_5_4(x: Infra) -> Diagrama:
 # FIG-1.1 — topología ejecutiva (≤ 12 bloques)
 # --------------------------------------------------------------------------------------------------
 def fig_1_1(x: Infra) -> Diagrama:
-    """≤ 12 bloques; cada uno con la frase de lo que aporta (aporta_corto del componente o propósito de la zona)."""
-    d = Diagrama(x, "FIG-1.1", 1640, 860)
-    d.titulo(w=1600)
+    """12 bloques: 40 PCs por laboratorio → nodos de caché → una sola descarga por el FortiGate; consola en el campus;
+    en AWS solo EC2-GW y S3; Wi-Fi de estudiantes como cliente sin descifrado."""
+    d = Diagrama(x, "FIG-1.1", 1680, 900)
+    d.titulo(w=1640)
     plantilla = (f"rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor={{fill}};strokeColor={{stroke}};strokeWidth={{sw}};"
-                 f"align=center;verticalAlign=middle;fontSize=13;fontColor={TEXTO};spacing=6;spacingLeft={{sl}};")
+                 f"align=center;verticalAlign={{va}};fontSize=13;fontColor={TEXTO};spacing=6;spacingLeft={{sl}};")
 
-    def bloque(cid, x0, y0, w, h, titulo, frase, incluye=None):
+    def bloque(cid, x0, y0, w, h, titulo, frase, incluye=None, arriba=False):
         if cid in x.componentes:
             c = x.componentes[cid]
             sw, tag = CRITICIDAD[c["criticidad"]]
@@ -1051,21 +1187,23 @@ def fig_1_1(x: Infra) -> Diagrama:
             attrs = d.datos_componente(c)
             label = f"<b>{esc(titulo)}</b> · <b>{tag}</b><br>{esc(ip_texto(x, c))}<br><i>{esc(frase)}</i>"
             d.presentes.append(cid)
+            discont = "dashed=1;dashPattern=6 3;" if c["estado"] in EXISTENTES else ""
         else:
-            z = x.zonas.get(cid)
-            color = (z or {}).get("color") or ("#4D4D4D" if z else "#8C4FFF")
+            z = x.zonas[cid]
+            color = z.get("color") or "#4D4D4D"
             sw = 2
-            attrs = {"celeris_id": cid, "celeris_tipo": "zona" if z else "vpn"}
-            cidr = f"<br>{esc(z['cidr'])}" if z and z.get("cidr") else ""
-            nombre = f" · zona {esc(cid)}" if z and cid not in titulo else ""
-            label = f"<b>{esc(titulo)}</b>{nombre}{cidr}<br><i>{esc(frase)}</i>"
-            if z and z.get("color"):
+            attrs = {"celeris_id": cid, "celeris_tipo": "zona"}
+            cidr = f" · {esc(z['cidr'])}" if z.get("cidr") else ""
+            label = f"<b>{esc(titulo)}</b><br>zona {esc(cid)}{cidr}<br><i>{esc(frase)}</i>"
+            if z.get("color"):
                 d.zonas_dibujadas.append(cid)
+            discont = ""
         if incluye:
             attrs["celeris_incluye"] = ",".join(incluye)
         fill = aclarar(color, 0.86) if color not in ("#4D4D4D", AWS_TINTA) else "#F2F2F2"
         icono = cid in x.componentes and x.componentes[cid]["tipo"] in ICONO
-        nid = d.caja(x0, y0, w, h, plantilla.format(fill=fill, stroke=color, sw=sw, sl=34 if icono else 6), label, attrs)
+        nid = d.caja(x0, y0, w, h, plantilla.format(fill=fill, stroke=color, sw=sw, sl=34 if icono else 6,
+                                                    va="top" if arriba else "middle") + discont, label, attrs)
         d.nodos[cid] = nid
         if icono:
             d.caja(x0 + 6, y0 + 6, 26, 26, ICONO[x.componentes[cid]["tipo"]] + "html=1;aspect=fixed;outlineConnect=0;dashed=0;")
@@ -1073,44 +1211,49 @@ def fig_1_1(x: Infra) -> Diagrama:
         return nid
 
     z, c = x.zonas, x.componentes
-    vpn_id = x.inv["vpn"]["id"]
-    BW, BH = 300, 100
-    bloque("DMZ-SVC", 20, 70, BW, BH, "Portal de transparencia (WAF01 + WEB01)", c["WAF01"]["aporta_corto"], ["WAF01", "WEB01"])
-    bloque("INTERNET", 660, 70, BW, BH, "Internet", z["INTERNET"]["proposito"].split(":")[0])
-    bloque("LAB", 20, 240, 240, BH, "Usuarios de laboratorio (LAB + LAB-TEST)", z["LAB"]["proposito"].split(".")[0], ["LAB", "LAB-TEST"])
-    bloque("FW01", 660, 240, BW, BH, "FW01 · Firewall OPNsense", c["FW01"]["aporta_corto"])
-    bloque(vpn_id, 1000, 240, 280, BH, "VPN IPsec (VTI1 activo, VTI2 respaldo)", f"IKEv2 · {x.inv['vpn']['fase1']['cifrado']} · BGP", ["VTI1", "VTI2"])
-    bloque("VGW", 1320, 240, 300, BH, "VGW · extremo AWS", c["VGW"]["aporta_corto"])
-    bloque("EDGE", 350, 240, 270, BH, "Nodos de caché (EDGE01, EDGE02)", c["EDGE01"]["aporta_corto"], ["EDGE01", "EDGE02"])
-    bloque("SERVERS", 660, 410, BW, BH, "Zonas internas: SERVERS, MGMT, STORAGE, BACKUP", "Control, DNS/PAC/NTP, gestión con MFA y respaldos",
-           ["SERVERS", "MGMT", "STORAGE", "BACKUP"])
-    bloque("SECURITY", 1000, 410, 280, BH, "SIEM y detección (SIEM01, IDS01)", c["SIEM01"]["aporta_corto"], ["SIEM01", "IDS01"])
-    bloque("AWS-VPC", 1320, 410, 300, 130, "AWS · VPC " + c["AWS-VPC"]["cidr"],
-           c["EC2-SHIELD"]["aporta_corto"] + "; " + c["EC2-CTRLR"]["aporta_corto"].lower(), ["AWS-VPC", "EC2-SHIELD", "EC2-CTRLR", "NAT01"])
-    bloque("DMZ-HONEY", 20, 410, BW, BH, "Señuelos (HNY01)", z["DMZ-HONEY"]["regla_diseno"], ["HNY01"])
-    bloque("ESX01", 660, 580, BW, BH, "ESX01 · Servidor ESXi", c["ESX01"]["aporta_corto"])
-    e = "edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#FFFFFF;strokeColor=#1A1A1A;endArrow=block;endFill=1;strokeWidth=1.5;"
+    ctrl_ip = c["CTRL01"]["ips"][0]["ip"]
+    e1, e2 = (c[e]["ips"][0]["ip"] for e in ("EDGE01", "EDGE02"))
+    bloque("WIFI-EST", 20, 70, 280, 110, "WIFI-EST · Wi-Fi de estudiantes", c["WIFI-EST"]["aporta_corto"])
+    bloque("INTERNET", 700, 70, 280, 100, "Internet", z["INTERNET"]["proposito"].split(":")[0])
+    bloque("PCS-LAB", 20, 240, 280, 120, "PCS-LAB · PCs de laboratorio", c["PCS-LAB"]["aporta_corto"])
+    bloque("EDGE", 400, 240, 250, 120, f"Caché EDGE01 {e1} y EDGE02 {e2}", c["EDGE01"]["aporta_corto"], ["EDGE01", "EDGE02"])
+    bloque("FGT-EXT", 700, 240, 280, 120, "FGT-EXT · FortiGate de la DTI", c["FGT-EXT"]["aporta_corto"])
+    bloque("S3", 1340, 240, 300, 110, "S3 · respaldos", c["S3"]["aporta_corto"])
+    bloque("ESX01", 20, 430, 280, 110, "ESX01 · Servidor ESXi", c["ESX01"]["aporta_corto"])
+    bloque("SERVERS", 400, 430, 250, 110, f"Consola en el campus: CTRL01 {ctrl_ip}", c["CTRL01"]["aporta_corto"], ["CTRL01"])
+    bloque("FW01", 700, 430, 280, 110, "FW01 · Firewall OPNsense", c["FW01"]["aporta_corto"])
+    bloque("VGW", 1110, 430, 200, 110, "VGW · extremo AWS", c["VGW"]["aporta_corto"])
+    bloque("AWS-VPC", 1330, 390, 330, 180, "AWS · VPC " + c["AWS-VPC"]["cidr"], c["AWS-VPC"]["aporta_corto"], arriba=True)
+    bloque("EC2-GW", 1340, 470, 310, 90, "EC2-GW · panel remoto", c["EC2-GW"]["aporta_corto"])
+    d.nota_d25(1010, 70, 300, 96)
     n = d.nodos
+    e = "edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;fontSize=11;labelBackgroundColor=#FFFFFF;strokeColor=#1A1A1A;"
 
-    def conex(fid, a, b, label=None, extra=""):
-        f = x.flujos[fid]
-        est = e + ("" if f["proteccion"]["tipo"] in CIFRADOS else "dashed=1;dashPattern=8 4;") + extra
-        d.flecha(n[a], n[b], est, label or f"{fid} · {protocolos_texto(f)}", {"celeris_id": fid, "celeris_tipo": "flujo", "etiqueta": etiqueta_flujo(f)})
+    def conex(fid, a, b, label, extra="", puntos=None):
+        d.flecha_flujo(fid, n[a], n[b], label, "fontSize=11;" + extra, puntos=puntos)
 
-    conex("F21", "INTERNET", "DMZ-SVC", "F21 · " + protocolos_texto(x.flujos["F21"]).split(" + ")[0])
-    conex("F1", "LAB", "EDGE", "F1 · " + protocolos_texto(x.flujos["F1"]))
-    conex("F8", "EDGE", "FW01", "F8 · MISS")
-    conex("F13", "SERVERS", "SECURITY", "F13 · agentes Wazuh")
-    gris = "html=1;endArrow=none;strokeColor=#7F7F7F;strokeWidth=1.5;fontSize=11;labelBackgroundColor=#FFFFFF;"
-    d.flecha(n["INTERNET"], n["FW01"], gris + "strokeColor=#4D4D4D;strokeWidth=2;", "WAN")
-    d.flecha(n["FW01"], n[vpn_id], "html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;")
-    d.flecha(n[vpn_id], n["VGW"], "html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;fontSize=11;labelBackgroundColor=#FFFFFF;", "2 túneles")
-    d.flecha(n["VGW"], n["AWS-VPC"], "html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=2;")
-    d.flecha(n["FW01"], n["SERVERS"], gris, "ruteo entre zonas")
-    d.flecha(n["ESX01"], n["SERVERS"], gris, "hospeda las VM")
-    alto_l = d.leyenda(1000, 580, w=620)
-    alto_p = d.panel(20, 580, 620, list(d.presentes), max_si_falla=80)
-    d.alto = max(580 + alto_l + 20, 580 + alto_p + 20)
+    conex("F1", "PCS-LAB", "EDGE", "F1 · TCP/3128")
+    conex("F31", "WIFI-EST", "EDGE", "F31 · sin descifrado", "exitX=1;exitY=0.5;entryX=0.5;entryY=0;")
+    conex("F8", "EDGE", "FGT-EXT", "F8 · una sola descarga (solo MISS)", "exitX=0.8;exitY=0;entryX=0;entryY=0.3;",
+          puntos=[(600, 210), (680, 210), (680, 276)])
+    conex("F10", "EDGE", "SERVERS", "F10 · config. firmada (mTLS)")
+    conex("F18", "SERVERS", "S3", "F18 · respaldo cifrado, por Internet", "exitX=0.5;exitY=1;entryX=1;entryY=0.5;",
+          puntos=[(525, 610), (1665, 610), (1665, 295)])
+    conex("F29", "INTERNET", "EC2-GW", "F29 · encargado fuera del campus", "exitX=1;exitY=0.9;entryX=0;entryY=0.5;",
+          puntos=[(995, 160), (995, 205), (1320, 205), (1320, 515)])
+    d.flecha(n["INTERNET"], n["FGT-EXT"], e + "endArrow=none;strokeColor=#4D4D4D;strokeWidth=2;", "WAN · FortiGuard")
+    d.flecha(n["FGT-EXT"], n["FW01"], e + "endArrow=none;strokeColor=#999999;strokeWidth=3;", f"tránsito {z['TRANSITO']['cidr']}")
+    d.flecha(n["FW01"], n["SERVERS"], e + "endArrow=none;strokeColor=#7F7F7F;strokeWidth=1.5;")
+    d.flecha(n["ESX01"], n["SERVERS"], e + "endArrow=none;strokeColor=#7F7F7F;strokeWidth=1.5;dashed=1;dashPattern=2 2;")
+    vpn = x.inv["vpn"]
+    d.flecha(n["FW01"], n["VGW"], VIOLETA + "fontSize=10;", "VPN IPsec<br>2 túneles<br>lleva " + " y ".join(vpn["flujos_sobre_vpn"]),
+             {"celeris_id": vpn["id"], "celeris_tipo": "tunel", "flujos": ", ".join(vpn["flujos_sobre_vpn"])})
+    d.flecha(n["VGW"], n["AWS-VPC"], VIOLETA + "strokeWidth=2;")
+    d.nota(20, 560, 960, 30, "La VPN sale por FGT-EXT (NAT-T, UDP 4500). FW01 → consola: ruteo entre zonas. ESX01 hospeda las VM (línea punteada).",
+           {"celeris_rol": "nota"}, color="#FFFFFF", borde="#FFFFFF", tam=10)
+    alto_p = d.panel(20, 640, 940, list(d.presentes), max_si_falla=90)
+    alto_l = d.leyenda(980, 640, w=680)
+    d.alto = max(640 + alto_l + 20, 640 + alto_p + 20)
     return d
 
 
@@ -1120,11 +1263,21 @@ GENERADORES = {
 }
 
 
+# draw.io Desktop deja de dibujar las celdas que caen fuera de ~2^25 píxeles al exportar el PNG (se vio en FIG-5.3:
+# a escala 3 y 6847 × 4963 px quedó en blanco el último cuarto). Cada página debe caber a la escala de exportación.
+ESCALA_PNG = 3
+PIXELES_MAX = 2 ** 25
+
+
 def generar(x: Infra, salida: Path = SALIDA, figuras=None) -> list[Path]:
     salida.mkdir(parents=True, exist_ok=True)
     hechos = []
     for fig in figuras or FIGURAS:
         d = GENERADORES[fig](x)
+        px = (d.ancho + 20) * (d.alto + 20) * ESCALA_PNG ** 2
+        if px > PIXELES_MAX:
+            raise SystemExit(f"{fig}: {d.ancho} × {d.alto} a escala {ESCALA_PNG} son {px / 1e6:.1f} Mpx (> {PIXELES_MAX / 1e6:.1f}); "
+                             "draw.io no dibujaría el final del PNG. Compacte la disposición.")
         ruta = salida / f"{fig}.drawio"
         ruta.write_text(d.xml(), encoding="utf-8", newline="\n")
         hechos.append(ruta)

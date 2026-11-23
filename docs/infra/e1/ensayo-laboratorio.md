@@ -31,7 +31,7 @@ La columna «v0.2 → v0.4» compara con el ensayo anterior (2026-11-21, v0.2). 
 | T15 — Exposición del portal | **PASA** | PASA → PASA | puertos_abiertos = 2, puertos_abiertos_en_ctrl01 = 0, alertas_suricata_fw01 = 0 |  |
 | T16 — TLS del portal | **PASA** | PASA → PASA | — | calificación de testssl.sh: A+ (certificado de la CA de laboratorio; el ACME público se prueba en Modo H) |
 | T17 — Escaneo web | **PASA** | PASA → PASA | alertas_altas = 0 |  |
-| T18 — WAF | **PASA** | PASA → PASA | eventos_modsecurity = 1, latencia_alerta_wazuh_s = 0.8 |  |
+| T18 — WAF | **PASA** | PASA → PASA | eventos_modsecurity = 6, latencia_alerta_wazuh_s = 1.3 |  |
 | T19 — PORTAL01 no establece conexiones hacia la WAN (TCP/UDP) | **PASA** | PASA → PASA | conexiones_establecidas_hacia_la_wan = 0, paquetes_denegados_por_fw01 = 12, salida_http_8… | el DNS hacia el resolvedor de FW01 (F2) no cuenta: es tráfico local a 10.20.0.0/16; ACME corre en FW01 y no se emula en el Modo L (no hay Internet) |
 | T20 — Aislamiento del señuelo | **PASA** | PASA → PASA (cambió de destino: HNY01 → PORTAL01:443 (antes WEB01:8080)) | — |  |
 | T21 — MTU del túnel | **NO_APLICA** | NO_APLICA → NO_APLICA (cambió de destino: destino 10.30.0.10) | — | el Modo L no ejecuta T21 (modos de la prueba: A, H); se ejecuta en A y H |
@@ -43,7 +43,7 @@ La columna «v0.2 → v0.4» compara con el ensayo anterior (2026-11-21, v0.2). 
 | T28 — Syslog cifrado | **PASA** | PASA → PASA | paquetes_udp_514 = 0, handshakes_tls_6514 = 2, latencia_alerta_wazuh_s = 1.8 | fw01-sim no es OPNsense y no tiene syslog nativo: el evento lo envía `socat` desde fw01-sim; lo que se prueba es el receptor de SIEM01 (solo TLS) |
 | T29 — Escaneo lateral detectado por Suricata de FW01 | **PASA** | PASA → PASA (cambió de destino: Suricata de FW01 en la interfaz LAB (antes IDS01)) | puertos_open = 0, paquetes_denegados_por_fw01 = 1282, latencia_alerta_wazuh_s = 2.6 | las reglas del laboratorio son locales (sid 9000001, escaneo SYN por origen): ET Open no está disponible en el Modo L |
 | T30 — Canary interno detecta un barrido en LAB | **PASA** | PASA → PASA | conexiones_registradas_en_hny02 = 4, paquetes_vistos_por_fw01 = 0, latencia_alerta_wazuh_… | el canario registró 0 eventos con un barrido SYN (-sS) y 4 con uno de conexión completa (-sT): un canario de aplicación no ve los SYN sin respuesta; IDS01 no captura la … |
-| T31 — Honey-URL en el nodo de borde | **PASA** | PASA → PASA | latencia_alerta_wazuh_s = 0.2 | la ruta señuelo del laboratorio es /admin-backup.zip [S-17]; en S2 se define con el equipo |
+| T31 — Honey-URL en el nodo de borde | **PASA** | PASA → PASA | latencia_alerta_wazuh_s = 0.9 | la ruta señuelo del laboratorio es /admin-backup.zip [S-17]; en S2 se define con el equipo |
 | T32 — CrowdSec bloquea una IP abusiva en la WAN | **PASA** | PASA → PASA | paquetes_descartados_tras_la_decision = 8, latencia_alerta_wazuh_s = 20.1 | la decisión se agrega con `cscli decisions add` (la «simulación con su escenario de prueba» de D1.14): un escenario real exige logs de SSH o del WAF |
 | T33 — Toda denegación deja rastro con hora fiable | **NO_APLICA** | NO_APLICA → NO_APLICA | — | el Modo L no ejecuta T33 (modos de la prueba: H); se ejecuta en H |
 | T34 — Administración desde JMP01 | **NO_APLICA** | NO_APLICA → NO_APLICA | — | el Modo L no ejecuta T34 (modos de la prueba: H); se ejecuta en H |

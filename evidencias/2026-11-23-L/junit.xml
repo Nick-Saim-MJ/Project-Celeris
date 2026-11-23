@@ -32,9 +32,9 @@
   </testcase>
   <testcase classname="CE0311.seguridad_web" name="T15 Exposición del portal" time="5.0">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T16 TLS del portal" time="42.2">
+  <testcase classname="CE0311.seguridad_web" name="T16 TLS del portal" time="42.0">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T17 Escaneo web" time="57.9">
+  <testcase classname="CE0311.seguridad_web" name="T17 Escaneo web" time="48.8">
   </testcase>
   <testcase classname="CE0311.seguridad_web" name="T18 WAF" time="1.7">
   </testcase>
@@ -48,7 +48,7 @@
   <testcase classname="CE0311.segmentacion" name="T23 Fuga IPv6" time="0">
     <skipped message="NO_APLICA: RA guard es un control del switch de acceso (SW-ACC, S-14); los puentes Linux del laboratorio no lo emulan; se ejecuta en Modo H"/>
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T24 DNS cifrado" time="5.1">
+  <testcase classname="CE0311.segmentacion" name="T24 DNS cifrado" time="5.0">
   </testcase>
   <testcase classname="CE0311.disponibilidad" name="T25 Break-glass" time="0">
     <skipped message="NO_APLICA: ESX01, IPMI01, BRK01 y SW-CORE01 no se emulan: el puerto break-glass no existe en F4.1 (CI-16); se ejecuta en Modo H"/>
@@ -63,7 +63,7 @@
   </testcase>
   <testcase classname="CE0311.deteccion" name="T30 Canary interno detecta un barrido en LAB" time="5.8">
   </testcase>
-  <testcase classname="CE0311.deteccion" name="T31 Honey-URL en el nodo de borde" time="3.5">
+  <testcase classname="CE0311.deteccion" name="T31 Honey-URL en el nodo de borde" time="3.9">
   </testcase>
   <testcase classname="CE0311.deteccion" name="T32 CrowdSec bloquea una IP abusiva en la WAN" time="24.7">
   </testcase>

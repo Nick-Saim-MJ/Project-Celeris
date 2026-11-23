@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="celeris-modo-L" tests="52" failures="1" skipped="18" timestamp="2026-11-23">
+<testsuite name="celeris-modo-L" tests="52" failures="0" skipped="18" timestamp="2026-11-23">
   <testcase classname="CE0311.vpn" name="T01 ON-PREM → AWS" time="0">
     <skipped message="NO_APLICA: el Modo L no ejecuta T01 (modos de la prueba: A, H); se ejecuta en A y H"/>
   </testcase>
@@ -30,16 +30,15 @@
   </testcase>
   <testcase classname="CE0311.deteccion" name="T14 Puerto no permitido" time="1.9">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T15 Exposición del portal" time="5.1">
+  <testcase classname="CE0311.seguridad_web" name="T15 Exposición del portal" time="5.0">
   </testcase>
   <testcase classname="CE0311.seguridad_web" name="T16 TLS del portal" time="42.2">
   </testcase>
   <testcase classname="CE0311.seguridad_web" name="T17 Escaneo web" time="57.9">
   </testcase>
-  <testcase classname="CE0311.seguridad_web" name="T18 WAF" time="1.8">
+  <testcase classname="CE0311.seguridad_web" name="T18 WAF" time="1.7">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T19 Salida del portal" time="0.4">
-    <failure message="código de salida ≠ 0: salida 0"/>
+  <testcase classname="CE0311.segmentacion" name="T19 PORTAL01 no establece conexiones hacia la WAN (TCP/UDP)" time="16.3">
   </testcase>
   <testcase classname="CE0311.segmentacion" name="T20 Aislamiento del señuelo" time="3.4">
   </testcase>
@@ -90,11 +89,11 @@
   </testcase>
   <testcase classname="CE0311.segmentacion" name="T45 Internet → zonas internas" time="6.7">
   </testcase>
-  <testcase classname="CE0311.segmentacion" name="T46 DMZ-SVC → zonas internas" time="6.3">
+  <testcase classname="CE0311.segmentacion" name="T46 DMZ-SVC → zonas internas" time="6.4">
   </testcase>
   <testcase classname="CE0311.segmentacion" name="T47 DMZ-HONEY → cualquier zona" time="9.5">
   </testcase>
-  <testcase classname="CE0311.conectividad" name="T49 Renovación ACME desde PORTAL01" time="5.3">
+  <testcase classname="CE0311.conectividad" name="T49 Entrega del certificado del portal por F33 (ACME en FW01)" time="3.5">
   </testcase>
   <testcase classname="CE0311.conectividad" name="T50 Precarga en ventana horaria con límite de ancho de banda" time="0">
     <skipped message="NO_APLICA: requiere la consola (CE02, S2): la precarga programada con ventana horaria y límite de ancho de banda (REQ-F-34, REQ-RN-10) no existe en el nodo ni en ctrl01; se ejecuta en Modo H"/>

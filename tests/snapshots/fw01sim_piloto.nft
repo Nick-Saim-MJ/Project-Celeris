@@ -39,7 +39,6 @@ table inet fw01sim {
     ip saddr 10.20.20.10 oifname "wan" tcp dport 443 counter accept comment "F18 CTRL01 > S3 backup tcp/443"
     ip saddr 10.20.10.20 ip daddr { 10.20.20.0/24, 10.20.32.0/22, 10.20.40.0/24, 10.20.41.0/24, 10.20.50.0/24, 10.20.60.0/24 } tcp dport { 22, 443, 9128 } counter accept comment "F20 JMP01 > HOSTS-LISTADOS admin tcp/22,443,9128"
     iifname "wan" ip daddr 10.20.40.10 tcp dport { 80, 443 } counter accept comment "F21 INTERNET > PORTAL01 portal-dnat tcp/443 (80 redirige y ACME)"
-    ip saddr 10.20.40.10 oifname "wan" tcp dport 443 counter accept comment "F23 PORTAL01 > INTERNET acme tcp/443"
     ip saddr 10.20.50.10 oifname "wan" tcp dport 443 counter accept comment "F26 SIEM01,FW01 > INTERNET feeds tcp/443"
     ip saddr 10.20.10.20 oifname "wan" tcp dport 443 counter accept comment "F27 JMP01 > INTERNET actualizaciones tcp/443"
     ip saddr 10.20.35.10 ip daddr 10.20.20.10 tcp dport 443 counter accept comment "F28 ENC01 > CTRL01 consola tcp/443"
@@ -60,6 +59,7 @@ table inet fw01sim {
     oifname "vlan50" ip daddr 10.20.50.10 tcp dport 6514 counter accept comment "F14 FW01 > SIEM01 syslog-tls tcp/6514"
     oifname "wan" meta l4proto . th dport { tcp . 853, tcp . 4460, udp . 123 } counter accept comment "F25 FW01 > INTERNET nts+dot tcp/4460,853 udp/123"
     oifname "wan" tcp dport 443 counter accept comment "F26 SIEM01,FW01 > INTERNET feeds tcp/443"
+    oifname "vlan40" ip daddr 10.20.40.10 tcp dport 22 counter accept comment "F33 FW01 > PORTAL01 sftp tcp/22 (origen local de FW01)"
     limit rate 20/second burst 50 packets log prefix "fw01sim DENEGADO output: " level info counter drop
   }
 

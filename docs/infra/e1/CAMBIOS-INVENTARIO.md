@@ -78,7 +78,8 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-47 | contradicción | F2 «zonas internas» frente a DMZ-HONEY («solo envía al SIEM», D1.9) | resuelto (2026-11-22: F2 excluye DMZ-HONEY) |
 | CI-48 | decisión de transcripción | Laboratorio emulado v0.4 (I2): parámetros que el inventario no fija (WAN y IP públicas, labcli02/03, byod01, gw-sim) y equivalencias distintas de D5.3 | abierto |
 | CI-49 | contradicción | F24 (señuelo) exige que el FortiGate publique TCP 22 y 23, pero D1.8 y S-29 limitan su NAT 1:1 a UDP 500/4500 y TCP 80/443 | abierto |
-| CI-50 | vacío | F23 y D1.9 («Salida: solo ACME y Wazuh»): FW01 permite TCP 443 a cualquier destino; el diseño no dice cómo se limita el destino | abierto |
+| CI-50 | vacío | F23 y D1.9 («Salida: solo ACME y Wazuh»): FW01 permite TCP 443 a cualquier destino; el diseño no dice cómo se limita el destino | resuelto (2026-11-23: opción A, ver CI-52) |
+| CI-52 | decisión de diseño | Opción A de CI-50: F23 retirado; ACME corre en FW01 y entrega el certificado a PORTAL01 por SFTP (F33); PORTAL01 no sale a la WAN | resuelto (2026-11-23) |
 | CI-51 | vacío | Memoria para servir objetos grandes: 20 clientes de un instalador de 100 MB agotan `max_buffered_bytes` (512 MiB); D2.4 no lo dimensiona | abierto |
 
 ## Entradas
@@ -662,13 +663,14 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto y DTI
 
 ### CI-50 — F23: la salida del portal no está limitada a los endpoints ACME
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-23, opción A; ver CI-52)
 - **Tipo:** vacío
 - **Dónde:** CE03 D1.9 (DMZ-SVC, «Salida: solo ACME y el agente Wazuh»), D1.11 (F23), T19; `infra/inventory.yaml` (F23)
 - **Qué dice cada fuente:** F23 es PORTAL01 → Internet TCP 443 «solo hacia los endpoints ACME», pero el flujo se transcribe por zona y puerto: FW01 permite 443 hacia cualquier destino. T19 («Salida del portal: curl https://example.com, Denegado») no se cumple con esa regla.
 - **Qué se hizo:** T19 mide el hallazgo (control positivo: el endpoint ACME de laboratorio; prueba: otro destino) y F23 queda `pendiente: true`.
 - **Propuesta:** limitar el destino con un alias de FW01 por FQDN (los endpoints de la CA elegida) o con una lista de IP del FortiGate; sin eso, T19 falla por diseño.
 - **Decide:** equipo del proyecto
+- **Resolución:** se elige la opción A: el portal no sale a la WAN. F23 se retira (CI-52) y T19 pasa a «PORTAL01 no establece conexiones hacia la WAN». `pendiente` queda en `false`: se quita de F23.
 
 ### CI-51 — Memoria para servir un objeto grande a muchos clientes a la vez
 - **Estado:** abierto
@@ -678,3 +680,17 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Qué se hizo:** el laboratorio fija `max_buffered_bytes = 3 GiB`, `max_object_bytes = 200 MiB` y `coalesce_wait_secs = 30` en los nodos EDGE (CI-48); no cambia el diseño.
 - **Propuesta:** dimensionar la RAM de EDGE01/02 para N clientes × el instalador más grande (S-27: 3 GB por PC en una actualización masiva) o servir los objetos grandes desde disco sin reservar memoria por cliente. Es trabajo de CE02.
 - **Decide:** equipo de software (CE02) y equipo del proyecto
+
+### CI-52 — F23 retirado; F33 (FW01 → PORTAL01, SFTP) entrega el certificado del portal
+- **Estado:** resuelto (2026-11-23)
+- **Tipo:** decisión de diseño (resuelve CI-50, opción A)
+- **Dónde:** CE03 D1.8 (matriz: DMZ-SVC → Internet), D1.9 (DMZ-SVC, «Salida»), D1.11 (F23, F33), D1.16 (T19, T49); `infra/inventory.yaml` (F23, F33, PORTAL01, FW01, `matriz_esperada`); `infra/pruebas.yaml` (T19, T49, T46); `infra/trazabilidad.yaml` (D-29, S-31)
+- **Qué cambia:**
+  - **F23** (PORTAL01 → Internet, TCP 443) pasa a `estado: retirado` (`retirado_por: CI-52`); su ID no se reutiliza.
+  - **F33** nuevo: FW01 → PORTAL01, TCP 22, «despliegue del certificado del portal por SFTP (ACME en FW01)». Control: llave dedicada y usuario chroot en la carpeta del certificado. Nace en FW01 (local al firewall, como F14), por eso no figura en la matriz zona × zona.
+  - **Matriz D1.8:** DMZ-SVC → Internet pasa de ✔ F23 a ✖; se agrega la nota de F33 (FW01 → DMZ-SVC).
+  - **T19** = «PORTAL01 no establece conexiones hacia la WAN (TCP/UDP)»; criterio: 0 conexiones establecidas en los contadores de FW01; sigue crítica. En el Modo H agrega un paso: la renovación ACME desde FW01 llega a PORTAL01 por F33.
+  - **T49** = entrega del certificado por F33: en el Modo L solo se comprueba que F33 abre (no hay Internet, no se emula ACME).
+  - **D-29** (decisión) y **S-31** (el FortiGate deja a FW01 llegar a la CA por 443 y 80; supuesto a confirmar con la DTI).
+- **Efecto sobre el laboratorio:** `fw01-sim` genera la regla de F33 y ninguna regla permite a PORTAL01 salir a la WAN; `portal01` abre TCP 22 como emulación del SFTP (solo el puerto; sin ACME ni chroot real, CI-48).
+- **Decide:** equipo del proyecto

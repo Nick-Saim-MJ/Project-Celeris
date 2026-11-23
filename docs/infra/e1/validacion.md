@@ -3,8 +3,8 @@
 > Generado por `infra/validate.py` (`make validate`). No editar a mano.
 
 - Inventario: versión 1.1 · fecha 2026-11-22
-- Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 8 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **7 FALLA**, 3 con advertencias, 44 PASA, 1 pendientes de P2–P5.
+- Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 9 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
+- Resultado: **6 FALLA**, 4 con advertencias, 44 PASA, 1 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -37,7 +37,7 @@
 | V-25 | Detecciones: ubicación existente y validación | PASA | — |
 | V-26 | Correspondencia contenidos mínimos (1–15) → secciones del DOCX cubre las 11 secciones | PASA con advertencias | 0 errores, 1 advertencias |
 | V-27 | Cobertura de las denegaciones de la matriz por pruebas (informativo) | PASA | 0 errores, 0 advertencias |
-| V-28 | Inventario v0.4 completo: D1.12, VPC/subredes D2.5, D1.11 (F1–F32), D1.16 (T01–T60), 7 VLAN | PASA | — |
+| V-28 | Inventario v0.4 completo: D1.12, VPC/subredes D2.5, D1.11 (F1–F33), D1.16 (T01–T60), 7 VLAN | PASA | — |
 | V-29 | Pendientes (`pendiente: true`) registrados en CAMBIOS-INVENTARIO.md | PASA | 0 errores, 0 advertencias |
 | V-30 | Sin secretos, llaves ni credenciales en infra/, docs/infra/, Makefile y CI | PASA | — |
 | V-31 | VPN (D1.10 v0.4): ASN, /30 de túnel, NAT-T, MTU/MSS, temporizadores y flujos sobre la VPN | PASA | — |
@@ -46,15 +46,15 @@
 | V-34 | La rúbrica coincide con el XLSX oficial (nombre, peso y descriptor de nivel 4) | PASA | — |
 | V-40 | El ruleset generado de fw01-sim contiene exactamente los flujos permitidos (y los bloqueos) del inventario | PASA | — |
 | V-41 | swanctl, FRR y VTI generados coinciden con la sección vpn del inventario (cifrado, DPD, vidas, ASN, BGP, MTU, MSS) | PASA | — |
-| V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | FALLA | 1 errores, 2 advertencias |
+| V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 2 advertencias |
 | V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA con advertencias | 0 errores, 1 advertencias |
 | V-44 | Un ID retirado no se reutiliza ni aparece en flujos, pruebas, componentes, zonas, rúbrica o textos vigentes | PASA | — |
 | V-45 | Ningún flujo permite descifrado con origen WIFI-EST (REQ-F-36, REQ-RN-11) | PASA | — |
 | V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA | Detalle y matriz componente × figura en docs/infra/e1/cobertura-figuras.md |
 | V-51 | Cobertura componente × figura igual al campo `figuras` del inventario | FALLA | 30 errores, 0 advertencias |
-| V-52 | Todo celeris_id es un ID del contrato | FALLA | 92 errores, 0 advertencias |
+| V-52 | Todo celeris_id es un ID del contrato | FALLA | 93 errores, 0 advertencias |
 | V-53 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | FALLA | 16 errores, 0 advertencias |
-| V-54 | Flujos F-nn: FIG-5.5a ∪ FIG-5.5b completas y etiquetas derivadas del inventario | FALLA | 19 errores, 0 advertencias |
+| V-54 | Flujos F-nn: FIG-5.5a ∪ FIG-5.5b completas y etiquetas derivadas del inventario | FALLA | 20 errores, 0 advertencias |
 | V-55 | Título, leyenda y panel «Qué aporta y qué pasa si falla» en cada figura | PASA | — |
 | V-56 | Criticidad (borde + texto) y color de zona según CLAUDE.md | FALLA | 3 errores, 0 advertencias |
 | V-60 | Matriz de componentes: archivo y hojas | FALLA | 1 errores, 0 advertencias |
@@ -68,7 +68,6 @@
 
 ## Errores
 
-- **V-42** — 2026-11-23-L: la prueba crítica T19 (Salida del portal) FALLA. *Cómo corregir:* Corrija el diseño o la implementación; una prueba crítica en FALLA invalida un límite de seguridad
 - **V-51** — FGT-EXT falta en FIG-1.1 (campo `figuras`). *Cómo corregir:* Añádalo a la disposición de la figura en drawio.py
 - **V-51** — FGT-EXT falta en FIG-5.1 (campo `figuras`). *Cómo corregir:* Añádalo a la disposición de la figura en drawio.py
 - **V-51** — FGT-EXT falta en FIG-5.2 (campo `figuras`). *Cómo corregir:* Añádalo a la disposición de la figura en drawio.py
@@ -167,6 +166,7 @@
 - **V-52** — FIG-5.5a: dibuja el ID retirado «BACKUP» (v0.4); pendiente de I4: regenerar los diagramas. *Cómo corregir:* Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
 - **V-52** — FIG-5.5a: dibuja el ID retirado «STORAGE» (v0.4); pendiente de I4: regenerar los diagramas. *Cómo corregir:* Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
 - **V-52** — FIG-5.5a: dibuja el ID retirado «F22» (v0.4); pendiente de I4: regenerar los diagramas. *Cómo corregir:* Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
+- **V-52** — FIG-5.5a: dibuja el ID retirado «F23» (v0.4); pendiente de I4: regenerar los diagramas. *Cómo corregir:* Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
 - **V-52** — FIG-5.5b: dibuja el ID retirado «WAF01» (v0.4); pendiente de I4: regenerar los diagramas. *Cómo corregir:* Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
 - **V-52** — FIG-5.5b: dibuja el ID retirado «WEB01» (v0.4); pendiente de I4: regenerar los diagramas. *Cómo corregir:* Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
 - **V-52** — FIG-5.5b: dibuja el ID retirado «LAB-TEST» (v0.4); pendiente de I4: regenerar los diagramas. *Cómo corregir:* Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
@@ -226,6 +226,7 @@
 - **V-54** — FIG-5.5b: falta F28. *Cómo corregir:* 
 - **V-54** — FIG-5.5b: falta F29. *Cómo corregir:* 
 - **V-54** — FIG-5.5b: falta F30. *Cómo corregir:* 
+- **V-54** — FIG-5.5b: falta F33. *Cómo corregir:* 
 - **V-56** — FIG-5.1: AWS-APP-A con criticidad Media; inventario: Baja. *Cómo corregir:* 
 - **V-56** — FIG-5.2: AWS-APP-A con criticidad Media; inventario: Baja. *Cómo corregir:* 
 - **V-56** — FIG-5.4: AWS-APP-A con criticidad Media; inventario: Baja. *Cómo corregir:* 
@@ -242,10 +243,10 @@
 
 ## Información
 
-- **V-27** — 28 de 59 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 28 elementos pendientes en los YAML; 51 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-51']
-- **V-42** — Resultados de 2026-11-23-L (commit descono): {'PASA': 33, 'FALLA': 1, 'PARCIAL': 1, 'NO_APLICA': 17}
-- **V-72** — Celdas denegadas no críticas sin prueba dedicada: 32 de 59 (las cubre la política deny-all; ver hoja «Cobertura»)
+- **V-27** — 29 de 60 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
+- **V-29** — 27 elementos pendientes en los YAML; 52 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-50', 'CI-51', 'CI-52']
+- **V-42** — Resultados de 2026-11-23-L (commit descono): {'PASA': 34, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
+- **V-72** — Celdas denegadas no críticas sin prueba dedicada: 32 de 60 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 605 fórmulas recalculadas con LibreOffice sin errores
 
 ## Cobertura
@@ -258,7 +259,7 @@
 | objetivos con ≥ 1 prueba | 12 | 12 |
 | amenazas con ≥ 1 prueba | 18 | 18 |
 | detecciones con ≥ 1 prueba | 11 | 11 |
-| celdas denegadas con ≥ 1 prueba | 28 | 59 |
+| celdas denegadas con ≥ 1 prueba | 29 | 60 |
 | criterios de rúbrica con evidencia | 8 | 8 |
 
 ## Pendientes de P2–P5 (ganchos)

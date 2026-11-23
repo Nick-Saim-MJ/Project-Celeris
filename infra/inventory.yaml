@@ -2,7 +2,7 @@
 # Transcripción fiel de docs/celeris/Celeris-CE03-Infraestructura.md (v0.4: D1.8–D1.13, D2.4–D2.5, D5.3 y D7) y de
 # docs/celeris/Celeris-Arquitectura-v0.4.md; la base v0.2 es docs/Celeris-Edge-Documento-Maestro.md.
 # No editar a mano fuera del proceso de CAMBIOS-INVENTARIO.md. Valida con: make validate
-# Convenciones: IDs del contrato (FW01…, F1–F32, S-xx, D-xx, REQ-…, OD-xx, FIG-x.x).
+# Convenciones: IDs del contrato (FW01…, F1–F33, S-xx, D-xx, REQ-…, OD-xx, FIG-x.x).
 # v0.4 (I1): aplica CI-35…CI-43 (CE03 D7 CI-30…38, renumerados). Lo retirado conserva su ID con `estado: retirado` y
 # `retirado_por`; un ID retirado NUNCA se reutiliza ni puede aparecer en algo vigente (V-44).
 # Marca `pendiente: true` = contradicción o vacío del documento maestro registrado en
@@ -413,7 +413,7 @@ componentes:
     vm: { fase: F1, vcpu: 4, ram_gb: 8, disco_gb: 40, so: OPNsense, port_group: "TRANSITO + FW-TRUNK" }
     por_que: "Todo tráfico entre zonas pasa por FW01 (D-17), de modo que cada flujo tiene una regla y un registro. Además termina la VPN IPsec, ejecuta Suricata y CrowdSec, y presta DNS (Unbound con DNSSEC), NTP y DHCP a las zonas (D-28)."
     aporta_corto: "Ruteo entre zonas, deny-all, IPS, VPN, DNS y NTP"
-    aporta: "Se conecta al FortiGate FGT-EXT por la red de tránsito 10.20.0.0/29 (WAN 10.20.0.2; FortiGate 10.20.0.1); una subinterfaz VLAN por zona (10, 20, 30, 40, 41, 50, 60) en el trunk PG-FW-TRUNK; VTI1 y VTI2 con BGP y NAT-T (identidad IKE 203.0.113.10); Unbound con DNSSEC y NTP en la interfaz .1 de cada VLAN (F2), NTS y DoT hacia arriba (F25); Suricata IPS inline en tránsito y DMZ-SVC e IDS en las interfaces LAB y SERVERS (DET-02); CrowdSec; DHCP con reservas por rango de laboratorio."
+    aporta: "Se conecta al FortiGate FGT-EXT por la red de tránsito 10.20.0.0/29 (WAN 10.20.0.2; FortiGate 10.20.0.1); una subinterfaz VLAN por zona (10, 20, 30, 40, 41, 50, 60) en el trunk PG-FW-TRUNK; VTI1 y VTI2 con BGP y NAT-T (identidad IKE 203.0.113.10); Unbound con DNSSEC y NTP en la interfaz .1 de cada VLAN (F2), NTS y DoT hacia arriba (F25); cliente ACME del certificado del portal, que entrega por SFTP a PORTAL01 (F33); Suricata IPS inline en tránsito y DMZ-SVC e IDS en las interfaces LAB y SERVERS (DET-02); CrowdSec; DHCP con reservas por rango de laboratorio."
     si_falla: "Se pierde el ruteo entre VLAN, la salida a Internet, la VPN y el DNS y NTP de las zonas (punto único de falla, AM-12). Mitigación: BRK01 y restauración desde el XML en Git, RTO 1 h (D2.9); CARP en H3."
     dependencias: [FGT-EXT, ESX01, SW-CORE01]
     controles: "Deny-all con registro; Suricata IPS inline en tránsito y DMZ-SVC e IDS en LAB y SERVERS; CrowdSec; anti-spoofing y bogons en WAN, excepto 10.20.0.0/29, la red del Wi-Fi (172.16.0.0/16, solo hacia F31/F32) y 10.30.0.0/16 por VTI; GUI solo desde JMP01 con MFA (TOTP); reglas exportadas a Git con revisión de cuatro ojos"
@@ -740,10 +740,10 @@ componentes:
     vm: { fase: F1, vcpu: 1, ram_gb: 2, disco_gb: 20, so: "Debian 13", port_group: "PG-DMZ-SVC" }
     por_que: "El usuario debe poder leer qué se descifra y verificar la huella de la CA antes de usar el proxy. Es el servicio protegido que exige la DMZ de la rúbrica."
     aporta_corto: "Portal de transparencia protegido por WAF"
-    aporta: "Caddy + Coraza (OWASP CRS) con certificado público ACME (F23), TLS 1.3 y HSTS; sirve el sitio estático firmado que genera la consola (REQ-F-30) con sistema de archivos de solo lectura, sin base de datos ni login; recibe TCP 443 de LAB (F5), de WIFI-EST (F32) y de Internet por NAT 1:1 en el FortiGate (F21); su salida es solo ACME y el agente Wazuh (F13)."
+    aporta: "Caddy + Coraza (OWASP CRS) con certificado público que FW01 renueva por ACME y le entrega por SFTP (F33), TLS 1.3 y HSTS; sirve el sitio estático firmado que genera la consola (REQ-F-30) con sistema de archivos de solo lectura, sin base de datos ni login; recibe TCP 443 de LAB (F5), de WIFI-EST (F32) y de Internet por NAT 1:1 en el FortiGate (F21); no tiene salida a la WAN: solo el agente Wazuh hacia SIEM01 (F13); recibe el certificado de FW01 por SFTP en TCP 22 (F33)."
     si_falla: "Las PCs ya enroladas siguen funcionando; no se pueden enrolar nuevas."
     dependencias: [FW01, FGT-EXT, SIEM01]
-    controles: "Caddy + Coraza + OWASP CRS; límite por IP; CSP default-src 'self', frame-ancestors 'none', nosniff y Referrer-Policy; sistema de archivos de solo lectura; salida solo ACME y Wazuh; Suricata IPS inline y CrowdSec en FW01"
+    controles: "Caddy + Coraza + OWASP CRS; límite por IP; CSP default-src 'self', frame-ancestors 'none', nosniff y Referrer-Policy; sistema de archivos de solo lectura; sin salida a la WAN (solo Wazuh, F13); recibe el certificado por SFTP desde FW01 (F33), usuario chroot y llave dedicada; Suricata IPS inline y CrowdSec en FW01"
     adr: [D-15, D-28]
     req: [REQ-F-30, REQ-RN-05]
     objetivos: [OD-08]
@@ -1498,7 +1498,7 @@ componentes:
     pendiente: true
     cambio: CI-13
 
-# Flujos F1–F32 (D1.11 v0.4). Endpoint = ID de componente, "COMP:interfaz" o ID de zona.
+# Flujos F1–F33 (D1.11 v0.4 + F33 de CI-52). Endpoint = ID de componente, "COMP:interfaz" o ID de zona.
 # v0.4: F9, F11, F12, F15, F16, F17, F19 y F22 quedan `estado: retirado` (no se borran ni se reutilizan); F28–F32 son nuevos.
 # El flujo F4 está reservado en el documento maestro: no se borra.
 # regla_fw: descripción de la regla en OPNsense; contiene el ID del flujo (criterio 1 de D1.13).
@@ -1893,7 +1893,8 @@ flujos:
     req: []
 
   - id: F23
-    estado: activo
+    estado: retirado
+    retirado_por: CI-52
     origen: [PORTAL01]
     destino: [INTERNET]
     destino_detalle: "Endpoints ACME"
@@ -1901,16 +1902,14 @@ flujos:
     proposito: "Renovación del certificado"
     accion: permitir
     proteccion: { tipo: tls, detalle: "TLS" }
-    riesgo_residual: "Bajo: solo hacia los endpoints ACME"
+    riesgo_residual: "Retirado: PORTAL01 ya no sale a la WAN; ACME corre en FW01 y entrega el certificado por F33 (CI-52)"
     modo: ambos
     regla_fw: "F23 PORTAL01 > INTERNET acme tcp/443"
     figura: FIG-5.5a
     objetivos: [OD-08]
     adr: [D-15]
     req: []
-    pendiente: true
-    cambio: CI-50
-    nota: "FW01 permite TCP 443 hacia cualquier destino; D1.9 dice «solo ACME» y el diseño no limita el destino (CI-50)"
+    cambio: CI-52
 
   - id: F24
     estado: activo
@@ -2090,6 +2089,29 @@ flujos:
     ampliacion: true
     cambio: CI-38
 
+  - id: F33
+    estado: activo
+    origen: [FW01]
+    destino: [PORTAL01]
+    destino_detalle: "10.20.40.10 (interfaz vlan40 de FW01, 10.20.40.1)"
+    protocolos: [{ proto: tcp, puertos: [22] }]
+    proposito: "despliegue del certificado del portal por SFTP (ACME en FW01)"
+    accion: permitir
+    proteccion:
+      tipo: ssh
+      detalle: "SFTP sobre SSH con llave dedicada; el certificado se renueva por ACME en FW01 y se empuja a PORTAL01 (PORTAL01 no sale a la WAN)"
+    control: "llave dedicada, usuario chroot en la carpeta del certificado"
+    riesgo_residual: "Bajo: un FW01 comprometido ya controla todo el tráfico; la llave solo escribe en la carpeta del certificado (usuario chroot) y no da shell"
+    modo: ambos
+    regla_fw: "F33 FW01 > PORTAL01 sftp tcp/22 (origen local de FW01)"
+    figura: FIG-5.5b
+    objetivos: [OD-08]
+    adr: [D-29]
+    req: [REQ-RN-05]
+    supuestos: [S-31]
+    ampliacion: true
+    cambio: CI-52
+
 # Matriz zona × zona esperada (D1.8 v0.4), transcrita celda por celda. Fila = origen; columna = destino.
 # estado: permitido | denegado | no_aplica ("—" del documento). `bloqueados` = flujos bloqueados explícitos (✖ Fn).
 # La matriz no incluye una fila Perímetro ni Tránsito: los flujos que nacen o terminan en FW01 son locales al firewall y no se derivan.
@@ -2151,7 +2173,7 @@ matriz_esperada:
       SECURITY: { estado: permitido, flujos: [F13] }
       EDGE: { estado: denegado }
       AWS: { estado: denegado }
-      INTERNET: { estado: permitido, flujos: [F23], nota: "ACME" }
+      INTERNET: { estado: denegado, nota: "CI-52: F23 retirado; PORTAL01 no sale a la WAN (ACME en FW01, entrega por F33, que nace en FW01 y no figura en la matriz)" }
     DMZ-HONEY:
       MGMT: { estado: denegado }
       SERVERS: { estado: denegado }

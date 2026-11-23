@@ -152,3 +152,12 @@ def test_antispoofing_de_la_wan_excluye_el_transito_y_el_wifi(infra):
     cubre = lambda ip: any(ipaddress.ip_address(ip) in r for r in redes)
     assert not cubre("10.20.0.1") and not cubre("172.16.0.50")
     assert cubre("172.17.0.1") and cubre("192.168.1.1") and cubre("10.20.60.10") and cubre("10.1.1.1")
+
+
+def test_portal01_no_sale_a_la_wan_y_f33_abre_de_fw01_al_portal(infra):
+    """CI-52: F23 retirado (sin regla de PORTAL01 hacia la WAN); F33 FW01 → PORTAL01 TCP 22 es una regla de salida local de FW01."""
+    t = gen(infra)
+    assert not any("10.20.40.10" in l and "oifname \"wan\"" in l for l in reglas(t)), "PORTAL01 no debe tener ninguna regla hacia la WAN"
+    assert "F23" not in t
+    f33 = [l for l in reglas(t) if "F33" in l]
+    assert len(f33) == 1 and 'oifname "vlan40"' in f33[0] and "ip daddr 10.20.40.10 tcp dport 22" in f33[0]

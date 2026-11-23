@@ -516,31 +516,33 @@ pruebas:
 
   - id: T19
     categoria: segmentacion
-    nombre: "Salida del portal"
+    nombre: "PORTAL01 no establece conexiones hacia la WAN (TCP/UDP)"
     origen: PORTAL01
     destino: INTERNET
-    flujos: [F23]
+    flujos: [F33, F13]
+    flujos_justificacion: "Prueba de denegación: PORTAL01 no inicia ningún flujo hacia la WAN (CI-52); F33 (FW01 → PORTAL01) y F13 se usan solo como controles positivos"
     componentes: [PORTAL01, FW01]
-    objetivo_que_valida: "PORTAL01 no sale a Internet salvo hacia los endpoints ACME (F23)"
-    precondicion: "PORTAL01 solo con su agente Wazuh hacia SIEM01 (F13) y ACME (F23)"
-    comando: "curl -sS -m 5 https://example.com"
-    resultado_esperado: "Denegado"
+    objetivo_que_valida: "PORTAL01 no establece conexiones hacia la WAN (TCP ni UDP): ningún destino de Internet sale, ni 443, ni 80, ni DNS o NTP directos (D-29)"
+    precondicion: "PORTAL01 solo con su agente Wazuh hacia SIEM01 (F13); el certificado llega desde FW01 por F33; ninguna regla de PORTAL01 ni de FW01 permite salir hacia la WAN"
+    comando: "curl -sS -m 5 https://example.com ; curl -sS -m 5 http://example.com ; nc -zvu -w3 203.0.113.53 53 ; conntrack -L -s 10.20.40.10   # en FW01"
+    resultado_esperado: "Denegado: 0 conexiones establecidas hacia la WAN en los contadores de FW01"
     criterio_aprobacion:
       - { tipo: exit_code, valor: distinto_de_0 }
+      - { tipo: contador, metrica: conexiones_establecidas_hacia_la_wan, operador: "==", valor: 0, nota: "conntrack de FW01: conexiones con origen 10.20.40.10 y destino fuera de 10.20.0.0/16, en estado establecido" }
+      - { tipo: contador, metrica: paquetes_denegados_por_fw01, operador: ">", valor: 0, nota: "contador de denegación de FW01 (FORWARD)" }
     automatizable: true
     critica: true
     polaridad: negativa
-    evidencia_a_capturar: ["Salida de curl", "Registro de denegación en FW01"]
+    evidencia_a_capturar: ["Salida de curl y nc", "Conexiones de PORTAL01 en conntrack de FW01 (0 hacia la WAN)", "Contador de denegación de FW01"]
     modos: [L, H]
+    nota_modos: "Además, la renovación ACME desde FW01 llega a PORTAL01 por F33: se fuerza una renovación (certbot/lego en FW01) y se comprueba que el certificado nuevo queda en la carpeta del usuario chroot de PORTAL01 y que PORTAL01 lo sirve en 443 sin haber abierto ninguna conexión hacia la WAN (conntrack en FW01 sigue en 0)"
     semestre: S2
     criterios_rubrica: [R4]
     objetivos: [OD-01, OD-06, OD-08]
     amenazas: []
     detecciones: []
-    celdas_matriz: []
-    observacion_ensayo:
-      causa: "FW01 permite TCP 443 desde DMZ-SVC hacia cualquier destino (F23); D1.9 y D1.11 piden solo los endpoints ACME y el diseño no dice cómo limitar el destino (CI-50)"
-      accion: "Decidir CI-50: alias de FW01 por FQDN de la CA elegida o lista de IP en el FortiGate; luego repetir T19 con make test-lab"
+    celdas_matriz: ["DMZ-SVC>INTERNET"]
+    cambio: CI-52
 
   - id: T20
     categoria: segmentacion
@@ -1313,7 +1315,7 @@ pruebas:
     origen: PORTAL01
     destino: [MGMT, SERVERS, LAB, EDGE]
     flujos: []
-    flujos_justificacion: "Prueba de denegación: PORTAL01 solo inicia F23 (ACME) y F13 (Wazuh); no inicia ningún flujo hacia el campus"
+    flujos_justificacion: "Prueba de denegación: PORTAL01 solo inicia F13 (Wazuh); no inicia ningún flujo hacia el campus ni hacia la WAN (CI-52)"
     componentes: [PORTAL01, FW01, ESX01, CTRL01, EDGE01]
     objetivo_que_valida: "Un servidor de la DMZ comprometido no alcanza las zonas internas (OD-01)"
     precondicion: "PORTAL01 en 10.20.40.10; objetivos: ESX01 10.20.10.10, CTRL01 10.20.20.10 (incluido el 5432 de PostgreSQL, que no escucha en red), LABCLI01 10.20.35.50 y EDGE01 10.20.60.10"
@@ -1401,31 +1403,32 @@ pruebas:
 
   - id: T49
     categoria: conectividad
-    nombre: "Renovación ACME desde PORTAL01"
-    origen: PORTAL01
-    destino: INTERNET
-    flujos: [F23]
+    nombre: "Entrega del certificado del portal por F33 (ACME en FW01)"
+    origen: FW01
+    destino: PORTAL01
+    flujos: [F33]
     componentes: [PORTAL01, FW01]
-    objetivo_que_valida: "PORTAL01 alcanza los endpoints ACME por TCP 443 para renovar el certificado del portal y no sale por otros puertos (F23)"
-    precondicion: "PORTAL01 en 10.20.40.10; CA ACME elegida por el equipo (se usa el directorio de Let's Encrypt como ejemplo; el inventario no fija el endpoint)"
-    comando: "curl -sS -o /dev/null -w \"%{http_code}\" https://acme-v02.api.letsencrypt.org/directory ; curl -sS -m5 http://example.com"
-    resultado_esperado: "El directorio ACME responde 200; HTTP en claro hacia Internet no sale"
+    objetivo_que_valida: "FW01 llega a PORTAL01 por TCP 22 (F33) para entregarle el certificado renovado por ACME, y ninguna otra zona llega a ese puerto (D-29)"
+    precondicion: "PORTAL01 en 10.20.40.10 con el usuario chroot de la carpeta del certificado; llave dedicada de FW01; en el Modo L no hay Internet: no se emula ACME y solo se comprueba que F33 abre"
+    comando: "nc -zv -w3 10.20.40.10 22   # desde FW01 ; nc -zv -w3 10.20.40.10 22   # desde LABCLI01"
+    resultado_esperado: "F33 abre desde FW01 y no desde otra zona"
     criterio_aprobacion:
-      - { tipo: regex, sobre: stdout, patron: "^200$", comando_adicional: "curl -sS -o /dev/null -w \"%{http_code}\" https://acme-v02.api.letsencrypt.org/directory" }
-      - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "curl -sS -m5 http://example.com", nota: "DMZ-SVC → Internet solo permite TCP 443 desde PORTAL01" }
+      - { tipo: exit_code, valor: 0, comando_adicional: "nc -zv -w3 10.20.40.10 22   # desde FW01", nota: "control positivo de F33" }
+      - { tipo: exit_code, valor: distinto_de_0, comando_adicional: "nc -zv -w3 10.20.40.10 22   # desde LABCLI01", nota: "el SFTP del portal solo lo alcanza FW01" }
     automatizable: true
     critica: false
     polaridad: mixta
-    evidencia_a_capturar: ["Código HTTP del directorio ACME", "Salida de curl hacia el puerto 80", "Contador de la regla F23 en FW01"]
+    evidencia_a_capturar: ["Salida de nc desde FW01 y desde LABCLI01", "Contador de la regla F33 en FW01"]
     modos: [L, H]
+    nota_modos: "Modo L: solo la apertura de F33 (no hay Internet ni ACME). Modo H: la renovación ACME real de FW01 entrega el certificado nuevo a PORTAL01 por SFTP (usuario chroot) y PORTAL01 lo sirve en 443 (S-31)"
     semestre: S2
     criterios_rubrica: [R4, R6]
     objetivos: [OD-08]
     amenazas: []
     detecciones: []
-    celdas_matriz: ["DMZ-SVC>INTERNET"]
+    celdas_matriz: []
     ampliacion: true
-    cambio: CI-27
+    cambio: CI-52
 
   - id: T50
     categoria: conectividad

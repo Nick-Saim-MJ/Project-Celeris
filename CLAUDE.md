@@ -12,9 +12,9 @@
 - Si un documento y infra/*.yaml no coinciden, manda infra/*.yaml. Si el YAML está mal, se corrige por CI-xx.
 - No inventes IP, puertos, nombres ni cantidades. Si falta algo, DETENTE y regístralo en
   docs/infra/e1/CAMBIOS-INVENTARIO.md con el siguiente CI libre.
-- IDs vigentes: F1–F32 (F4 reservado; F9, F11, F12, F15, F16, F17, F19, F22 retirados), T01–T60
-  (T12, T22, T37, T38, T39, T41, T44, T48 retirados), OD-01–OD-12, AM-01–AM-18, DET-01–DET-11, S-01–S-30,
-  D-01–D-28, REQ-F-01–F-37. Un ID retirado NUNCA se reutiliza.
+- IDs vigentes: F1–F33 (F4 reservado; F9, F11, F12, F15, F16, F17, F19, F22, F23 retirados), T01–T60
+  (T12, T22, T37, T38, T39, T41, T44, T48 retirados), OD-01–OD-12, AM-01–AM-18, DET-01–DET-11, S-01–S-31,
+  D-01–D-29, REQ-F-01–F-37. Un ID retirado NUNCA se reutiliza.
 - Componentes vigentes (v0.4): FGT-EXT, FW01, SW-CORE01, SW-ACC, BRK01, ESX01, IPMI01, UPS01, JMP01, CTRL01,
   EDGE01, EDGE02, PORTAL01, HNY01, SIEM01, ENC01, LABCLI01, KALI01, HNY02, PCs LAB-01…LAB-10, WIFI-EST,
   VTI1, VTI2, VGW, EC2-GW, S3 celeris-backups, AWS-VPC, AWS-PUB-A, AWS-APP-A (+ EC2-DR y NAT-DR temporales).

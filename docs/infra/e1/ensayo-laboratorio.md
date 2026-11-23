@@ -5,7 +5,7 @@
 > **El laboratorio es emulado** (Parte F4.2 del documento maestro). Lo que pasa aquí demuestra que el *diseño* se comporta como está descrito en una emulación funcional; no es la validación del producto real (OPNsense, VGW de AWS) ni del campus.
 
 - Fecha: 2026-11-23 · commit: `desconocido`
-- Resultado: **33 PASA**, **1 FALLA**, **1 PARCIAL**, **17 NO_APLICA** (de 52 pruebas vigentes, 24 de ellas ampliaciones T29+ que aún no tienen caso en el Modo L)
+- Resultado: **34 PASA**, **0 FALLA**, **1 PARCIAL**, **17 NO_APLICA** (de 52 pruebas vigentes, 24 de ellas ampliaciones T29+ que aún no tienen caso en el Modo L)
 - `PARCIAL` = parte de los criterios no se pudo evaluar en el Modo L (navegador real, Wazuh…) o la medición no ejercitó lo que la prueba valida. **No cuenta como PASA.**
 - `NO_APLICA` = la prueba no se puede ejecutar en L; se indica el modo en que sí se ejecutará. **Nunca cuenta como PASA.**
 
@@ -28,11 +28,11 @@ La columna «v0.2 → v0.4» compara con el ensayo anterior (2026-11-21, v0.2). 
 | T11 — Internet → DMZ-HONEY | **PASA** | PASA → PASA | conexiones_en_cowrie = 18, latencia_alerta_wazuh_s = 2.7 | F24 exige abrir TCP 22 y 23 en el FortiGate durante la ventana, pero D1.8 y S-29 limitan su NAT 1:1 a UDP 500/4500 y TCP 80/443 (CI-49) |
 | T13 — Abuso del proxy | **PASA** | PASA → PASA | — |  |
 | T14 — Puerto no permitido | **PASA** | PASA → PASA | — |  |
-| T15 — Exposición del portal | **PASA** | PASA → PASA | puertos_abiertos = 2, puertos_abiertos_en_ctrl01 = 0, alertas_suricata_fw01 = 543 |  |
+| T15 — Exposición del portal | **PASA** | PASA → PASA | puertos_abiertos = 2, puertos_abiertos_en_ctrl01 = 0, alertas_suricata_fw01 = 0 |  |
 | T16 — TLS del portal | **PASA** | PASA → PASA | — | calificación de testssl.sh: A+ (certificado de la CA de laboratorio; el ACME público se prueba en Modo H) |
 | T17 — Escaneo web | **PASA** | PASA → PASA | alertas_altas = 0 |  |
-| T18 — WAF | **PASA** | PASA → PASA | eventos_modsecurity = 15, latencia_alerta_wazuh_s = 1.4 |  |
-| T19 — Salida del portal | **FALLA** | PASA → FALLA | — | código de salida ≠ 0: salida 0 |
+| T18 — WAF | **PASA** | PASA → PASA | eventos_modsecurity = 1, latencia_alerta_wazuh_s = 0.8 |  |
+| T19 — PORTAL01 no establece conexiones hacia la WAN (TCP/UDP) | **PASA** | PASA → PASA | conexiones_establecidas_hacia_la_wan = 0, paquetes_denegados_por_fw01 = 12, salida_http_8… | el DNS hacia el resolvedor de FW01 (F2) no cuenta: es tráfico local a 10.20.0.0/16; ACME corre en FW01 y no se emula en el Modo L (no hay Internet) |
 | T20 — Aislamiento del señuelo | **PASA** | PASA → PASA (cambió de destino: HNY01 → PORTAL01:443 (antes WEB01:8080)) | — |  |
 | T21 — MTU del túnel | **NO_APLICA** | NO_APLICA → NO_APLICA (cambió de destino: destino 10.30.0.10) | — | el Modo L no ejecuta T21 (modos de la prueba: A, H); se ejecuta en A y H |
 | T23 — Fuga IPv6 | **NO_APLICA** | NO_APLICA → NO_APLICA | — | RA guard es un control del switch de acceso (SW-ACC, S-14); los puentes Linux del laboratorio no lo emulan; se ejecuta en Modo H |
@@ -55,7 +55,7 @@ La columna «v0.2 → v0.4» compara con el ensayo anterior (2026-11-21, v0.2). 
 | T45 — Internet → zonas internas | **PASA** | PASA → PASA | puertos_open = 0, paquetes_denegados_por_fw01 = 20 | el FortiGate emulado reenvía todo y deja la política a FW01; el FortiGate real solo publica UDP 500/4500 y TCP 80/443 (D1.8) |
 | T46 — DMZ-SVC → zonas internas | **PASA** | PASA → PASA (cambió de destino: DMZ-SVC → zonas internas, incluido CTRL01:5432) | puertos_open = 0, paquetes_denegados_por_fw01 = 24 | PORTAL01 se probó como equipo comprometido; el 5432 de CTRL01 es un puerto de prueba: PostgreSQL de la v0.4 no escucha en la red (socket local, D-25) |
 | T47 — DMZ-HONEY → cualquier zona | **PASA** | PASA → PASA | puertos_open = 0, paquetes_denegados_por_fw01 = 16 | «Internet» es ext01 (198.51.100.100): el laboratorio no tiene DNS ni salida a Internet real |
-| T49 — Renovación ACME desde PORTAL01 | **PASA** | PASA → PASA | — | el directorio ACME es un servidor de laboratorio en ext01 (no Let's Encrypt, no emite certificados) |
+| T49 — Entrega del certificado del portal por F33 (ACME en FW01) | **PASA** | PASA → PASA | — | Modo L: solo se comprueba que F33 abre; el SFTP (llave dedicada, usuario chroot) y la renovación ACME de FW01 se prueban en el Modo H (S-31) |
 | T50 — Precarga en ventana horaria con límite de ancho de banda | **NO_APLICA** | nueva | — | requiere la consola (CE02, S2): la precarga programada con ventana horaria y límite de ancho de banda (REQ-F-34, REQ-RN-10) no existe en el nodo ni en ctrl01; se ejecuta… |
 | T51 — Cambio del encargado y configuración sin firma | **PASA** | nueva | latencia_cambio_s = 2.5, bundles_sin_firma_aplicados = 0 | el nodo recarga cada 5 s (config_reload_secs en el laboratorio); en producción el intervalo lo fija la DTI. Solo cambian allowed_clients, intercept_domains, never_interc… |
 | T52 — Laboratorio deshabilitado | **PASA** | nueva | — | el laboratorio es un /26 de allowed_clients; el tráfico de LAB-03 sigue llegando al nodo (F1 abre toda la VLAN 30 en FW01): el control está en el nodo (D1.8, nota 1) |
@@ -88,12 +88,11 @@ La columna «v0.2 → v0.4» compara con el ensayo anterior (2026-11-21, v0.2). 
 - **Coalescencia (T55):** 1 descarga(s) en origin-sim para 20 clientes simultáneos de 100 MB; 19 respuestas HIT de las 19 que esperaron.
 - **Cambio firmado (T51, REQ-NF-16):** el nodo aplicó la configuración firmada en 2.5 s (meta ≤ 60 s; intervalo de recarga del laboratorio: 5 s).
 - **TLS del portal (T16, OD-08):** calificación de testssl.sh: A+ (certificado de la CA de laboratorio; el ACME público se prueba en Modo H)
-- **Exposición (T15):** 2 puertos abiertos desde Internet; alertas de Suricata en fw01-sim durante el escaneo: 543.
+- **Exposición (T15):** 2 puertos abiertos desde Internet; alertas de Suricata en fw01-sim durante el escaneo: 0.
 - **Métricas (T27, REQ-NF-14):** paquetes HTTP en claro = 0, handshakes TLS = 7, apariciones del token = 0.
 
 ## Hallazgos (contradicen o precisan el diseño)
 
-- **T19 FALLA** — código de salida ≠ 0: salida 0 (PORTAL01 alcanza example.com por 443: F23 permite TCP 443 hacia cualquier destino de Internet y no solo hacia los endpoints ACME que D1.9 («Salida: solo ACME y Wazuh») y D1.11 («Renovación del certificado») prometen; el diseño no define cómo se limita el destino (alias de FW01 por FQDN o lista del FortiGate))
 - T05 — tras la caída la ruta a 10.30.0.0/16 va por: vti2
 - T05 — la sonda va de EC2-GW (gw-sim) a CTRL01:443 (F30): es el flujo que la VPN transporta en la v0.4
 - T07 — Cache-Status presente pero distinto de lo esperado: primera = ['celeris; hit; ttl=1686'], segunda = ['celeris; hit; ttl=1686']
@@ -102,6 +101,7 @@ La columna «v0.2 → v0.4» compara con el ensayo anterior (2026-11-21, v0.2). 
 - T11 — F24 exige abrir TCP 22 y 23 en el FortiGate durante la ventana, pero D1.8 y S-29 limitan su NAT 1:1 a UDP 500/4500 y TCP 80/443 (CI-49)
 - T11 — el puerto 23 de F24 no se prueba: OpenCanary no está en el laboratorio
 - T16 — calificación de testssl.sh: A+ (certificado de la CA de laboratorio; el ACME público se prueba en Modo H)
+- T19 — el DNS hacia el resolvedor de FW01 (F2) no cuenta: es tráfico local a 10.20.0.0/16; ACME corre en FW01 y no se emula en el Modo L (no hay Internet)
 - T24 — el resolvedor de prueba es ext01 (IP del laboratorio), no 203.0.113.53 (CI-19): la regla F7 bloquea por puerto, no por destino
 - T26 — en la v0.4 el MISS sale a Internet (F8) y no por la VPN; se captura en la interfaz del nodo y se compara con el eco del origen (/echo de ext01)
 - T27 — el 9128 de los nodos y el 443 de ctrl01 solo aceptan TLS; los certificados son de laboratorio (en producción, los de step-ca)
@@ -117,7 +117,7 @@ La columna «v0.2 → v0.4» compara con el ensayo anterior (2026-11-21, v0.2). 
 - T45 — el FortiGate emulado reenvía todo y deja la política a FW01; el FortiGate real solo publica UDP 500/4500 y TCP 80/443 (D1.8)
 - T46 — PORTAL01 se probó como equipo comprometido; el 5432 de CTRL01 es un puerto de prueba: PostgreSQL de la v0.4 no escucha en la red (socket local, D-25)
 - T47 — «Internet» es ext01 (198.51.100.100): el laboratorio no tiene DNS ni salida a Internet real
-- T49 — el directorio ACME es un servidor de laboratorio en ext01 (no Let's Encrypt, no emite certificados)
+- T49 — Modo L: solo se comprueba que F33 abre; el SFTP (llave dedicada, usuario chroot) y la renovación ACME de FW01 se prueban en el Modo H (S-31)
 - T51 — el nodo recarga cada 5 s (config_reload_secs en el laboratorio); en producción el intervalo lo fija la DTI. Solo cambian allowed_clients, intercept_domains, never_intercept y byod_networks
 - T52 — el laboratorio es un /26 de allowed_clients; el tráfico de LAB-03 sigue llegando al nodo (F1 abre toda la VLAN 30 en FW01): el control está en el nodo (D1.8, nota 1)
 - T55 — con el presupuesto de memoria por defecto (max_buffered_bytes = 512 MiB) los seguidores de un objeto de 100 MB se sirven desde memoria de a uno por cada 100 MB reservados; en una primera corrida solo 5 de 19 obtuvieron HIT y 15 pasaron por el origen (sobre presupuesto). El laboratorio fija 3 GiB; el dimensionamiento de RAM del nodo (8 GB, D2.4) debe reservar max_buffered_bytes para 20 clientes × el instalador más grande

@@ -537,6 +537,11 @@ supuestos:
     valor: La cuenta permite una credencial de solo escritura en el bucket de respaldos
     validacion: Confirmar con el docente (en AWS Academy puede no estar disponible)
     responsable: Nick
+  S-31:
+    supuesto: Certificado del portal
+    valor: El FortiGate permite a FW01 llegar a los endpoints ACME de la CA elegida (TCP 443) y a su validación por HTTP (TCP 80, NAT 1:1 de S-29); PORTAL01 no sale a la WAN
+    validacion: Reunión con la DTI y prueba de la renovación en el Modo H (T49)
+    responsable: Henyelrey
 
 decisiones:
   D-01:
@@ -589,6 +594,8 @@ decisiones:
     decision: BYOD sin descifrado y proxy opcional
   D-28:
     decision: "Simplificación: DNS y NTP en FW01, PAC en el nodo, WAF y portal en una VM, sin NAS, sin OBS, sin IDS separado"
+  D-29:
+    decision: "El portal no sale a la WAN: FW01 renueva el certificado por ACME y lo entrega a PORTAL01 por SFTP (F33)"
 
 requisitos:
   REQ-F-01: Atender como proxy explícito HTTP y HTTPS (CONNECT) en un puerto configurable

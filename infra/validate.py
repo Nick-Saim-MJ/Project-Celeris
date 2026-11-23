@@ -723,7 +723,7 @@ def v27(x: Infra):
 # --------------------------------------------------------------------------------------------------
 
 
-@chequeo("V-28", "Inventario v0.4 completo: D1.12, VPC/subredes D2.5, D1.11 (F1–F32), D1.16 (T01–T60), 7 VLAN")
+@chequeo("V-28", "Inventario v0.4 completo: D1.12, VPC/subredes D2.5, D1.11 (F1–F33), D1.16 (T01–T60), 7 VLAN")
 def v28(x: Infra):
     r = []
     faltan = [c for c in ci.COMPONENTES_D112 if c not in x.componentes]
@@ -750,13 +750,13 @@ def v28(x: Infra):
     for z in ("LAB-TEST", "STORAGE", "BACKUP"):
         if z not in x.zonas_retiradas:
             r.append(E(f"La zona {z} debe quedar «retirada»", "CI-39"))
-    esperados_f = [f"F{n}" for n in range(1, 33)]
+    esperados_f = [f"F{n}" for n in range(1, 34)]
     ids_f = [f["id"] for f in x.inv["flujos"]]
     if ids_f != esperados_f:
-        r.append(E(f"Los flujos deben ser F1…F32 sin huecos ni repeticiones y son {ids_f[0]}…{ids_f[-1]} ({len(ids_f)})", "Restituya los IDs (los retirados se conservan)"))
+        r.append(E(f"Los flujos deben ser F1…F33 sin huecos ni repeticiones y son {ids_f[0]}…{ids_f[-1]} ({len(ids_f)})", "Restituya los IDs (los retirados se conservan)"))
     retirados_f = sorted(x.flujos_retirados, key=lambda i: int(i[1:]))
-    if retirados_f != ["F11", "F12", "F15", "F16", "F17", "F19", "F22", "F9"][:0] + sorted(["F9", "F11", "F12", "F15", "F16", "F17", "F19", "F22"], key=lambda i: int(i[1:])):
-        r.append(E(f"Flujos retirados {retirados_f} ≠ F9, F11, F12, F15, F16, F17, F19, F22 (D1.11 v0.4)", "CI-35, CI-36, CI-39"))
+    if retirados_f != sorted(["F9", "F11", "F12", "F15", "F16", "F17", "F19", "F22", "F23"], key=lambda i: int(i[1:])):
+        r.append(E(f"Flujos retirados {retirados_f} ≠ F9, F11, F12, F15, F16, F17, F19, F22, F23 (D1.11 v0.4 y CI-52)", "CI-35, CI-36, CI-39, CI-52"))
     esperados_t = [f"T{n:02d}" for n in range(1, 61)]
     ids_t = [t["id"] for t in x.pru["pruebas"]]
     if ids_t != esperados_t:

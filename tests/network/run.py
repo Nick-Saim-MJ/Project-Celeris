@@ -13,6 +13,7 @@ en que sí se ejecutará). Si el laboratorio no está levantado, termina con có
 from __future__ import annotations
 
 import argparse
+import shutil
 import json
 import sys
 import time
@@ -139,6 +140,8 @@ def main(argv=None) -> int:
     resultados = []
     for t in pruebas:
         print(f"{t['id']} {t['nombre']} ...", flush=True)
+        if a.solo:
+            shutil.rmtree(raiz_ev / t["id"], ignore_errors=True)       # sin restos de una corrida anterior de esta prueba
         r = ejecutar(infra, t, ctx_base, raiz_ev)
         r.update(commit=commit, fecha=a.fecha)
         resultados.append(r)
@@ -146,12 +149,23 @@ def main(argv=None) -> int:
     _, imagenes = L.docker(["image", "ls", "--format", "{{.Repository}}:{{.Tag}} {{.ID}}", "--filter", "reference=celeris*"], 20)
     meta = {"modo": "L (emulación local con containerlab)", "fecha": a.fecha, "commit": commit, "imagenes": imagenes.split("\n")[:-1] if imagenes else [],
             "aviso": "Laboratorio EMULADO (Parte F4.2): no es OPNsense ni el VGW de AWS. PARCIAL y NO_APLICA no cuentan como PASA."}
+    previo = raiz_ev / "resultados.json"
+    if a.solo and previo.exists():
+        # --solo sobre un ensayo del mismo día: se reemplazan solo esas pruebas y el resto del ensayo se conserva (queda dicho en meta)
+        anterior = json.loads(previo.read_text(encoding="utf-8"))
+        por_id = {r["id"]: r for r in anterior["resultados"]}
+        por_id.update({r["id"]: r for r in resultados})
+        meta = {**anterior["meta"], "reejecutadas": sorted(set(anterior["meta"].get("reejecutadas", [])) | {r["id"] for r in resultados}), "commit_reejecucion": commit}
+        resultados = sorted(por_id.values(), key=lambda r: r["id"])
+        fusion = True
+    else:
+        fusion = False
     cuenta = {k: sum(r["resultado"] == k for r in resultados) for k in ("PASA", "FALLA", "PARCIAL", "NO_APLICA")}
     meta["resumen"] = cuenta
     (raiz_ev / "resultados.json").write_text(json.dumps({"meta": meta, "resultados": resultados}, ensure_ascii=False, indent=2), encoding="utf-8")
     (raiz_ev / "junit.xml").write_text(junit(resultados, a.fecha), encoding="utf-8")
     print("\nResumen:", ", ".join(f"{v} {k}" for k, v in cuenta.items()), f"→ {raiz_ev.relative_to(RAIZ)}/resultados.json")
-    if not a.sin_ensayo and not a.solo:
+    if not a.sin_ensayo and (fusion or not a.solo):
         import ensayo
         print("Ensayo:", ensayo.escribir(infra, meta, resultados, RAIZ))
     return 1 if cuenta["FALLA"] else 0

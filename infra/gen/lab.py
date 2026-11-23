@@ -44,7 +44,6 @@ PARAMETROS_LAB = {
     "dominio_portal": "portal.celeris.internal",
     "dominio_origen": "listado.example.com",    # dominio «listado» de T07: el nodo descifra su TLS
     "dominio_generico": "example.com",          # T14, T19, T24
-    "dominio_acme": "acme.example.com",         # T49: directorio ACME de laboratorio en ext01 (no es Let's Encrypt)
     "dominio_grande": "descargas.example.com",  # T55: archivos grandes en origin-sim
     "dominio_panel": "panel.celeris.internal",  # EC2-GW (panel remoto): certificado de la CA de laboratorio
     "honey_url": "/admin-backup.zip",           # T31 (REQ-F-27): ruta señuelo de los nodos EDGE [S-17]
@@ -192,7 +191,7 @@ def _zona_dns(x: Infra) -> str:
     for r in x.inv["servicios_base"]["pac"]["registros_a"]:
         lineas.append(f'  local-data: "{pac_host}. A {r["ip"]}"')
     lineas.append(f'  local-data: "{P["dominio_portal"]}. A {_ip_de(x, "PORTAL01")}"')
-    for d in (P["dominio_origen"], P["dominio_generico"], P["dominio_acme"]):
+    for d in (P["dominio_origen"], P["dominio_generico"]):
         lineas.append(f'  local-zone: "{d}." redirect')
         lineas.append(f'  local-data: "{d}. A {P["ext01"]}"')
     lineas.append(f'  local-zone: "{P["dominio_grande"]}." redirect')
@@ -412,6 +411,18 @@ alert tcp any any -> any any (msg:"LAB escaneo SYN de un origen"; flags:S,12; th
 alert tcp any any -> any [22,23] (msg:"LAB intento de acceso SSH/Telnet"; flags:S; threshold: type threshold, track by_src, count 5, seconds 30; classtype:attempted-admin; sid:9000002; rev:1;)
 """
 
+SFTP_SIM_PY = """#!/usr/bin/env python3
+# EMULADO (CE03 D5.3, CI-52): no es OpenSSH ni SFTP; solo abre TCP 22 con un banner SSH para comprobar que F33 abre.
+import socket, sys
+s = socket.socket(); s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1); s.bind((sys.argv[1], int(sys.argv[2]))); s.listen(8)
+while True:
+    c, _ = s.accept()
+    try: c.sendall(b"SSH-2.0-celeris-lab-sftp-emulado\\r\\n")
+    except Exception: pass
+    c.close()
+"""
+
+
 CANARIO_PY = '''#!/usr/bin/env python3
 """Canario interno del laboratorio (equivalente funcional de OpenCanary, F4.2): cualquier conexión a sus puertos es una alerta."""
 import json, socket, sys, threading, time
@@ -437,10 +448,6 @@ class H(http.server.BaseHTTPRequestHandler):
             cuerpo = json.dumps({k.lower(): v for k, v in self.headers.items()}).encode()
             self.send_response(200); self.send_header("Content-Type", "application/json"); self.send_header("Cache-Control", "no-store")
             self.send_header("Content-Length", str(len(cuerpo))); self.end_headers(); self.wfile.write(cuerpo); return
-        if self.path == "/directory":        # ACME de laboratorio (T49): responde como un directorio; no emite certificados
-            cuerpo = b'{"newNonce": "/acme/new-nonce", "newAccount": "/acme/new-acct", "newOrder": "/acme/new-order", "meta": {"nota": "ACME de laboratorio"}}'
-            self.send_response(200); self.send_header("Content-Type", "application/json"); self.send_header("Content-Length", str(len(cuerpo)))
-            self.end_headers(); self.wfile.write(cuerpo); return
         cuerpo = ("origen " + self.headers.get("Host", "?") + " " + self.path + "\\n").encode() + b"x" * 2048
         self.send_response(200); self.send_header("Content-Type", "text/plain"); self.send_header("Alt-Svc", 'h3=":443"; ma=3600')
         self.send_header("Cache-Control", "public, max-age=3600"); self.send_header("Content-Length", str(len(cuerpo)))
@@ -736,9 +743,10 @@ def archivos_nodo(x: Infra, nodo: str, aviso_md: Path) -> dict[str, str]:
         base += ["touch /run/lab-listo", ""]
         return {"arranque.sh": "\n".join(base), "config.toml": _config_edge(x, nodo), "nginx.conf": _nginx_pac(ip).replace("root /lab/pac", "root /pac")} | extra_agente
     if rol == "portal":
-        base += ["mkdir -p /var/log/nginx", "touch /var/log/modsec_audit.log; chmod 666 /var/log/modsec_audit.log",
+        # F33 (CI-52): el SFTP de entrega del certificado se EMULA con un escucha en TCP 22 (sin ACME, sin llave ni chroot reales). PORTAL01 no tiene ninguna regla de salida hacia la WAN.
+        base += [f"python3 /lab/sftp-sim.py {_ip_de(x, comp)} 22 &","mkdir -p /var/log/nginx", "touch /var/log/modsec_audit.log; chmod 666 /var/log/modsec_audit.log",
                  "mkdir -p /etc/modsecurity; cp /lab/lab-main.conf /etc/modsecurity/lab-main.conf", "nginx -c /lab/nginx.conf", "touch /run/lab-listo", ""]
-        return {"arranque.sh": "\n".join(base), "nginx.conf": _nginx_portal(x), "lab-main.conf": _modsec_main(), "web/index.html": _html_aviso(aviso_md)} | extra_agente
+        return {"arranque.sh": "\n".join(base), "nginx.conf": _nginx_portal(x), "lab-main.conf": _modsec_main(), "web/index.html": _html_aviso(aviso_md), "sftp-sim.py": SFTP_SIM_PY} | extra_agente
     if rol == "canary":
         ip = _ip_de(x, comp)
         base += ["touch /var/log/canary.json; chmod 666 /var/log/canary.json", f"python3 /lab/canario.py {ip} 22,80,445,3389 &", "touch /run/lab-listo", ""]
@@ -794,7 +802,7 @@ def crear_pki(directorio: Path, x: Infra | None = None) -> None:
     ca("ca", "Celeris Lab CA")
     ca("nodos-ca", "Celeris Lab CA de nodos")
     cert("portal", "ca", P["dominio_portal"], [f"DNS:{P['dominio_portal']}"], "serverAuth")
-    cert("origen", "ca", P["dominio_origen"], [f"DNS:{d}" for d in (P["dominio_origen"], P["dominio_generico"], P["dominio_acme"])], "serverAuth")
+    cert("origen", "ca", P["dominio_origen"], [f"DNS:{d}" for d in (P["dominio_origen"], P["dominio_generico"])], "serverAuth")
     if x is not None:
         cert("siem01", "ca", "siem01", [f"IP:{_ip_de(x, 'SIEM01')}"], "serverAuth")
         cert("ctrl01", "ca", "ctrl01", [f"IP:{_ip_de(x, 'CTRL01')}", "DNS:ctrl01"], "serverAuth")

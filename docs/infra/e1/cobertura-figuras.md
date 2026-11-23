@@ -10,9 +10,9 @@ Un componente cuenta como presente si tiene caja propia con `celeris_id`. Los qu
 |---|---|---|---|
 | V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA | 0 |
 | V-51 | Cobertura componente × figura igual al campo `figuras` del inventario | FALLA | 30 |
-| V-52 | Todo celeris_id es un ID del contrato | FALLA | 92 |
+| V-52 | Todo celeris_id es un ID del contrato | FALLA | 93 |
 | V-53 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | FALLA | 16 |
-| V-54 | Flujos F-nn: FIG-5.5a ∪ FIG-5.5b completas y etiquetas derivadas del inventario | FALLA | 19 |
+| V-54 | Flujos F-nn: FIG-5.5a ∪ FIG-5.5b completas y etiquetas derivadas del inventario | FALLA | 20 |
 | V-55 | Título, leyenda y panel «Qué aporta y qué pasa si falla» en cada figura | PASA | 0 |
 | V-56 | Criticidad (borde + texto) y color de zona según CLAUDE.md | FALLA | 3 |
 
@@ -114,6 +114,7 @@ Un componente cuenta como presente si tiene caja propia con `celeris_id`. Los qu
 - **V-52** [error] FIG-5.5a: dibuja el ID retirado «BACKUP» (v0.4); pendiente de I4: regenerar los diagramas — Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
 - **V-52** [error] FIG-5.5a: dibuja el ID retirado «STORAGE» (v0.4); pendiente de I4: regenerar los diagramas — Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
 - **V-52** [error] FIG-5.5a: dibuja el ID retirado «F22» (v0.4); pendiente de I4: regenerar los diagramas — Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
+- **V-52** [error] FIG-5.5a: dibuja el ID retirado «F23» (v0.4); pendiente de I4: regenerar los diagramas — Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
 - **V-52** [error] FIG-5.5b: dibuja el ID retirado «WAF01» (v0.4); pendiente de I4: regenerar los diagramas — Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
 - **V-52** [error] FIG-5.5b: dibuja el ID retirado «WEB01» (v0.4); pendiente de I4: regenerar los diagramas — Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
 - **V-52** [error] FIG-5.5b: dibuja el ID retirado «LAB-TEST» (v0.4); pendiente de I4: regenerar los diagramas — Un ID retirado no puede aparecer en una figura (V-44): regenere con make diagrams-check (I4)
@@ -173,6 +174,7 @@ Un componente cuenta como presente si tiene caja propia con `celeris_id`. Los qu
 - **V-54** [error] FIG-5.5b: falta F28
 - **V-54** [error] FIG-5.5b: falta F29
 - **V-54** [error] FIG-5.5b: falta F30
+- **V-54** [error] FIG-5.5b: falta F33
 - **V-56** [error] FIG-5.1: AWS-APP-A con criticidad Media; inventario: Baja
 - **V-56** [error] FIG-5.2: AWS-APP-A con criticidad Media; inventario: Baja
 - **V-56** [error] FIG-5.4: AWS-APP-A con criticidad Media; inventario: Baja
@@ -186,7 +188,7 @@ Un componente cuenta como presente si tiene caja propia con `celeris_id`. Los qu
 | FIG-5.2 | 18 | — |
 | FIG-5.3 | 18 | — |
 | FIG-5.4 | 7 | — |
-| FIG-5.5a | 6 | F1, F2, F3, F5, F6, F7, F8, F21, F23, F24, F25 |
+| FIG-5.5a | 6 | F1, F2, F3, F5, F6, F7, F8, F21, F24, F25 |
 | FIG-5.5b | 12 | F10, F13, F14, F18, F20, F26, F27 |
 
 Agrupados en bloques de FIG-1.1: AWS-VPC, EDGE01, EDGE02, HNY01, SIEM01, VTI1, VTI2.

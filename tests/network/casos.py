@@ -432,19 +432,34 @@ def t18(c: Contexto) -> Medicion:
 
 
 def t19(c: Contexto) -> Medicion:
-    """Salida del portal: PORTAL01 solo debe alcanzar los endpoints ACME por 443 (F23); hacia otro destino de Internet no debe salir (D1.16: «Denegado»)."""
+    """PORTAL01 no establece conexiones hacia la WAN (CI-52): intenta TCP 443, TCP 80 y UDP 53 hacia ext01; FW01 las deniega y su conntrack no guarda ninguna conexión establecida de PORTAL01 hacia fuera de 10.20.0.0/16."""
     m = Medicion()
-    objetivo = f"https://{c.P['dominio_generico']}/"
-    acme = c.P["dominio_acme"]
-    rc_ctrl, _ = L.ex("portal01", f"curl -sk -m6 -o /dev/null -w '%{{http_code}}' --resolve {acme}:443:{c.P['ext01']} https://{acme}/directory")
-    # -k: lo que se mide es si FW01 deja pasar la conexión; sin -k, un certificado desconocido da código 60 (conexión hecha) y la prueba pasaría por la razón equivocada
-    rc, out = L.ex("portal01", f"curl -skS -m6 -o /dev/null --resolve {c.P['dominio_generico']}:443:{c.P['ext01']} {objetivo}")
+    portal, ext, siem = c.ip("PORTAL01"), c.P["ext01"], c.ip("SIEM01")
+    antes = L.contador_nft("DENEGADO", "forward")
+    rc, out = L.ex("portal01", f"curl -skS -m5 -o /dev/null --resolve {c.P['dominio_generico']}:443:{ext} https://{c.P['dominio_generico']}/")
     m.codigos["principal"] = rc
-    if rc_ctrl != 0:
-        m.vacia = "el control positivo falló: PORTAL01 tampoco alcanzó el endpoint ACME de laboratorio (F23), así que la denegación no es concluyente"
-    if rc == 0:
-        m.hallazgos.append("PORTAL01 alcanza example.com por 443: F23 permite TCP 443 hacia cualquier destino de Internet y no solo hacia los endpoints ACME que D1.9 («Salida: solo ACME y Wazuh») y D1.11 («Renovación del certificado») prometen; "
-                           "el diseño no define cómo se limita el destino (alias de FW01 por FQDN o lista del FortiGate)")
+    rc80, _ = L.ex("portal01", f"curl -sS -m5 -o /dev/null --resolve {c.P['dominio_generico']}:80:{ext} http://{c.P['dominio_generico']}/")
+    L.ex("portal01", f"echo t19 | nc -u -w2 {ext} 53; echo t19 | nc -u -w2 {ext} 123; true")
+    time.sleep(1)
+    despues = L.contador_nft("DENEGADO", "forward")
+    _, ct = L.ex("fw01-sim", "cat /proc/net/nf_conntrack 2>/dev/null; true")
+    def hacia_fuera(linea: str) -> bool:
+        m1 = re.search(r"src=(\S+) dst=(\S+)", linea)
+        return bool(m1) and m1.group(1) == portal and not m1.group(2).startswith("10.20.")
+    hacia_wan = [linea for linea in ct.splitlines() if hacia_fuera(linea)]
+    establecidas = [linea for linea in hacia_wan if "ESTABLISHED" in linea or "ASSURED" in linea or "UNREPLIED" not in linea]
+    m.medidas["conexiones_establecidas_hacia_la_wan"] = len(establecidas)
+    m.medidas["paquetes_denegados_por_fw01"] = despues - antes
+    m.medidas["salida_http_80"] = rc80
+    c.ev.guardar("conntrack_portal.txt", "\n".join(hacia_wan) or "(sin conexiones de PORTAL01 hacia la WAN)")
+    # controles positivos: la red de PORTAL01 funciona (F33 desde FW01, F13 hacia SIEM01), así que la denegación no es una avería
+    rc_f33, _ = L.ex("fw01-sim", f"nc -zv -w3 {portal} 22")
+    rc_f13, _ = L.ex("portal01", f"nc -zv -w3 {siem} 1514")
+    if rc_f33 != 0 or rc_f13 != 0:
+        m.vacia = f"el control positivo falló: F33 desde FW01 ({rc_f33}) o F13 hacia SIEM01 ({rc_f13}) no abren, así que la denegación no es concluyente"
+    if rc80 == 0:
+        m.hallazgos.append("PORTAL01 alcanzó el puerto 80 de Internet: hay una regla que le permite salir")
+    m.hallazgos.append("el DNS hacia el resolvedor de FW01 (F2) no cuenta: es tráfico local a 10.20.0.0/16; ACME corre en FW01 y no se emula en el Modo L (no hay Internet)")
     return m
 
 
@@ -800,7 +815,7 @@ def t09_navegador(c: Contexto, m: Medicion) -> None:
 
 
 # ---------------------------------------------------------------------------------------------------------------
-# T12, T28, T31, T35, T39, T49: ahora con NAS01, siem01, el nodo con honey-URL, restic y el ACME de laboratorio
+# T28, T31, T35: siem01, el nodo con honey-URL y restic (v0.4)
 # ---------------------------------------------------------------------------------------------------------------
 def t28(c: Contexto) -> Medicion:
     """Syslog cifrado: un evento de FW01 llega a SIEM01 solo por TLS en 6514, sin UDP 514 (receptor de siem01 hacia el syslog local de Wazuh)."""
@@ -860,14 +875,14 @@ def t35(c: Contexto) -> Medicion:
 
 
 def t49(c: Contexto) -> Medicion:
-    """ACME desde PORTAL01 (F23): el directorio ACME de laboratorio de ext01 responde 200 por 443; el HTTP en claro hacia Internet no sale."""
+    """Entrega del certificado por F33 (CI-52): FW01 abre TCP 22 de PORTAL01 y otra zona no. No se emula ACME (no hay Internet) ni el SFTP real (solo el puerto)."""
     m = Medicion()
-    acme = c.P["dominio_acme"]
-    rc, out = L.ex("portal01", f"curl -sS -m8 --cacert /pki/ca.pem --resolve {acme}:443:{c.P['ext01']} -o /dev/null -w '%{{http_code}}' https://{acme}/directory")
-    m.salidas["stdout"] = out.strip()
-    m.salidas["curl -sS -o /dev/null -w \"%{http_code}\" https://acme-v02.api.letsencrypt.org/directory"] = out.strip()
-    m.codigos["curl -sS -m5 http://example.com"], _ = L.ex("portal01", f"curl -sS -m5 --resolve {c.P['dominio_generico']}:80:{c.P['ext01']} http://{c.P['dominio_generico']}/")
-    m.hallazgos.append("el directorio ACME es un servidor de laboratorio en ext01 (no Let's Encrypt, no emite certificados)")
+    portal = c.ip("PORTAL01")
+    m.codigos[f"nc -zv -w3 {portal} 22   # desde FW01"], salida = L.ex("fw01-sim", f"nc -zv -w3 {portal} 22")
+    m.codigos[f"nc -zv -w3 {portal} 22   # desde LABCLI01"], _ = L.ex("labcli01", f"nc -zv -w3 {portal} 22")
+    _, banner = L.ex("fw01-sim", f"nc -w2 {portal} 22 < /dev/null")
+    c.ev.guardar("banner_f33.txt", banner)
+    m.hallazgos.append("Modo L: solo se comprueba que F33 abre; el SFTP (llave dedicada, usuario chroot) y la renovación ACME de FW01 se prueban en el Modo H (S-31)")
     return m
 
 

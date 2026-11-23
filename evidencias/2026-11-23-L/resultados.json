@@ -8,11 +8,19 @@
     ],
     "aviso": "Laboratorio EMULADO (Parte F4.2): no es OPNsense ni el VGW de AWS. PARCIAL y NO_APLICA no cuentan como PASA.",
     "resumen": {
-      "PASA": 33,
-      "FALLA": 1,
+      "PASA": 34,
+      "FALLA": 0,
       "PARCIAL": 1,
       "NO_APLICA": 17
-    }
+    },
+    "reejecutadas": [
+      "T15",
+      "T18",
+      "T19",
+      "T46",
+      "T49"
+    ],
+    "commit_reejecucion": "desconocido"
   },
   "resultados": [
     {
@@ -557,7 +565,7 @@
       "valor_medido": {
         "puertos_abiertos": 2,
         "puertos_abiertos_en_ctrl01": 0,
-        "alertas_suricata_fw01": 543,
+        "alertas_suricata_fw01": 0,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -584,7 +592,7 @@
         "T15/suricata_alertas.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 5.1,
+      "duracion_s": 5.0,
       "commit": "desconocido",
       "fecha": "2026-11-23"
     },
@@ -696,8 +704,8 @@
       "resultado": "PASA",
       "motivo": "",
       "valor_medido": {
-        "eventos_modsecurity": 15,
-        "latencia_alerta_wazuh_s": 1.4,
+        "eventos_modsecurity": 1,
+        "latencia_alerta_wazuh_s": 0.8,
         "codigos_de_salida": {
           "principal": 0
         }
@@ -723,45 +731,62 @@
         "T18/alerta_wazuh_100303.json"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 1.8,
+      "duracion_s": 1.7,
       "commit": "desconocido",
       "fecha": "2026-11-23"
     },
     {
       "id": "T19",
-      "nombre": "Salida del portal",
+      "nombre": "PORTAL01 no establece conexiones hacia la WAN (TCP/UDP)",
       "categoria": "segmentacion",
       "modos": [
         "L",
         "H"
       ],
       "flujos": [
-        "F23"
+        "F33",
+        "F13"
       ],
-      "comando_de_referencia": "curl -sS -m 5 https://example.com",
-      "resultado": "FALLA",
-      "motivo": "código de salida ≠ 0: salida 0",
+      "comando_de_referencia": "curl -sS -m 5 https://example.com ; curl -sS -m 5 http://example.com ; nc -zvu -w3 203.0.113.53 53 ; conntrack -L -s 10.20.40.10   # en FW01",
+      "resultado": "PASA",
+      "motivo": "",
       "valor_medido": {
+        "conexiones_establecidas_hacia_la_wan": 0,
+        "paquetes_denegados_por_fw01": 12,
+        "salida_http_80": 28,
         "codigos_de_salida": {
-          "principal": 0
+          "principal": 28
         }
       },
       "criterios": [
         {
           "descripcion": "código de salida ≠ 0",
-          "estado": "FALLA",
+          "estado": "PASA",
+          "medido": 28,
+          "detalle": "salida 28"
+        },
+        {
+          "descripcion": "conexiones_establecidas_hacia_la_wan == 0",
+          "estado": "PASA",
           "medido": 0,
-          "detalle": "salida 0"
+          "detalle": "conexiones_establecidas_hacia_la_wan = 0"
+        },
+        {
+          "descripcion": "paquetes_denegados_por_fw01 > 0",
+          "estado": "PASA",
+          "medido": 12,
+          "detalle": "paquetes_denegados_por_fw01 = 12"
         }
       ],
       "hallazgos": [
-        "PORTAL01 alcanza example.com por 443: F23 permite TCP 443 hacia cualquier destino de Internet y no solo hacia los endpoints ACME que D1.9 («Salida: solo ACME y Wazuh») y D1.11 («Renovación del certificado») prometen; el diseño no define cómo se limita el destino (alias de FW01 por FQDN o lista del FortiGate)"
+        "el DNS hacia el resolvedor de FW01 (F2) no cuenta: es tráfico local a 10.20.0.0/16; ACME corre en FW01 y no se emula en el Modo L (no hay Internet)"
       ],
       "evidencia": [
-        "T19/salida.txt"
+        "T19/salida.txt",
+        "T19/conntrack_portal.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 0.4,
+      "duracion_s": 16.3,
       "commit": "desconocido",
       "fecha": "2026-11-23"
     },
@@ -1580,7 +1605,7 @@
         "T46/nmap.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 6.3,
+      "duracion_s": 6.4,
       "commit": "desconocido",
       "fecha": "2026-11-23"
     },
@@ -1647,45 +1672,47 @@
     },
     {
       "id": "T49",
-      "nombre": "Renovación ACME desde PORTAL01",
+      "nombre": "Entrega del certificado del portal por F33 (ACME en FW01)",
       "categoria": "conectividad",
       "modos": [
         "L",
         "H"
       ],
       "flujos": [
-        "F23"
+        "F33"
       ],
-      "comando_de_referencia": "curl -sS -o /dev/null -w \"%{http_code}\" https://acme-v02.api.letsencrypt.org/directory ; curl -sS -m5 http://example.com",
+      "comando_de_referencia": "nc -zv -w3 10.20.40.10 22   # desde FW01 ; nc -zv -w3 10.20.40.10 22   # desde LABCLI01",
       "resultado": "PASA",
       "motivo": "",
       "valor_medido": {
         "codigos_de_salida": {
-          "curl -sS -m5 http://example.com": 28
+          "nc -zv -w3 10.20.40.10 22   # desde FW01": 0,
+          "nc -zv -w3 10.20.40.10 22   # desde LABCLI01": 1
         }
       },
       "criterios": [
         {
-          "descripcion": "/^200$/ sobre curl -sS -o /dev/null -w \"%{http_code}\" https://acme-v02.api.letsencrypt.org/directory",
+          "descripcion": "código de salida = 0 (nc -zv -w3 10.20.40.10 22   # desde FW01)",
           "estado": "PASA",
-          "medido": "200",
-          "detalle": "coincide"
+          "medido": 0,
+          "detalle": "salida 0"
         },
         {
-          "descripcion": "código de salida ≠ 0 (curl -sS -m5 http://example.com)",
+          "descripcion": "código de salida ≠ 0 (nc -zv -w3 10.20.40.10 22   # desde LABCLI01)",
           "estado": "PASA",
-          "medido": 28,
-          "detalle": "salida 28"
+          "medido": 1,
+          "detalle": "salida 1"
         }
       ],
       "hallazgos": [
-        "el directorio ACME es un servidor de laboratorio en ext01 (no Let's Encrypt, no emite certificados)"
+        "Modo L: solo se comprueba que F33 abre; el SFTP (llave dedicada, usuario chroot) y la renovación ACME de FW01 se prueban en el Modo H (S-31)"
       ],
       "evidencia": [
-        "T49/salida.txt"
+        "T49/salida.txt",
+        "T49/banner_f33.txt"
       ],
       "error_de_ejecucion": false,
-      "duracion_s": 5.3,
+      "duracion_s": 3.5,
       "commit": "desconocido",
       "fecha": "2026-11-23"
     },

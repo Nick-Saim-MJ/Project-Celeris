@@ -103,7 +103,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "pattern": "^F([1-9]|[12][0-9]|3[0-2])$"
+              "pattern": "^F([1-9]|[12][0-9]|3[0-3])$"
             }
           },
           "flujos_justificacion": {

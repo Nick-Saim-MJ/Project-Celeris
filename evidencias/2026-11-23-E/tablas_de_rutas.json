@@ -1,0 +1,173 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "RouteTables": [
+      {
+        "Associations": [
+          {
+            "Main": true,
+            "RouteTableAssociationId": "rtbassoc-00000000000000006",
+            "RouteTableId": "rtb-00000000000000005",
+            "AssociationState": {
+              "State": "associated"
+            }
+          }
+        ],
+        "PropagatingVgws": [],
+        "RouteTableId": "rtb-00000000000000005",
+        "Routes": [
+          {
+            "DestinationCidrBlock": "172.31.0.0/16",
+            "GatewayId": "local",
+            "Origin": "CreateRouteTable",
+            "State": "active"
+          },
+          {
+            "DestinationCidrBlock": "0.0.0.0/0",
+            "GatewayId": "igw-00000000000000016",
+            "Origin": "CreateRoute",
+            "State": "active"
+          }
+        ],
+        "Tags": [],
+        "VpcId": "vpc-00000000000000001",
+        "OwnerId": "000000000000"
+      },
+      {
+        "Associations": [
+          {
+            "Main": true,
+            "RouteTableAssociationId": "rtbassoc-000000000000000ac",
+            "RouteTableId": "rtb-000000000000000ab",
+            "AssociationState": {
+              "State": "associated"
+            }
+          }
+        ],
+        "PropagatingVgws": [],
+        "RouteTableId": "rtb-000000000000000ab",
+        "Routes": [
+          {
+            "DestinationCidrBlock": "10.30.0.0/16",
+            "GatewayId": "local",
+            "Origin": "CreateRouteTable",
+            "State": "active"
+          }
+        ],
+        "Tags": [],
+        "VpcId": "vpc-000000000000000a8",
+        "OwnerId": "000000000000"
+      },
+      {
+        "Associations": [
+          {
+            "Main": false,
+            "RouteTableAssociationId": "rtbassoc-000000000000000be",
+            "RouteTableId": "rtb-000000000000000b1",
+            "SubnetId": "subnet-000000000000000b4",
+            "AssociationState": {
+              "State": "associated"
+            }
+          }
+        ],
+        "PropagatingVgws": [],
+        "RouteTableId": "rtb-000000000000000b1",
+        "Routes": [
+          {
+            "DestinationCidrBlock": "10.30.0.0/16",
+            "GatewayId": "local",
+            "Origin": "CreateRouteTable",
+            "State": "active"
+          },
+          {
+            "DestinationCidrBlock": "0.0.0.0/0",
+            "GatewayId": "igw-000000000000000b0",
+            "Origin": "CreateRoute",
+            "State": "active"
+          },
+          {
+            "DestinationCidrBlock": "10.20.0.0/16",
+            "GatewayId": "vgw-000000000000000b3",
+            "Origin": "CreateRoute",
+            "State": "active"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "rt-public"
+          },
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          },
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          }
+        ],
+        "VpcId": "vpc-000000000000000a8",
+        "OwnerId": "000000000000"
+      },
+      {
+        "Associations": [
+          {
+            "Main": false,
+            "RouteTableAssociationId": "rtbassoc-000000000000000bf",
+            "RouteTableId": "rtb-000000000000000b2",
+            "SubnetId": "subnet-000000000000000b6",
+            "AssociationState": {
+              "State": "associated"
+            }
+          }
+        ],
+        "PropagatingVgws": [],
+        "RouteTableId": "rtb-000000000000000b2",
+        "Routes": [
+          {
+            "DestinationCidrBlock": "10.30.0.0/16",
+            "GatewayId": "local",
+            "Origin": "CreateRouteTable",
+            "State": "active"
+          },
+          {
+            "DestinationPrefixListId": "pl-e9da6b72",
+            "GatewayId": "vpce-000000000000000c0",
+            "Origin": "CreateRoute",
+            "State": "active"
+          },
+          {
+            "DestinationCidrBlock": "10.20.0.0/16",
+            "GatewayId": "vgw-000000000000000b3",
+            "Origin": "CreateRoute",
+            "State": "active"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          },
+          {
+            "Key": "Name",
+            "Value": "rt-private"
+          },
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          }
+        ],
+        "VpcId": "vpc-000000000000000a8",
+        "OwnerId": "000000000000"
+      }
+    ]
+  }
+}

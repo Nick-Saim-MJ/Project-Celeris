@@ -1,0 +1,8 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "PolicyNames": [
+      "solo-escritura-desde-el-campus"
+    ]
+  }
+}

@@ -9,7 +9,8 @@ resource "aws_vpn_gateway" "vgw" {
   tags            = merge(var.etiquetas, { Name = "${var.nombre}-vgw" })
 }
 
-# Extremo del campus: ASN privado de D1.10. La IP es la del firewall (producción) o la de cgw-sim (Modo A).
+# Extremo del campus: ASN privado de D1.10. La IP es la pública del FortiGate (S-29): FW01 está detrás de su NAT 1:1 y usa NAT-T (UDP 4500);
+# el lado AWS lo admite sin opciones propias.
 resource "aws_customer_gateway" "cgw" {
   bgp_asn    = var.vpn.asn_cliente
   ip_address = var.ip_publica_cliente
@@ -52,11 +53,32 @@ resource "aws_vpn_connection" "vpn" {
   tunnel2_startup_action               = local.o.startup_action
 
   tags = merge(var.etiquetas, { Name = "${var.nombre}-vpn" })
+
+  # D1.10 usa AES-GCM (AEAD): la integridad de fase 2 y el margen de rekey no son de diseño. AWS (y el emulador) devuelven sus valores
+  # por defecto y el proveedor quiere «corregirlos» con ModifyVpnTunnelOptions, que el AWS Emulator no implementa (CI-55).
+  lifecycle {
+    ignore_changes = [
+      tunnel1_phase2_integrity_algorithms, tunnel2_phase2_integrity_algorithms,
+      tunnel1_rekey_margin_time_seconds, tunnel2_rekey_margin_time_seconds,
+    ]
+  }
 }
 
-# Las rutas del campus (10.20.0.0/14, aprendidas por BGP) entran solas en las tablas de rutas (D2.5: «propagada»).
+# Rutas hacia el campus en las tablas de rutas (D2.5: «propagada»).
+# AWS real: el VGW propaga las rutas aprendidas por BGP.
+# Emulador (var.emulador = true): el AWS Emulator no implementa EnableVgwRoutePropagation (NotImplemented), así que se crea una ruta
+# estática hacia el VGW con el mismo destino. DIFERENCIA CON AWS REAL: la ruta estática no sigue al BGP (no desaparece si cae el túnel).
 resource "aws_vpn_gateway_route_propagation" "tabla" {
-  for_each       = var.tablas_de_rutas
+  for_each       = var.emulador ? {} : var.tablas_de_rutas
   vpn_gateway_id = aws_vpn_gateway.vgw.id
   route_table_id = each.value
+}
+
+resource "aws_route" "campus_estatica" {
+  for_each               = var.emulador ? { for r in var.rutas_al_campus : "${r.tabla}|${r.destino}" => r } : {}
+  route_table_id         = var.tablas_de_rutas[each.value.tabla]
+  destination_cidr_block = each.value.destino
+  gateway_id             = aws_vpn_gateway.vgw.id
+
+  depends_on = [aws_vpn_gateway.vgw]
 }

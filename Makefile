@@ -4,7 +4,7 @@
 PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
 VERSION ?= v1.0
 
-.PHONY: help entorno lab-gen tofu-gen tofu-check image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
+.PHONY: help entorno lab-gen tofu-gen tofu-check tofu-emulador image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
 
 help:
 	@echo "make validate        fuente única + artefactos + secretos (infra/validate.py y gitleaks si está instalado)"
@@ -17,6 +17,7 @@ help:
 	@echo "make lab-up|lab-down laboratorio emulado con containerlab (Modo L; necesita Linux/WSL, Docker y containerlab)"
 	@echo "make tofu-gen         genera deploy/opentofu/envs/demo/diseno.auto.tfvars.json desde el inventario (Modo A)"
 	@echo "make tofu-check       tofu fmt -check y tofu validate de deploy/opentofu (no planifica ni aplica nada)"
+	@echo "make tofu-emulador    levanta el AWS Emulator local, aplica la demo y genera evidencias/<fecha>-E (AWS emulado, sin cuenta real)"
 	@echo "make test-lab         ejecuta las pruebas T-nn del Modo L (Etapa 4)"
 	@echo "make matrices        genera las dos matrices XLSX (componentes y pruebas)"
 	@echo "make diagrams-check  genera, exporta y valida los diagramas draw.io (V-50…V-56)"
@@ -66,6 +67,10 @@ tofu-gen:
 tofu-check: tofu-gen
 	tofu fmt -check -recursive deploy/opentofu
 	cd deploy/opentofu/envs/demo && tofu init -backend=false -input=false && tofu validate
+
+# AWS emulado: plano de control, sin tráfico. Solo contra el AWS Emulator en Docker, con credenciales ficticias (CI-53).
+tofu-emulador:
+	deploy/opentofu/emulador/demo.sh todo
 
 lab-up:
 	bash lab/lab.sh up

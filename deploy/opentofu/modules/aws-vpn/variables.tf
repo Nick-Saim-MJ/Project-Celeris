@@ -16,8 +16,20 @@ variable "tablas_de_rutas" {
 }
 
 variable "ip_publica_cliente" {
-  description = "IP pública del extremo del campus (en el Modo A, la IP elástica de cgw-sim; en producción, la del firewall perimetral [S-15])."
+  description = "IP pública del extremo del campus: la del FortiGate [S-15, S-29]."
   type        = string
+}
+
+variable "emulador" {
+  description = "true: AWS Emulator, que no implementa la propagación de rutas del VGW; se usa una ruta estática hacia el campus."
+  type        = bool
+  default     = false
+}
+
+variable "rutas_al_campus" {
+  description = "Rutas hacia el campus del diseño (tabla y destino) que la propagación de BGP traería en AWS real."
+  type        = list(object({ tabla = string, destino = string }))
+  default     = []
 }
 
 variable "vpn" {

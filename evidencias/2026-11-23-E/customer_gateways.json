@@ -1,0 +1,32 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "CustomerGateways": [
+      {
+        "Tags": [
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          },
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          },
+          {
+            "Key": "Name",
+            "Value": "celeris-cgw"
+          }
+        ],
+        "CustomerGatewayId": "cgw-000000000000000a7",
+        "State": "available",
+        "Type": "ipsec.1",
+        "IpAddress": "203.0.113.10",
+        "BgpAsn": "65020"
+      }
+    ]
+  }
+}

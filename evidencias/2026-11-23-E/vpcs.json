@@ -1,0 +1,68 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "Vpcs": [
+      {
+        "OwnerId": "000000000000",
+        "InstanceTenancy": "default",
+        "CidrBlockAssociationSet": [
+          {
+            "AssociationId": "vpc-cidr-assoc-00000000000000002",
+            "CidrBlock": "172.31.0.0/16",
+            "CidrBlockState": {
+              "State": "associated"
+            }
+          }
+        ],
+        "IsDefault": true,
+        "Tags": [],
+        "BlockPublicAccessStates": {
+          "InternetGatewayBlockMode": "off"
+        },
+        "VpcId": "vpc-00000000000000001",
+        "State": "available",
+        "CidrBlock": "172.31.0.0/16",
+        "DhcpOptionsId": "dopt-00000000000000003"
+      },
+      {
+        "OwnerId": "000000000000",
+        "InstanceTenancy": "default",
+        "CidrBlockAssociationSet": [
+          {
+            "AssociationId": "vpc-cidr-assoc-000000000000000a9",
+            "CidrBlock": "10.30.0.0/16",
+            "CidrBlockState": {
+              "State": "associated"
+            }
+          }
+        ],
+        "IsDefault": false,
+        "Tags": [
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          },
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          },
+          {
+            "Key": "Name",
+            "Value": "celeris"
+          }
+        ],
+        "BlockPublicAccessStates": {
+          "InternetGatewayBlockMode": "off"
+        },
+        "VpcId": "vpc-000000000000000a8",
+        "State": "available",
+        "CidrBlock": "10.30.0.0/16",
+        "DhcpOptionsId": "dopt-00000000000000003"
+      }
+    ]
+  }
+}

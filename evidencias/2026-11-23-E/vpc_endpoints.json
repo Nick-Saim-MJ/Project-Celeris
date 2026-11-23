@@ -1,0 +1,49 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "VpcEndpoints": [
+      {
+        "VpcEndpointId": "vpce-000000000000000c0",
+        "VpcEndpointType": "Gateway",
+        "VpcId": "vpc-000000000000000a8",
+        "ServiceName": "com.amazonaws.us-east-1.s3",
+        "State": "available",
+        "PolicyDocument": "{\"Version\":\"2008-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"*\",\"Resource\":\"*\"}]}",
+        "RouteTableIds": [
+          "rtb-000000000000000b2"
+        ],
+        "SubnetIds": [],
+        "Groups": [],
+        "IpAddressType": "ipv4",
+        "DnsOptions": {
+          "DnsRecordIpType": "service-defined"
+        },
+        "PrivateDnsEnabled": false,
+        "RequesterManaged": false,
+        "NetworkInterfaceIds": [],
+        "DnsEntries": [],
+        "CreationTimestamp": "2026-11-23T06:05:57.165704Z",
+        "Tags": [
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          },
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          },
+          {
+            "Key": "Name",
+            "Value": "celeris-s3"
+          }
+        ],
+        "OwnerId": "000000000000",
+        "ServiceRegion": "us-east-1"
+      }
+    ]
+  }
+}

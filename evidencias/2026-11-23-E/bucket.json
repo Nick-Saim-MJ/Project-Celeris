@@ -1,0 +1,30 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "versionado": {
+      "Status": "Enabled"
+    },
+    "object_lock": {
+      "ObjectLockConfiguration": {
+        "ObjectLockEnabled": "Enabled",
+        "Rule": {
+          "DefaultRetention": {
+            "Mode": "COMPLIANCE",
+            "Days": 30
+          }
+        }
+      }
+    },
+    "politica": {
+      "Policy": "{\"Statement\":[{\"Action\":\"s3:*\",\"Condition\":{\"NotIpAddress\":{\"aws:SourceIp\":\"203.0.113.10/32\"}},\"Effect\":\"Deny\",\"Principal\":{\"AWS\":\"arn:aws:iam::000000000000:user/celeris-respaldo\"},\"Resource\":[\"arn:aws:s3:::celeris-backups\",\"arn:aws:s3:::celeris-backups/*\"],\"Sid\":\"NegarElUsuarioDeRespaldoFueraDelCampus\"}],\"Version\":\"2012-10-17\"}"
+    },
+    "acceso_publico": {
+      "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": true,
+        "IgnorePublicAcls": true,
+        "BlockPublicPolicy": true,
+        "RestrictPublicBuckets": true
+      }
+    }
+  }
+}

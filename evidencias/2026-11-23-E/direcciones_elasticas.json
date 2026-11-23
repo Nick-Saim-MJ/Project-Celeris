@@ -1,0 +1,37 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "Addresses": [
+      {
+        "AllocationId": "eipalloc-000000000000000cc",
+        "AssociationId": "eipassoc-000000000000000cd",
+        "Domain": "vpc",
+        "NetworkInterfaceId": "eni-000000000000000c8",
+        "NetworkInterfaceOwnerId": "000000000000",
+        "PrivateIpAddress": "10.30.0.10",
+        "Tags": [
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          },
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Name",
+            "Value": "EC2-GW"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          }
+        ],
+        "PublicIpv4Pool": "amazon",
+        "NetworkBorderGroup": "us-east-1",
+        "InstanceId": "i-00000000000000001",
+        "PublicIp": "54.0.0.4"
+      }
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "User": {
+      "Path": "/",
+      "UserName": "celeris-respaldo",
+      "UserId": "AIDABGXEQES5NRCCJJWAN",
+      "Arn": "arn:aws:iam::000000000000:user/celeris-respaldo",
+      "CreateDate": "2026-11-23T06:05:47.031Z",
+      "Tags": [
+        {
+          "Key": "Modo",
+          "Value": "AWS emulado - plano de control sin trafico"
+        },
+        {
+          "Key": "Proyecto",
+          "Value": "celeris-edge"
+        },
+        {
+          "Key": "Ttl",
+          "Value": "4h"
+        }
+      ]
+    }
+  }
+}

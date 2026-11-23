@@ -1,0 +1,191 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "Reservations": [
+      {
+        "ReservationId": "r-00000000000000001",
+        "OwnerId": "000000000000",
+        "Groups": [],
+        "Instances": [
+          {
+            "Architecture": "x86_64",
+            "BlockDeviceMappings": [
+              {
+                "DeviceName": "/dev/xvda",
+                "Ebs": {
+                  "AttachTime": "2026-11-23T06:05:57.290073Z",
+                  "DeleteOnTermination": true,
+                  "Status": "attached",
+                  "VolumeId": "vol-000000000000000c6",
+                  "Operator": {
+                    "Managed": false,
+                    "HiddenByDefault": false
+                  },
+                  "EbsCardIndex": 0
+                }
+              }
+            ],
+            "ClientToken": "terraform-20261123060557288100000007",
+            "EbsOptimized": false,
+            "EnaSupport": true,
+            "Hypervisor": "xen",
+            "IamInstanceProfile": {
+              "Arn": "arn:aws:iam::000000000000:instance-profile/celeris-ec2-gw",
+              "Id": "AIPABGXEQES5NRCCJJWAN"
+            },
+            "NetworkInterfaces": [
+              {
+                "Association": {
+                  "IpOwnerId": "000000000000",
+                  "PublicDnsName": "ec2-54-0-0-4.compute-1.amazonaws.com",
+                  "PublicIp": "54.0.0.4"
+                },
+                "Attachment": {
+                  "AttachTime": "2026-11-23T06:05:57.290082Z",
+                  "AttachmentId": "eni-attach-000000000000000c7",
+                  "DeleteOnTermination": true,
+                  "DeviceIndex": 0,
+                  "Status": "attached",
+                  "NetworkCardIndex": 0
+                },
+                "Description": "",
+                "Groups": [
+                  {
+                    "GroupId": "sg-000000000000000b8",
+                    "GroupName": "celeris-sg-gw"
+                  }
+                ],
+                "Ipv6Addresses": [],
+                "MacAddress": "02:00:00:00:00:c8",
+                "NetworkInterfaceId": "eni-000000000000000c8",
+                "OwnerId": "000000000000",
+                "PrivateDnsName": "ip-10-30-0-10.ec2.internal",
+                "PrivateIpAddress": "10.30.0.10",
+                "PrivateIpAddresses": [
+                  {
+                    "Association": {
+                      "IpOwnerId": "000000000000",
+                      "PublicDnsName": "ec2-54-0-0-4.compute-1.amazonaws.com",
+                      "PublicIp": "54.0.0.4"
+                    },
+                    "Primary": true,
+                    "PrivateDnsName": "ip-10-30-0-10.ec2.internal",
+                    "PrivateIpAddress": "10.30.0.10"
+                  }
+                ],
+                "SourceDestCheck": true,
+                "Status": "in-use",
+                "SubnetId": "subnet-000000000000000b4",
+                "VpcId": "vpc-000000000000000a8",
+                "InterfaceType": "interface",
+                "Ipv4Prefixes": [],
+                "Ipv6Prefixes": [],
+                "Operator": {
+                  "Managed": false,
+                  "HiddenByDefault": false
+                }
+              }
+            ],
+            "RootDeviceName": "/dev/xvda",
+            "RootDeviceType": "ebs",
+            "SecurityGroups": [
+              {
+                "GroupId": "sg-000000000000000b8",
+                "GroupName": "celeris-sg-gw"
+              }
+            ],
+            "SourceDestCheck": true,
+            "Tags": [
+              {
+                "Key": "Modo",
+                "Value": "AWS emulado - plano de control sin trafico"
+              },
+              {
+                "Key": "Name",
+                "Value": "EC2-GW"
+              },
+              {
+                "Key": "Proyecto",
+                "Value": "celeris-edge"
+              },
+              {
+                "Key": "Ttl",
+                "Value": "4h"
+              }
+            ],
+            "VirtualizationType": "hvm",
+            "CpuOptions": {
+              "CoreCount": 1,
+              "ThreadsPerCore": 2
+            },
+            "CapacityReservationSpecification": {
+              "CapacityReservationPreference": "open"
+            },
+            "HibernationOptions": {
+              "Configured": false
+            },
+            "MetadataOptions": {
+              "State": "applied",
+              "HttpTokens": "required",
+              "HttpPutResponseHopLimit": 2,
+              "HttpEndpoint": "enabled",
+              "HttpProtocolIpv6": "disabled",
+              "InstanceMetadataTags": "disabled"
+            },
+            "EnclaveOptions": {
+              "Enabled": false
+            },
+            "BootMode": "uefi-preferred",
+            "PlatformDetails": "Linux/UNIX",
+            "UsageOperation": "RunInstances",
+            "UsageOperationUpdateTime": "2025-11-04T05:52:41Z",
+            "PrivateDnsNameOptions": {
+              "HostnameType": "ip-name",
+              "EnableResourceNameDnsARecord": false,
+              "EnableResourceNameDnsAAAARecord": false
+            },
+            "MaintenanceOptions": {
+              "AutoRecovery": "default",
+              "RebootMigration": "default"
+            },
+            "CurrentInstanceBootMode": "uefi",
+            "NetworkPerformanceOptions": {
+              "BandwidthWeighting": "default"
+            },
+            "Operator": {
+              "Managed": false,
+              "HiddenByDefault": false
+            },
+            "SecondaryInterfaces": [],
+            "InstanceId": "i-00000000000000001",
+            "ImageId": "ami-00000000000000053",
+            "State": {
+              "Code": 16,
+              "Name": "running"
+            },
+            "PrivateDnsName": "ip-10-30-0-10.ec2.internal",
+            "PublicDnsName": "ec2-54-0-0-4.compute-1.amazonaws.com",
+            "StateTransitionReason": "",
+            "AmiLaunchIndex": 0,
+            "ProductCodes": [],
+            "InstanceType": "t3.micro",
+            "LaunchTime": "2026-11-23T06:05:57.290056Z",
+            "Placement": {
+              "AvailabilityZoneId": "use1-az1",
+              "GroupName": "",
+              "Tenancy": "default",
+              "AvailabilityZone": "us-east-1a"
+            },
+            "Monitoring": {
+              "State": "disabled"
+            },
+            "SubnetId": "subnet-000000000000000b4",
+            "VpcId": "vpc-000000000000000a8",
+            "PrivateIpAddress": "10.30.0.10",
+            "PublicIpAddress": "54.0.0.4"
+          }
+        ]
+      }
+    ]
+  }
+}

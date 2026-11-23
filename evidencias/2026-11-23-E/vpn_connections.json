@@ -1,0 +1,191 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "VpnConnections": [
+      {
+        "Category": "VPN",
+        "GatewayAssociationState": "associated",
+        "Options": {
+          "EnableAcceleration": false,
+          "StaticRoutesOnly": false,
+          "LocalIpv4NetworkCidr": "0.0.0.0/0",
+          "RemoteIpv4NetworkCidr": "0.0.0.0/0",
+          "OutsideIpAddressType": "PublicIpv4",
+          "TunnelInsideIpVersion": "ipv4",
+          "TunnelOptions": [
+            {
+              "OutsideIpAddress": "54.0.0.2",
+              "TunnelInsideCidr": "169.254.10.0/30",
+              "PreSharedKey": "[REDACTADO]",
+              "Phase1LifetimeSeconds": 28800,
+              "Phase2LifetimeSeconds": 3600,
+              "RekeyMarginTimeSeconds": 270,
+              "RekeyFuzzPercentage": 100,
+              "ReplayWindowSize": 1024,
+              "DpdTimeoutSeconds": 30,
+              "DpdTimeoutAction": "restart",
+              "Phase1EncryptionAlgorithms": [
+                {
+                  "Value": "AES256-GCM-16"
+                }
+              ],
+              "Phase2EncryptionAlgorithms": [
+                {
+                  "Value": "AES256-GCM-16"
+                }
+              ],
+              "Phase1IntegrityAlgorithms": [
+                {
+                  "Value": "SHA2-384"
+                }
+              ],
+              "Phase2IntegrityAlgorithms": [
+                {
+                  "Value": "SHA1"
+                },
+                {
+                  "Value": "SHA2-256"
+                },
+                {
+                  "Value": "SHA2-384"
+                },
+                {
+                  "Value": "SHA2-512"
+                }
+              ],
+              "Phase1DHGroupNumbers": [
+                {
+                  "Value": 20
+                }
+              ],
+              "Phase2DHGroupNumbers": [
+                {
+                  "Value": 20
+                }
+              ],
+              "IkeVersions": [
+                {
+                  "Value": "ikev2"
+                }
+              ],
+              "StartupAction": "add",
+              "LogOptions": {
+                "CloudWatchLogOptions": {
+                  "LogEnabled": false,
+                  "BgpLogEnabled": false
+                }
+              },
+              "EnableTunnelLifecycleControl": false
+            },
+            {
+              "OutsideIpAddress": "54.0.0.3",
+              "TunnelInsideCidr": "169.254.11.0/30",
+              "PreSharedKey": "[REDACTADO]",
+              "Phase1LifetimeSeconds": 28800,
+              "Phase2LifetimeSeconds": 3600,
+              "RekeyMarginTimeSeconds": 270,
+              "RekeyFuzzPercentage": 100,
+              "ReplayWindowSize": 1024,
+              "DpdTimeoutSeconds": 30,
+              "DpdTimeoutAction": "restart",
+              "Phase1EncryptionAlgorithms": [
+                {
+                  "Value": "AES256-GCM-16"
+                }
+              ],
+              "Phase2EncryptionAlgorithms": [
+                {
+                  "Value": "AES256-GCM-16"
+                }
+              ],
+              "Phase1IntegrityAlgorithms": [
+                {
+                  "Value": "SHA2-384"
+                }
+              ],
+              "Phase2IntegrityAlgorithms": [
+                {
+                  "Value": "SHA1"
+                },
+                {
+                  "Value": "SHA2-256"
+                },
+                {
+                  "Value": "SHA2-384"
+                },
+                {
+                  "Value": "SHA2-512"
+                }
+              ],
+              "Phase1DHGroupNumbers": [
+                {
+                  "Value": 20
+                }
+              ],
+              "Phase2DHGroupNumbers": [
+                {
+                  "Value": 20
+                }
+              ],
+              "IkeVersions": [
+                {
+                  "Value": "ikev2"
+                }
+              ],
+              "StartupAction": "add",
+              "LogOptions": {
+                "CloudWatchLogOptions": {
+                  "LogEnabled": false,
+                  "BgpLogEnabled": false
+                }
+              },
+              "EnableTunnelLifecycleControl": false
+            }
+          ],
+          "TunnelBandwidth": "standard"
+        },
+        "Routes": [],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "celeris-vpn"
+          },
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          },
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          }
+        ],
+        "VgwTelemetry": [
+          {
+            "AcceptedRouteCount": 0,
+            "LastStatusChange": "2026-11-23T06:06:07.071858Z",
+            "OutsideIpAddress": "54.0.0.2",
+            "Status": "DOWN",
+            "StatusMessage": "IPSEC IS DOWN"
+          },
+          {
+            "AcceptedRouteCount": 0,
+            "LastStatusChange": "2026-11-23T06:06:07.071858Z",
+            "OutsideIpAddress": "54.0.0.3",
+            "Status": "DOWN",
+            "StatusMessage": "IPSEC IS DOWN"
+          }
+        ],
+        "VpnConnectionId": "vpn-000000000000000cb",
+        "State": "available",
+        "CustomerGatewayConfiguration": "[REDACTADO]",
+        "Type": "ipsec.1",
+        "CustomerGatewayId": "cgw-000000000000000a7",
+        "VpnGatewayId": "vgw-000000000000000b3"
+      }
+    ]
+  }
+}

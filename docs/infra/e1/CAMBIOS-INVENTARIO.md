@@ -80,6 +80,10 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-49 | contradicción | F24 (señuelo) exige que el FortiGate publique TCP 22 y 23, pero D1.8 y S-29 limitan su NAT 1:1 a UDP 500/4500 y TCP 80/443 | abierto |
 | CI-50 | vacío | F23 y D1.9 («Salida: solo ACME y Wazuh»): FW01 permite TCP 443 a cualquier destino; el diseño no dice cómo se limita el destino | resuelto (2026-11-23: opción A, ver CI-52) |
 | CI-52 | decisión de diseño | Opción A de CI-50: F23 retirado; ACME corre en FW01 y entrega el certificado a PORTAL01 por SFTP (F33); PORTAL01 no sale a la WAN | resuelto (2026-11-23) |
+| CI-53 | decisión de transcripción | Demo de OpenTofu solo contra el AWS Emulator (I3-DEMO): `var.emulador = true` por defecto, credenciales ficticias, ruta estática en lugar de la propagación del VGW, módulos aws-vpc, aws-vpn, aws-gw y aws-backup | resuelto (2026-11-23) |
+| CI-54 | vacío | EC2-GW: D2.5 y CE02 no definen su AMI ni su software de arranque (Caddy + Coraza, certificado de cliente, agente Wazuh); el módulo crea la instancia sin `user_data` | abierto |
+| CI-55 | decisión de transcripción | El AWS Emulator no implementa EnableVgwRoutePropagation ni ModifyVpnTunnelOptions y no registra la Debian 13: diferencias con AWS real que el módulo absorbe | resuelto (2026-11-23) |
+| CI-56 | vacío | Política del bucket de respaldos: D2.5 dice «solo acepta la IP pública del campus» sin decir si la regla alcanza a todos los principales o solo a la credencial de respaldo | abierto |
 | CI-51 | vacío | Memoria para servir objetos grandes: 20 clientes de un instalador de 100 MB agotan `max_buffered_bytes` (512 MiB); D2.4 no lo dimensiona | abierto |
 
 ## Entradas
@@ -693,4 +697,48 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - **T49** = entrega del certificado por F33: en el Modo L solo se comprueba que F33 abre (no hay Internet, no se emula ACME).
   - **D-29** (decisión) y **S-31** (el FortiGate deja a FW01 llegar a la CA por 443 y 80; supuesto a confirmar con la DTI).
 - **Efecto sobre el laboratorio:** `fw01-sim` genera la regla de F33 y ninguna regla permite a PORTAL01 salir a la WAN; `portal01` abre TCP 22 como emulación del SFTP (solo el puerto; sin ACME ni chroot real, CI-48).
+- **Decide:** equipo del proyecto
+
+### CI-53 — Demo de OpenTofu solo contra el AWS Emulator
+- **Estado:** resuelto (2026-11-23, indicado en el prompt I3-DEMO)
+- **Tipo:** decisión de transcripción
+- **Dónde:** `deploy/opentofu/` (envs/demo y módulos aws-vpc, aws-vpn, aws-gw, aws-backup); `infra/gen/tofu.py`; CE03 D2.5 y D5.4
+- **Qué se hizo:**
+  - **AWS emulado: plano de control, sin tráfico.** El proveedor apunta al AWS Emulator oficial (`github.com/aws/aws-emulator`) en Docker, en `https://127.0.0.1:9297`, con credenciales ficticias y `skip_credentials_validation`, `skip_requesting_account_id`, `skip_metadata_api_check` y `skip_region_validation`. Nada va contra una cuenta real.
+  - `var.emulador` vale `true` por defecto: sin `-var emulador=false` nadie toca una cuenta real. El camino `false` (AWS real) no se probó.
+  - El generador (`infra/gen/tofu.py`) pasa a la v0.4: VPC con pub-a y app-a, sg-gw, nacl-public y nacl-private, EC2-GW, S3 celeris-backups y la VPN con NAT-T. Quedan fuera EC2-DR, NAT-DR y sg-dr (temporales, solo del simulacro T59) y EC2-SHIELD, EC2-CTRLR y NAT01 (retirados). El módulo aws-shield se elimina; `onprem-sim` (campus simulado del Modo A real) queda sin usar en esta demo.
+  - Quedan fuera, por indicación: runbook de cuenta real, simulacro T59 y AWS Budgets.
+  - El estado de OpenTofu se guarda fuera del repositorio (`~/.aws-emulator-lab/demo.tfstate`): contiene las llaves de la VPN.
+- **Descargas hechas para esto:** el Dockerfile oficial baja el RPM de `downloads.aws.com` (imagen de 2,1 GB, no publicada por AWS); `awscli` v1 desde PyPI (para `aws ec2/s3 describe`); el proveedor `hashicorp/aws` 5.100 con `tofu init`.
+- **Decide:** equipo del proyecto
+
+### CI-54 — EC2-GW sin AMI ni software definidos
+- **Estado:** abierto
+- **Tipo:** vacío
+- **Dónde:** CE03 D2.5 (EC2-GW); `deploy/opentofu/modules/aws-gw`
+- **Qué dice cada fuente:** D2.5 fija IP 10.30.0.10, subred pub-a, t3.micro, disco de 8 GB, sg-gw y perfil sin permisos sobre S3. El software («Caddy + Coraza, mTLS hacia CTRL01, agente Wazuh») es de CE02 y no hay receta de arranque. En la v0.2, la Debian 13 salía del parámetro público de SSM.
+- **Qué se hizo:** el módulo crea la instancia, la IP elástica y el rol con solo Session Manager, sin `user_data`. Con el emulador usa una imagen de Amazon Linux 2023 que él registra; con AWS real, la Debian 13 por SSM (sin probar).
+- **Propuesta:** CE02 entrega la receta de EC2-GW (paquete o imagen y certificado de cliente) y se agrega como `user_data` en el Modo A real.
+- **Decide:** equipo de software (CE02)
+
+### CI-55 — Diferencias del AWS Emulator con AWS real
+- **Estado:** resuelto (2026-11-23): documentadas y absorbidas
+- **Tipo:** decisión de transcripción
+- **Dónde:** `deploy/opentofu/modules/aws-vpn`, `envs/demo/main.tf`
+- **Qué se midió:**
+  - `EnableVgwRoutePropagation` devuelve `NotImplemented`. **Diferencia con AWS real:** con `var.emulador = true` se crea una ruta estática a 10.20.0.0/16 (la sede, `SEDE-JULIACA`) hacia el VGW en `rt-public` y `rt-private`. La ruta estática no sigue al BGP: no desaparece si cae el túnel. En AWS real se usa la propagación.
+  - `ModifyVpnTunnelOptions` devuelve `NotImplemented` y el emulador devuelve valores por defecto de integridad de fase 2 y de margen de rekey que el proveedor quiere corregir. Como D1.10 usa AES-GCM (AEAD), esos campos no son de diseño y el recurso los ignora con `lifecycle.ignore_changes`.
+  - El emulador no registra la Debian 13 ni tiene los parámetros de SSM: se usa una imagen de Amazon Linux 2023 suya.
+  - Crea la instancia pero no la ejecuta ni abre túneles: no hay tráfico (T01, T02, T05 y T21 siguen siendo de los Modos A y H).
+  - No evalúa políticas de IAM ni de bucket: la política con condición de IP se crea pero no se hace cumplir.
+  - Un nombre de Security Group no puede empezar con `sg-` (tampoco en AWS): el módulo lo prefija con el nombre de la VPC.
+- **Decide:** equipo del proyecto
+
+### CI-56 — Alcance de «solo acepta la IP pública del campus»
+- **Estado:** abierto
+- **Tipo:** vacío
+- **Dónde:** CE03 D2.5 (S3 celeris-backups), S-30; `deploy/opentofu/modules/aws-backup`
+- **Qué dice cada fuente:** el inventario dice «Solo acepta la IP pública del campus; credencial aparte con solo s3:PutObject y condición de IP de origen». No dice si la restricción de IP alcanza a todos los principales (lo que dejaría fuera a quien administra el bucket desde otra red) o solo a la credencial de respaldo.
+- **Qué se hizo:** la política IAM del usuario `celeris-respaldo` permite solo `s3:PutObject` con `aws:SourceIp` = 203.0.113.10/32 (la IP del FortiGate, S-29), y la política del bucket niega cualquier acción de ese usuario fuera de esa IP. No se niega a los demás principales. En AWS Academy puede no existir el usuario [S-30]: `var.crear_credencial_respaldo = false`.
+- **Propuesta:** confirmar con el equipo si se endurece (denegar a todos salvo un rol de administración) y probarlo en el Modo A real: el emulador no evalúa políticas.
 - **Decide:** equipo del proyecto

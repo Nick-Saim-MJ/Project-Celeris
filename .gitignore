@@ -49,3 +49,10 @@ e2e/cfg-firmada/
 e2e/*-e2e.crt
 e2e/pac.err
 e2e/pac.generado
+
+# OpenTofu: estado, planes y caché de proveedores (el estado de la demo contiene llaves de la VPN)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log

@@ -1,0 +1,46 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "InternetGateways": [
+      {
+        "Attachments": [
+          {
+            "State": "available",
+            "VpcId": "vpc-00000000000000001"
+          }
+        ],
+        "InternetGatewayId": "igw-00000000000000016",
+        "OwnerId": "000000000000",
+        "Tags": []
+      },
+      {
+        "Attachments": [
+          {
+            "State": "available",
+            "VpcId": "vpc-000000000000000a8"
+          }
+        ],
+        "InternetGatewayId": "igw-000000000000000b0",
+        "OwnerId": "000000000000",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "celeris-igw"
+          },
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          },
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          }
+        ]
+      }
+    ]
+  }
+}

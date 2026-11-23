@@ -1,0 +1,265 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "Subnets": [
+      {
+        "AvailabilityZoneId": "use1-az1",
+        "MapCustomerOwnedIpOnLaunch": false,
+        "OwnerId": "000000000000",
+        "AssignIpv6AddressOnCreation": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Tags": [],
+        "SubnetArn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-00000000000000007",
+        "EnableDns64": false,
+        "Ipv6Native": false,
+        "PrivateDnsNameOptionsOnLaunch": {
+          "HostnameType": "ip-name",
+          "EnableResourceNameDnsARecord": false,
+          "EnableResourceNameDnsAAAARecord": false
+        },
+        "BlockPublicAccessStates": {
+          "InternetGatewayBlockMode": "off"
+        },
+        "SubnetId": "subnet-00000000000000007",
+        "State": "available",
+        "VpcId": "vpc-00000000000000001",
+        "CidrBlock": "172.31.0.0/20",
+        "AvailableIpAddressCount": 4091,
+        "AvailabilityZone": "us-east-1a",
+        "DefaultForAz": true,
+        "MapPublicIpOnLaunch": true
+      },
+      {
+        "AvailabilityZoneId": "use1-az2",
+        "MapCustomerOwnedIpOnLaunch": false,
+        "OwnerId": "000000000000",
+        "AssignIpv6AddressOnCreation": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Tags": [],
+        "SubnetArn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-00000000000000009",
+        "EnableDns64": false,
+        "Ipv6Native": false,
+        "PrivateDnsNameOptionsOnLaunch": {
+          "HostnameType": "ip-name",
+          "EnableResourceNameDnsARecord": false,
+          "EnableResourceNameDnsAAAARecord": false
+        },
+        "BlockPublicAccessStates": {
+          "InternetGatewayBlockMode": "off"
+        },
+        "SubnetId": "subnet-00000000000000009",
+        "State": "available",
+        "VpcId": "vpc-00000000000000001",
+        "CidrBlock": "172.31.16.0/20",
+        "AvailableIpAddressCount": 4091,
+        "AvailabilityZone": "us-east-1b",
+        "DefaultForAz": true,
+        "MapPublicIpOnLaunch": true
+      },
+      {
+        "AvailabilityZoneId": "use1-az3",
+        "MapCustomerOwnedIpOnLaunch": false,
+        "OwnerId": "000000000000",
+        "AssignIpv6AddressOnCreation": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Tags": [],
+        "SubnetArn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-0000000000000000b",
+        "EnableDns64": false,
+        "Ipv6Native": false,
+        "PrivateDnsNameOptionsOnLaunch": {
+          "HostnameType": "ip-name",
+          "EnableResourceNameDnsARecord": false,
+          "EnableResourceNameDnsAAAARecord": false
+        },
+        "BlockPublicAccessStates": {
+          "InternetGatewayBlockMode": "off"
+        },
+        "SubnetId": "subnet-0000000000000000b",
+        "State": "available",
+        "VpcId": "vpc-00000000000000001",
+        "CidrBlock": "172.31.32.0/20",
+        "AvailableIpAddressCount": 4091,
+        "AvailabilityZone": "us-east-1c",
+        "DefaultForAz": true,
+        "MapPublicIpOnLaunch": true
+      },
+      {
+        "AvailabilityZoneId": "use1-az4",
+        "MapCustomerOwnedIpOnLaunch": false,
+        "OwnerId": "000000000000",
+        "AssignIpv6AddressOnCreation": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Tags": [],
+        "SubnetArn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-0000000000000000d",
+        "EnableDns64": false,
+        "Ipv6Native": false,
+        "PrivateDnsNameOptionsOnLaunch": {
+          "HostnameType": "ip-name",
+          "EnableResourceNameDnsARecord": false,
+          "EnableResourceNameDnsAAAARecord": false
+        },
+        "BlockPublicAccessStates": {
+          "InternetGatewayBlockMode": "off"
+        },
+        "SubnetId": "subnet-0000000000000000d",
+        "State": "available",
+        "VpcId": "vpc-00000000000000001",
+        "CidrBlock": "172.31.48.0/20",
+        "AvailableIpAddressCount": 4091,
+        "AvailabilityZone": "us-east-1d",
+        "DefaultForAz": true,
+        "MapPublicIpOnLaunch": true
+      },
+      {
+        "AvailabilityZoneId": "use1-az5",
+        "MapCustomerOwnedIpOnLaunch": false,
+        "OwnerId": "000000000000",
+        "AssignIpv6AddressOnCreation": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Tags": [],
+        "SubnetArn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-0000000000000000f",
+        "EnableDns64": false,
+        "Ipv6Native": false,
+        "PrivateDnsNameOptionsOnLaunch": {
+          "HostnameType": "ip-name",
+          "EnableResourceNameDnsARecord": false,
+          "EnableResourceNameDnsAAAARecord": false
+        },
+        "BlockPublicAccessStates": {
+          "InternetGatewayBlockMode": "off"
+        },
+        "SubnetId": "subnet-0000000000000000f",
+        "State": "available",
+        "VpcId": "vpc-00000000000000001",
+        "CidrBlock": "172.31.64.0/20",
+        "AvailableIpAddressCount": 4091,
+        "AvailabilityZone": "us-east-1e",
+        "DefaultForAz": true,
+        "MapPublicIpOnLaunch": true
+      },
+      {
+        "AvailabilityZoneId": "use1-az6",
+        "MapCustomerOwnedIpOnLaunch": false,
+        "OwnerId": "000000000000",
+        "AssignIpv6AddressOnCreation": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Tags": [],
+        "SubnetArn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-00000000000000011",
+        "EnableDns64": false,
+        "Ipv6Native": false,
+        "PrivateDnsNameOptionsOnLaunch": {
+          "HostnameType": "ip-name",
+          "EnableResourceNameDnsARecord": false,
+          "EnableResourceNameDnsAAAARecord": false
+        },
+        "BlockPublicAccessStates": {
+          "InternetGatewayBlockMode": "off"
+        },
+        "SubnetId": "subnet-00000000000000011",
+        "State": "available",
+        "VpcId": "vpc-00000000000000001",
+        "CidrBlock": "172.31.80.0/20",
+        "AvailableIpAddressCount": 4091,
+        "AvailabilityZone": "us-east-1f",
+        "DefaultForAz": true,
+        "MapPublicIpOnLaunch": true
+      },
+      {
+        "AvailabilityZoneId": "use1-az1",
+        "MapCustomerOwnedIpOnLaunch": false,
+        "OwnerId": "000000000000",
+        "AssignIpv6AddressOnCreation": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Tags": [
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          },
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          },
+          {
+            "Key": "Tipo",
+            "Value": "publica"
+          },
+          {
+            "Key": "Name",
+            "Value": "pub-a"
+          },
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          }
+        ],
+        "SubnetArn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-000000000000000b4",
+        "EnableDns64": false,
+        "Ipv6Native": false,
+        "PrivateDnsNameOptionsOnLaunch": {
+          "HostnameType": "ip-name",
+          "EnableResourceNameDnsARecord": false,
+          "EnableResourceNameDnsAAAARecord": false
+        },
+        "BlockPublicAccessStates": {
+          "InternetGatewayBlockMode": "off"
+        },
+        "SubnetId": "subnet-000000000000000b4",
+        "State": "available",
+        "VpcId": "vpc-000000000000000a8",
+        "CidrBlock": "10.30.0.0/24",
+        "AvailableIpAddressCount": 250,
+        "AvailabilityZone": "us-east-1a",
+        "DefaultForAz": false,
+        "MapPublicIpOnLaunch": false
+      },
+      {
+        "AvailabilityZoneId": "use1-az1",
+        "MapCustomerOwnedIpOnLaunch": false,
+        "OwnerId": "000000000000",
+        "AssignIpv6AddressOnCreation": false,
+        "Ipv6CidrBlockAssociationSet": [],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "app-a"
+          },
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          },
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          },
+          {
+            "Key": "Tipo",
+            "Value": "privada"
+          }
+        ],
+        "SubnetArn": "arn:aws:ec2:us-east-1:000000000000:subnet/subnet-000000000000000b6",
+        "EnableDns64": false,
+        "Ipv6Native": false,
+        "PrivateDnsNameOptionsOnLaunch": {
+          "HostnameType": "ip-name",
+          "EnableResourceNameDnsARecord": false,
+          "EnableResourceNameDnsAAAARecord": false
+        },
+        "BlockPublicAccessStates": {
+          "InternetGatewayBlockMode": "off"
+        },
+        "SubnetId": "subnet-000000000000000b6",
+        "State": "available",
+        "VpcId": "vpc-000000000000000a8",
+        "CidrBlock": "10.30.10.0/24",
+        "AvailableIpAddressCount": 251,
+        "AvailabilityZone": "us-east-1a",
+        "DefaultForAz": false,
+        "MapPublicIpOnLaunch": false
+      }
+    ]
+  }
+}

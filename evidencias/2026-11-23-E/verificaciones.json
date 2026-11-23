@@ -1,0 +1,176 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "fecha": "2026-11-23",
+  "endpoint": "https://127.0.0.1:9297",
+  "resumen": {
+    "PASA": 17,
+    "FALLA": 0
+  },
+  "comprobaciones": [
+    {
+      "id": "V1",
+      "comprobacion": "VPC 10.30.0.0/16",
+      "resultado": "PASA",
+      "detalle": [
+        "vpc-000000000000000a8"
+      ]
+    },
+    {
+      "id": "V2",
+      "comprobacion": "subredes pub-a y app-a con sus CIDR",
+      "resultado": "PASA",
+      "detalle": [
+        "10.30.0.0/24",
+        "10.30.10.0/24"
+      ]
+    },
+    {
+      "id": "V3",
+      "comprobacion": "ruta 0.0.0.0/0 hacia el IGW",
+      "resultado": "PASA",
+      "detalle": [
+        [
+          "0.0.0.0/0",
+          "igw"
+        ],
+        [
+          "10.20.0.0/16",
+          "vgw"
+        ],
+        [
+          "10.30.0.0/16",
+          "local"
+        ]
+      ]
+    },
+    {
+      "id": "V4",
+      "comprobacion": "ruta estática 10.20.0.0/16 hacia el VGW (el emulador no propaga rutas: diferencia con AWS real)",
+      "resultado": "PASA",
+      "detalle": "10.20.0.0/16"
+    },
+    {
+      "id": "V5",
+      "comprobacion": "VGW con ASN 64512 adjunto a la VPC",
+      "resultado": "PASA",
+      "detalle": [
+        "vgw-000000000000000b3"
+      ]
+    },
+    {
+      "id": "V6",
+      "comprobacion": "customer gateway 203.0.113.10 (FortiGate, S-29) con ASN 65020",
+      "resultado": "PASA",
+      "detalle": [
+        "cgw-000000000000000a7"
+      ]
+    },
+    {
+      "id": "V7",
+      "comprobacion": "conexión VPN con BGP (sin rutas estáticas) y dos túneles",
+      "resultado": "PASA",
+      "detalle": [
+        "vpn-000000000000000cb"
+      ]
+    },
+    {
+      "id": "V8",
+      "comprobacion": "sg-gw: entrada TCP 443 desde Internet (F29) y ninguna otra",
+      "resultado": "PASA",
+      "detalle": [
+        [
+          "tcp",
+          443,
+          "0.0.0.0/0"
+        ]
+      ]
+    },
+    {
+      "id": "V9",
+      "comprobacion": "sg-gw: salida solo CTRL01:443 (F30), SIEM01:1514/1515 (F13) y TCP 443 a Internet",
+      "resultado": "PASA",
+      "detalle": [
+        [
+          "tcp",
+          1514,
+          "10.20.50.10/32"
+        ],
+        [
+          "tcp",
+          1515,
+          "10.20.50.10/32"
+        ],
+        [
+          "tcp",
+          443,
+          "0.0.0.0/0"
+        ],
+        [
+          "tcp",
+          443,
+          "10.20.20.10/32"
+        ]
+      ]
+    },
+    {
+      "id": "V10",
+      "comprobacion": "NACL nacl-public y nacl-private",
+      "resultado": "PASA",
+      "detalle": [
+        "nacl-private",
+        "nacl-public"
+      ]
+    },
+    {
+      "id": "V11",
+      "comprobacion": "EC2-GW en 10.30.0.10 con IMDSv2 obligatorio",
+      "resultado": "PASA",
+      "detalle": [
+        "i-00000000000000001"
+      ]
+    },
+    {
+      "id": "V12",
+      "comprobacion": "bucket celeris-backups existe",
+      "resultado": "PASA",
+      "detalle": "celeris-backups"
+    },
+    {
+      "id": "V13",
+      "comprobacion": "versionado activo",
+      "resultado": "PASA",
+      "detalle": {
+        "Status": "Enabled"
+      }
+    },
+    {
+      "id": "V14",
+      "comprobacion": "Object Lock 30 días, modo compliance",
+      "resultado": "PASA",
+      "detalle": {
+        "Mode": "COMPLIANCE",
+        "Days": 30
+      }
+    },
+    {
+      "id": "V15",
+      "comprobacion": "política del bucket: el usuario de respaldo solo desde 203.0.113.10",
+      "resultado": "PASA",
+      "detalle": "politica.json"
+    },
+    {
+      "id": "V16",
+      "comprobacion": "usuario de respaldo con política solo-escritura",
+      "resultado": "PASA",
+      "detalle": [
+        "solo-escritura-desde-el-campus"
+      ]
+    },
+    {
+      "id": "V17",
+      "comprobacion": "etiquetas Proyecto y Ttl en tablas de rutas, NACL, EC2-GW, VGW y conexión VPN",
+      "resultado": "PASA",
+      "detalle": "7 recursos revisados, 0 sin etiquetas"
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "SecurityGroups": [
+      {
+        "GroupId": "sg-00000000000000013",
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "UserIdGroupPairs": [],
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": []
+          }
+        ],
+        "Tags": [],
+        "VpcId": "vpc-00000000000000001",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:000000000000:security-group/sg-00000000000000013",
+        "OwnerId": "000000000000",
+        "GroupName": "default",
+        "Description": "default VPC security group",
+        "IpPermissions": [
+          {
+            "IpProtocol": "-1",
+            "UserIdGroupPairs": [
+              {
+                "UserId": "000000000000",
+                "GroupId": "sg-00000000000000013"
+              }
+            ],
+            "IpRanges": [],
+            "Ipv6Ranges": [],
+            "PrefixListIds": []
+          }
+        ]
+      },
+      {
+        "GroupId": "sg-000000000000000ad",
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "-1",
+            "UserIdGroupPairs": [],
+            "IpRanges": [
+              {
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": []
+          }
+        ],
+        "Tags": [],
+        "VpcId": "vpc-000000000000000a8",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:000000000000:security-group/sg-000000000000000ad",
+        "OwnerId": "000000000000",
+        "GroupName": "default",
+        "Description": "default VPC security group",
+        "IpPermissions": [
+          {
+            "IpProtocol": "-1",
+            "UserIdGroupPairs": [
+              {
+                "UserId": "000000000000",
+                "GroupId": "sg-000000000000000ad"
+              }
+            ],
+            "IpRanges": [],
+            "Ipv6Ranges": [],
+            "PrefixListIds": []
+          }
+        ]
+      },
+      {
+        "GroupId": "sg-000000000000000b8",
+        "IpPermissionsEgress": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "UserIdGroupPairs": [],
+            "IpRanges": [
+              {
+                "Description": "ACME y actualizaciones",
+                "CidrIp": "0.0.0.0/0"
+              },
+              {
+                "Description": "F30",
+                "CidrIp": "10.20.20.10/32"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": []
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 1514,
+            "ToPort": 1514,
+            "UserIdGroupPairs": [],
+            "IpRanges": [
+              {
+                "Description": "F13",
+                "CidrIp": "10.20.50.10/32"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": []
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 1515,
+            "ToPort": 1515,
+            "UserIdGroupPairs": [],
+            "IpRanges": [
+              {
+                "Description": "F13",
+                "CidrIp": "10.20.50.10/32"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": []
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          },
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          },
+          {
+            "Key": "Name",
+            "Value": "sg-gw"
+          }
+        ],
+        "VpcId": "vpc-000000000000000a8",
+        "SecurityGroupArn": "arn:aws:ec2:us-east-1:000000000000:security-group/sg-000000000000000b8",
+        "OwnerId": "000000000000",
+        "GroupName": "celeris-sg-gw",
+        "Description": "D2.5: sg-gw (EC2-GW)",
+        "IpPermissions": [
+          {
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "UserIdGroupPairs": [],
+            "IpRanges": [
+              {
+                "Description": "F29",
+                "CidrIp": "0.0.0.0/0"
+              }
+            ],
+            "Ipv6Ranges": [],
+            "PrefixListIds": []
+          }
+        ]
+      }
+    ]
+  }
+}

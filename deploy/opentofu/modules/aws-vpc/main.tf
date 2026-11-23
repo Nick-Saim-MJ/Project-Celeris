@@ -1,6 +1,5 @@
 locals {
-  az_de     = { a = "${var.region}a", b = "${var.region}b" }
-  crear_iam = var.perfil_de_instancia_existente == null
+  az_de = { a = "${var.region}a", b = "${var.region}b" }
 
   rutas_estaticas = flatten([
     for t in var.tablas_de_rutas : [
@@ -9,7 +8,7 @@ locals {
         tabla   = t.id
         destino = r.destino
         salto   = r.salto
-      } if contains(["internet_gateway", "nat"], r.salto)
+      } if r.salto == "internet_gateway"
     ]
   ])
 
@@ -64,8 +63,7 @@ resource "aws_route" "estatica" {
   for_each               = { for r in local.rutas_estaticas : r.clave => r }
   route_table_id         = aws_route_table.tabla[each.value.tabla].id
   destination_cidr_block = each.value.destino
-  gateway_id             = each.value.salto == "internet_gateway" ? aws_internet_gateway.este.id : null
-  network_interface_id   = each.value.salto == "nat" ? aws_instance.nat.primary_network_interface_id : null
+  gateway_id             = aws_internet_gateway.este.id
 }
 
 # Prefijo de S3 por Gateway Endpoint: sin costo por hora (D2.5).
@@ -125,72 +123,4 @@ resource "aws_network_acl_rule" "regla" {
   cidr_block     = each.value.cidr
   from_port      = each.value.protocolo == "-1" ? null : each.value.desde
   to_port        = each.value.protocolo == "-1" ? null : each.value.hasta
-}
-
-# Roles por instancia con Session Manager (sin bastion ni puerto 22, D2.5). En AWS Academy se usa el perfil existente.
-resource "aws_iam_role" "instancia" {
-  for_each = local.crear_iam ? toset(var.nombres_de_instancia) : toset([])
-  name     = "${var.nombre}-${lower(each.key)}"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect    = "Allow"
-      Action    = "sts:AssumeRole"
-      Principal = { Service = "ec2.amazonaws.com" }
-    }]
-  })
-  tags = var.etiquetas
-}
-
-resource "aws_iam_role_policy_attachment" "ssm" {
-  for_each   = local.crear_iam ? toset(var.nombres_de_instancia) : toset([])
-  role       = aws_iam_role.instancia[each.key].name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
-
-resource "aws_iam_instance_profile" "instancia" {
-  for_each = local.crear_iam ? toset(var.nombres_de_instancia) : toset([])
-  name     = aws_iam_role.instancia[each.key].name
-  role     = aws_iam_role.instancia[each.key].name
-  tags     = var.etiquetas
-}
-
-# NAT01: instancia NAT en lugar de NAT Gateway (D2.5). Punto único de falla aceptado; se recrea con `tofu apply`.
-resource "aws_instance" "nat" {
-  ami                    = var.ami_id
-  instance_type          = var.nat.tipo
-  subnet_id              = aws_subnet.este[var.nat.subred].id
-  private_ip             = var.nat.ip
-  vpc_security_group_ids = [aws_security_group.grupo[var.nat.grupo_de_seguridad].id]
-  source_dest_check      = false
-  iam_instance_profile   = local.crear_iam ? aws_iam_instance_profile.instancia["NAT01"].name : var.perfil_de_instancia_existente
-
-  user_data = <<-EOT
-    #!/bin/bash
-    set -eu
-    sysctl -w net.ipv4.ip_forward=1
-    echo "net.ipv4.ip_forward=1" > /etc/sysctl.d/99-nat.conf
-    apt-get update -y && DEBIAN_FRONTEND=noninteractive apt-get install -y iptables
-    iptables -t nat -A POSTROUTING -s ${var.vpc.cidr} -j MASQUERADE
-  EOT
-
-  metadata_options {
-    http_tokens = "required"
-  }
-
-  root_block_device {
-    volume_type = "gp3"
-    volume_size = var.nat.disco_gb
-    encrypted   = true
-  }
-
-  tags = merge(var.etiquetas, { Name = "NAT01" })
-}
-
-resource "aws_eip" "nat" {
-  domain   = "vpc"
-  instance = aws_instance.nat.id
-  tags     = merge(var.etiquetas, { Name = "NAT01" })
-
-  depends_on = [aws_internet_gateway.este]
 }

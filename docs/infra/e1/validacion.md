@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.1 · fecha 2026-11-22
 - Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 9 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **6 FALLA**, 4 con advertencias, 44 PASA, 1 pendientes de P2–P5.
+- Resultado: **6 FALLA**, 3 con advertencias, 45 PASA, 1 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -47,7 +47,7 @@
 | V-40 | El ruleset generado de fw01-sim contiene exactamente los flujos permitidos (y los bloqueos) del inventario | PASA | — |
 | V-41 | swanctl, FRR y VTI generados coinciden con la sección vpn del inventario (cifrado, DPD, vidas, ASN, BGP, MTU, MSS) | PASA | — |
 | V-42 | Los últimos resultados de make test-lab no tienen FALLA en pruebas críticas | PASA con advertencias | 0 errores, 2 advertencias |
-| V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA con advertencias | 0 errores, 1 advertencias |
+| V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA | — |
 | V-44 | Un ID retirado no se reutiliza ni aparece en flujos, pruebas, componentes, zonas, rúbrica o textos vigentes | PASA | — |
 | V-45 | Ningún flujo permite descifrado con origen WIFI-EST (REQ-F-36, REQ-RN-11) | PASA | — |
 | V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA | Detalle y matriz componente × figura en docs/infra/e1/cobertura-figuras.md |
@@ -239,12 +239,11 @@
 - **V-33** — T25 (Modo L): destino ESX01 no se emula en el laboratorio (F4.1/F4.2) — registrado (CI-16)
 - **V-42** — 2026-11-23-L: la prueba crítica T23 (Fuga IPv6) está en NO_APLICA, no en PASA
 - **V-42** — 2026-11-23-L: la prueba crítica T58 (EC2-GW solo alcanza CTRL01:443 y SIEM01) está en PARCIAL, no en PASA
-- **V-43** — El generador de OpenTofu no puede leer el inventario v0.4 (ValueError('referencia de red desconocida: prefijo_s3')); queda pendiente de I3
 
 ## Información
 
 - **V-27** — 29 de 60 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 27 elementos pendientes en los YAML; 52 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-50', 'CI-51', 'CI-52']
+- **V-29** — 27 elementos pendientes en los YAML; 56 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-50', 'CI-51', 'CI-52', 'CI-53', 'CI-54', 'CI-55', 'CI-56']
 - **V-42** — Resultados de 2026-11-23-L (commit descono): {'PASA': 34, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 32 de 60 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 605 fórmulas recalculadas con LibreOffice sin errores

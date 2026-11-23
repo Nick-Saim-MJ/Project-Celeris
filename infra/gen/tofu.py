@@ -87,7 +87,7 @@ def _nacl(x: Infra, n: dict) -> dict:
         for r in n[lado]:
             proto = "-1" if r["proto"] == "todo" else r["proto"]
             for d, h in (_puertos(r) if proto != "-1" else [(0, 0)]):
-                reglas[lado].append({"numero": cont, "accion": r["accion"], "protocolo": proto, "desde": d, "hasta": h, "cidr": _red(x, r["origen"])})
+                reglas[lado].append({"numero": cont, "accion": r["accion"], "protocolo": proto, "desde": d, "hasta": h, "cidr": _red(x, r["origen"] if lado == "ingress" else r["destino"])})
                 cont += 10
     return {"id": n["id"], "subredes": [_id_subred(s) for s in n["subredes"]], **reglas}
 
@@ -114,35 +114,31 @@ def _opciones_vpn_aws(x: Infra) -> dict:
 
 
 def variables(x: Infra) -> dict:
+    """v0.4 (CE03 D2.5): VPC con pub-a y app-a, EC2-GW, S3 celeris-backups y la VPN con NAT-T. EC2-DR y NAT-DR (temporales) y SHIELD/CTRLR/NAT01 (retirados) no entran."""
     inv, aws = x.inv, x.inv["aws"]
     vpc = x.componentes["AWS-VPC"]
     subredes = [{"id": _id_subred(c["id"]), "cidr": c["cidr"], "az": c["az"], "publica": c["subred_tipo"] == "publica"}
-                for c in x.componentes.values() if c["tipo"] == "aws_subred"]
+                for c in x.componentes.values() if c["tipo"] == "aws_subred" and c["estado"] != "retirado"]
     reserva = next(r["cidr"] for r in inv["reservas"] if r["dentro_de"] == "AWS-CELERIS")
+
     def destino(d: str) -> str:
         return d if d == "prefijo_s3" else _red(x, d)
 
-    def salto(s: str) -> str:
-        return "nat" if s.startswith("nat:") else s
-
     rutas = [{"id": t["id"], "subredes": [_id_subred(s) for s in t["subredes"]],
-              "rutas": [{"destino": destino(r["destino"]), "salto": salto(r["salto"])} for r in t["rutas"]]} for t in aws["tablas_de_rutas"]]
+              "rutas": [{"destino": destino(r["destino"]), "salto": r["salto"]} for r in t["rutas"] if not r.get("solo_en_simulacro")]}
+             for t in aws["tablas_de_rutas"]]
+    temporales = {c["id"] for c in x.componentes.values() if c.get("estado") == "temporal"}
     sgs = [{"id": s["id"], "componente": s["componente"], "ingress": _reglas_sg(x, s["ingress"], "ingress"),
-            "egress": _reglas_sg(x, s["egress"], "egress")} for s in aws["security_groups"]]
+            "egress": _reglas_sg(x, s["egress"], "egress")} for s in aws["security_groups"] if s["componente"] not in temporales and not s.get("temporal")]
     instancias = {}
-    for cid in ("EC2-SHIELD", "EC2-CTRLR", "NAT01"):
+    for cid in ("EC2-GW",):
         c = x.componentes[cid]
         instancias[cid] = {"ip": c["ips"][0]["ip"], "subred": _id_subred(c["subred"]), "tipo_produccion": c["instancia"]["tipo_produccion"],
                            "tipo_laboratorio": c["instancia"]["tipo_laboratorio"], "disco_gb": c["instancia"]["disco_gb_gp3"],
                            "grupo_de_seguridad": next(s["id"] for s in aws["security_groups"] if s["componente"] == cid)}
     v = inv["vpn"]
     ts = vpn.tuneles(x)
-    ike, esp = vpn.propuestas(x)
-    shield_puerto = x.flujos["F9"]["protocolos"][0]["puertos"][0]
-    admin = next(p for pr in x.flujos["F12"]["protocolos"] for p in pr["puertos"] if p == 9128)
-    cgw = aws["onprem_sim"]["cgw_sim"]
-    lab = aws["onprem_sim"]["labcli_sim"]
-    zona_lab = x.zonas[lab["zona"]]
+    s3 = aws["s3"]
     return {
         **CABECERA,
         "region_por_defecto": aws["region"]["laboratorio"],
@@ -154,27 +150,16 @@ def variables(x: Infra) -> dict:
         "security_groups": sgs,
         "nacls": [_nacl(x, n) for n in aws["nacl"]],
         "instancias": instancias,
-        "presupuesto_alarma_porcentaje": aws["presupuesto"]["alarma_porcentaje"],
-        "shield": {"puerto_f9": shield_puerto, "puerto_admin": admin,
-                   "clientes_permitidos": [x.zonas[z]["cidr"] for z in ("EDGE",)]},
         "vpn": {
             "asn_aws": v["extremo_aws"]["asn"], "asn_cliente": v["extremo_onpremise"]["asn"],
+            "ip_publica_campus": v["extremo_onpremise"]["ip_publica"], "nat_t": v["extremo_onpremise"]["nat_t"],
             "redes": {"campus": v["extremo_onpremise"]["redes_anunciadas"][0], "aws": v["extremo_aws"]["redes_anunciadas"][0]},
             "tuneles": [{"nombre": t["nombre"], "inside_cidr": t["red"], "ip_aws": t["ip_aws"], "ip_cliente": t["ip_campus"],
                          "rol": t["rol"], "prepend": t["prepend"], "clave_vti": t["n"]} for t in ts],
             "opciones_aws": _opciones_vpn_aws(x),
-            "strongswan": {"ike": ike, "esp": esp, "dpd_s": v["dpd"]["intervalo_s"], "dpd_accion": v["dpd"]["accion"],
-                           "reautenticacion_ike_s": v["fase1"]["vida_s"], "vida_child_s": v["fase2"]["vida_s"]},
-            "bgp": {"keepalive_s": v["bgp"]["keepalive_s"], "hold_s": v["bgp"]["hold_s"]},
-            "mtu": v["mtu"], "mss": v["mss_clamping"],
         },
-        "frr_conf": vpn.frr(x, "fw01"),
-        "onprem_sim": {
-            "vpc_cidr": _red(x, aws["onprem_sim"]["vpc"]["cidr"]),
-            "subred_wan_cidr": cgw["subred_cidr"], "cgw_tipo": cgw["tipo"],
-            "subred_lab_cidr": zona_lab["cidr"], "labcli_ip": next(i["ip"] for i in x.componentes[lab["componente"]]["ips"] if i["zona"] == lab["zona"]),
-            "labcli_tipo": lab["tipo"], "campus_resumen": _red(x, "supernet:CAMPUS-RESUMEN"),
-        },
+        "respaldo": {"bucket": s3["bucket"], "versionado": s3["versionado"], "object_lock": s3["object_lock"],
+                     "ip_campus": v["extremo_onpremise"]["ip_publica"], "usuario": "celeris-respaldo"},
     }
 
 

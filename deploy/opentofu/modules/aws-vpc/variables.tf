@@ -87,33 +87,6 @@ variable "nacls" {
   }))
 }
 
-variable "nat" {
-  description = "Instancia NAT (NAT01): IP, subred, tipo, disco y Security Group."
-  type = object({
-    ip                 = string
-    subred             = string
-    tipo               = string
-    disco_gb           = number
-    grupo_de_seguridad = string
-  })
-}
-
-variable "ami_id" {
-  description = "AMI de las instancias (x86_64)."
-  type        = string
-}
-
-variable "perfil_de_instancia_existente" {
-  description = "Nombre de un perfil de instancia ya creado (AWS Academy: LabInstanceProfile). Si es null, el módulo crea un rol por instancia con SSM."
-  type        = string
-  default     = null
-}
-
-variable "nombres_de_instancia" {
-  description = "Instancias de la VPC que necesitan un rol (NAT01, EC2-SHIELD, EC2-CTRLR)."
-  type        = list(string)
-}
-
 variable "etiquetas" {
   description = "Etiquetas de todos los recursos (Proyecto y Ttl)."
   type        = map(string)

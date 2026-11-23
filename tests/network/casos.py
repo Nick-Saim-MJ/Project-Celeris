@@ -18,6 +18,10 @@ SIN_WAZUH = "Wazuh (siem01) no está desplegado en el laboratorio: la alerta del
 NO_APLICA_L = {
     "T23": "RA guard es un control del switch de acceso (SW-ACC, S-14); los puentes Linux del laboratorio no lo emulan",
     "T25": "ESX01, IPMI01, BRK01 y SW-CORE01 no se emulan: el puerto break-glass no existe en F4.1 (CI-16)",
+    # v0.4: dependen de la consola completa (CE02, S2). ctrl01 es solo una consola de prueba: aquí no se simulan ni se marcan PASA.
+    "T50": ("requiere la consola (CE02, S2): la precarga programada con ventana horaria y límite de ancho de banda (REQ-F-34, REQ-RN-10) no existe en el nodo ni en ctrl01", ["H"]),
+    "T53": ("requiere la consola (CE02, S2): el segundo factor, el límite de intentos y la auditoría de inicios de sesión (REQ-F-33, DET-10) no existen en ctrl01", ["A", "H"]),
+    "T54": ("requiere la consola (CE02, S2): la aprobación de fuentes y el RBAC de la API (REQ-F-31, REQ-F-37); ctrl01 solo rechaza con 403 un POST /aprobar remoto de prueba", ["A", "H"]),
 }
 
 SONDA_PY = r"""
@@ -112,21 +116,21 @@ def _bgp_y_sas(c: Contexto) -> tuple[bool, str]:
 
 # ---------------------------------------------------------------------------------------------------------------------
 def t05(c: Contexto) -> Medicion:
-    """Falla de un túnel: baja el túnel activo con tráfico en curso y mide cuánto tarda en volver a pasar por el otro."""
+    """Falla de un túnel: baja el túnel activo con tráfico en curso (EC2-GW → CTRL01:443, F30) y mide cuánto tarda en volver a pasar por el otro."""
     m = Medicion()
-    objetivo, puerto = c.ip("EC2-SHIELD"), c.puerto("F9")
+    objetivo, puerto = c.ip("CTRL01"), c.puerto("F30")
     ok, estado = _bgp_y_sas(c)
     c.ev.guardar("antes.txt", estado)
     if not ok:
         raise RuntimeError("precondición: los dos túneles y las dos sesiones BGP deben estar establecidos")
-    L.enviar("edge01", "/tmp/sonda.py", SONDA_PY)
-    L.fondo("edge01", f"python3 /tmp/sonda.py {objetivo} {puerto} 110 /tmp/sonda.log")
+    L.enviar("gw-sim", "/tmp/sonda.py", SONDA_PY)
+    L.fondo("gw-sim", f"python3 /tmp/sonda.py {objetivo} {puerto} 110 /tmp/sonda.log")
     time.sleep(4)
     t_baja = time.time()
     L.ex("fw01-sim", "swanctl --terminate --ike tunel1 2>&1 | grep -v '^plugin' | tail -2", timeout=30)
 
     def analizar():
-        lineas = [l.split() for l in L.leer("edge01", "/tmp/sonda.log").splitlines() if len(l.split()) == 2]
+        lineas = [l.split() for l in L.leer("gw-sim", "/tmp/sonda.log").splitlines() if len(l.split()) == 2]
         caida = next((float(t) for t, e in lineas if e == "down" and float(t) >= t_baja), None)
         if caida is None:
             return None, None
@@ -143,8 +147,8 @@ def t05(c: Contexto) -> Medicion:
     else:
         m.medidas["convergencia_s"] = round(vuelta - t_baja, 1)
         m.medidas["interrupcion_s"] = round(vuelta - caida, 1)
-    L.ex("edge01", "pkill -f sonda.py")
-    L.traer("edge01", "/tmp/sonda.log", c.ev.dir / "sonda.log")
+    L.ex("gw-sim", "pkill -f sonda.py")
+    L.traer("gw-sim", "/tmp/sonda.log", c.ev.dir / "sonda.log")
     c.ev.registrar_existente("sonda.log")
     _, sas = L.ex("fw01-sim", "swanctl --list-sas 2>/dev/null | grep -v '^plugin'")
     _, ruta = L.ex("fw01-sim", "vtysh -c 'show ip route 10.30.0.0/16' | head -8")
@@ -152,6 +156,7 @@ def t05(c: Contexto) -> Medicion:
     m.salidas["swanctl --list-sas"] = sas
     m.salidas["stdout"] = sas
     m.hallazgos.append(f"tras la caída la ruta a 10.30.0.0/16 va por: {'vti2' if 'vti2' in ruta else 'vti1' if 'vti1' in ruta else 'ninguna'}")
+    m.hallazgos.append("la sonda va de EC2-GW (gw-sim) a CTRL01:443 (F30): es el flujo que la VPN transporta en la v0.4")
     # restaura el túnel 1 y espera a que BGP vuelva a tener los dos vecinos
     L.ex("fw01-sim", "timeout 25 swanctl --initiate --child tunel1 2>&1 | grep -v '^plugin' | tail -1", timeout=40)
     L.esperar(lambda: _bgp_y_sas(c)[0], 90, 3)
@@ -269,14 +274,14 @@ def t09(c: Contexto) -> Medicion:
 
 
 def t10(c: Contexto) -> Medicion:
-    """DMZ → LAN: con el puerto 445 abierto a propósito en LABCLI01, WEB01 y HNY01 no deben alcanzarlo."""
+    """DMZ → LAN: con el puerto 445 abierto a propósito en LABCLI01, PORTAL01 y HNY01 no deben alcanzarlo."""
     m = Medicion()
     lab = c.ip("LABCLI01")
     L.enviar("labcli01", "/tmp/escucha.py", TCP_ESCUCHA_PY)
     L.fondo("labcli01", f"python3 /tmp/escucha.py {lab} 445 25")
     time.sleep(1)
     rc_ctrl, _ = L.ex("labcli01", f"nc -zv -w2 {lab} 445")
-    rcs = [L.ex(n, f"nc -zv -w3 {lab} 445")[0] for n in ("web01", "hny01")]
+    rcs = [L.ex(n, f"nc -zv -w3 {lab} 445")[0] for n in ("portal01", "hny01")]
     m.codigos["principal"] = _codigo_principal(rcs)
     if rc_ctrl != 0:
         m.vacia = "el control positivo falló: el puerto 445 de LABCLI01 no abre ni localmente"
@@ -285,15 +290,18 @@ def t10(c: Contexto) -> Medicion:
 
 def _reglas(c: Contexto, ventana: bool) -> str:
     from gen import nftables
-    return nftables.generar(c.infra, modo="piloto", ventana=ventana, wan_ip=c.P["fw01_wan"], aws_peers=c.P["aws_peers"])
+    return nftables.generar(c.infra, modo="piloto", ventana=ventana, aws_peers=c.P["aws_peers"])
 
 
 def t11(c: Contexto) -> Medicion:
     """Internet → DMZ-HONEY: con la ventana autorizada (F24), ext01 llega a Cowrie por el 22 y queda registro."""
     m = Medicion()
-    wan = c.P["fw01_wan"]
+    wan = c.P["fgt_wan"]
+    fw = c.infra.componentes["FW01"]["ips"][0]["ip"]
     inicio = time.time()
     try:
+        # La ventana autorizada también abre el FortiGate: D1.8 limita su NAT 1:1 a UDP 500/4500 y TCP 80/443, y F24 necesita TCP 22 y 23 (CI-49)
+        L.ex("fgt-sim", f"nft add rule ip fgt ventana iifname eth2 ip daddr {wan} tcp dport {{ 22, 23 }} counter dnat to {fw}")
         L.recargar_nft(_reglas(c, ventana=True))
         rc, out = L.ex("ext01", f"nc -zv -w3 {wan} 22")
         m.codigos["principal"] = rc
@@ -307,8 +315,10 @@ def t11(c: Contexto) -> Medicion:
             m.hallazgos.append("Cowrie no registró la conexión")
             m.codigos["principal"] = m.codigos["principal"] or 1
     finally:
+        L.ex("fgt-sim", "nft flush chain ip fgt ventana")
         L.recargar_nft(_reglas(c, ventana=False))
     _alerta_wazuh(c, m, "100302", inicio)
+    m.hallazgos.append("F24 exige abrir TCP 22 y 23 en el FortiGate durante la ventana, pero D1.8 y S-29 limitan su NAT 1:1 a UDP 500/4500 y TCP 80/443 (CI-49)")
     m.hallazgos.append("el puerto 23 de F24 no se prueba: OpenCanary no está en el laboratorio")
     return m
 
@@ -341,16 +351,21 @@ def t14(c: Contexto) -> Medicion:
 
 
 def t15(c: Contexto) -> Medicion:
-    """Exposición del portal: desde Internet solo 80 y 443 (los señuelos solo con ventana autorizada)."""
+    """Exposición del portal: desde Internet solo 80 y 443 en la IP pública del FortiGate; CTRL01 no es alcanzable (los señuelos, solo con ventana)."""
     m = Medicion()
-    wan = c.P["fw01_wan"]
-    extra = ",".join(str(p) for p in sorted({c.puerto("F1"), c.puerto("F12"), c.puerto("F9"), c.puerto("F22"), 2222, 5601, 3000} - set(range(1, 1025))))
+    wan = c.P["fgt_wan"]
+    extra = ",".join(str(p) for p in sorted({c.puerto("F1"), c.puerto("F10"), 9128, 2222, 5601, 5432} - set(range(1, 1025))))
     rc, out = L.ex("ext01", f"nmap -sS -Pn -n -T4 --max-retries 1 -p 1-1024,{extra} {wan}", timeout=240)
     c.ev.guardar("nmap.txt", out)
     m.codigos["principal"] = rc
     m.salidas["stdout"] = out
     abiertos = re.findall(r"(?m)^(\d+)/tcp\s+open", out)
     m.medidas["puertos_abiertos"] = len(abiertos)
+    ctrl = c.ip("CTRL01")
+    rc_ctrl, out_ctrl = L.ex("ext01", f"ip route replace 10.20.0.0/16 via {wan}; nmap -sS -Pn -n -T4 --max-retries 1 -p 22,443,8443 {ctrl}; ip route del 10.20.0.0/16 via {wan}", timeout=120)
+    c.ev.guardar("nmap_ctrl01.txt", out_ctrl)
+    m.medidas["puertos_abiertos_en_ctrl01"] = len(re.findall(r"(?m)^\d+/tcp\s+open", out_ctrl))
+    m.salidas["nmap hacia CTRL01"] = out_ctrl
     time.sleep(2)
     eve = L.ex("fw01-sim", "grep -c '\"event_type\":\"alert\"' /var/log/suricata/eve.json 2>/dev/null")[1].strip()
     alertas = L.ex("fw01-sim", "grep '\"event_type\":\"alert\"' /var/log/suricata/eve.json 2>/dev/null | tail -3")[1]
@@ -364,7 +379,7 @@ def t16(c: Contexto) -> Medicion:
     m = Medicion()
     imagen = TESTSSL_IMAGEN
     rc, out = L.docker(["run", "--rm", "--network", f"container:{L.PREFIJO}ext01", "-v", f"{c.ev.dir}:/out", "-v", f"{c.pki}:/pki:ro", imagen,
-                        "--add-ca", "/pki/ca.pem", "--ip", c.P["fw01_wan"], "--jsonfile", "/out/tls.json", "--warnings", "off", "--color", "0",
+                        "--add-ca", "/pki/ca.pem", "--ip", c.P["fgt_wan"], "--jsonfile", "/out/tls.json", "--warnings", "off", "--color", "0",
                         f"{c.P['dominio_portal']}:443"], 900)
     c.ev.guardar("testssl.txt", out)
     m.codigos["principal"] = rc
@@ -383,7 +398,7 @@ def t17(c: Contexto) -> Medicion:
     """Escaneo web con ZAP baseline contra el portal."""
     m = Medicion()
     rc, out = L.docker(["run", "--rm", "--network", f"container:{L.PREFIJO}ext01", "-v", f"{c.ev.dir}:/zap/wrk:rw", ZAP_IMAGEN, "zap-baseline.py",
-                        "-t", f"https://{c.P['fw01_wan']}/", "-J", "zap.json", "-m", "1", "-I"], 900)
+                        "-t", f"https://{c.P['fgt_wan']}/", "-J", "zap.json", "-m", "1", "-I"], 900)
     c.ev.guardar("zap.txt", out)
     ruta = c.ev.dir / "zap.json"
     m.codigos["principal"] = rc
@@ -400,69 +415,47 @@ def t17(c: Contexto) -> Medicion:
 
 
 def t18(c: Contexto) -> Medicion:
-    """WAF: una inyección SQL debe recibir 403 y quedar en el registro de auditoría de ModSecurity."""
+    """WAF (PORTAL01): una inyección SQL debe recibir 403 y quedar en el registro de auditoría de ModSecurity."""
     m = Medicion()
     inicio = time.time()
     q = "https://%s/?q=%%27%%20OR%%201%%3D1--" % c.P["dominio_portal"]
-    rc, out = L.ex("ext01", f"curl -sk -m8 --resolve {c.P['dominio_portal']}:443:{c.P['fw01_wan']} -o /dev/null -w '%{{http_code}}' '{q}'")
+    rc, out = L.ex("ext01", f"curl -sk -m8 --resolve {c.P['dominio_portal']}:443:{c.P['fgt_wan']} -o /dev/null -w '%{{http_code}}' '{q}'")
     m.codigos["principal"] = rc
     m.salidas["stdout"] = out.strip()
     time.sleep(1)
-    audit = L.ex("waf01", "tail -c 6000 /var/log/modsec_audit.log 2>/dev/null")[1]
+    audit = L.ex("portal01", "tail -c 6000 /var/log/modsec_audit.log 2>/dev/null")[1]
     c.ev.guardar("modsec_audit.log", audit)
-    n = L.ex("waf01", "grep -c '\"transaction\"' /var/log/modsec_audit.log 2>/dev/null")[1].strip()
+    n = L.ex("portal01", "grep -c '\"transaction\"' /var/log/modsec_audit.log 2>/dev/null")[1].strip()
     m.medidas["eventos_modsecurity"] = int(n) if n.isdigit() else 0
     _alerta_wazuh(c, m, "100303", inicio)
     return m
 
 
 def t19(c: Contexto) -> Medicion:
-    """Salida del portal: WEB01 no sale a Internet (control positivo: WAF01 sí alcanza ACME/443)."""
+    """Salida del portal: PORTAL01 solo debe alcanzar los endpoints ACME por 443 (F23); hacia otro destino de Internet no debe salir (D1.16: «Denegado»)."""
     m = Medicion()
     objetivo = f"https://{c.P['dominio_generico']}/"
-    rc_ctrl, _ = L.ex("waf01", f"curl -sk -m6 -o /dev/null -w '%{{http_code}}' --resolve {c.P['dominio_generico']}:443:{c.P['ext01']} {objetivo}")
-    rc, out = L.ex("web01", f"curl -sS -m6 --resolve {c.P['dominio_generico']}:443:{c.P['ext01']} {objetivo}")
+    acme = c.P["dominio_acme"]
+    rc_ctrl, _ = L.ex("portal01", f"curl -sk -m6 -o /dev/null -w '%{{http_code}}' --resolve {acme}:443:{c.P['ext01']} https://{acme}/directory")
+    rc, out = L.ex("portal01", f"curl -sS -m6 --resolve {c.P['dominio_generico']}:443:{c.P['ext01']} {objetivo}")
     m.codigos["principal"] = rc
     if rc_ctrl != 0:
-        m.vacia = "el control positivo falló: WAF01 tampoco alcanzó al origen de prueba, así que la denegación de WEB01 no es concluyente"
+        m.vacia = "el control positivo falló: PORTAL01 tampoco alcanzó el endpoint ACME de laboratorio (F23), así que la denegación no es concluyente"
+    if rc == 0:
+        m.hallazgos.append("PORTAL01 alcanza example.com por 443: F23 permite TCP 443 hacia cualquier destino de Internet y no solo hacia los endpoints ACME que D1.9 («Salida: solo ACME y Wazuh») y D1.11 («Renovación del certificado») prometen; "
+                           "el diseño no define cómo se limita el destino (alias de FW01 por FQDN o lista del FortiGate)")
     return m
 
 
 def t20(c: Contexto) -> Medicion:
-    """Aislamiento del señuelo: HNY01 no alcanza a WEB01:8080 (control positivo: WAF01 sí)."""
+    """Aislamiento del señuelo: HNY01 no alcanza a PORTAL01:443 (control positivo: LABCLI01 sí, por F5)."""
     m = Medicion()
-    web, pt = c.ip("WEB01"), c.puerto("F22")
-    rc_ctrl, _ = L.ex("waf01", f"nc -zv -w3 {web} {pt}")
-    rc, _ = L.ex("hny01", f"nc -zv -w3 {web} {pt}")
+    portal, pt = c.ip("PORTAL01"), c.puerto("F5")
+    rc_ctrl, _ = L.ex("labcli01", f"nc -zv -w3 {portal} {pt}")
+    rc, _ = L.ex("hny01", f"nc -zv -w3 {portal} {pt}")
     m.codigos["principal"] = rc
     if rc_ctrl != 0:
-        m.vacia = "el control positivo falló: WAF01 no alcanza a WEB01"
-    return m
-
-
-def t22(c: Contexto) -> Medicion:
-    """Caída de SVC01: el DNS lo atiende FW01 y el PAC lo sirve EDGE01."""
-    m = Medicion()
-    puerta_svc = c.puerta("SVC01")
-    svc = c.ip("SVC01")
-    resolv = L.leer("labcli01", "/etc/resolv.conf")
-    try:
-        L.ex("labcli01", f"printf '%s\\noptions timeout:2 attempts:1\\n' \"$(cat /etc/resolv.conf)\" > /tmp/r && cat /tmp/r > /etc/resolv.conf")
-        L.enlace("svc01", False)
-        rc_dns, dns = L.ex("labcli01", f"kdig +short +time=2 +retry=1 @{c.puerta('LABCLI01')} {c.P['dominio_generico']}")
-        # El connect-timeout incluye la resolución: con SVC01 caído el cliente espera el timeout del resolvedor (2 s) antes de usar FW01.
-        inicio = time.time()
-        rc_pac, pac = L.ex("labcli01", "curl -s -m14 --connect-timeout 10 -o /dev/null -w '%{http_code}' http://pac.celeris.internal/wpad.dat", timeout=30)
-        m.medidas["tiempo_hasta_el_pac_s"] = round(time.time() - inicio, 1)
-        _, quien = L.ex("edge01", "tail -n 2 /var/log/nginx/pac.log 2>/dev/null")
-    finally:
-        L.enlace("svc01", True, puerta_svc)
-        L.enviar("labcli01", "/etc/resolv.conf", resolv)
-    c.ev.guardar("conmutacion.txt", f"DNS por FW01: {dns}\nPAC: {pac}\nnginx de EDGE01:\n{quien}")
-    m.codigos["nslookup example.com 10.20.32.1"] = rc_dns if dns.strip() else 1
-    m.salidas["curl ... http://pac.celeris.internal/wpad.dat"] = pac.strip()
-    t22_navegador(c, m)
-    m.hallazgos.append("`nslookup` no está en la imagen: se usó kdig contra la IP de FW01 en la VLAN de LAB")
+        m.vacia = "el control positivo falló: LABCLI01 no alcanza a PORTAL01:443 (F5)"
     return m
 
 
@@ -486,73 +479,75 @@ def t24(c: Contexto) -> Medicion:
 
 
 def t26(c: Contexto) -> Medicion:
-    """Privacidad del túnel: captura en vti1 durante un MISS con cabeceras de cliente falsas."""
+    """Privacidad hacia orígenes (F8, REQ-F-28): el nodo reenvía una petición con X-Forwarded-For y Via falsos y el origen no los recibe."""
     m = Medicion()
-    ca = c.ca_del_nodo()
     px = f"http://{c.ip('EDGE01')}:{c.puerto('F1')}"
-    L.fondo("fw01-sim", "timeout 12 tcpdump -ni any -w /tmp/t26.pcap 'ip proto 50 or udp port 4500 or (host 10.30.10.10)'")
-    # Lo que llega al motor del shield ya descifrado (el TLS termina en el shield): ahí se vería cualquier cabecera que identifique al cliente
-    L.fondo("shield01", "timeout 12 tcpdump -ni lo -A -s 0 'tcp port 3128' > /tmp/t26-shield.txt 2>&1")
+    ext = c.P["ext01"]
+    L.fondo("edge01", f"timeout 10 tcpdump -ni eth1 -A -s 0 'tcp port 80 and host {ext}' > /tmp/t26.txt 2>&1")
     time.sleep(1.5)
-    ruta = f"/t26-{int(time.time())}.js"
-    L.ex("labcli01", f"curl -s -m8 -x {px} --cacert {ca} -H 'X-Forwarded-For: {c.ip('LABCLI01')}' -H 'Via: 1.1 cliente-lab' -o /dev/null "
-                     f"https://{c.P['dominio_origen']}{ruta}")
-    time.sleep(11)
-    L.traer("fw01-sim", "/tmp/t26.pcap", c.ev.dir / "t26.pcap")
-    c.ev.registrar_existente("t26.pcap")
-    _, ascii_ = L.ex("fw01-sim", "tcpdump -nn -A -r /tmp/t26.pcap 2>/dev/null | head -400")
-    _, n = L.ex("fw01-sim", "tcpdump -nn -r /tmp/t26.pcap 2>/dev/null | wc -l")
-    paquetes = int(n.strip() or 0)
-    en_shield = L.leer("shield01", "/tmp/t26-shield.txt")
-    m.salidas["captura"] = ascii_ + "\n--- en el shield, ya descifrado ---\n" + en_shield
-    m.medidas["paquetes_en_la_vpn"] = paquetes
+    rc, eco = L.ex("labcli01", f"curl -s -m8 -x {px} -H 'X-Forwarded-For: {c.ip('LABCLI01')}' -H 'Via: 1.1 cliente-lab' -H 'Forwarded: for={c.ip('LABCLI01')}' "
+                               f"http://{ext}/echo?t26={int(time.time())}")
+    time.sleep(9)
+    saliente = L.leer("edge01", "/tmp/t26.txt")
+    m.salidas["captura"] = saliente + "\n--- lo que recibió el origen (eco) ---\n" + eco
+    m.medidas["paquetes_en_la_vpn"] = 0
     c.ev.guardar("captura.txt", m.salidas["captura"])
-    llego_al_shield = ruta in en_shield
-    m.vacia = ("" if paquetes > 0 and llego_al_shield else
-               "el MISS no llegó al shield (la captura del shield no contiene la petición): la ausencia de cabeceras no demuestra nada")
-    m.hallazgos.append("F9 (EDGE → EC2-SHIELD) se ejercita con REQ-F-29: los MISS salen del nodo hacia el shield por la VPN con mTLS; en la VPN solo se ve TLS, "
-                       "y por eso se mira también lo que llega al motor del shield ya descifrado")
+    m.codigos["principal"] = rc
+    m.vacia = "" if ("GET /echo" in saliente and "host" in eco.lower()) else "la petición no salió del nodo hacia el origen: la ausencia de cabeceras no demuestra nada"
+    m.hallazgos.append("en la v0.4 el MISS sale a Internet (F8) y no por la VPN; se captura en la interfaz del nodo y se compara con el eco del origen (/echo de ext01)")
     return m
 
 
 def t27(c: Contexto) -> Medicion:
-    """Métricas cifradas: scraping obs01 → edge01:9128; captura en edge01; nada en claro y sin el token."""
+    """Administración y consola cifradas (F20, F28, F30): capturas en edge01:9128 y ctrl01:443; todo es TLS y el token no aparece en claro."""
     m = Medicion()
-    edge, puerto = c.ip("EDGE01"), c.puerto("F12")
+    edge, adm = c.ip("EDGE01"), 9128
+    ctrl = c.ip("CTRL01")
     token = L.leer("edge01", "/data/admin.token").strip()
-    # el certificado de laboratorio del nodo se fija como ancla de confianza en obs01 (equivale a `--cacert` de Prometheus)
-    L.enviar("obs01", "/tmp/admin-tls.crt", L.leer("edge01", "/data/ca/admin-tls.crt"))
-    L.fondo("edge01", f"timeout 12 tcpdump -ni eth1 -w /tmp/t27.pcap 'host {c.ip('OBS01')} and port {puerto}'")
+    L.enviar("jmp01", "/tmp/admin-tls.crt", L.leer("edge01", "/data/ca/admin-tls.crt"))
+    L.fondo("edge01", f"rm -f /tmp/t27a.pcap; timeout 14 tcpdump -Z root -ni eth1 -w /tmp/t27a.pcap 'port {adm}'")
+    L.fondo("ctrl01", f"rm -f /tmp/t27c.pcap; timeout 14 tcpdump -Z root -ni eth1 -w /tmp/t27c.pcap 'port 443'")
     time.sleep(1.5)
-    m.medidas["esquema_https"] = 0
-    for esquema, opcion in (("https", "--cacert /tmp/admin-tls.crt"), ("http", "")):
-        rc, out = L.ex("obs01", f"curl -s -m6 {opcion} -H \"Authorization: Bearer {token}\" -o /dev/null -w '%{{http_code}}' {esquema}://{edge}:{puerto}/metrics")
-        if rc == 0 and out.strip() == "200":
-            m.medidas["esquema_https"] = 1 if esquema == "https" else 0
-            break
-    time.sleep(10)
-    # fuera de la ventana de captura (y sin token): una petición HTTP en claro al mismo puerto no debe recibir ninguna respuesta
-    rc_claro, resp_claro = L.ex("obs01", f"curl -s -m5 http://{edge}:{puerto}/healthz")
-    m.medidas["respuestas_http_en_claro_del_servidor"] = 0 if (rc_claro != 0 and not resp_claro.strip()) else 1
-    L.traer("edge01", "/tmp/t27.pcap", c.ev.dir / "t27.pcap")
-    c.ev.registrar_existente("t27.pcap")
-    _, ascii_ = L.ex("edge01", "tcpdump -nn -A -r /tmp/t27.pcap 2>/dev/null | head -300")
-    _, http = L.ex("edge01", "tshark -r /tmp/t27.pcap -Y http 2>/dev/null | wc -l")
-    _, tls = L.ex("edge01", "tshark -r /tmp/t27.pcap -Y tls.handshake 2>/dev/null | wc -l")
-    enclaro = L.ex("edge01", f"grep -a -c '{token}' /tmp/t27.pcap")[1].strip()
-    m.salidas["scrape.pcap"] = ascii_.replace(token, "<TOKEN>")
-    m.medidas["paquetes_http_en_claro"] = int(http.strip() or 0)
-    m.medidas["handshakes_tls"] = int(tls.strip() or 0)
-    m.medidas["apariciones_del_token_en_la_captura"] = int(enclaro) if enclaro.isdigit() else -1
-    c.ev.guardar("captura.txt", m.salidas["scrape.pcap"])
-    if m.medidas["paquetes_http_en_claro"] > 0 or m.medidas["respuestas_http_en_claro_del_servidor"] > 0:
-        m.hallazgos.append("el puerto 9128 sigue sirviendo HTTP en claro con el token en la cabecera Authorization: incumple REQ-NF-14 (hallazgo F12 de D1.11)")
+    ok = 0
+    # F20: JMP01 → edge01:9128 con el token, por TLS
+    rc, out = L.ex("jmp01", f"curl -s -m6 --cacert /tmp/admin-tls.crt -H \"Authorization: Bearer {token}\" -o /dev/null -w '%{{http_code}}' https://{edge}:{adm}/metrics")
+    ok += int(rc == 0 and out.strip() == "200")
+    # F28: ENC01 → ctrl01:443; F30: EC2-GW → ctrl01:443 por la VPN (certificado de cliente)
+    rc2, o2 = L.ex("enc01", f"curl -sk -m6 -H 'Authorization: Bearer prueba-no-secreto' https://{ctrl}/")
+    ok += int(rc2 == 0 and "campus" in o2)
+    rc3, o3 = L.ex("ext01", f"curl -sk -m8 -H 'Authorization: Bearer prueba-no-secreto' https://{c.P['gw_publica']}/")
+    ok += int(rc3 == 0 and "remoto" in o3)
+    time.sleep(14)
+    # fuera de la captura: HTTP en claro hacia los mismos puertos no debe recibir respuesta
+    claro1 = L.ex("jmp01", f"curl -s -m5 http://{edge}:{adm}/healthz")
+    claro2 = L.ex("enc01", f"curl -s -m5 http://{ctrl}/")
+    m.medidas["respuestas_http_en_claro_del_servidor"] = int(bool(claro1[1].strip()) and claro1[0] == 0) + int(bool(claro2[1].strip()) and claro2[0] == 0)
+    L.traer("edge01", "/tmp/t27a.pcap", c.ev.dir / "t27a.pcap")
+    L.traer("ctrl01", "/tmp/t27c.pcap", c.ev.dir / "t27c.pcap")
+    c.ev.registrar_existente("t27a.pcap")
+    c.ev.registrar_existente("t27c.pcap")
+    http = tls = claves = 0
+    texto = ""
+    for nodo, pcap in (("edge01", "/tmp/t27a.pcap"), ("ctrl01", "/tmp/t27c.pcap")):
+        h = L.ex(nodo, f"tshark -r {pcap} -Y http 2>/dev/null | wc -l")[1]
+        t = L.ex(nodo, f"tshark -r {pcap} -Y tls.handshake 2>/dev/null | wc -l")[1]
+        k = L.ex(nodo, f"grep -a -c -e '{token}' -e 'prueba-no-secreto' {pcap}")[1]
+        http += int(h.strip() or 0)
+        tls += int(t.strip() or 0)
+        claves += int(k.strip()) if k.strip().isdigit() else 0
+        texto += L.ex(nodo, f"tcpdump -nn -A -r {pcap} 2>/dev/null | head -150")[1]
+    m.salidas["admin.pcap"] = texto.replace(token, "<TOKEN>")
+    m.medidas["paquetes_http_en_claro"] = http
+    m.medidas["handshakes_tls"] = tls
+    m.medidas["apariciones_del_token_en_la_captura"] = claves
+    c.ev.guardar("captura.txt", m.salidas["admin.pcap"])
+    if ok < 3:
+        m.vacia = f"solo {ok} de las 3 sesiones (JMP01 → edge01:9128, ENC01 → ctrl01, EC2-GW → ctrl01) funcionaron: la captura no cubre F20, F28 y F30"
+    if http > 0 or m.medidas["respuestas_http_en_claro_del_servidor"] > 0:
+        m.hallazgos.append("algún puerto de administración o de la consola responde en claro: incumple REQ-NF-14")
     else:
-        m.hallazgos.append("el puerto 9128 solo acepta TLS (REQ-NF-14); el certificado es autofirmado de laboratorio: en producción F12 usa los de step-ca (F11)")
-    if m.medidas.get("apariciones_del_token_en_la_captura", 0) > 0:
-        m.hallazgos.append("el token de administración aparece en claro en la captura")
+        m.hallazgos.append("el 9128 de los nodos y el 443 de ctrl01 solo aceptan TLS; los certificados son de laboratorio (en producción, los de step-ca)")
     return m
-
 
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -562,22 +557,22 @@ PUERTOS_SONDA = "22,443"
 NO_EMULADAS = "STORAGE y BACKUP no se emulan (F4.1 no tiene br-vlan70 ni br-vlan71, CI-16): sus celdas no se pudieron probar en el Modo L"
 
 
-def _escuchas(nodos: dict[str, str], segundos: int = 90) -> None:
-    """Abre los puertos 22 y 443 en cada nodo (control: sin un puerto abierto, que nmap no lo vea no demuestra nada)."""
+def _escuchas(nodos: dict[str, str], segundos: int = 90, puertos: tuple[int, ...] = (22, 443)) -> None:
+    """Abre los puertos indicados en cada nodo (control: sin un puerto abierto, que nmap no lo vea no demuestra nada)."""
     for clave, ip in nodos.items():
         nodo = clave.split("#")[0]
         L.enviar(nodo, "/tmp/escucha.py", TCP_ESCUCHA_PY)
-        L.fondo(nodo, f"python3 /tmp/escucha.py {ip} 22 {segundos} & python3 /tmp/escucha.py {ip} 443 {segundos} & wait")
+        L.fondo(nodo, " & ".join(f"python3 /tmp/escucha.py {ip} {p} {segundos}" for p in puertos) + " & wait")
     time.sleep(1)
 
 
-def _escaneo_denegado(c: Contexto, origen: str, destinos: dict[str, str], previo: str = "") -> Medicion:
+def _escaneo_denegado(c: Contexto, origen: str, destinos: dict[str, str], previo: str = "", puertos: tuple[int, ...] = (22, 443)) -> Medicion:
     """nmap desde `origen` hacia un nodo de cada zona: ninguno debe tener un puerto abierto y FW01 debe contar denegaciones."""
     m = Medicion()
-    _escuchas(destinos)
+    _escuchas(destinos, puertos=puertos)
     controles = [L.ex(clave.split("#")[0], f"nc -zv -w2 {ip} 22")[0] for clave, ip in destinos.items()]
     antes = L.contador_nft("DENEGADO", "forward")
-    rc, out = L.ex(origen, f"nmap -n -Pn -sS -p{PUERTOS_SONDA} --max-retries 1 --max-rtt-timeout 300ms {' '.join(destinos.values())}", timeout=180)
+    rc, out = L.ex(origen, f"nmap -n -Pn -sS -p{",".join(str(p) for p in puertos)} --max-retries 1 --max-rtt-timeout 300ms {' '.join(destinos.values())}", timeout=180)
     despues = L.contador_nft("DENEGADO", "forward")
     c.ev.guardar("nmap.txt", out)
     m.codigos["principal"] = rc
@@ -590,37 +585,32 @@ def _escaneo_denegado(c: Contexto, origen: str, destinos: dict[str, str], previo
 
 
 def _destinos_de_zonas(c: Contexto, zonas: list[str]) -> dict[str, str]:
-    nodos = {"MGMT": ("jmp01", "JMP01"), "SERVERS": ("obs01", "OBS01"), "LAB": ("labcli01", "LABCLI01"), "LAB-TEST": ("kali01", "KALI01"),
-             "SECURITY": ("ids01", "IDS01"), "EDGE": ("edge01", "EDGE01"), "STORAGE": ("nas01", "NAS01"), "BACKUP": ("nas01", "NAS01")}
-    out = {}
-    for z in zonas:
-        if z in nodos:
-            nodo = nodos[z][0]
-            out[nodo if nodo not in out else f"{nodo}#{len(out)}"] = c.ip(nodos[z][1], z)      # NAS01 aparece dos veces: una por zona
-    return out
+    nodos = {"MGMT": ("jmp01", "JMP01"), "SERVERS": ("ctrl01", "CTRL01"), "LAB": ("labcli01", "LABCLI01"), "SECURITY": ("siem01", "SIEM01"),
+             "EDGE": ("edge01", "EDGE01"), "DMZ-SVC": ("portal01", "PORTAL01")}
+    return {nodos[z][0]: c.ip(nodos[z][1], z) for z in zonas if z in nodos}
 
 
 def t29(c: Contexto) -> Medicion:
-    """Escaneo desde KALI01 hacia SERVERS: FW01 lo deniega e IDS01 lo detecta en su captura de la VLAN 31."""
+    """Escaneo desde KALI01 (LAB) hacia CTRL01 (SERVERS): FW01 lo deniega y Suricata de fw01-sim, en la interfaz LAB, lo detecta (DET-02)."""
     m = Medicion()
     inicio = time.time()
-    destinos = [c.ip("OBS01")]
-    previas = int(L.ex("ids01", "grep -c '\"event_type\":\"alert\"' /var/log/suricata/eve.json")[1].strip() or 0)
+    destino = c.ip("CTRL01")
+    previas = int(L.ex("fw01-sim", "grep -c '\"event_type\":\"alert\"' /var/log/suricata/eve.json")[1].strip() or 0)
     antes = L.contador_nft("DENEGADO", "forward")
-    rc, out = L.ex("kali01", f"nmap -n -Pn -sS -p 1-1024 --max-rate 100 --max-retries 1 --max-rtt-timeout 300ms --host-timeout 150s {' '.join(destinos)}", timeout=400)
+    rc, out = L.ex("kali01", f"nmap -n -Pn -sS -p 1-1024 --max-rate 100 --max-retries 1 --max-rtt-timeout 300ms --host-timeout 150s {destino}", timeout=400)
     time.sleep(5)
     despues = L.contador_nft("DENEGADO", "forward")
-    eve = L.ex("ids01", f"grep '\"event_type\":\"alert\"' /var/log/suricata/eve.json | tail -n +{previas + 1} | tail -5")[1]
+    eve = L.ex("fw01-sim", f"grep '\"event_type\":\"alert\"' /var/log/suricata/eve.json | tail -n +{previas + 1} | tail -5")[1]
     c.ev.guardar("nmap.txt", out)
-    c.ev.guardar("eve_ids01.json", eve)
+    c.ev.guardar("eve_fw01.json", eve)
     m.codigos["principal"] = rc
     m.salidas["stdout"] = out
-    m.salidas["eve_json_ids01"] = eve
+    m.salidas["eve_json_fw01"] = eve
     m.medidas["puertos_open"] = len(re.findall(r"(?m)^\d+/tcp\s+open", out))
     m.medidas["paquetes_denegados_por_fw01"] = despues - antes
-    _alerta_wazuh(c, m, "100300", inicio, filtro=r'10\.20\.31\.60')
+    _alerta_wazuh(c, m, "100300", inicio, filtro=r'10\.20\.35\.60')
     m.hallazgos.append("las reglas del laboratorio son locales (sid 9000001, escaneo SYN por origen): ET Open no está disponible en el Modo L")
-    m.hallazgos.append("el destino es OBS01, el nodo de SERVERS que existe en el laboratorio y que ningún flujo alcanza desde LAB-TEST (SVC01 no sirve: F3 le abre el puerto 80)")
+    m.hallazgos.append("el escaneo cruza FW01 desde la interfaz LAB (vlan30): Suricata de fw01-sim lo ve aunque el firewall lo deniegue; el evento llega a Wazuh por syslog TLS (F14)")
     return m
 
 
@@ -654,23 +644,10 @@ def t30(c: Contexto) -> Medicion:
     return m
 
 
-def t44(c: Contexto) -> Medicion:
-    """Alcance IP entre EDGE01 y EDGE02 (VLAN 60). El puerto del peering no está definido (CI-06): no se prueba ninguno."""
-    m = Medicion()
-    uno, dos = c.ip("EDGE01"), c.ip("EDGE02")
-    rc1, o1 = L.ex("edge01", f"ping -c 3 -W 2 {dos}")
-    rc2, o2 = L.ex("edge02", f"ping -c 3 -W 2 {uno}")
-    c.ev.guardar("ping.txt", o1 + "\n---\n" + o2)
-    m.codigos[f"ping -c 3 {dos}"] = rc1
-    m.codigos[f"ping -c 3 {uno}"] = rc2
-    m.vacia = "el protocolo y el puerto del peering no están definidos (CI-06): solo se probó el alcance IP"
-    return m
-
-
 def t45(c: Contexto) -> Medicion:
-    """Internet → zonas internas: ext01 enruta 10.20.0.0/16 por la WAN de FW01 y escanea un nodo de cada zona emulada."""
-    wan = c.P["fw01_wan"]
-    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB", "LAB-TEST", "SECURITY", "EDGE", "STORAGE", "BACKUP"])
+    """Internet → zonas internas: ext01 enruta 10.20.0.0/16 por el FortiGate y escanea un nodo de cada zona interna del laboratorio."""
+    wan = c.P["fgt_wan"]
+    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB", "SECURITY", "EDGE"])
     try:
         L.ex("ext01", f"ip route replace 10.20.0.0/16 via {wan}")
         m = _escaneo_denegado(c, "ext01", destinos)
@@ -679,24 +656,21 @@ def t45(c: Contexto) -> Medicion:
             m.vacia = "el control positivo falló: ext01 no llega al puerto 443 publicado (F21), así que la ruta de prueba no es válida"
     finally:
         L.ex("ext01", "ip route del 10.20.0.0/16 via " + wan + "; true")
+    m.hallazgos.append("el FortiGate emulado reenvía todo y deja la política a FW01; el FortiGate real solo publica UDP 500/4500 y TCP 80/443 (D1.8)")
     return m
 
 
 def t46(c: Contexto) -> Medicion:
-    """DMZ-SVC → zonas internas: WEB01 «comprometido» (sin su cortafuegos de host) escanea un nodo de cada zona interna emulada."""
-    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB-TEST", "EDGE", "STORAGE", "BACKUP"])
-    try:
-        L.ex("web01", "nft flush ruleset")      # el cortafuegos de host de WEB01 bloquearía la salida por sí solo: no sería FW01 quien deniega
-        m = _escaneo_denegado(c, "web01", destinos)
-    finally:
-        L.ex("web01", "nft -f /lab/web01.nft")
-    m.hallazgos.append("WEB01 se probó como equipo comprometido, sin su nftables de host: con él, WEB01 ya no puede iniciar conexiones (D1.9, «Salida») y no sería FW01 quien deniega")
+    """DMZ-SVC → zonas internas, incluido CTRL01:5432: PORTAL01 «comprometido» escanea un nodo de cada zona interna."""
+    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB", "EDGE"])
+    m = _escaneo_denegado(c, "portal01", destinos, puertos=(22, 443, 5432))
+    m.hallazgos.append("PORTAL01 se probó como equipo comprometido; el 5432 de CTRL01 es un puerto de prueba: PostgreSQL de la v0.4 no escucha en la red (socket local, D-25)")
     return m
 
 
 def t47(c: Contexto) -> Medicion:
     """DMZ-HONEY → cualquier zona: HNY01 escanea un nodo de cada zona y no llega a Internet (ext01)."""
-    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB-TEST", "EDGE", "STORAGE", "BACKUP"])
+    destinos = _destinos_de_zonas(c, ["MGMT", "SERVERS", "LAB", "EDGE"])
     ext = c.P["ext01"]
     L.enviar("ext01", "/tmp/escucha.py", TCP_ESCUCHA_PY)
     L.fondo("ext01", f"python3 /tmp/escucha.py {ext} 443 60")
@@ -710,8 +684,6 @@ def t47(c: Contexto) -> Medicion:
     m.hallazgos.append("«Internet» es ext01 (198.51.100.100): el laboratorio no tiene DNS ni salida a Internet real")
     return m
 
-
-"""Casos del Modo L con Wazuh, NAS01, shield con mTLS y navegador (Chromium sin pantalla). Se agrega a tests/network/casos.py."""
 
 # ---------------------------------------------------------------------------------------------------------------
 # Wazuh (siem01): alertas reales del manager, no simuladas
@@ -816,53 +788,16 @@ def t09_navegador(c: Contexto, m: Medicion) -> None:
     m.salidas["navegador_con_edge01_caido"] = d1
     m.salidas["navegador_sin_nodos"] = d2
     directas = [linea for linea in log.splitlines() if "t09-nav-b" in linea]
-    # DIRECT: el origen ve la IP de la WAN de FW01 (NAT de salida); si pasara por un nodo EDGE o por el shield vería otra (la de vgw-sim)
-    m.salidas["registro_origen_directo"] = "salida=DIRECT" if any(f"origen {c.P['fw01_wan']} " in linea for linea in directas) else "\n".join(directas)
+    # DIRECT: el origen ve la IP pública del FortiGate (NAT de salida); si pasara por un nodo EDGE vería la misma, así que se distingue por el registro del nodo
+    m.salidas["registro_origen_directo"] = "salida=DIRECT" if any(f"origen {c.P['fgt_wan']} " in linea for linea in directas) else "\n".join(directas)
     m.medidas["tiempo_de_cambio_s"] = t1
     m.medidas["tiempo_hasta_direct_s"] = t2
     m.medidas["peticiones_nuevas_en_edge02_con_edge01_caido"] = despues2 - antes2 if antes2 >= 0 and despues2 >= 0 else -1
 
 
-def t22_navegador(c: Contexto, m: Medicion) -> None:
-    """Chromium con SVC01 caído: el DNS lo resuelve FW01 y la navegación sigue sin intervención."""
-    puerta_svc = c.puerta("SVC01")
-    resolv = L.leer("labcli01", "/etc/resolv.conf")
-    try:
-        L.ex("labcli01", "printf '%s\\noptions timeout:2 attempts:1\\n' \"$(cat /etc/resolv.conf)\" > /tmp/r && cat /tmp/r > /etc/resolv.conf")
-        L.enlace("svc01", False)
-        rc, seg, dom = _navegar(c, f"https://{c.P['dominio_origen']}/t22-navegador", f"--proxy-server=http://{c.ip('EDGE01')}:{c.puerto('F1')}")
-    finally:
-        L.enlace("svc01", True, puerta_svc)
-        L.enviar("labcli01", "/etc/resolv.conf", resolv)
-    c.ev.guardar("navegador_dom.html", dom)
-    m.salidas["navegador"] = dom
-    m.medidas["tiempo_navegador_con_svc01_caido_s"] = seg
-
-
 # ---------------------------------------------------------------------------------------------------------------
 # T12, T28, T31, T35, T39, T49: ahora con NAS01, siem01, el nodo con honey-URL, restic y el ACME de laboratorio
 # ---------------------------------------------------------------------------------------------------------------
-def t12(c: Contexto) -> Medicion:
-    """STORAGE no enrutada: sin gateway ni ruta, ni LABCLI01 ni OBS01 alcanzan a NAS01 en la VLAN 70 (control: NAS01 sí escucha en 2049)."""
-    m = Medicion()
-    alm = c.ip("NAS01", "STORAGE")
-    rc_ctrl, _ = L.ex("nas01", f"nc -zv -w2 {alm} 2049")
-    rcs, perdidas = [], []
-    for nodo in ("labcli01", "obs01"):
-        rc, out = L.ex(nodo, f"ping -c 4 -W 2 {alm}")
-        rcs.append(rc)
-        perdidas.append(out)
-        rc_t, _ = L.ex(nodo, f"nc -zv -w3 {alm} 2049")
-        rcs.append(rc_t)
-    c.ev.guardar("ping.txt", "\n---\n".join(perdidas))
-    m.codigos["principal"] = 0 if 0 in rcs else 1
-    m.salidas["stdout"] = perdidas[0]
-    if rc_ctrl != 0:
-        m.vacia = "el control positivo falló: NAS01 no escucha en el puerto 2049 de la VLAN 70 ni desde su propio nodo"
-    m.hallazgos.append("NAS01 es un equivalente funcional (F4.2): sshd, restic y un puerto 2049 que no es NFS; el origen CTRL01 no se emula (se usan LABCLI01 y OBS01)")
-    return m
-
-
 def t28(c: Contexto) -> Medicion:
     """Syslog cifrado: un evento de FW01 llega a SIEM01 solo por TLS en 6514, sin UDP 514 (receptor de siem01 hacia el syslog local de Wazuh)."""
     m = Medicion()
@@ -920,46 +855,14 @@ def t35(c: Contexto) -> Medicion:
     return m
 
 
-def t39(c: Contexto) -> Medicion:
-    """Respaldo por SFTP (F17): OBS01 respalda en NAS01 por la VLAN 71 con restic, comprueba y restaura; LABCLI01 no llega a esa VLAN."""
-    import secrets
-    m = Medicion()
-    nas = c.ip("NAS01", "BACKUP")
-    usr, repo = c.P["restic_usuario"], c.P["restic_repositorio"]
-    clave = secrets.token_hex(16)      # solo para este ensayo: se genera al vuelo y no se guarda en el repositorio
-    nombre = f"t39-{int(time.time())}"
-    ssh = f"ssh -i /root/.ssh/id_respaldo -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR {usr}@{nas} -s sftp"
-    r = f"restic -r sftp:{usr}@{nas}:{repo}/{nombre} -o sftp.command='{ssh}'"
-    pre = f"export RESTIC_PASSWORD={clave}; mkdir -p /root/.ssh /tmp/datos; install -m600 /pki/respaldo.key /root/.ssh/id_respaldo; "
-    L.ex("obs01", pre + "head -c 4194304 /dev/urandom > /tmp/datos/a.bin; sha256sum /tmp/datos/a.bin > /tmp/datos.sha")
-    rc_init, o_init = L.ex("obs01", pre + f"{r} init", timeout=120)
-    rc_b, o_b = L.ex("obs01", pre + f"{r} backup /tmp/datos", timeout=180)
-    rc_c, o_c = L.ex("obs01", pre + f"{r} check", timeout=180)
-    inicio = time.time()
-    rc_r, o_r = L.ex("obs01", pre + f"{r} restore latest --target /tmp/restaurado", timeout=180)
-    m.medidas["tiempo_restauracion_s"] = round(time.time() - inicio, 1)
-    _, ok = L.ex("obs01", "cd /tmp/restaurado/tmp/datos && sha256sum -c /tmp/datos.sha 2>&1 | tail -1; cd /; sha256sum /tmp/restaurado/tmp/datos/a.bin | cut -d' ' -f1; cut -d' ' -f1 /tmp/datos.sha")
-    iguales = len(set(ok.split()[-2:])) == 1
-    c.ev.guardar("restic.txt", "\n".join(re.sub(clave, "<clave>", x) for x in (o_init, o_b, o_c, o_r)))
-    m.codigos["restic backup"] = rc_b if rc_init == 0 else rc_init
-    m.salidas["stdout"] = o_c
-    m.salidas["restic check"] = o_c
-    rc_lab, _ = L.ex("labcli01", f"nc -zv -w3 {nas} 22")
-    m.codigos["nc -zv -w3 10.20.71.20 22"] = rc_lab
-    if not iguales:
-        m.vacia = "la restauración no coincide con el original (sha256)"
-    m.hallazgos.append("NAS01 es un equivalente funcional (F4.2): sshd + restic; la clave del repositorio se genera al vuelo y no se guarda")
-    return m
-
-
 def t49(c: Contexto) -> Medicion:
-    """ACME desde WAF01 (F23): el directorio ACME de laboratorio de ext01 responde 200 por 443; el HTTP en claro hacia Internet no sale."""
+    """ACME desde PORTAL01 (F23): el directorio ACME de laboratorio de ext01 responde 200 por 443; el HTTP en claro hacia Internet no sale."""
     m = Medicion()
     acme = c.P["dominio_acme"]
-    rc, out = L.ex("waf01", f"curl -sS -m8 --cacert /pki/ca.pem --resolve {acme}:443:{c.P['ext01']} -o /dev/null -w '%{{http_code}}' https://{acme}/directory")
+    rc, out = L.ex("portal01", f"curl -sS -m8 --cacert /pki/ca.pem --resolve {acme}:443:{c.P['ext01']} -o /dev/null -w '%{{http_code}}' https://{acme}/directory")
     m.salidas["stdout"] = out.strip()
     m.salidas["curl -sS -o /dev/null -w \"%{http_code}\" https://acme-v02.api.letsencrypt.org/directory"] = out.strip()
-    m.codigos["curl -sS -m5 http://example.com"], _ = L.ex("waf01", f"curl -sS -m5 --resolve {c.P['dominio_generico']}:80:{c.P['ext01']} http://{c.P['dominio_generico']}/")
+    m.codigos["curl -sS -m5 http://example.com"], _ = L.ex("portal01", f"curl -sS -m5 --resolve {c.P['dominio_generico']}:80:{c.P['ext01']} http://{c.P['dominio_generico']}/")
     m.hallazgos.append("el directorio ACME es un servidor de laboratorio en ext01 (no Let's Encrypt, no emite certificados)")
     return m
 
@@ -967,7 +870,7 @@ def t49(c: Contexto) -> Medicion:
 def t32(c: Contexto) -> Medicion:
     """CrowdSec (DET-08): una decisión de bloqueo sobre la IP externa la aplica el bouncer de nftables de FW01 y llega a Wazuh por el syslog TLS."""
     m = Medicion()
-    wan, ext, siem = c.P["fw01_wan"], c.P["ext01"], c.ip("SIEM01")
+    wan, ext, siem = c.P["fgt_wan"], c.P["ext01"], c.ip("SIEM01")
     inicio = time.time()
     # Otras pruebas recargan las reglas de FW01 con `flush ruleset` y eso borra la tabla del bouncer: se reinicia para empezar con su tabla creada.
     L.ex("fw01-sim", "pkill -x crowdsec-firewall-bouncer; sleep 1; (crowdsec-firewall-bouncer -c /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml >> /var/log/crowdsec-bouncer.out 2>&1 &); sleep 3")
@@ -998,10 +901,234 @@ def t32(c: Contexto) -> Medicion:
     return m
 
 
+
+# ---------------------------------------------------------------------------------------------------------------
+# v0.4: configuración firmada, acceso por laboratorio, coalescencia, BYOD, panel remoto y WPAD (T51, T52, T55, T56, T57, T58, T60)
+# ---------------------------------------------------------------------------------------------------------------
+def _toml_firmado(c: Contexto, version: int, dominios: list[str] | None = None, deshabilitados: tuple[str, ...] = ()) -> str:
+    """Configuración que ctrl01 firma para los nodos: rangos /26 habilitados + infraestructura + Wi-Fi, dominios a descifrar y redes BYOD (REQ-F-17, REQ-F-32, REQ-F-36)."""
+    import json
+    rl = c.infra.inv["rangos_lab"]
+    permitidos = [l["cidr"] for l in rl["laboratorios"] if l["habilitado"] and l["id"] not in deshabilitados] + [rl["infraestructura"]["cidr"], c.infra.zonas["WIFI-EST"]["cidr"]]
+    base = dominios if dominios is not None else [c.P["dominio_origen"], c.P["dominio_grande"]]
+    return (f"config_version = {version}\nallowed_clients = {json.dumps(permitidos)}\nintercept_domains = {json.dumps(base)}\n"
+            f"byod_networks = {json.dumps([c.infra.zonas['WIFI-EST']['cidr']])}\n")
+
+
+def _firmar(c: Contexto, toml: str) -> None:
+    """ctrl01 firma y publica la configuración (`firmar.sh`)."""
+    L.ex("ctrl01", "sh /lab/firmar.sh", entrada=toml, timeout=30)
+
+
+def _version() -> int:
+    return int(time.time())          # creciente entre ejecuciones; el nodo solo exige que no baje
+
+
+def _intercepta(c: Contexto, nodo_cliente: str = "labcli01", ruta: str = "/firmada") -> bool:
+    """¿El nodo EDGE01 descifra el dominio listado para este cliente? Sí si el certificado que recibe es de la CA del nodo."""
+    ca = c.ca_del_nodo()
+    px = f"http://{c.ip('EDGE01')}:{c.puerto('F1')}"
+    rc, _ = L.ex(nodo_cliente, f"curl -sS -m6 -o /dev/null -x {px} --cacert {ca} https://{c.P['dominio_origen']}{ruta}-{int(time.time() * 1000) % 10**8}", timeout=20)
+    return rc == 0
+
+
+def t51(c: Contexto) -> Medicion:
+    """Cambio del encargado y configuración sin firma (REQ-F-17, AM-15): ctrl01 firma un cambio; el nodo lo aplica en ≤ 60 s y rechaza lo no firmado o más antiguo."""
+    m = Medicion()
+    v0 = _version()
+    # precondición: v0 con el dominio descifrado
+    _firmar(c, _toml_firmado(c, v0))
+    L.esperar(lambda: _intercepta(c), 40, 3)
+    previo = _intercepta(c)
+    # cambio firmado: el encargado deja de descifrar el dominio (la fuente se desactiva)
+    t0 = time.time()
+    _firmar(c, _toml_firmado(c, v0 + 1, dominios=[]))
+    aplicado = L.esperar(lambda: not _intercepta(c), 70, 2)
+    m.medidas["latencia_cambio_s"] = round(time.time() - t0, 1) if aplicado else 999.0
+    # configuración alterada sin volver a firmar (versión nueva, mismo .sig): debe rechazarse y conservarse la anterior
+    alterada = _toml_firmado(c, v0 + 2, dominios=[c.P["dominio_origen"], c.P["dominio_grande"]])
+    L.ex("ctrl01", "cat > /firmada/config.toml", entrada=alterada, timeout=20)
+    time.sleep(14)
+    m.medidas["bundles_sin_firma_aplicados"] = 1 if _intercepta(c) else 0
+    # firmada pero con versión anterior a la aplicada
+    _firmar(c, _toml_firmado(c, v0 - 1))
+    time.sleep(14)
+    anterior_aplicada = _intercepta(c)
+    m.medidas["bundles_sin_firma_aplicados"] += 1 if anterior_aplicada else 0
+    log = _nodo_edge_log(c)
+    m.salidas["registro_celeris"] = log
+    c.ev.guardar("registro_seguridad.jsonl", log)
+    # deja el laboratorio como estaba: dominio descifrado con una versión mayor
+    _firmar(c, _toml_firmado(c, v0 + 3))
+    L.esperar(lambda: _intercepta(c), 40, 3)
+    if not previo:
+        m.vacia = "la precondición falló: el nodo no descifraba el dominio antes del cambio, así que no se pudo observar el efecto"
+    if not aplicado:
+        m.hallazgos.append("el nodo no aplicó el cambio firmado en 70 s")
+    m.hallazgos.append("el nodo recarga cada 5 s (config_reload_secs en el laboratorio); en producción el intervalo lo fija la DTI. Solo cambian allowed_clients, intercept_domains, never_intercept y byod_networks")
+    return m
+
+
+def t52(c: Contexto) -> Medicion:
+    """Laboratorio deshabilitado (REQ-F-32): con LAB-03 fuera de allowed_clients, labcli03 recibe 403 y labcli02 (LAB-01) sigue con acceso."""
+    m = Medicion()
+    px = f"http://{c.ip('EDGE01')}:{c.puerto('F1')}"
+    dom = c.P["dominio_generico"]
+    cmd = f"curl -s -m8 -o /dev/null -w '%{{http_code}}' -x {px} http://{dom}/t52-@N@"
+    v = _version()
+    _firmar(c, _toml_firmado(c, v))
+    L.esperar(lambda: L.ex("labcli03", cmd.replace("@N@", str(int(time.time()))))[1].strip() == "200", 40, 3)
+    previo = L.ex("labcli03", cmd.replace("@N@", "previo"))[1].strip()
+    _firmar(c, _toml_firmado(c, v + 1, deshabilitados=("LAB-03",)))
+    L.esperar(lambda: L.ex("labcli03", cmd.replace("@N@", str(int(time.time()))))[1].strip() == "403", 40, 3)
+    c03 = L.ex("labcli03", cmd.replace("@N@", "lab03"))[1].strip()
+    c01 = L.ex("labcli02", cmd.replace("@N@", "lab01"))[1].strip()
+    m.salidas["curl desde una PC de LAB-03"] = c03
+    m.salidas["curl desde una PC de LAB-01"] = c01
+    time.sleep(1.5)
+    log = _nodo_edge_log(c)
+    m.salidas["registro_celeris"] = log
+    c.ev.guardar("registro_seguridad.jsonl", log)
+    c.ev.guardar("codigos.txt", f"antes: LAB-03={previo}\ndespués: LAB-03={c03} LAB-01={c01}")
+    # restablece el acceso a LAB-03 (versión mayor)
+    _firmar(c, _toml_firmado(c, v + 2))
+    L.esperar(lambda: L.ex("labcli03", cmd.replace("@N@", str(int(time.time()))))[1].strip() == "200", 40, 3)
+    if previo != "200":
+        m.vacia = f"la precondición falló: labcli03 no tenía acceso antes de deshabilitar LAB-03 (código {previo})"
+    m.hallazgos.append("el laboratorio es un /26 de allowed_clients; el tráfico de LAB-03 sigue llegando al nodo (F1 abre toda la VLAN 30 en FW01): el control está en el nodo (D1.8, nota 1)")
+    return m
+
+
+def t55(c: Contexto) -> Medicion:
+    """Coalescencia: 20 descargas simultáneas del mismo instalador (100 MB en origin-sim) producen 1 sola descarga en el origen."""
+    m = Medicion()
+    px = f"http://{c.ip('EDGE01')}:{c.puerto('F1')}"
+    ruta = f"/archivo-100MB.bin?t55={int(time.time())}"
+    url = f"http://{c.P['dominio_grande']}{ruta}"
+    antes = L.ex("origin-sim", "grep -c DESCARGA /var/log/origin-sim.log")[1].strip()
+    n_antes = int(antes) if antes.isdigit() else 0
+    script = ("#!/bin/sh\nfor i in $(seq 1 20); do ( curl -s -m90 -D /tmp/t55-$i.h -o /dev/null -x " + px + " '" + url + "' ) & done\nwait\n"
+              "cat /tmp/t55-*.h | tr -d '\r' | grep -iE '^(HTTP/|cache-status:)'\nrm -f /tmp/t55-*.h\n")
+    L.enviar("labcli01", "/tmp/t55.sh", script)
+    rc, out = L.ex("labcli01", "sh /tmp/t55.sh", timeout=180)
+    time.sleep(2)
+    despues = L.ex("origin-sim", "grep -c DESCARGA /var/log/origin-sim.log")[1].strip()
+    n_despues = int(despues) if despues.isdigit() else 0
+    c.ev.guardar("respuestas.txt", out)
+    c.ev.guardar("origin-sim.log", L.ex("origin-sim", "tail -n 40 /var/log/origin-sim.log")[1])
+    m.codigos["principal"] = rc
+    m.salidas["stdout"] = out
+    respuestas_200 = len(re.findall(r"(?m)^HTTP/\S+ 200", out))
+    hit = len(re.findall(r"(?im)^cache-status:.*\bhit\b", out))
+    m.medidas["descargas_en_origen"] = n_despues - n_antes
+    m.medidas["respuestas_collapsed_o_hit"] = hit
+    m.medidas["respuestas_200"] = respuestas_200
+    if respuestas_200 != 20:
+        m.vacia = f"solo {respuestas_200} de las 20 peticiones recibieron 200: la medición no ejercita la coalescencia completa"
+    m.hallazgos.append("con el presupuesto de memoria por defecto (max_buffered_bytes = 512 MiB) los seguidores de un objeto de 100 MB se sirven desde memoria de a uno por cada 100 MB reservados; en una primera corrida "
+                       "solo 5 de 19 obtuvieron HIT y 15 pasaron por el origen (sobre presupuesto). El laboratorio fija 3 GiB; el dimensionamiento de RAM del nodo (8 GB, D2.4) debe reservar max_buffered_bytes para 20 clientes × el instalador más grande")
+    m.hallazgos.append("los 19 que esperan reciben la copia ya guardada (Cache-Status: hit): el nodo no marca «collapsed»; el líder es el único MISS")
+    m.hallazgos.append("el laboratorio sube max_object_bytes a 200 MiB y coalesce_wait_secs a 30 en los nodos EDGE: con los valores por defecto (64 MiB) un objeto de 100 MB no se guarda ni se coalesce")
+    return m
+
+
+def _emisor(nodo: str, ruta: str) -> str:
+    return L.ex(nodo, f"openssl x509 -in {ruta} -noout -subject | sed 's/^subject=//'")[1].strip()
+
+
+def t56(c: Contexto) -> Medicion:
+    """BYOD: un equipo del Wi-Fi que abre un dominio aprobado para descifrar recibe el certificado del origen, no el de la CA del proyecto (REQ-F-36)."""
+    m = Medicion()
+    px = f"http://{c.ip('EDGE01')}:{c.puerto('F31')}"
+    url = f"https://{c.P['dominio_origen']}/t56"
+    ca_nodo = _emisor("edge01", "/data/ca/celeris-ca.crt")
+    cmd = f"curl -sv -k -m8 -o /dev/null -x {px} {url}-{{n}} 2>&1 | grep -i 'issuer:'"
+    _, byod = L.ex("byod01", cmd.format(n="byod"), timeout=30)
+    _, ctrl = L.ex("labcli01", cmd.format(n="control"), timeout=30)
+    c.ev.guardar("emisores.txt", f"CA del nodo: {ca_nodo}\nBYOD: {byod}\nControl (LABCLI01): {ctrl}\n")
+    m.salidas["stdout"] = byod
+    cn = lambda t: (re.search(r"CN\s*=\s*([^,;\n]+)", t) or [None, ""])[1].strip().lower()
+    norm = lambda t: cn(t)
+    m.medidas["certificados_emitidos_por_la_ca_del_proyecto"] = 1 if cn(ca_nodo) and cn(ca_nodo) == cn(byod) else 0
+    if not byod.strip():
+        m.vacia = "byod01 no obtuvo ningún certificado (¿F31 o el nodo cerrados?)"
+    elif not (cn(ca_nodo) and cn(ca_nodo) == cn(ctrl)):
+        m.vacia = "el control falló: un PC de laboratorio tampoco recibió el certificado de la CA del nodo, así que no se puede distinguir un certificado del otro"
+    m.hallazgos.append("la red del Wi-Fi está en byod_networks del nodo; la regla no depende de la configuración que llegue (REQ-RN-11)")
+    return m
+
+
+def t57(c: Contexto) -> Medicion:
+    """WIFI-EST → CTRL01, MGMT y LAB: byod01 escanea un nodo de cada zona; controles positivos hacia EDGE (F31) y el portal (F32)."""
+    destinos = {"ctrl01": c.ip("CTRL01"), "jmp01": c.ip("JMP01"), "labcli01": c.ip("LABCLI01")}
+    m = _escaneo_denegado(c, "byod01", destinos)
+    edge, portal = c.ip("EDGE01"), c.ip("PORTAL01")
+    m.codigos[f"nc -zv -w3 {edge} 3128"], _ = L.ex("byod01", f"nc -zv -w3 {edge} 3128")
+    m.codigos[f"nc -zv -w3 {portal} 443"], _ = L.ex("byod01", f"nc -zv -w3 {portal} 443")
+    return m
+
+
+def t58(c: Contexto) -> Medicion:
+    """EC2-GW comprometido: desde gw-sim solo abren CTRL01:443 y SIEM01:1514; todo lo demás lo deniega FW01 (el Security Group no se emula en el Modo L)."""
+    m = Medicion()
+    ctrl, siem, jmp, lab, edge = c.ip("CTRL01"), c.ip("SIEM01"), c.ip("JMP01"), c.ip("LABCLI01"), c.ip("EDGE01")
+    _escuchas({"jmp01": jmp, "labcli01": lab, "siem01": siem}, puertos=(22, 445))
+    antes = L.contador_nft("DENEGADO", "forward")
+    m.codigos[f"nc -zv -w3 {ctrl} 443"], _ = L.ex("gw-sim", f"nc -zv -w3 {ctrl} 443")
+    m.codigos[f"nc -zv -w3 {siem} 1514"], _ = L.ex("gw-sim", f"nc -zv -w3 {siem} 1514")
+    negativos = {f"{ctrl}:22": ("gw-sim", ctrl, 22), f"{siem}:22": ("gw-sim", siem, 22), f"{jmp}:22": ("gw-sim", jmp, 22), f"{lab}:445": ("gw-sim", lab, 445),
+                 f"{edge}:3128": ("gw-sim", edge, 3128)}
+    cerrados = {k: L.ex(n, f"nc -zv -w3 {ip} {p}")[0] for k, (n, ip, p) in negativos.items()}
+    m.codigos["nc -zv -w3 10.20.10.10 443"] = L.ex("gw-sim", "nc -zv -w3 10.20.10.10 443")[0]
+    despues = L.contador_nft("DENEGADO", "forward")
+    m.medidas["paquetes_denegados_por_fw01"] = despues - antes
+    c.ev.guardar("negativos.txt", "\n".join(f"{k}: rc={v}" for k, v in cerrados.items()))
+    controles = [L.ex("jmp01", f"nc -zv -w2 {jmp} 22")[0], L.ex("labcli01", f"nc -zv -w2 {lab} 445")[0], L.ex("siem01", f"nc -zv -w2 {siem} 22")[0]]
+    if any(controles):
+        m.vacia = f"el control falló: algún puerto de prueba no abre ni desde su propio nodo ({controles})"
+    elif all(v != 0 for v in cerrados.values()):
+        m.vacia = "el Security Group sg-gw no existe en el Modo L: aquí solo se midió la denegación de FW01; la del SG se prueba en el Modo A (D5.4, make test-aws)"
+    m.hallazgos.append("sg-gw (D2.5) no se emula; la mitad «SG» de T58 queda para el Modo A")
+    return m
+
+
+def t60(c: Contexto) -> Medicion:
+    """Secuestro de WPAD: kali01 anuncia `wpad` (un servidor rogue en LAB); LABCLI01 con la URL fija del PAC por GPO lo ignora."""
+    m = Medicion()
+    kali = c.ip("KALI01")
+    L.ex("kali01", "mkdir -p /tmp/rogue")
+    L.enviar("kali01", "/tmp/rogue/wpad.dat", "function FindProxyForURL(url, host) { return \"PROXY " + kali + ":8080\"; }\n")
+    L.ex("kali01", "cd /tmp/rogue && (nohup python3 -m http.server 80 > /tmp/rogue.log 2>&1 &) ; sleep 1")
+    # el anuncio falso por DNS y DHCP se emula resolviendo `wpad` hacia kali01 en los clientes de autodescubrimiento
+    resolv_hosts = L.leer("labcli01", "/etc/hosts")
+    L.ex("labcli01", f"echo '{kali} wpad' >> /etc/hosts")
+    try:
+        _, vulnerable = L.ex("labcli01", "curl -s -m5 http://wpad/wpad.dat")             # control: un cliente con autodescubrimiento SÍ recibe el PAC falso
+        golpes_control = int((L.ex("kali01", "grep -c 'GET /wpad.dat' /tmp/rogue.log")[1].strip() or 0))
+        rc_dns, dns = L.ex("labcli01", f"kdig +short +time=2 +retry=1 @{c.puerta('LABCLI01')} pac.celeris.internal")
+        rc_pac, pac = L.ex("labcli01", f"curl -s -m5 {PAC_URL}")
+        rc_nav, seg, dom = _navegar(c, f"https://{c.P['dominio_origen']}/t60-navegador", f"--proxy-pac-url={PAC_URL}")
+        golpes = int((L.ex("kali01", "grep -c 'GET /wpad.dat' /tmp/rogue.log")[1].strip() or 0))
+    finally:
+        L.enviar("labcli01", "/etc/hosts", resolv_hosts)
+        L.ex("kali01", "pkill -f 'http.server 80'; true")
+    c.ev.guardar("pac_obtenido.txt", pac)
+    c.ev.guardar("rogue.log", L.leer("kali01", "/tmp/rogue.log"))
+    m.salidas["curl http://pac.celeris.internal/wpad.dat"] = pac
+    m.codigos["nslookup pac.celeris.internal 10.20.32.1"] = rc_dns if dns.strip() else 1
+    m.medidas["peticiones_a_la_url_falsa_wpad"] = golpes - golpes_control
+    if "FindProxyForURL" not in vulnerable or golpes_control < 1:
+        m.vacia = "el control falló: ni un cliente con autodescubrimiento recibió el PAC falso, así que el anuncio rogue no quedó demostrado"
+    m.hallazgos.append("el anuncio por DNS y DHCP se emula con una entrada `wpad` en el cliente y un servidor rogue en kali01: ni FW01 ni el laboratorio tienen un DHCP donde anunciar la opción 252")
+    m.hallazgos.append("`nslookup` no está en la imagen: se usó kdig contra la IP de FW01 en la VLAN de LAB")
+    return m
+
+
+# ---------------------------------------------------------------------------------------------------------------
 CASOS = {"T05": t05, "T06": t06, "T07": t07, "T08": t08, "T09": t09, "T10": t10, "T11": t11, "T13": t13, "T14": t14, "T15": t15,
-         "T16": t16, "T17": t17, "T18": t18, "T19": t19, "T20": t20, "T22": t22, "T24": t24, "T26": t26, "T27": t27,
-         "T29": t29, "T30": t30, "T44": t44, "T45": t45, "T46": t46, "T47": t47,
-         "T12": t12, "T28": t28, "T32": t32, "T31": t31, "T35": t35, "T39": t39, "T49": t49}
+         "T16": t16, "T17": t17, "T18": t18, "T19": t19, "T20": t20, "T24": t24, "T26": t26, "T27": t27,
+         "T29": t29, "T30": t30, "T45": t45, "T46": t46, "T47": t47, "T28": t28, "T32": t32, "T31": t31, "T35": t35, "T49": t49,
+         "T51": t51, "T52": t52, "T55": t55, "T56": t56, "T57": t57, "T58": t58, "T60": t60}
 
 TESTSSL_IMAGEN = "drwetter/testssl.sh@sha256:64bab3c1fd8eee440f68d5e020dd633c1f2d375fe0ae593bdfec2725110a7e29"   # 3.2
 ZAP_IMAGEN = "ghcr.io/zaproxy/zaproxy@sha256:9624669db72f54d86c4b46a7064518bd9bf79d8c61a4c31befa9923489f328af"   # stable

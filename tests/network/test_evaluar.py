@@ -67,3 +67,22 @@ def test_todo_lo_definido_en_pruebas_yaml_es_evaluable_por_tipo():
     from celeris_infra import Infra
     tipos = {c["tipo"] for t in Infra.cargar().pruebas.values() for c in t["criterio_aprobacion"]}
     assert tipos <= {"exit_code", "regex", "umbral", "contador", "manual"}
+
+
+def test_toda_prueba_vigente_del_modo_l_tiene_caso_o_un_no_aplica_con_motivo():
+    """v0.4: ninguna prueba con L en sus modos queda sin caso ni motivo; no hay casos de pruebas retiradas; T50, T53 y T54 nunca se ejecutan en el Modo L."""
+    import sys
+    from pathlib import Path
+    raiz = Path(__file__).resolve().parents[2]
+    sys.path.insert(0, str(raiz / "infra"))
+    from celeris_infra import Infra
+    import casos
+    infra = Infra.cargar()
+    con_l = {t["id"] for t in infra.pruebas.values() if "L" in t["modos"]}
+    assert con_l - set(casos.CASOS) - set(casos.NO_APLICA_L) == set(), "pruebas del Modo L sin caso ni motivo"
+    assert set(casos.CASOS) <= set(infra.pruebas), "hay casos de pruebas retiradas"
+    for tid in ("T50", "T53", "T54"):
+        motivo, donde = casos.NO_APLICA_L[tid]
+        assert "requiere la consola (CE02, S2)" in motivo and tid not in casos.CASOS and "L" not in donde
+    for tid in ("T51", "T52", "T55", "T56", "T57", "T58", "T60"):
+        assert tid in casos.CASOS

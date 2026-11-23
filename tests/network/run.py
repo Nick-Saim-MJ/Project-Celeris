@@ -32,8 +32,8 @@ from celeris_infra import Infra  # noqa: E402
 from evaluar import Medicion, evaluar  # noqa: E402
 from gen import lab as genlab  # noqa: E402
 
-NODOS_REQUERIDOS = ["fw01-sim", "vgw-sim", "ext01", "shield01", "jmp01", "svc01", "obs01", "labcli01", "hny02", "kali01", "waf01", "web01",
-                    "hny01", "hny01-cowrie", "ids01", "edge01", "edge02", "nas01", "siem01", "siem01-wazuh"]
+NODOS_REQUERIDOS = ["fw01-sim", "fgt-sim", "vgw-sim", "gw-sim", "ext01", "origin-sim", "byod01", "jmp01", "ctrl01", "enc01", "labcli01", "labcli02", "labcli03",
+                    "hny02", "kali01", "portal01", "hny01", "hny01-cowrie", "edge01", "edge02", "siem01", "siem01-wazuh"]
 
 
 def commit_actual() -> str:
@@ -76,8 +76,9 @@ def ejecutar(infra: Infra, t: dict, ctx_base: dict, raiz_ev: Path) -> dict:
         r.update(resultado="NO_APLICA", motivo=f"el Modo L no ejecuta {t['id']} (modos de la prueba: {', '.join(modos)}); se ejecuta en {' y '.join(modos)}")
         return r
     if t["id"] in casos.NO_APLICA_L:
-        r.update(resultado="NO_APLICA", motivo=casos.NO_APLICA_L[t["id"]] + "; se ejecuta en Modo H",
-                 modo_en_que_si_se_ejecuta=["H"])
+        motivo = casos.NO_APLICA_L[t["id"]]
+        motivo, donde = motivo if isinstance(motivo, tuple) else (motivo, ["H"])
+        r.update(resultado="NO_APLICA", motivo=motivo + f"; se ejecuta en Modo {' y '.join(donde)}", modo_en_que_si_se_ejecuta=donde)
         return r
     ev = L.Evidencia(raiz_ev / t["id"])
     L.usar(ev)

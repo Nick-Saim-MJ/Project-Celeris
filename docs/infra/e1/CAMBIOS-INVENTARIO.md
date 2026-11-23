@@ -77,6 +77,9 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-46 | vacío | nacl-private de D2.5: «puertos de servicio» sin definir | resuelto (2026-11-22: TCP 443 desde pub-a y efímeros) |
 | CI-47 | contradicción | F2 «zonas internas» frente a DMZ-HONEY («solo envía al SIEM», D1.9) | resuelto (2026-11-22: F2 excluye DMZ-HONEY) |
 | CI-48 | decisión de transcripción | Laboratorio emulado v0.4 (I2): parámetros que el inventario no fija (WAN y IP públicas, labcli02/03, byod01, gw-sim) y equivalencias distintas de D5.3 | abierto |
+| CI-49 | contradicción | F24 (señuelo) exige que el FortiGate publique TCP 22 y 23, pero D1.8 y S-29 limitan su NAT 1:1 a UDP 500/4500 y TCP 80/443 | abierto |
+| CI-50 | vacío | F23 y D1.9 («Salida: solo ACME y Wazuh»): FW01 permite TCP 443 a cualquier destino; el diseño no dice cómo se limita el destino | abierto |
+| CI-51 | vacío | Memoria para servir objetos grandes: 20 clientes de un instalador de 100 MB agotan `max_buffered_bytes` (512 MiB); D2.4 no lo dimensiona | abierto |
 
 ## Entradas
 
@@ -648,3 +651,30 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Equivalencias distintas de D5.3:** `gw-sim` y `portal01` son nginx + ModSecurity + OWASP CRS, no Caddy + Coraza (la imagen base no los trae). `fgt-sim` no emula FortiGuard ni la inspección SSL, de modo que la exclusión de EDGE01/02 [S-29] no se puede probar en el Modo L. No hay sincronización NTS hacia arriba.
 - **Propuesta:** dar por buenos los parámetros 1–5 para el laboratorio; construir una imagen con Caddy + Coraza si el equipo quiere «mismo producto» en gw-sim.
 - **Decide:** equipo del proyecto
+
+### CI-49 — F24: el señuelo necesita que el FortiGate publique TCP 22 y 23
+- **Estado:** abierto
+- **Tipo:** contradicción
+- **Dónde:** CE03 D1.8 («Posición frente al FortiGate»), D1.11 (F24), S-29; `infra/inventory.yaml` (F24); T11
+- **Qué dice cada fuente:** D1.8 y S-29: el FortiGate hace NAT 1:1 hacia FW01 «solo» para UDP 500/4500 y TCP 80/443. D1.11 F24: Internet → HNY01 por TCP 22 (→ 2222) y 23, con autorización de la DTI y una ventana.
+- **Qué se hizo:** en el Modo L, T11 abre en `fgt-sim` una cadena `ventana` con TCP 22 y 23 mientras dura la prueba y la vacía después. F24 queda `pendiente: true`.
+- **Propuesta:** decir en D1.8 y en el pedido a la DTI que la ventana del señuelo incluye un cambio temporal en el FortiGate (22 y 23 hacia 10.20.0.2), o publicar el honeypot por otros puertos.
+- **Decide:** equipo del proyecto y DTI
+
+### CI-50 — F23: la salida del portal no está limitada a los endpoints ACME
+- **Estado:** abierto
+- **Tipo:** vacío
+- **Dónde:** CE03 D1.9 (DMZ-SVC, «Salida: solo ACME y el agente Wazuh»), D1.11 (F23), T19; `infra/inventory.yaml` (F23)
+- **Qué dice cada fuente:** F23 es PORTAL01 → Internet TCP 443 «solo hacia los endpoints ACME», pero el flujo se transcribe por zona y puerto: FW01 permite 443 hacia cualquier destino. T19 («Salida del portal: curl https://example.com, Denegado») no se cumple con esa regla.
+- **Qué se hizo:** T19 mide el hallazgo (control positivo: el endpoint ACME de laboratorio; prueba: otro destino) y F23 queda `pendiente: true`.
+- **Propuesta:** limitar el destino con un alias de FW01 por FQDN (los endpoints de la CA elegida) o con una lista de IP del FortiGate; sin eso, T19 falla por diseño.
+- **Decide:** equipo del proyecto
+
+### CI-51 — Memoria para servir un objeto grande a muchos clientes a la vez
+- **Estado:** abierto
+- **Tipo:** vacío
+- **Dónde:** CE03 D2.4 (EDGE01: 8 GB de RAM), D2.8 (dimensionamiento), `max_buffered_bytes` del nodo, T55
+- **Qué se midió:** con el valor por defecto (512 MiB), 20 clientes simultáneos de un objeto de 100 MB obtuvieron 5 HIT y 15 pasaron por el origen (sobre presupuesto): el nodo reserva el tamaño del objeto por cada cliente servido desde memoria. Con 3 GiB, T55 da 1 descarga en el origen y 19 HIT.
+- **Qué se hizo:** el laboratorio fija `max_buffered_bytes = 3 GiB`, `max_object_bytes = 200 MiB` y `coalesce_wait_secs = 30` en los nodos EDGE (CI-48); no cambia el diseño.
+- **Propuesta:** dimensionar la RAM de EDGE01/02 para N clientes × el instalador más grande (S-27: 3 GB por PC en una actualización masiva) o servir los objetos grandes desde disco sin reservar memoria por cliente. Es trabajo de CE02.
+- **Decide:** equipo de software (CE02) y equipo del proyecto

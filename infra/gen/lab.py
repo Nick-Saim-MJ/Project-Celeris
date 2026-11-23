@@ -379,6 +379,8 @@ def _config_edge(x: Infra, nodo: str) -> str:
             # REQ-NF-14: el puerto de administración solo por TLS (certificado autofirmado de laboratorio, generado por el nodo al arrancar)
             'admin_tls = true\nadmin_tls_cert = "/data/ca/admin-tls.crt"\nadmin_tls_key = "/data/ca/admin-tls.key"\n'
             'security_log_enabled = true\nsecurity_log_dir = "/data/logs"\n'
+            # T55: objetos de hasta 200 MiB, espera de coalescencia de 30 s y 3 GiB de memoria para servir (por defecto 64 MiB, 10 s y 512 MiB: un instalador de 100 MB no se guardaría y 20 clientes agotarían la memoria)
+            'max_object_bytes = 209715200\ncoalesce_wait_secs = 30\nmax_buffered_bytes = 3221225472\n'
             # REQ-F-27: ruta señuelo de laboratorio [S-17]
             f'honey_urls = ["{P["honey_url"]}"]\n'
             # REQ-F-17: el nodo recarga la configuración que la consola de prueba firma (ctrl01); la llave pública queda fijada aquí, en el arranque
@@ -428,9 +430,13 @@ threading.Event().wait()
 
 ORIGEN_PY = '''#!/usr/bin/env python3
 """Origen web de prueba del laboratorio (ext01): HTTP 80 y HTTPS 443, contenido cacheable (Cache-Control public)."""
-import http.server, ssl, sys, threading
+import http.server, json, ssl, sys, threading
 class H(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
+        if self.path.startswith("/echo"):        # T26 (REQ-F-28): devuelve las cabeceras tal como llegaron al origen
+            cuerpo = json.dumps({k.lower(): v for k, v in self.headers.items()}).encode()
+            self.send_response(200); self.send_header("Content-Type", "application/json"); self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(cuerpo))); self.end_headers(); self.wfile.write(cuerpo); return
         if self.path == "/directory":        # ACME de laboratorio (T49): responde como un directorio; no emite certificados
             cuerpo = b'{"newNonce": "/acme/new-nonce", "newAccount": "/acme/new-acct", "newOrder": "/acme/new-order", "meta": {"nota": "ACME de laboratorio"}}'
             self.send_response(200); self.send_header("Content-Type", "application/json"); self.send_header("Content-Length", str(len(cuerpo)))
@@ -574,6 +580,10 @@ table ip fgt {{
     # NAT 1:1 (D1.8, D-26): solo IPsec con NAT-T y el portal; el resto de la IP pública no se publica
     iifname "eth2" ip daddr {pub} udp dport {{ 500, 4500 }} counter dnat to {wan_fw} comment "NAT 1:1 IPsec NAT-T"
     iifname "eth2" ip daddr {pub} tcp dport {{ 80, 443 }} counter dnat to {wan_fw} comment "NAT 1:1 portal (F21)"
+  }}
+  # Ventana autorizada de F24 (señuelo): vacía; T11 agrega ahí TCP 22 y 23 mientras dura (CI-49)
+  chain ventana {{
+    type nat hook prerouting priority dstnat; policy accept;
   }}
   chain postrouting {{
     type nat hook postrouting priority srcnat; policy accept;

@@ -1467,8 +1467,8 @@ pruebas:
     resultado_esperado: "El nodo aplica el cambio firmado en ≤ 60 s y rechaza el bundle sin firma y el más antiguo"
     criterio_aprobacion:
       - { tipo: umbral, metrica: latencia_cambio_s, operador: "<=", valor: 60 }
-      - { tipo: regex, sobre: registro_celeris, patron: "(?i)bundle (aplicado|applied)" }
-      - { tipo: regex, sobre: registro_celeris, patron: "(?i)(firma inválida|invalid signature|bundle rechazado|rejected)" }
+      - { tipo: regex, sobre: registro_celeris, patron: "\"event\":\"config_applied\"" }
+      - { tipo: regex, sobre: registro_celeris, patron: "\"event\":\"config_rejected\"" }
       - { tipo: contador, metrica: bundles_sin_firma_aplicados, operador: "==", valor: 0 }
     automatizable: true
     critica: true
@@ -1498,7 +1498,7 @@ pruebas:
     criterio_aprobacion:
       - { tipo: regex, sobre: stdout, patron: "^403$", comando_adicional: "curl desde una PC de LAB-03" }
       - { tipo: regex, sobre: stdout, patron: "^200$", comando_adicional: "curl desde una PC de LAB-01" }
-      - { tipo: regex, sobre: registro_celeris, patron: "(?i)(client_not_allowed|cliente no permitido)" }
+      - { tipo: regex, sobre: registro_celeris, patron: "\"event\":\"client_denied\"" }
     automatizable: true
     critica: false
     polaridad: mixta
@@ -1643,7 +1643,7 @@ pruebas:
     resultado_esperado: "Ningún puerto abierto en CTRL01, MGMT ni LAB; el control positivo hacia EDGE01:3128 sí abre; denegaciones registradas"
     criterio_aprobacion:
       - { tipo: contador, metrica: puertos_open, operador: "==", valor: 0 }
-      - { tipo: exit_code, valor: 0, comando_adicional: "nc -zv -w3 10.20.60.10 3128 ; nc -zv -w3 10.20.40.10 443", nota: "control positivo: sin él, la denegación no demuestra nada" }
+      - { tipo: exit_code, valor: 0, comando_adicional: "nc -zv -w3 10.20.60.10 3128", nota: "control positivo de F31: sin él, la denegación no demuestra nada" }
       - { tipo: exit_code, valor: 0, comando_adicional: "nc -zv -w3 10.20.40.10 443", nota: "control positivo de F32" }
       - { tipo: contador, metrica: paquetes_denegados_por_fw01, operador: ">", valor: 0 }
     automatizable: true

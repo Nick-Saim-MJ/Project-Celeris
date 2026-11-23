@@ -1908,6 +1908,9 @@ flujos:
     objetivos: [OD-08]
     adr: [D-15]
     req: []
+    pendiente: true
+    cambio: CI-50
+    nota: "FW01 permite TCP 443 hacia cualquier destino; D1.9 dice «solo ACME» y el diseño no limita el destino (CI-50)"
 
   - id: F24
     estado: activo
@@ -1925,6 +1928,9 @@ flujos:
     objetivos: [OD-09]
     adr: [D-16]
     req: []
+    pendiente: true
+    cambio: CI-49
+    nota: "F24 exige TCP 22 y 23 en el FortiGate durante la ventana; D1.8 y S-29 lo limitan a 500/4500 y 80/443 (CI-49)"
 
   - id: F25
     estado: activo

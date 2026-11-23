@@ -251,7 +251,7 @@
 ## Información
 
 - **V-27** — 28 de 59 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 26 elementos pendientes en los YAML; 48 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48']
+- **V-29** — 28 elementos pendientes en los YAML; 51 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-17', 'CI-18', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-51']
 - **V-42** — Resultados de 2026-11-21-L (commit e480bdc): {'PASA': 31, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-42** — 2026-11-21-L: T12 está retirada en la v0.4 y se ignora en los resultados del ensayo (v0.2)
 - **V-42** — 2026-11-21-L: T22 está retirada en la v0.4 y se ignora en los resultados del ensayo (v0.2)

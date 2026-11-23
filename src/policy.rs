@@ -217,9 +217,45 @@ pub fn is_hop_by_hop(name: &str) -> bool {
     )
 }
 
+/// Cabeceras que identifican al cliente o delatan al proxy ante el origen: nunca se reenvían.
+// req: REQ-F-28
+const CLIENT_IDENTITY_HEADERS: [&str; 3] = ["x-forwarded-for", "via", "forwarded"];
+
+/// Elimina de forma explícita `X-Forwarded-For`, `Via` y `Forwarded` (todas sus apariciones) antes de enviar una petición al
+/// origen o al shield. Devuelve cuántas cabeceras distintas quitó.
+// req: REQ-F-28
+pub fn strip_client_identity(headers: &mut HeaderMap) -> usize {
+    CLIENT_IDENTITY_HEADERS.iter().filter(|name| headers.remove(**name).is_some()).count()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    // req: REQ-F-28
+    #[test]
+    fn quita_las_cabeceras_que_identifican_al_cliente() {
+        let mut h = HeaderMap::new();
+        h.append("x-forwarded-for", "10.20.32.50".parse().unwrap());
+        h.append("X-Forwarded-For", "10.20.32.51".parse().unwrap());
+        h.insert("via", "1.1 cliente-lab".parse().unwrap());
+        h.insert("forwarded", "for=10.20.32.50".parse().unwrap());
+        h.insert("accept", "*/*".parse().unwrap());
+        assert_eq!(strip_client_identity(&mut h), 3);
+        for name in ["x-forwarded-for", "via", "forwarded"] {
+            assert!(!h.contains_key(name), "{name} debe haberse eliminado");
+        }
+        assert!(h.contains_key("accept"), "el resto de cabeceras no se toca");
+    }
+
+    // req: REQ-F-28
+    #[test]
+    fn sin_cabeceras_de_identidad_no_cambia_nada() {
+        let mut h = HeaderMap::new();
+        h.insert("host", "example.com".parse().unwrap());
+        assert_eq!(strip_client_identity(&mut h), 0);
+        assert_eq!(h.len(), 1);
+    }
 
     fn norm(url: &str) -> String {
         let cfg = Config::default();
@@ -255,15 +291,37 @@ mod tests {
         }
     }
 
+    // req: REQ-F-28
+    #[test]
+    fn quita_la_identidad_de_una_peticion_completa() {
+        let mut req = Request::get("https://cdn.example.com/a.js")
+            .header("X-Forwarded-For", "10.20.32.50")
+            .header("x-forwarded-for", "10.20.32.51")
+            .header("Via", "1.1 proxy-interno")
+            .header("Forwarded", "for=10.20.32.50")
+            .header("Accept", "*/*")
+            .body(())
+            .unwrap();
+        assert_eq!(strip_client_identity(req.headers_mut()), 3);
+        for name in ["x-forwarded-for", "via", "forwarded"] {
+            assert!(!req.headers().contains_key(name), "{name} no debería salir");
+        }
+        assert!(req.headers().contains_key("accept"));
+        assert_eq!(strip_client_identity(req.headers_mut()), 0);
+    }
+
     #[test]
     fn never_intercept_gana_sobre_intercept() {
-        let mut cfg = Config::default();
-        cfg.intercept_domains = vec!["example.com".into()];
-        cfg.never_intercept = vec!["bank.example.com".into()];
-        assert!(cfg.should_intercept("cdn.example.com"));
-        assert!(!cfg.should_intercept("online.bank.example.com"));
-        assert!(cfg.is_never_intercept("BANK.example.com."));
-        assert!(!cfg.is_never_intercept("cdn.example.com"));
+        let cfg = Config {
+            intercept_domains: vec!["example.com".into()],
+            never_intercept: vec!["bank.example.com".into()],
+            ..Default::default()
+        };
+        let p = crate::signed::Policy::from_config(&cfg).unwrap();
+        assert!(p.domain_allowed("cdn.example.com"));
+        assert!(!p.domain_allowed("online.bank.example.com"));
+        assert!(p.is_never_intercept("BANK.example.com."));
+        assert!(!p.is_never_intercept("cdn.example.com"));
     }
 
     #[test]

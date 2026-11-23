@@ -1,0 +1,60 @@
+name: e1-red
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: make validate (fuente única)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: infra/requirements*.txt
+      - run: make deps-dev
+      - name: LibreOffice (V-74 recalcula las fórmulas del XLSX de pruebas)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-calc
+      - run: make validate
+      - run: make test-gen
+      - name: El informe de validación versionado está al día
+        run: git diff --exit-code docs/infra/e1/validacion.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: validacion
+          path: docs/infra/e1/validacion.md
+
+  opentofu:
+    name: OpenTofu (fmt y validate, sin desplegar)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: infra/requirements*.txt
+      - run: make deps
+      - uses: opentofu/setup-opentofu@v1
+      - run: make tofu-check
+      - name: El tfvars versionado coincide con el inventario
+        run: git diff --exit-code deploy/opentofu/envs/demo/diseno.auto.tfvars.json
+
+  gitleaks:
+    name: gitleaks (secretos)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

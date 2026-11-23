@@ -1,0 +1,86 @@
+# GENERADO por infra/gen desde infra/inventory.yaml — no editar a mano. EMULADO (Modo L, Parte F4.2): no es el producto real.
+# modo=gestionado ventana=no wan=10.20.0.2
+flush ruleset
+
+table inet fw01sim {
+  chain input {
+    type filter hook input priority 0; policy drop;
+    ct state established,related accept
+    ct state invalid counter drop
+    iifname "lo" accept
+    iifname "wan" ip saddr { 0.0.0.0/8, 10.0.0.0/12, 10.16.0.0/14, 10.20.0.8/29, 10.20.0.16/28, 10.20.0.32/27, 10.20.0.64/26, 10.20.0.128/25, 10.20.1.0/24, 10.20.2.0/23, 10.20.4.0/22, 10.20.8.0/21, 10.20.16.0/20, 10.20.32.0/19, 10.20.64.0/18, 10.20.128.0/17, 10.21.0.0/16, 10.22.0.0/15, 10.24.0.0/13, 10.32.0.0/11, 10.64.0.0/10, 10.128.0.0/9, 127.0.0.0/8, 169.254.0.0/16, 172.17.0.0/16, 172.18.0.0/15, 172.20.0.0/14, 172.24.0.0/13, 192.168.0.0/16 } counter drop comment "Anti-spoofing WAN D1.13 (sin F-nn)"
+    iifname "wan" ip saddr { 198.51.100.21, 198.51.100.22 } udp dport { 500, 4500 } counter accept comment "VPN D1.10 (sin F-nn, CI-23)"
+    iifname "wan" ip saddr { 198.51.100.21, 198.51.100.22 } ip protocol esp counter accept comment "VPN D1.10 (sin F-nn, CI-23)"
+    iifname { "vti1", "vti2" } ip saddr { 169.254.10.1, 169.254.11.1 } tcp dport 179 counter accept comment "VPN D1.10 (sin F-nn, CI-23)"
+    iifname "vlan40" ip saddr 10.20.40.0/24 ip daddr 10.20.40.1 meta l4proto . th dport { tcp . 53, udp . 53, udp . 123 } counter accept comment "F2 ZONAS-INTERNAS(sin DMZ-HONEY) > FW01 dns+ntp tcp,udp/53 udp/123"
+    iifname "vlan60" ip saddr 10.20.60.0/24 ip daddr 10.20.60.1 meta l4proto . th dport { tcp . 53, udp . 53, udp . 123 } counter accept comment "F2 ZONAS-INTERNAS(sin DMZ-HONEY) > FW01 dns+ntp tcp,udp/53 udp/123"
+    iifname "vlan30" ip saddr 10.20.32.0/22 ip daddr 10.20.32.1 meta l4proto . th dport { tcp . 53, udp . 53, udp . 123 } counter accept comment "F2 ZONAS-INTERNAS(sin DMZ-HONEY) > FW01 dns+ntp tcp,udp/53 udp/123"
+    iifname "vlan10" ip saddr 10.20.10.0/24 ip daddr 10.20.10.1 meta l4proto . th dport { tcp . 53, udp . 53, udp . 123 } counter accept comment "F2 ZONAS-INTERNAS(sin DMZ-HONEY) > FW01 dns+ntp tcp,udp/53 udp/123"
+    iifname "vlan50" ip saddr 10.20.50.0/24 ip daddr 10.20.50.1 meta l4proto . th dport { tcp . 53, udp . 53, udp . 123 } counter accept comment "F2 ZONAS-INTERNAS(sin DMZ-HONEY) > FW01 dns+ntp tcp,udp/53 udp/123"
+    iifname "vlan20" ip saddr 10.20.20.0/24 ip daddr 10.20.20.1 meta l4proto . th dport { tcp . 53, udp . 53, udp . 123 } counter accept comment "F2 ZONAS-INTERNAS(sin DMZ-HONEY) > FW01 dns+ntp tcp,udp/53 udp/123"
+    iifname "vlan10" ip saddr 10.20.10.20 ip daddr 10.20.10.1 tcp dport { 22, 443, 9128 } counter accept comment "F20 JMP01 > HOSTS-LISTADOS admin tcp/22,443,9128"
+    limit rate 20/second burst 50 packets log prefix "fw01sim DENEGADO input: " level info counter drop
+  }
+
+  chain forward {
+    type filter hook forward priority 0; policy drop;
+    ct state established,related accept
+    ct state invalid counter drop
+    iifname "wan" ip saddr { 0.0.0.0/8, 10.0.0.0/12, 10.16.0.0/14, 10.20.0.8/29, 10.20.0.16/28, 10.20.0.32/27, 10.20.0.64/26, 10.20.0.128/25, 10.20.1.0/24, 10.20.2.0/23, 10.20.4.0/22, 10.20.8.0/21, 10.20.16.0/20, 10.20.32.0/19, 10.20.64.0/18, 10.20.128.0/17, 10.21.0.0/16, 10.22.0.0/15, 10.24.0.0/13, 10.32.0.0/11, 10.64.0.0/10, 10.128.0.0/9, 127.0.0.0/8, 169.254.0.0/16, 172.17.0.0/16, 172.18.0.0/15, 172.20.0.0/14, 172.24.0.0/13, 192.168.0.0/16 } counter drop comment "Anti-spoofing WAN D1.13 (sin F-nn)"
+    ip saddr 10.20.32.0/22 oifname "wan" meta l4proto . th dport { tcp . 853, udp . 443, udp . 853 } log prefix "F7 BLOQUEADO " counter drop comment "F7 LAB > INTERNET BLOQUEAR udp/443 tcp,udp/853 ipv6"
+    iifname "vlan30" meta nfproto ipv6 log prefix "F7 BLOQUEADO " counter drop comment "F7 LAB > INTERNET BLOQUEAR udp/443 tcp,udp/853 ipv6"
+    ip saddr 10.20.32.0/22 ip daddr { 10.20.60.10, 10.20.60.11 } tcp dport 3128 counter accept comment "F1 LAB > EDGE01,EDGE02 proxy tcp/3128"
+    ip saddr 10.20.32.0/22 ip daddr { 10.20.60.10, 10.20.60.11 } tcp dport 80 counter accept comment "F3 LAB > EDGE01,EDGE02 pac tcp/80"
+    ip saddr 10.20.32.0/22 ip daddr 10.20.40.10 tcp dport 443 counter accept comment "F5 LAB > PORTAL01 portal tcp/443"
+    ip saddr 10.20.60.0/24 oifname "wan" tcp dport { 80, 443 } counter accept comment "F8 EDGE > INTERNET miss tcp/80,443"
+    ip saddr 10.20.60.0/24 ip daddr 10.20.20.10 tcp dport 8443 counter accept comment "F10 EDGE > CTRL01 control tcp/8443"
+    ip saddr { 10.20.20.10, 10.20.35.250, 10.20.40.10, 10.20.41.20, 10.20.60.10, 10.20.60.11, 10.30.0.10 } ip daddr 10.20.50.10 tcp dport { 1514, 1515 } counter accept comment "F13 AGENTES > SIEM01 wazuh tcp/1514,1515"
+    ip saddr 10.20.20.10 oifname "wan" tcp dport 443 counter accept comment "F18 CTRL01 > S3 backup tcp/443"
+    ip saddr 10.20.10.20 ip daddr { 10.20.20.0/24, 10.20.32.0/22, 10.20.40.0/24, 10.20.41.0/24, 10.20.50.0/24, 10.20.60.0/24 } tcp dport { 22, 443, 9128 } counter accept comment "F20 JMP01 > HOSTS-LISTADOS admin tcp/22,443,9128"
+    iifname "wan" ip daddr 10.20.40.10 tcp dport { 80, 443 } counter accept comment "F21 INTERNET > PORTAL01 portal-dnat tcp/443 (80 redirige y ACME)"
+    ip saddr 10.20.50.10 oifname "wan" tcp dport 443 counter accept comment "F26 SIEM01,FW01 > INTERNET feeds tcp/443"
+    ip saddr 10.20.10.20 oifname "wan" tcp dport 443 counter accept comment "F27 JMP01 > INTERNET actualizaciones tcp/443"
+    ip saddr 10.20.35.10 ip daddr 10.20.20.10 tcp dport 443 counter accept comment "F28 ENC01 > CTRL01 consola tcp/443"
+    ip saddr 10.30.0.10 ip daddr 10.20.20.10 tcp dport 443 counter accept comment "F30 EC2-GW > CTRL01 consola-remota tcp/443 via VTI"
+    ip saddr 172.16.0.0/16 ip daddr { 10.20.60.10, 10.20.60.11 } tcp dport { 80, 3128 } counter accept comment "F31 WIFI-EST > EDGE01,EDGE02 proxy-byod tcp/3128,80"
+    ip saddr 172.16.0.0/16 ip daddr 10.20.40.10 tcp dport 443 counter accept comment "F32 WIFI-EST > PORTAL01 portal tcp/443"
+    limit rate 20/second burst 50 packets log prefix "fw01sim DENEGADO forward: " level info counter drop
+  }
+
+  chain output {
+    type filter hook output priority 0; policy drop;
+    ct state established,related accept
+    ct state invalid counter drop
+    oifname "lo" accept
+    oifname "wan" ip daddr { 198.51.100.21, 198.51.100.22 } udp dport { 500, 4500 } counter accept comment "VPN D1.10 (sin F-nn, CI-23)"
+    oifname "wan" ip daddr { 198.51.100.21, 198.51.100.22 } ip protocol esp counter accept comment "VPN D1.10 (sin F-nn, CI-23)"
+    oifname { "vti1", "vti2" } ip daddr { 169.254.10.1, 169.254.11.1 } tcp dport 179 counter accept comment "VPN D1.10 (sin F-nn, CI-23)"
+    oifname "vlan50" ip daddr 10.20.50.10 tcp dport 6514 counter accept comment "F14 FW01 > SIEM01 syslog-tls tcp/6514"
+    oifname "wan" meta l4proto . th dport { tcp . 853, tcp . 4460, udp . 123 } counter accept comment "F25 FW01 > INTERNET nts+dot tcp/4460,853 udp/123"
+    oifname "wan" tcp dport 443 counter accept comment "F26 SIEM01,FW01 > INTERNET feeds tcp/443"
+    oifname "vlan40" ip daddr 10.20.40.10 tcp dport 22 counter accept comment "F33 FW01 > PORTAL01 sftp tcp/22 (origen local de FW01)"
+    limit rate 20/second burst 50 packets log prefix "fw01sim DENEGADO output: " level info counter drop
+  }
+
+  chain mss_vpn {
+    type filter hook forward priority mangle; policy accept;
+    oifname { "vti1", "vti2" } tcp flags syn tcp option maxseg size set 1360 comment "MSS clamping D1.10 (sin F-nn)"
+  }
+}
+
+table ip fw01sim_nat {
+  chain prerouting {
+    type nat hook prerouting priority dstnat; policy accept;
+    iifname "wan" ip daddr 10.20.0.2 tcp dport 443 dnat to 10.20.40.10:443 comment "F21 INTERNET > PORTAL01 portal-dnat tcp/443 (80 redirige y ACME)"
+    iifname "wan" ip daddr 10.20.0.2 tcp dport 80 dnat to 10.20.40.10:80 comment "F21 INTERNET > PORTAL01 portal-dnat tcp/443 (80 redirige y ACME)"
+  }
+  chain postrouting {
+    type nat hook postrouting priority srcnat; policy accept;
+    oifname "wan" masquerade comment "NAT de salida (sin F-nn)"
+  }
+}
+
+# --- Flujos sin regla en fw01-sim ---
+# F6: omitido en modo gestionado (solo piloto, fail-open)
+# F24: deshabilitado (señuelo): requiere ventana autorizada por escrito de la DTI (--ventana)
+# F29: no pasa por FW01 (entra por la IP pública de EC2-GW en AWS, v0.4): F29 INTERNET > EC2-GW panel-remoto tcp/443 (sg-gw)

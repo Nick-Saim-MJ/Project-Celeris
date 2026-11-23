@@ -1,0 +1,95 @@
+' Estilo común de los diagramas UML de CE02 E1 (sección 4).
+' Misma paleta que el prototipo (src/panel/panel.css): tinta #0B0B0B, texto secundario #52514E,
+' acento #2A78D6, página #F9F9F7.
+' Convención de versión (el color nunca va solo; siempre se acompaña del estereotipo en texto):
+'   «R1» = existe en el código (fondo blanco, borde de tinta)
+'   «R2» = diseño, aún no implementado (fondo azul claro, borde de acento)
+'   «R3» = escalamiento (fondo gris claro)
+!$INK = "#0B0B0B"
+!$INK2 = "#52514E"
+!$ACCENT = "#2A78D6"
+!$PAGE = "#F9F9F7"
+!$R2FILL = "#E8F1FB"
+!$R3FILL = "#EEEEEE"
+
+skinparam backgroundColor $PAGE
+' Arial: presente en Windows y Linux, así el render es igual en cualquier equipo.
+skinparam defaultFontName "Arial"
+skinparam defaultFontSize 12
+skinparam defaultFontColor $INK
+skinparam shadowing false
+skinparam roundCorner 6
+skinparam ArrowColor $INK2
+skinparam ArrowFontColor $INK2
+skinparam ArrowFontSize 11
+skinparam NoteBackgroundColor #FFFFFF
+skinparam NoteBorderColor $INK2
+skinparam NoteFontSize 11
+skinparam TitleFontSize 15
+skinparam TitleFontStyle bold
+skinparam CaptionFontSize 10
+skinparam CaptionFontColor $INK2
+skinparam FooterFontSize 10
+skinparam FooterFontColor $INK2
+skinparam PackageBorderColor $INK2
+skinparam PackageBackgroundColor #FFFFFF
+skinparam PackageFontStyle bold
+
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor $INK
+  HeaderBackgroundColor #FFFFFF
+  AttributeFontSize 11
+  StereotypeFontColor $INK2
+  BackgroundColor<<R2>> $R2FILL
+  BorderColor<<R2>> $ACCENT
+  BackgroundColor<<R3>> $R3FILL
+  BorderColor<<R3>> $INK2
+}
+skinparam stereotypeCBackgroundColor #FFFFFF
+hide circle
+set separator none
+hide empty members
+skinparam classAttributeIconSize 0
+
+skinparam sequence {
+  ParticipantBackgroundColor #FFFFFF
+  ParticipantBorderColor $INK
+  ParticipantBackgroundColor<<R2>> $R2FILL
+  ParticipantBorderColor<<R2>> $ACCENT
+  ActorBorderColor $INK
+  ActorBackgroundColor #FFFFFF
+  LifeLineBorderColor $INK2
+  LifeLineBackgroundColor #FFFFFF
+  GroupBorderColor $INK2
+  GroupHeaderFontColor $INK
+  DividerBackgroundColor #FFFFFF
+  BoxBorderColor $INK2
+}
+skinparam responseMessageBelowArrow true
+
+skinparam state {
+  BackgroundColor #FFFFFF
+  BorderColor $INK
+  StartColor $INK
+  EndColor $INK
+  BackgroundColor<<R2>> $R2FILL
+  BorderColor<<R2>> $ACCENT
+  BackgroundColor<<error>> #FBEAEA
+  BorderColor<<error>> #B3261E
+}
+
+skinparam entity {
+  BackgroundColor $R2FILL
+  BorderColor $ACCENT
+}
+
+' Pie de trazabilidad uniforme: ID del diagrama, requisitos, casos de uso y pantallas.
+!procedure $pie($id, $req, $cu, $pant)
+footer $id · Requisitos: $req · Casos de uso: $cu · Pantallas: $pant · Fuente: documento maestro C4 y código en src/
+!endprocedure
+
+skinparam database {
+  BackgroundColor #FFFFFF
+  BorderColor $INK
+}

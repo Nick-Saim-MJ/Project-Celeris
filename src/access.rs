@@ -8,7 +8,7 @@ use std::fmt;
 use std::io;
 use std::net::{IpAddr, SocketAddr};
 use std::str::FromStr;
-use std::sync::{LazyLock, Mutex};
+use std::sync::{LazyLock, Mutex, RwLock};
 
 /// Red en notación CIDR. Una IP sin prefijo equivale a esa sola dirección.
 #[derive(Debug, Clone, Copy)]
@@ -72,7 +72,9 @@ pub enum ClientDecision {
 
 /// Decide si un cliente puede usar el proxy en este momento.
 pub struct ClientGate {
-    allowed: Vec<Network>,
+    /// Redes permitidas. Se sustituyen enteras al aplicar una configuración firmada (REQ-F-17).
+    allowed: RwLock<Vec<Network>>,
+    listen: SocketAddr,
     limit_per_minute: u32,
     /// Minuto en curso y peticiones de cada IP en él. Se vacía al cambiar de minuto,
     /// así que su tamaño queda acotado por los clientes permitidos.
@@ -82,7 +84,12 @@ pub struct ClientGate {
 impl ClientGate {
     /// Falla si la configuración dejaría el proxy abierto a la red.
     pub fn new(cfg: &Config, listen: SocketAddr) -> anyhow::Result<Self> {
-        let allowed = parse_networks(&cfg.allowed_clients).context("allowed_clients inválido")?;
+        let allowed = Self::validar(&cfg.allowed_clients, listen)?;
+        Ok(Self { allowed: RwLock::new(allowed), listen, limit_per_minute: cfg.rate_limit_per_minute, window: Mutex::new((0, HashMap::new())) })
+    }
+
+    fn validar(lista: &[String], listen: SocketAddr) -> anyhow::Result<Vec<Network>> {
+        let allowed = parse_networks(lista).context("allowed_clients inválido")?;
         if allowed.is_empty() {
             bail!("allowed_clients está vacío: nadie podría usar el proxy");
         }
@@ -95,7 +102,14 @@ impl ClientGate {
                  Agrega la subred de tus clientes, por ejemplo \"192.168.1.0/24\""
             );
         }
-        Ok(Self { allowed, limit_per_minute: cfg.rate_limit_per_minute, window: Mutex::new((0, HashMap::new())) })
+        Ok(allowed)
+    }
+
+    /// Sustituye las redes permitidas con las mismas validaciones del arranque (REQ-F-17, REQ-F-32).
+    pub fn reload(&self, lista: &[String]) -> anyhow::Result<()> {
+        let nuevas = Self::validar(lista, self.listen)?;
+        *self.allowed.write().expect("las redes permitidas no se envenenan") = nuevas;
+        Ok(())
     }
 
     pub fn check(&self, client: IpAddr) -> ClientDecision {
@@ -104,7 +118,7 @@ impl ClientGate {
 
     fn check_at(&self, client: IpAddr, minute: u64) -> ClientDecision {
         let client = client.to_canonical();
-        if !self.allowed.iter().any(|n| n.contains(client)) {
+        if !self.allowed.read().expect("las redes permitidas no se envenenan").iter().any(|n| n.contains(client)) {
             return ClientDecision::Denied;
         }
         if self.limit_per_minute == 0 {

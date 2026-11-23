@@ -29,7 +29,7 @@ pub struct Shared {
     pub store: Store,
     pub stats: Arc<Stats>,
     pub normalizer: KeyNormalizer,
-    pub clients: ClientGate,
+    pub clients: Arc<ClientGate>,
     pub destinations: Arc<DestinationPolicy>,
     pub memory: MemoryBudget,
     pub flights: Flights,
@@ -38,6 +38,8 @@ pub struct Shared {
     pub detector: Arc<Detector>,
     pub live_log: Arc<LiveLog>,
     pub security: Arc<SecurityLog>,
+    /// Política que puede cambiar sin reiniciar (configuración firmada) y regla del Wi-Fi de estudiantes (REQ-F-36).
+    pub policy: Arc<crate::signed::LivePolicy>,
     /// Página de http://celeris.aviso/, generada al arrancar.
     pub notice: Bytes,
 }
@@ -174,6 +176,45 @@ fn empty_response(status: StatusCode) -> Response<Body> {
     Response::builder().status(status).body(Body::empty()).expect("respuesta estática válida")
 }
 
+const CACHE_STATUS: &str = "cache-status";
+/// Nombre de este nodo en `Cache-Status` (RFC 9211, sección 2: identifica a la caché que responde).
+const CACHE_NAME: &str = "celeris";
+
+/// Qué hizo la caché con una petición, para la cabecera `Cache-Status` (RFC 9211, REQ-NF-11).
+enum CacheResult {
+    /// Servida desde disco; `ttl` es lo que le queda de vida (segundos, negativo si venció).
+    Hit { ttl: i64 },
+    /// La copia estaba vencida, el origen respondió 304 y se sirvió la copia con `ttl` ya renovado.
+    Revalidated { ttl: i64 },
+    /// Pedida al origen; `stored` indica si quedó guardada.
+    Miss { stored: bool },
+}
+
+/// Valor de la cabecera `Cache-Status`: una lista estructurada (RFC 8941) con un elemento por caché.
+/// No incluye `key` ni `detail`: la clave de caché contiene la URL completa y no debe salir del nodo.
+fn cache_status_value(result: &CacheResult) -> String {
+    match result {
+        CacheResult::Hit { ttl } => format!("{CACHE_NAME}; hit; ttl={ttl}"),
+        CacheResult::Revalidated { ttl } => format!("{CACHE_NAME}; hit; fwd=stale; fwd-status=304; ttl={ttl}"),
+        CacheResult::Miss { stored: true } => format!("{CACHE_NAME}; fwd=miss; stored"),
+        CacheResult::Miss { stored: false } => format!("{CACHE_NAME}; fwd=miss"),
+    }
+}
+
+/// Segundos de vida que le quedan a una copia (negativo si ya venció).
+fn remaining_ttl(expires_at: u64, now: u64) -> i64 {
+    i64::try_from(expires_at).unwrap_or(i64::MAX).saturating_sub(i64::try_from(now).unwrap_or(i64::MAX))
+}
+
+/// ¿La ruta es una honey-URL (REQ-F-27)? Coincide la ruta exacta o cualquier ruta que cuelgue de ella. Una entrada vacía no cuenta: coincidiría con todo.
+fn is_honey_url(honey: &[String], path: &str) -> bool {
+    honey.iter().map(|h| h.trim()).filter(|h| !h.is_empty() && *h != "/").any(|h| {
+        let h = h.trim_end_matches('/');
+        let h = if h.starts_with('/') { h.to_owned() } else { format!("/{h}") };
+        path == h || path.starts_with(&format!("{h}/"))
+    })
+}
+
 /// El Host no decide nada: el destino y la clave de caché salen de la URI, que en HTTPS es la del CONNECT.
 /// Que no coincidan no daña la caché, pero un navegador normal no lo hace.
 fn host_differs(host_header: &HeaderValue, uri_host: &str) -> bool {
@@ -195,12 +236,16 @@ impl CacheHandler {
         &self,
         meta: &Meta,
         status: &'static str,
+        cache_status: String,
         reservation: R,
     ) -> Option<Response<Body>> {
         let body = self.shared.store.read_object(meta).await?;
         let mut b = Response::builder().status(StatusCode::OK);
         for (k, v) in &meta.headers {
-            b = b.header(k.as_str(), v.as_str());
+            // El Cache-Status guardado describe otra transacción (la del origen con su propia caché): no se repite en un HIT.
+            if !k.eq_ignore_ascii_case("cache-status") {
+                b = b.header(k.as_str(), v.as_str());
+            }
         }
         let age = now().saturating_sub(meta.stored_at);
         let len = body.len();
@@ -208,6 +253,7 @@ impl CacheHandler {
             .header(header::CONTENT_LENGTH, len)
             .header(header::AGE, age)
             .header("x-celeris-cache", status)
+            .header(CACHE_STATUS, cache_status)
             .body(hold(Body::from(body), reservation))
             .ok()?;
         Stats::add(&self.shared.stats.bytes_from_cache, len as u64);
@@ -270,7 +316,7 @@ impl CacheHandler {
         // Un túnel lo abre Hudsucker, que volvería a resolver el nombre y podría recibir una IP interna.
         // Por eso se fija la IP ya validada. A cambio, el túnel no prueba las demás IPs del nombre.
         // No afecta a TLS: el SNI y el certificado siguen siendo un asunto entre cliente y origen.
-        if !sh.cfg.should_intercept(host) {
+        if !sh.policy.current().should_intercept(host, client) {
             // Hudsucker no expone los bytes de un túnel: solo se puede registrar que se abrió.
             info.finish(sh, Outcome::Tunnel, None, None);
             let target = addrs.iter().find(|a| a.is_ipv4()).or_else(|| addrs.first());
@@ -284,9 +330,10 @@ impl CacheHandler {
 
 impl HttpHandler for CacheHandler {
     /// Intercepción selectiva en modo proxy explícito (CONNECT host:443).
-    async fn should_intercept_connect(&mut self, _ctx: &HttpContext, req: &Request<Body>) -> bool {
+    async fn should_intercept_connect(&mut self, ctx: &HttpContext, req: &Request<Body>) -> bool {
         let host = req.uri().host().unwrap_or_default();
-        let yes = self.shared.cfg.should_intercept(host);
+        // REQ-F-36: un cliente de una red BYOD nunca se descifra, aunque el dominio esté en la lista.
+        let yes = self.shared.policy.current().should_intercept(host, ctx.client_addr.ip());
         // Hudsucker solo lee el SNI si se intercepta: en los demás túneles no hay nada que comparar.
         self.connect_host = yes.then(|| host.to_owned());
         if !yes {
@@ -296,17 +343,15 @@ impl HttpHandler for CacheHandler {
         yes
     }
 
-    /// Segundo filtro sobre el SNI real del ClientHello: si no está en la lista, pasa cifrado.
-    /// La intercepción se cuenta aquí porque recién en este punto queda decidida.
+    /// Segundo filtro sobre el SNI real del ClientHello: si no está en la lista o no coincide con el
+    /// CONNECT, pasa cifrado (REQ-F-02). La intercepción se cuenta aquí porque recién en este punto queda decidida.
     async fn should_intercept_tls(&mut self, ctx: &HttpContext, hello: ClientHello<'_>) -> bool {
         let sni = hello.server_name();
-        let yes = sni.map(|sni| self.shared.cfg.should_intercept(sni)).unwrap_or(false);
+        let (yes, mismatch) = tls_decision(&self.shared.policy.current(), ctx.client_addr.ip(), sni, self.connect_host.as_deref());
         let s = &self.shared.stats;
         Stats::inc(if yes { &s.tls_intercepted } else { &s.tls_passthrough });
-        if let (Some(sni), Some(connect)) = (sni, self.connect_host.as_deref()) {
-            if canonical_host(sni) != canonical_host(connect) {
-                self.shared.detector.host_mismatch(ctx.client_addr.ip(), "El SNI no coincide con el destino del CONNECT.");
-            }
+        if mismatch {
+            self.shared.detector.host_mismatch(ctx.client_addr.ip(), "El SNI no coincide con el destino del CONNECT.");
         }
         if !yes {
             self.shared.client_stats.record(ctx.client_addr.ip(), Outcome::Tunnel, None);
@@ -355,6 +400,14 @@ impl HttpHandler for CacheHandler {
             }
         }
 
+        // req: REQ-F-28: nada que identifique al cliente sale hacia el origen ni hacia el shield. Las cabeceras que el cliente
+        // (o un proxy anterior) haya puesto se eliminan aquí, antes de cualquier camino que reenvíe la petición.
+        // Como el origen ya no ve Forwarded, esa cabecera deja de afectar a si la respuesta se puede compartir.
+        let quitadas = policy::strip_client_identity(req.headers_mut());
+        if quitadas > 0 {
+            tracing::debug!(%client, quitadas, "cabeceras de identidad del cliente eliminadas (REQ-F-28)");
+        }
+
         // Hudsucker también pasa aquí el CONNECT inicial del túnel: no es contenido.
         if req.method() == Method::CONNECT {
             return self.guard_connect(client, started, req).await;
@@ -381,6 +434,12 @@ impl HttpHandler for CacheHandler {
         if url.hostname() == sh.cfg.notice_host {
             return self.notice_response().into();
         }
+        // req: REQ-F-27: ninguna persona pide estas rutas; quien lo hace está recorriendo el sitio en busca de algo. No se reenvía nada.
+        if is_honey_url(&sh.cfg.honey_urls, req.uri().path()) {
+            sh.security.record(SecurityEvent { event: "honey_url", srcip: Some(client), host: Some(url.hostname()), path: Some(req.uri().path()), ..Default::default() });
+            sh.detector.observe(client, Some(404), None);
+            return empty_response(StatusCode::NOT_FOUND).into();
+        }
         Stats::inc(&sh.stats.requests);
         let host = req.uri().host().unwrap_or(url.hostname());
         if sh.detector.enabled() {
@@ -395,7 +454,7 @@ impl HttpHandler for CacheHandler {
         let scope_ok = match url.scheme.as_str() {
             // HTTPS solo llega aquí si pasó el filtro de intercepción.
             "https" => true,
-            "http" => sh.cfg.cache_plain_http && !sh.cfg.is_never_intercept(url.hostname()),
+            "http" => sh.cfg.cache_plain_http && !sh.policy.current().is_never_intercept(url.hostname()),
             _ => false,
         };
         if !scope_ok || !policy::request_is_cacheable(&req) {
@@ -440,7 +499,8 @@ impl HttpHandler for CacheHandler {
                     return req.into();
                 };
                 if meta.is_fresh() {
-                    if let Some(res) = self.serve_from_cache(&meta, "HIT", reservation).await {
+                    let value = cache_status_value(&CacheResult::Hit { ttl: remaining_ttl(meta.expires_at, now()) });
+                    if let Some(res) = self.serve_from_cache(&meta, "HIT", value, reservation).await {
                         Stats::inc(&sh.stats.hits);
                         info.finish(&sh, Outcome::Hit, Some(200), Some(meta.size));
                         tracing::info!(url = %log_url, "HIT");
@@ -491,7 +551,8 @@ impl HttpHandler for CacheHandler {
                 Stats::inc(&sh.stats.store_write_errors);
                 tracing::warn!(url = %log_url, error = %e, "no se pudo extender la vigencia");
             }
-            if let Some(cached) = self.serve_from_cache(meta, "REVALIDATED", reservation.clone()).await {
+            let value = cache_status_value(&CacheResult::Revalidated { ttl: i64::try_from(ttl).unwrap_or(i64::MAX) });
+            if let Some(cached) = self.serve_from_cache(meta, "REVALIDATED", value, reservation.clone()).await {
                 Stats::inc(&sh.stats.revalidated);
                 p.info.finish(&sh, Outcome::Revalidated, Some(200), Some(meta.size));
                 tracing::info!(url = %log_url, "REVALIDATED (304)");
@@ -579,23 +640,32 @@ impl HttpHandler for CacheHandler {
             last_modified: h.get(header::LAST_MODIFIED).and_then(|v| v.to_str().ok()).map(str::to_owned),
         };
 
-        match sh.store.put(&p.key_hash, meta, &bytes).await {
-            Ok(PutOutcome::New) => Stats::inc(&sh.stats.stored_new),
+        let stored = match sh.store.put(&p.key_hash, meta, &bytes).await {
+            Ok(PutOutcome::New) => {
+                Stats::inc(&sh.stats.stored_new);
+                true
+            }
             Ok(PutOutcome::Deduplicated) => {
                 Stats::inc(&sh.stats.dedup);
                 tracing::info!(url = %log_url, "contenido idéntico ya almacenado (dedup)");
+                true
             }
             Err(e) => {
                 Stats::inc(&sh.stats.store_write_errors);
                 tracing::warn!(url = %log_url, error = %e, "no se pudo guardar");
+                false
             }
-        }
+        };
         p.info.finish(&sh, Outcome::Miss, Some(status.as_u16()), Some(bytes.len() as u64));
         tracing::info!(url = %log_url, bytes = bytes.len(), ttl, "MISS → guardado");
 
         parts.headers.remove(header::TRANSFER_ENCODING);
         parts.headers.insert(header::CONTENT_LENGTH, HeaderValue::from(bytes.len()));
         parts.headers.insert("x-celeris-cache", HeaderValue::from_static("MISS"));
+        // Se añade al final de la lista: si el origen ya trae `Cache-Status` de otra caché, se conserva (RFC 9211, sección 2).
+        if let Ok(value) = HeaderValue::from_str(&cache_status_value(&CacheResult::Miss { stored })) {
+            parts.headers.append(CACHE_STATUS, value);
+        }
         Response::from_parts(parts, hold(Body::from(bytes), reservation))
     }
 
@@ -625,9 +695,41 @@ impl HttpHandler for CacheHandler {
     }
 }
 
+/// Decide si se descifra un túnel ya autorizado: el SNI debe estar en la lista y coincidir con el
+/// destino del CONNECT (REQ-F-02). Devuelve (descifrar, el SNI difiere del CONNECT).
+// req: REQ-F-02
+fn tls_decision(policy: &crate::signed::Policy, client: IpAddr, sni: Option<&str>, connect: Option<&str>) -> (bool, bool) {
+    let mismatch = matches!((sni, connect), (Some(sni), Some(connect)) if canonical_host(sni) != canonical_host(connect));
+    let yes = !mismatch && sni.is_some_and(|sni| policy.should_intercept(sni, client));
+    (yes, mismatch)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const LAB: IpAddr = IpAddr::V4(std::net::Ipv4Addr::new(10, 20, 32, 5));
+
+    fn cfg_intercepta(dominios: &[&str]) -> crate::signed::Policy {
+        crate::signed::Policy::from_config(&Config { intercept_domains: dominios.iter().map(|d| d.to_string()).collect(), ..Default::default() }).unwrap()
+    }
+
+    // req: REQ-F-02
+    #[test]
+    fn sni_distinto_del_connect_no_se_descifra_aunque_ambos_esten_en_la_lista() {
+        let cfg = cfg_intercepta(&["cdn.example", "otro.example"]);
+        assert_eq!(tls_decision(&cfg, LAB, Some("otro.example"), Some("cdn.example")), (false, true));
+        assert_eq!(tls_decision(&cfg, LAB, Some("fuera.invalid"), Some("cdn.example")), (false, true));
+    }
+
+    // req: REQ-F-02
+    #[test]
+    fn sni_igual_al_connect_y_en_la_lista_se_descifra() {
+        let cfg = cfg_intercepta(&["cdn.example"]);
+        assert_eq!(tls_decision(&cfg, LAB, Some("CDN.example."), Some("cdn.example")), (true, false));
+        assert_eq!(tls_decision(&cfg, LAB, None, Some("cdn.example")), (false, false));
+        assert_eq!(tls_decision(&cfg_intercepta(&[]), LAB, Some("cdn.example"), Some("cdn.example")), (false, false));
+    }
 
     #[test]
     fn compara_el_host_sin_contar_puerto_mayusculas_ni_punto_final() {
@@ -638,6 +740,46 @@ mod tests {
         assert!(!differs("[::1]:8080", "[::1]"));
         assert!(differs("otro.example.com", "cdn.example.com"));
         assert!(differs("no es un host", "cdn.example.com"));
+    }
+
+    #[test]
+    fn cache_status_sigue_la_sintaxis_de_rfc_9211() {
+        assert_eq!(cache_status_value(&CacheResult::Hit { ttl: 120 }), "celeris; hit; ttl=120");
+        assert_eq!(cache_status_value(&CacheResult::Hit { ttl: -5 }), "celeris; hit; ttl=-5");
+        assert_eq!(cache_status_value(&CacheResult::Miss { stored: true }), "celeris; fwd=miss; stored");
+        assert_eq!(cache_status_value(&CacheResult::Miss { stored: false }), "celeris; fwd=miss");
+        assert_eq!(
+            cache_status_value(&CacheResult::Revalidated { ttl: 60 }),
+            "celeris; hit; fwd=stale; fwd-status=304; ttl=60"
+        );
+    }
+
+    #[test]
+    fn cache_status_no_revela_la_clave_ni_detalles() {
+        for r in [CacheResult::Hit { ttl: 1 }, CacheResult::Revalidated { ttl: 1 }, CacheResult::Miss { stored: true }] {
+            let v = cache_status_value(&r);
+            assert!(!v.contains("key") && !v.contains("detail") && !v.contains("http"), "{v}");
+            assert!(HeaderValue::from_str(&v).is_ok());
+        }
+    }
+
+    #[test]
+    fn la_vida_restante_puede_ser_negativa_y_no_desborda() {
+        assert_eq!(remaining_ttl(100, 40), 60);
+        assert_eq!(remaining_ttl(40, 100), -60);
+        assert_eq!(remaining_ttl(u64::MAX, 0), i64::MAX);
+    }
+
+    #[test]
+    fn las_honey_urls_coinciden_por_ruta_y_por_prefijo() {
+        let honey = vec!["/admin-backup.zip".to_owned(), "wp-login-trampa/".to_owned(), "".to_owned(), "/".to_owned()];
+        assert!(is_honey_url(&honey, "/admin-backup.zip"));
+        assert!(is_honey_url(&honey, "/wp-login-trampa"));
+        assert!(is_honey_url(&honey, "/wp-login-trampa/entrar"));
+        assert!(!is_honey_url(&honey, "/wp-login-trampa-otra"), "un prefijo de texto no es un prefijo de ruta");
+        assert!(!is_honey_url(&honey, "/"), "una entrada vacía o «/» no puede marcar todo el sitio como señuelo");
+        assert!(!is_honey_url(&honey, "/static.js"));
+        assert!(!is_honey_url(&[], "/admin-backup.zip"));
     }
 
     #[test]

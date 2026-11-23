@@ -1,0 +1,87 @@
+name: imagen-celeris-node
+
+# Imagen OCI de celeris-node (Parte F6, REQ-NF-15). En pull requests solo se construye (sin publicar).
+# En main y en etiquetas v* se publica en GHCR, se genera el SBOM y se firma con cosign SIN llaves ni secretos:
+# la firma es «keyless», con la identidad OIDC del propio workflow (permiso id-token) y el GITHUB_TOKEN efímero.
+# Paso preparado, no ejecutado todavía: requiere que el repositorio esté en GitHub con Actions habilitado.
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    paths:
+      - "src/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "deploy/image/**"
+      - ".github/workflows/imagen.yml"
+
+permissions:
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository_owner }}/celeris-node
+
+jobs:
+  imagen:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write      # publicar en GHCR con el GITHUB_TOKEN
+      id-token: write      # firma keyless de cosign (OIDC); no hay llaves en el repositorio
+      attestations: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Metadatos OCI (etiquetas y labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+
+      - uses: docker/login-action@v3
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Construir (amd64 y arm64, REQ-NF-10) y publicar con SBOM y procedencia
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/image/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GIT_COMMIT=${{ github.sha }}
+          sbom: true          # SBOM adjunto a la imagen (BuildKit, formato SPDX)
+          provenance: mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - uses: sigstore/cosign-installer@v3
+        if: github.event_name != 'pull_request'
+
+      - name: Firmar la imagen por digest (keyless)
+        if: github.event_name != 'pull_request'
+        run: cosign sign --yes "${REGISTRY}/${IMAGE_NAME}@${{ steps.build.outputs.digest }}"
+
+      - name: Verificar la firma (REQ-NF-15)
+        if: github.event_name != 'pull_request'
+        run: |
+          cosign verify "${REGISTRY}/${IMAGE_NAME}@${{ steps.build.outputs.digest }}" \
+            --certificate-identity-regexp "^https://github.com/${{ github.repository }}/" \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com

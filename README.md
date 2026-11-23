@@ -114,7 +114,7 @@ El proxy abre un puerto de administración en `admin_listen` (por defecto `127.0
 
 Abre `http://127.0.0.1:9128/` y pega el token. La barra lateral tiene dos vistas: **Resumen**, con la descarga evitada, los ratios, el reparto de peticiones, el disco y las alertas, que se actualiza cada 5 segundos, y **Registro en vivo**, que se actualiza cada 3 segundos.
 
-Sin token, la página se sirve vacía: **todos los datos lo exigen**. El token se crea al arrancar en `admin_token_file` (`ca/admin.token`), con acceso solo para el usuario que ejecuta el proxy. Para cambiarlo, bórralo y reinicia. El panel lo guarda solo en esa pestaña y lo olvida al pulsar «Salir». Si escuchas fuera de `127.0.0.1`, el token viaja sin cifrar por esa red: el proxy lo advierte al arrancar.
+Sin token, la página se sirve vacía: **todos los datos lo exigen**. El token se crea al arrancar en `admin_token_file` (`ca/admin.token`), con acceso solo para el usuario que ejecuta el proxy. Para cambiarlo, bórralo y reinicia. El panel lo guarda solo en esa pestaña y lo olvida al pulsar «Salir». Fuera de `127.0.0.1` el puerto solo se abre con `admin_tls = true` (REQ-NF-14): si no, el proxy no arranca, porque el token viajaría sin cifrar. Con TLS, el nodo genera un certificado autofirmado (`admin_tls_cert` y `admin_tls_key`, por defecto `ca/admin-tls.crt` y `ca/admin-tls.key`; la llave solo la lee el usuario del proxy) y una conexión HTTP en claro se cierra sin respuesta. El cliente lo fija como ancla de confianza, por ejemplo `curl --cacert ca/admin-tls.crt https://IP:9128/metrics`. En producción corresponde un certificado de step-ca (F11): pendiente.
 
 **Por cliente.** Con `client_stats_enabled = true`, el panel lista cada IP con sus peticiones, bytes, túneles y rechazos, pero no qué sitios visitó. Viene apagado porque son datos sobre personas, y el aviso de `http://celeris.aviso/` indica si está activo. Solo vive en memoria y se olvida tras un día sin actividad o al reiniciar. Guarda hasta 4096 clientes: los que no quepan no se cuentan hasta que se olvide alguno.
 
@@ -206,6 +206,7 @@ Con `security_log_enabled = true`, el proxy escribe `security-AAAA-MM-DD.jsonl` 
 | `rate_limited` | Una IP superó `rate_limit_per_minute` |
 | `port_blocked` | Un túnel a un puerto fuera de `allowed_connect_ports` |
 | `destination_blocked` | Una petición a la red interna o a metadatos de la nube |
+| `honey_url` | Alguien pidió una ruta señuelo de `honey_urls` (REQ-F-27) |
 | `admin_auth_failed` | Token ausente (`missing`) o incorrecto (`invalid`) en el puerto de administración |
 | `detection` | Volumen alto, muchos rechazos o nombre que no coincide |
 | `alert_raised`, `alert_resolved` | Cambió una alerta del panel, como objetos corruptos |
@@ -261,6 +262,14 @@ La CA permite leer el tráfico de los dominios listados. Úsala **solo en tus eq
 laboratorio donde todos los usuarios lo sepan y lo acepten**. La llave `ca/celeris-ca.key` nunca debe
 salir de la máquina del proxy. Las apps con *certificate pinning* (bancos, muchas apps móviles)
 fallarán si se interceptan: van en `never_intercept`.
+
+### Proxy padre (shield), PAC y rutas señuelo
+
+Tres funciones del diseño de red de Celeris Edge (D1.11 y D1.14), apagadas por defecto:
+
+- **Proxy padre con mTLS (REQ-F-29, F9).** Con `upstream_parent = "ip:puerto"`, el nodo envía al shield todo lo que saldría a Internet, por TLS y con el certificado de cliente de `upstream_parent_cert` y `upstream_parent_key`; la CA del shield va en `upstream_extra_ca`. Sin esos archivos el nodo no arranca. El shield es el mismo binario con `shield_listen = "ip:puerto"`, `shield_cert`, `shield_key` y `shield_client_ca`: acepta TLS exigiendo un certificado de cliente emitido por esa CA y pasa las peticiones, ya descifradas, al proxy de `listen`, que en ese modo debe ser de bucle local (si no, no arranca). El shield no intercepta TLS de usuarios y recibe las peticiones sin las cabeceras que identifican al cliente (REQ-F-28). Los certificados son del operador: el nodo no los genera.
+- **PAC con varios nodos (REQ-F-26, F1 y F3).** `pac_nodes = ["ip:puerto", …]` en orden de preferencia, `pac_direct_networks = ["10.20.0.0/14", …]` y `pac_host`. `celeris-cache pac config.toml` imprime el archivo y termina; con `pac_listen = "ip:puerto"` el nodo también lo sirve en `/wpad.dat`. Siempre termina en `DIRECT`: si todos los nodos caen, los usuarios salen sin caché y sin control (F6, solo en el piloto). Sin `pac_nodes` no se genera nada.
+- **Honey-URL (REQ-F-27, DET-07).** `honey_urls = ["/ruta", …]`: pedir esa ruta, o una que cuelgue de ella, devuelve 404 sin llegar al origen y escribe el evento `honey_url` en el log de seguridad (con la IP real, como los demás). Solo ve las rutas de los dominios que el nodo intercepta o de HTTP plano. Una entrada vacía o `/` se ignora: marcaría todo el sitio como señuelo.
 
 ## Mejoras siguientes (en orden de impacto)
 

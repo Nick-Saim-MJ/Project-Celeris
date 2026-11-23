@@ -1,0 +1,307 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "NetworkAcls": [
+      {
+        "Associations": [
+          {
+            "NetworkAclAssociationId": "aclassoc-00000000000000008",
+            "NetworkAclId": "acl-00000000000000004",
+            "SubnetId": "subnet-00000000000000007"
+          },
+          {
+            "NetworkAclAssociationId": "aclassoc-0000000000000000a",
+            "NetworkAclId": "acl-00000000000000004",
+            "SubnetId": "subnet-00000000000000009"
+          },
+          {
+            "NetworkAclAssociationId": "aclassoc-0000000000000000c",
+            "NetworkAclId": "acl-00000000000000004",
+            "SubnetId": "subnet-0000000000000000b"
+          },
+          {
+            "NetworkAclAssociationId": "aclassoc-0000000000000000e",
+            "NetworkAclId": "acl-00000000000000004",
+            "SubnetId": "subnet-0000000000000000d"
+          },
+          {
+            "NetworkAclAssociationId": "aclassoc-00000000000000010",
+            "NetworkAclId": "acl-00000000000000004",
+            "SubnetId": "subnet-0000000000000000f"
+          },
+          {
+            "NetworkAclAssociationId": "aclassoc-00000000000000012",
+            "NetworkAclId": "acl-00000000000000004",
+            "SubnetId": "subnet-00000000000000011"
+          }
+        ],
+        "Entries": [
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": true,
+            "Protocol": "-1",
+            "RuleAction": "allow",
+            "RuleNumber": 100
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": true,
+            "Protocol": "-1",
+            "RuleAction": "deny",
+            "RuleNumber": 32767
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "Protocol": "-1",
+            "RuleAction": "allow",
+            "RuleNumber": 100
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "Protocol": "-1",
+            "RuleAction": "deny",
+            "RuleNumber": 32767
+          }
+        ],
+        "IsDefault": true,
+        "NetworkAclId": "acl-00000000000000004",
+        "Tags": [],
+        "VpcId": "vpc-00000000000000001",
+        "OwnerId": "000000000000"
+      },
+      {
+        "Associations": [],
+        "Entries": [
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": true,
+            "Protocol": "-1",
+            "RuleAction": "allow",
+            "RuleNumber": 100
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": true,
+            "Protocol": "-1",
+            "RuleAction": "deny",
+            "RuleNumber": 32767
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "Protocol": "-1",
+            "RuleAction": "allow",
+            "RuleNumber": 100
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "Protocol": "-1",
+            "RuleAction": "deny",
+            "RuleNumber": 32767
+          }
+        ],
+        "IsDefault": true,
+        "NetworkAclId": "acl-000000000000000aa",
+        "Tags": [],
+        "VpcId": "vpc-000000000000000a8",
+        "OwnerId": "000000000000"
+      },
+      {
+        "Associations": [
+          {
+            "NetworkAclAssociationId": "aclassoc-000000000000000bc",
+            "NetworkAclId": "acl-000000000000000ba",
+            "SubnetId": "subnet-000000000000000b4"
+          }
+        ],
+        "Entries": [
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": true,
+            "PortRange": {
+              "From": 0,
+              "To": 0
+            },
+            "Protocol": "-1",
+            "RuleAction": "allow",
+            "RuleNumber": 100
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": true,
+            "Protocol": "-1",
+            "RuleAction": "deny",
+            "RuleNumber": 32767
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "PortRange": {
+              "From": 22,
+              "To": 22
+            },
+            "Protocol": "6",
+            "RuleAction": "deny",
+            "RuleNumber": 100
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "PortRange": {
+              "From": 3389,
+              "To": 3389
+            },
+            "Protocol": "6",
+            "RuleAction": "deny",
+            "RuleNumber": 110
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "PortRange": {
+              "From": 443,
+              "To": 443
+            },
+            "Protocol": "6",
+            "RuleAction": "allow",
+            "RuleNumber": 120
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "PortRange": {
+              "From": 1024,
+              "To": 65535
+            },
+            "Protocol": "6",
+            "RuleAction": "allow",
+            "RuleNumber": 130
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "Protocol": "-1",
+            "RuleAction": "deny",
+            "RuleNumber": 32767
+          }
+        ],
+        "IsDefault": false,
+        "NetworkAclId": "acl-000000000000000ba",
+        "Tags": [
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          },
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          },
+          {
+            "Key": "Name",
+            "Value": "nacl-public"
+          },
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          }
+        ],
+        "VpcId": "vpc-000000000000000a8",
+        "OwnerId": "000000000000"
+      },
+      {
+        "Associations": [
+          {
+            "NetworkAclAssociationId": "aclassoc-000000000000000bd",
+            "NetworkAclId": "acl-000000000000000bb",
+            "SubnetId": "subnet-000000000000000b6"
+          }
+        ],
+        "Entries": [
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": true,
+            "PortRange": {
+              "From": 443,
+              "To": 443
+            },
+            "Protocol": "6",
+            "RuleAction": "allow",
+            "RuleNumber": 100
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": true,
+            "PortRange": {
+              "From": 1024,
+              "To": 65535
+            },
+            "Protocol": "6",
+            "RuleAction": "allow",
+            "RuleNumber": 110
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": true,
+            "Protocol": "-1",
+            "RuleAction": "deny",
+            "RuleNumber": 32767
+          },
+          {
+            "CidrBlock": "10.30.0.0/24",
+            "Egress": false,
+            "PortRange": {
+              "From": 443,
+              "To": 443
+            },
+            "Protocol": "6",
+            "RuleAction": "allow",
+            "RuleNumber": 100
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "PortRange": {
+              "From": 1024,
+              "To": 65535
+            },
+            "Protocol": "6",
+            "RuleAction": "allow",
+            "RuleNumber": 110
+          },
+          {
+            "CidrBlock": "0.0.0.0/0",
+            "Egress": false,
+            "Protocol": "-1",
+            "RuleAction": "deny",
+            "RuleNumber": 32767
+          }
+        ],
+        "IsDefault": false,
+        "NetworkAclId": "acl-000000000000000bb",
+        "Tags": [
+          {
+            "Key": "Ttl",
+            "Value": "4h"
+          },
+          {
+            "Key": "Name",
+            "Value": "nacl-private"
+          },
+          {
+            "Key": "Modo",
+            "Value": "AWS emulado - plano de control sin trafico"
+          },
+          {
+            "Key": "Proyecto",
+            "Value": "celeris-edge"
+          }
+        ],
+        "VpcId": "vpc-000000000000000a8",
+        "OwnerId": "000000000000"
+      }
+    ]
+  }
+}

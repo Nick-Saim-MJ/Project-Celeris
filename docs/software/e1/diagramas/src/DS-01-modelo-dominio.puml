@@ -1,0 +1,100 @@
+@startuml DS-01-modelo-dominio
+!include _estilo.iuml
+title DS-01 · Modelo de dominio (C4.1)
+caption «R1» existe en el código · «R2» diseño del plano de control · «R3» escalamiento
+
+package "Plano de control (celeris-control, CTRL01 10.20.20.10)" {
+  class Tenant <<R3>> {
+    id: Uuid
+    nombre: String
+  }
+  class Site <<R2>> {
+    id: Uuid
+    nombre: String
+    cidrs: Vec<Cidr>
+  }
+  class Node <<R2>> {
+    id: Uuid
+    hostname: String
+    estado: NodeState
+    version_config: u64
+    last_seen: DateTime
+  }
+  class PolicyVersion <<R2>> {
+    version: u64
+    estado: PolicyState
+    firma_ed25519: Signature
+    propuesta_por: UserId
+    aprobada_por: UserId
+  }
+  class NodeCa <<R2>> {
+    serial: String
+    not_after: DateTime
+    name_constraints: Vec<String>
+    revocada_en: Option<DateTime>
+  }
+  class AuditEntry <<R2>> {
+    actor: UserId
+    accion: String
+    objeto: String
+    ts: DateTime
+  }
+}
+
+package "Política (hoy config.toml; R2: bundle firmado)" {
+  class InterceptRule <<R1>> {
+    sufijo: String
+    accion: Interceptar | NuncaInterceptar
+  }
+  class StoreIdRule <<R1>> {
+    host_suffix: String
+    pattern: Regex
+    replacement: String
+  }
+}
+
+package "Plano de datos (celeris-node, EDGE01 10.20.60.10 / EDGE02 10.20.60.11)" {
+  class CacheEntry <<R1>> {
+    key_hash: Sha256
+    url_sin_query: String
+    estado: EntryState
+    expires_at: u64
+    etag: Option<String>
+    last_modified: Option<String>
+  }
+  class ContentObject <<R1>> {
+    sha256: Sha256
+    size: u64
+    refcount: u32
+  }
+  class Detection <<R1>> {
+    kind: Volume | Denied | RarePort | HostMismatch
+    ip: IpAddr
+    count: u64
+    first_seen / last_seen: u64
+  }
+}
+
+Tenant "1" --> "*" Site
+Site "1" --> "*" Node
+Tenant "1" --> "*" PolicyVersion
+PolicyVersion "1" *-- "*" InterceptRule
+PolicyVersion "1" *-- "*" StoreIdRule
+Node "1" --> "1..*" NodeCa : vigente + históricas
+Node "*" --> "1" PolicyVersion : aplica
+Node "1" *-- "*" CacheEntry
+CacheEntry "*" --> "1" ContentObject : deduplica por SHA-256
+Node "1" --> "*" Detection
+PolicyVersion "1" --> "*" AuditEntry : cada cambio
+
+note bottom of InterceptRule
+  never_intercept gana siempre
+  sobre intercept_domains (REQ-RN-03)
+end note
+note bottom of ContentObject
+  Se verifica el hash antes de servir (REQ-F-06).
+  refcount: varias claves → un objeto (D-03).
+end note
+
+$pie("DS-01", "REQ-F-02, F-06, F-07, F-15, F-16, F-17, F-18, F-24, RN-03", "CU-01, CU-03, CU-04, CU-07", "P-04, P-05, P-06, P-07")
+@enduml

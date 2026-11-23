@@ -1,0 +1,126 @@
+@startuml DS-12-modelo-datos
+!include _estilo.iuml
+title DS-12 · Modelo de datos del plano de control (C4.6, PostgreSQL 18 en DB01 10.20.20.11)
+caption «R2 — diseño», base para CE022 (S2). PK = clave primaria, FK = clave foránea. Las tablas marcadas «nueva» no están en C4.6 del maestro.
+skinparam linetype ortho
+
+entity tenant <<R3>> {
+  * id : uuid <<PK>>
+  --
+  * nombre : text
+}
+entity site {
+  * id : uuid <<PK>>
+  --
+  * tenant_id : uuid <<FK>>
+  * nombre : text
+  * cidrs : cidr[]
+}
+entity node {
+  * id : uuid <<PK>>
+  --
+  * site_id : uuid <<FK>>
+  * hostname : text
+  * estado : node_state
+  version_config : bigint <<FK>>
+  last_seen : timestamptz
+}
+entity policy_version {
+  * version : bigint <<PK>>
+  --
+  * tenant_id : uuid <<FK>>
+  * estado : policy_state
+  * contenido_cedar : text
+  firma : bytea (ed25519)
+  * propuesta_por : uuid <<FK>>
+  aprobada_por : uuid <<FK>>
+  * creada_en : timestamptz
+  ..
+  CHECK (aprobada_por <> propuesta_por)
+}
+entity node_ca {
+  * serial : text <<PK>>
+  --
+  * node_id : uuid <<FK>>
+  * not_after : timestamptz
+  * name_constraints : text[]
+  * huella_sha256 : text
+  revocada_en : timestamptz
+}
+entity purge_job {
+  * id : uuid <<PK>>
+  --
+  * selector : jsonb (url | prefijo | etiqueta)
+  * estado : text
+  * creado_por : uuid <<FK>>
+}
+entity audit_log {
+  * id : bigserial <<PK>>
+  --
+  * actor : uuid <<FK>>
+  * accion : text
+  * objeto : text
+  antes : jsonb
+  despues : jsonb
+  * ts : timestamptz
+  ..
+  solo INSERT (sin UPDATE ni DELETE)
+}
+entity kpi_daily {
+  * fecha : date <<PK>>
+  * node_id : uuid <<PK, FK>>
+  --
+  bytes_cache : bigint
+  bytes_origen : bigint
+  hits : bigint
+  misses : bigint
+  bypass : bigint
+}
+entity operador <<nueva>> {
+  * id : uuid <<PK>>
+  --
+  * sub_oidc : text (único)
+  * nombre : text
+  * rol : operador | analista | auditor
+}
+entity enrollment_token <<nueva>> {
+  * hash_token : text <<PK>>
+  --
+  * node_id : uuid <<FK>>
+  * vence_en : timestamptz [S-20]
+  usado_en : timestamptz
+}
+entity rollout <<nueva>> {
+  * version : bigint <<PK, FK>>
+  * node_id : uuid <<PK, FK>>
+  --
+  * fase : 10 % | 100 %
+  * estado : pendiente | aplicado | fallido
+  errores : integer
+}
+
+tenant ||--o{ site
+site ||--o{ node
+tenant ||--o{ policy_version
+node ||--|{ node_ca
+node }o--|| policy_version : aplica
+node ||--o{ kpi_daily
+node ||--o| enrollment_token
+policy_version ||--o{ rollout
+node ||--o{ rollout
+operador ||--o{ policy_version : propone / aprueba
+operador ||--o{ purge_job
+operador ||--o{ audit_log
+
+note bottom of policy_version
+  Inmutable: un cambio crea una versión nueva.
+  El CHECK hace cumplir los cuatro ojos en la base (REQ-RN-07),
+  además de PolicyService.approve().
+end note
+note bottom of kpi_daily
+  Agregados diarios sin IP ni URL:
+  alimentan /v1/reports/savings (REQ-F-25) y P-02.
+end note
+
+$pie("DS-12", "REQ-F-16, F-17, F-18, F-19, F-24, F-25, RN-07, NF-07", "CU-03, CU-04, CU-05, CU-06, CU-10", "P-02, P-04, P-05, P-07, P-08")
+@enduml

@@ -1,0 +1,68 @@
+@startuml DS-04-secuencia-miss-coalescencia-hit
+!include _estilo.iuml
+title DS-04 · Secuencia: MISS con coalescencia y HIT posterior (C4.2, tal como lo hace el código)
+caption Participantes «R1»: existen en src/. Los nombres de método son los reales (handler.rs, coalesce.rs, store.rs, policy.rs).
+
+actor "Cliente 1\n(zona LAB)" as C1
+actor "Cliente 2\n(zona LAB)" as C2
+box "celeris-node · EDGE01 10.20.60.10" #FFFFFF
+  participant "CacheHandler\n(handler.rs)" as H <<R1>>
+  participant "KeyNormalizer\n(policy.rs)" as K <<R1>>
+  participant "Flights\n(coalesce.rs)" as F <<R1>>
+  participant "Store\n(store.rs)" as S <<R1>>
+end box
+participant "Origen\ncdn.example:443" as O
+
+note over C1, H : El túnel ya fue interceptado (ver DS-05). Ambos piden el mismo objeto casi a la vez.
+
+C1 -> H : GET https://cdn.example/app.js
+activate H
+H -> H : clients.check(ip) = Allow\nstrip_client_identity(headers) (REQ-F-28)
+H -> K : normalize(url)
+K --> H : clave sin parámetros de rastreo (REQ-F-07)
+H -> S : get(key_hash)
+S --> H : None (ausente)
+H -> F : enter(key_hash)
+F --> H : Leader(guard)
+
+C2 -> H : GET https://cdn.example/app.js
+H -> S : get(key_hash)
+S --> H : None
+H -> F : enter(key_hash)
+note right of F : C2 espera en un watch::Receiver\nhasta que el líder suelte el guardia\n(máximo coalesce_wait_secs) (REQ-F-05)
+
+H -> O : GET /app.js (una sola vez,\nsin X-Forwarded-For, Via ni Forwarded)
+O --> H : 200 OK, Cache-Control: max-age=3600, ETag
+H -> H : response_is_cacheable(res, max_object_bytes)\nmemory.try_reserve(bytes)
+H -> S : put(key_hash, meta, body)
+S -> S : SHA-256 del cuerpo → objects/ab/cd…\nescritura atómica (REQ-F-06, REQ-NF-04)
+S --> H : PutOutcome::New
+H --> C1 : 200 + x-celeris-cache: MISS
+H -> F : drop(guard)
+F --> H : Waited (despierta a C2)
+H -> S : get(key_hash)
+S --> H : Meta fresca
+H -> S : read_object(meta)
+S --> H : bytes (hash verificado)
+H --> C2 : 200 + x-celeris-cache: HIT\n(stats.coalesced += 1)
+deactivate H
+
+... más tarde, dentro de max-age ...
+
+C1 -> H : GET https://cdn.example/app.js
+activate H
+H -> S : get(key_hash)
+S --> H : Meta fresca (is_fresh)
+H -> S : read_object(meta)
+S --> H : bytes (hash verificado)
+H --> C1 : 200 + x-celeris-cache: HIT, Age
+deactivate H
+
+note over H, S
+  Diferencia con el maestro (H-04): el código responde x-celeris-cache: MISS/HIT/REVALIDATED;
+  la cabecera Cache-Status de RFC 9211 (p. ej. «celeris; fwd=miss; stored») es REQ-NF-11 y queda para R2.
+  El que esperó recibe HIT, no «collapsed».
+end note
+
+$pie("DS-04", "REQ-F-03, F-05, F-06, F-07, F-28, NF-04, NF-13", "CU-01", "P-02, P-03")
+@enduml

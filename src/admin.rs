@@ -19,11 +19,17 @@ use hyper::body::Incoming;
 use hyper::header::{self, HeaderValue};
 use hyper::{Method, Request, Response, StatusCode};
 use hyper_util::rt::{TokioIo, TokioTimer};
+use rcgen::{CertificateParams, DistinguishedName, DnType, ExtendedKeyUsagePurpose, KeyPair};
 use std::net::{IpAddr, SocketAddr};
 use std::path::Path;
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::net::TcpListener;
+use tokio_rustls::rustls::crypto::aws_lc_rs;
+use tokio_rustls::rustls::pki_types::pem::PemObject;
+use tokio_rustls::rustls::pki_types::{CertificateDer, PrivateKeyDer};
+use tokio_rustls::rustls::ServerConfig;
+use tokio_rustls::TlsAcceptor;
 
 const MIN_TOKEN_CHARS: usize = 32;
 
@@ -148,6 +154,80 @@ fn route(client: IpAddr, method: &Method, path: &str, authorization: Option<&Hea
     }
 }
 
+// req: REQ-NF-14
+/// Crea un certificado autofirmado de laboratorio para el puerto de administración (con `localhost`, 127.0.0.1 y la IP de
+/// `admin_listen`). El cliente lo fija como ancla de confianza (`curl --cacert`); la llave queda solo para el usuario del proxy.
+fn generate_tls_pair(cert_path: &Path, key_path: &Path, addr: &SocketAddr) -> anyhow::Result<()> {
+    let mut names = vec!["localhost".to_owned(), "127.0.0.1".to_owned()];
+    if !addr.ip().is_unspecified() && !addr.ip().is_loopback() {
+        names.push(addr.ip().to_string());
+    }
+    let mut params = CertificateParams::new(names)?;
+    let mut dn = DistinguishedName::new();
+    dn.push(DnType::CommonName, "Celeris administración (laboratorio)");
+    params.distinguished_name = dn;
+    params.extended_key_usages = vec![ExtendedKeyUsagePurpose::ServerAuth];
+    params.not_before = rcgen::date_time_ymd(2026, 1, 1);
+    params.not_after = rcgen::date_time_ymd(2028, 12, 31);
+    let key = KeyPair::generate()?;
+    let cert = params.self_signed(&key)?;
+    write_private(key_path, key.serialize_pem().as_bytes()).context("guardando la llave TLS de administración")?;
+    std::fs::write(cert_path, cert.pem()).context("guardando el certificado TLS de administración")?;
+    tracing::info!("certificado TLS de administración creado en {} (autofirmado)", cert_path.display());
+    Ok(())
+}
+
+// req: REQ-NF-14
+/// Prepara el TLS del puerto de administración: TLS 1.2 o superior, sin autenticación de cliente (el cliente se identifica con el token).
+fn load_or_generate_tls(cert_path: &Path, key_path: &Path, addr: &SocketAddr) -> anyhow::Result<TlsAcceptor> {
+    if !cert_path.exists() || !key_path.exists() {
+        generate_tls_pair(cert_path, key_path, addr)?;
+    }
+    let certs = CertificateDer::pem_file_iter(cert_path)
+        .with_context(|| format!("leyendo {}", cert_path.display()))?
+        .collect::<Result<Vec<_>, _>>()
+        .with_context(|| format!("certificado inválido en {}", cert_path.display()))?;
+    let key = PrivateKeyDer::from_pem_file(key_path).with_context(|| format!("llave inválida en {}", key_path.display()))?;
+    let config = ServerConfig::builder_with_provider(Arc::new(aws_lc_rs::default_provider()))
+        .with_safe_default_protocol_versions()?
+        .with_no_client_auth()
+        .with_single_cert(certs, key)
+        .context("el certificado y la llave TLS de administración no corresponden")?;
+    Ok(TlsAcceptor::from(Arc::new(config)))
+}
+
+/// Atiende las conexiones del puerto de administración. Con TLS, una conexión que no completa el apretón de manos (por ejemplo,
+/// HTTP en claro) se cierra sin respuesta: el token nunca se lee de un canal sin cifrar.
+async fn serve(listener: TcpListener, state: Arc<AdminState>, tls: Option<TlsAcceptor>) {
+    loop {
+        let Ok((stream, peer)) = listener.accept().await else {
+            continue;
+        };
+        let state = state.clone();
+        let tls = tls.clone();
+        tokio::spawn(async move {
+            let service = hyper::service::service_fn(move |req: Request<Incoming>| {
+                let res = route(peer.ip(), req.method(), req.uri().path(), req.headers().get(header::AUTHORIZATION), &state);
+                async move { Ok::<_, std::convert::Infallible>(res) }
+            });
+            // El límite evita que una conexión a medias quede ocupando recursos para siempre.
+            let mut http = hyper::server::conn::http1::Builder::new();
+            http.timer(TokioTimer::new()).header_read_timeout(Duration::from_secs(10));
+            match tls {
+                Some(acceptor) => {
+                    let Ok(Ok(stream)) = tokio::time::timeout(Duration::from_secs(10), acceptor.accept(stream)).await else {
+                        return;
+                    };
+                    let _ = http.serve_connection(TokioIo::new(stream), service).await;
+                }
+                None => {
+                    let _ = http.serve_connection(TokioIo::new(stream), service).await;
+                }
+            }
+        });
+    }
+}
+
 /// Abre el puerto. Si no se puede, el proxy no arranca: mejor saberlo que quedarse sin métricas.
 #[allow(clippy::too_many_arguments)]
 pub async fn start(
@@ -165,34 +245,21 @@ pub async fn start(
         return Ok(());
     }
     let addr: SocketAddr = listen.parse().with_context(|| format!("admin_listen inválido: {listen}"))?;
+    // req: REQ-NF-14: fuera del equipo local, el puerto de administración solo se abre con TLS.
+    let tls = if cfg.admin_tls {
+        Some(load_or_generate_tls(&cfg.admin_tls_cert, &cfg.admin_tls_key, &addr)?)
+    } else if !addr.ip().is_loopback() {
+        bail!("admin_listen {addr} no es de bucle local y admin_tls está desactivado: el token viajaría sin cifrar por esa red (REQ-NF-14); active admin_tls o use 127.0.0.1");
+    } else {
+        None
+    };
     let token = load_or_create_token(&cfg.admin_token_file)?;
     let listener = TcpListener::bind(addr).await.with_context(|| format!("abriendo el puerto de administración {addr}"))?;
-    if !addr.ip().is_loopback() {
-        tracing::warn!("el puerto de administración escucha en {addr}: el token viaja sin cifrar por esa red");
-    }
-    tracing::info!("panel en http://{addr}/ y métricas en /metrics (token en {})", cfg.admin_token_file.display());
+    let scheme = if tls.is_some() { "https" } else { "http" };
+    tracing::info!("panel en {scheme}://{addr}/ y métricas en /metrics (token en {})", cfg.admin_token_file.display());
 
     let state = Arc::new(AdminState { token, stats, monitor, clients, detector, live, traffic, security });
-    tokio::spawn(async move {
-        loop {
-            let Ok((stream, peer)) = listener.accept().await else {
-                continue;
-            };
-            let state = state.clone();
-            tokio::spawn(async move {
-                let service = hyper::service::service_fn(move |req: Request<Incoming>| {
-                    let res = route(peer.ip(), req.method(), req.uri().path(), req.headers().get(header::AUTHORIZATION), &state);
-                    async move { Ok::<_, std::convert::Infallible>(res) }
-                });
-                // El límite evita que una conexión a medias quede ocupando recursos para siempre.
-                let _ = hyper::server::conn::http1::Builder::new()
-                    .timer(TokioTimer::new())
-                    .header_read_timeout(Duration::from_secs(10))
-                    .serve_connection(TokioIo::new(stream), service)
-                    .await;
-            });
-        }
-    });
+    tokio::spawn(serve(listener, state, tls));
     Ok(())
 }
 
@@ -231,6 +298,97 @@ mod tests {
 
     async fn body(res: Response<Full<Bytes>>) -> String {
         String::from_utf8(res.into_body().collect().await.unwrap().to_bytes().to_vec()).unwrap()
+    }
+
+    fn directorio_temporal(nombre: &str) -> std::path::PathBuf {
+        let d = std::env::temp_dir().join(format!("celeris-admin-{nombre}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        std::fs::create_dir_all(&d).unwrap();
+        d
+    }
+
+    /// Cliente TLS que solo confía en el certificado generado por el nodo (como `curl --cacert`).
+    async fn pedir_por_tls(addr: SocketAddr, cert_pem: &Path, peticion: &str) -> String {
+        use tokio::io::{AsyncReadExt, AsyncWriteExt};
+        use tokio_rustls::rustls::pki_types::ServerName;
+        use tokio_rustls::rustls::{ClientConfig, RootCertStore};
+        let mut roots = RootCertStore::empty();
+        for c in CertificateDer::pem_file_iter(cert_pem).unwrap() {
+            roots.add(c.unwrap()).unwrap();
+        }
+        let config = ClientConfig::builder_with_provider(Arc::new(aws_lc_rs::default_provider()))
+            .with_safe_default_protocol_versions()
+            .unwrap()
+            .with_root_certificates(roots)
+            .with_no_client_auth();
+        let conector = tokio_rustls::TlsConnector::from(Arc::new(config));
+        let tcp = tokio::net::TcpStream::connect(addr).await.unwrap();
+        let mut tls = conector.connect(ServerName::IpAddress(addr.ip().into()), tcp).await.expect("el certificado debe cubrir la IP");
+        tls.write_all(peticion.as_bytes()).await.unwrap();
+        let mut salida = Vec::new();
+        let _ = tls.read_to_end(&mut salida).await;
+        String::from_utf8_lossy(&salida).into_owned()
+    }
+
+    // req: REQ-NF-14
+    #[tokio::test]
+    async fn el_puerto_de_administracion_solo_habla_tls() {
+        use tokio::io::{AsyncReadExt, AsyncWriteExt};
+        let dir = directorio_temporal("tls");
+        let (cert, key) = (dir.join("admin.crt"), dir.join("admin.key"));
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        let acceptor = load_or_generate_tls(&cert, &key, &addr).unwrap();
+        tokio::spawn(serve(listener, Arc::new(state()), Some(acceptor)));
+
+        // Por TLS: /healthz responde y /metrics exige el token.
+        let sana = pedir_por_tls(addr, &cert, "GET /healthz HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n").await;
+        assert!(sana.starts_with("HTTP/1.1 200"), "{sana}");
+        let sin_token = pedir_por_tls(addr, &cert, "GET /metrics HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n").await;
+        assert!(sin_token.starts_with("HTTP/1.1 401"), "{sin_token}");
+        let con_token = pedir_por_tls(addr, &cert, &format!("GET /metrics HTTP/1.1\r\nHost: x\r\nAuthorization: Bearer {TOKEN}\r\nConnection: close\r\n\r\n")).await;
+        assert!(con_token.starts_with("HTTP/1.1 200"), "{con_token}");
+
+        // En claro: la conexión se cierra sin una sola respuesta HTTP y el token no se lee jamás.
+        let mut tcp = tokio::net::TcpStream::connect(addr).await.unwrap();
+        tcp.write_all(format!("GET /metrics HTTP/1.1\r\nHost: x\r\nAuthorization: Bearer {TOKEN}\r\n\r\n").as_bytes()).await.unwrap();
+        let mut recibido = Vec::new();
+        let _ = tokio::time::timeout(Duration::from_secs(5), tcp.read_to_end(&mut recibido)).await;
+        let texto = String::from_utf8_lossy(&recibido);
+        assert!(!texto.contains("HTTP/1.1") && !texto.contains("celeris_"), "una petición en claro no debe recibir respuesta: {texto}");
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    // req: REQ-NF-14
+    #[test]
+    fn la_llave_tls_generada_es_privada_y_el_certificado_no_se_regenera() {
+        let dir = directorio_temporal("llave");
+        let (cert, key) = (dir.join("a.crt"), dir.join("a.key"));
+        let addr: SocketAddr = "10.20.60.10:9128".parse().unwrap();
+        load_or_generate_tls(&cert, &key, &addr).unwrap();
+        let primera = std::fs::read(&cert).unwrap();
+        assert!(std::fs::read_to_string(&cert).unwrap().contains("BEGIN CERTIFICATE"));
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            assert_eq!(std::fs::metadata(&key).unwrap().permissions().mode() & 0o077, 0, "la llave solo debe poder leerla su dueño");
+        }
+        load_or_generate_tls(&cert, &key, &addr).unwrap();
+        assert_eq!(primera, std::fs::read(&cert).unwrap(), "con certificado y llave existentes no se genera otro");
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    // req: REQ-NF-14
+    #[tokio::test]
+    async fn fuera_del_equipo_local_sin_tls_no_arranca() {
+        let s = state();
+        let mut cfg = Config::default();
+        cfg.admin_listen = "0.0.0.0:0".into();
+        cfg.admin_tls = false;
+        let err = start(&cfg, s.stats.clone(), s.monitor.clone(), s.clients.clone(), s.detector.clone(), s.live.clone(), s.traffic.clone(), s.security.clone())
+            .await
+            .expect_err("un puerto de administración abierto a la red sin TLS debe rechazarse");
+        assert!(err.to_string().contains("REQ-NF-14"), "{err}");
     }
 
     #[test]

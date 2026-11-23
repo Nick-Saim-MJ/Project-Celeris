@@ -16,3 +16,43 @@ e2e/*.srl
 e2e/*.log
 e2e/*.cnf
 e2e/config.*.toml
+
+# Python (infra/)
+__pycache__/
+*.pyc
+
+# Laboratorio emulado: lo generado y los secretos de laboratorio no se versionan
+lab/generated/
+lab/.run/
+*.psk
+psk-*.conf
+.pytest_cache/
+lab/clab-celeris/
+
+# Evidencias de las pruebas: salidas, pcap y registros pueden contener el token de laboratorio; solo se versionan resultados.json y junit.xml
+evidencias/*/*/
+evidencias/*/*.pcap
+
+# OpenTofu: el estado puede contener las llaves de la VPN; solo se versiona .terraform.lock.hcl
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+
+# Herramientas descargadas (PlantUML); se obtienen con docs/software/e1/diagramas/render.py
+.tools/
+
+# e2e: llaves de la prueba de configuración firmada (REQ-F-17), generadas en cada ejecución
+e2e/firma*
+e2e/cfg-firmada/
+e2e/*-e2e.crt
+e2e/pac.err
+e2e/pac.generado
+
+# OpenTofu: estado, planes y caché de proveedores (el estado de la demo contiene llaves de la VPN)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log

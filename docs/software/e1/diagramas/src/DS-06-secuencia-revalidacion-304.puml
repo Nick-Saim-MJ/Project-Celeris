@@ -1,0 +1,48 @@
+@startuml DS-06-secuencia-revalidacion-304
+!include _estilo.iuml
+title DS-06 · Secuencia: revalidación de una copia vencida (REQ-F-04, implementado)
+caption «R1»: handler.rs (handle_request / handle_response) y store.rs (read_object, refresh).
+
+actor "Cliente\n(zona LAB)" as C
+box "celeris-node · EDGE01 10.20.60.10" #FFFFFF
+  participant "CacheHandler" as H <<R1>>
+  participant "Flights" as F <<R1>>
+  participant "Store" as S <<R1>>
+  participant "MemoryBudget" as M <<R1>>
+end box
+participant "Origen" as O
+
+C -> H : GET https://cdn.example/app.js
+activate H
+H -> S : get(key_hash)
+S --> H : Meta vencida, con ETag
+H -> F : enter(key_hash)
+F --> H : Leader(guard)
+H -> M : try_reserve(meta.size)
+alt sin memoria disponible
+  M --> H : None
+  H -> O : reenvío sin caché (Outcome::Bypass)
+end
+M --> H : Reservation
+H -> S : read_object(meta)
+alt hash no coincide (copia dañada)
+  S --> H : None → se pide el cuerpo completo (como un MISS)
+end
+S --> H : bytes verificados
+H -> O : GET /app.js + If-None-Match: "etag"\n+ If-Modified-Since
+alt 304 Not Modified
+  O --> H : 304
+  H -> S : refresh(key_hash, meta, ttl)
+  H --> C : 200 + x-celeris-cache: REVALIDATED\n(cuerpo desde la copia; ahorra la descarga)
+else 200 con contenido nuevo
+  O --> H : 200 + cuerpo nuevo
+  H -> S : put(key_hash, meta_nueva, body)
+  H --> C : 200 + x-celeris-cache: MISS
+end
+H -> F : drop(guard)
+deactivate H
+
+note over C, H : Si el propio cliente envía If-None-Match, el 304 es solo para él:\nno se coalesce ni se guarda (Outcome::Bypass).
+
+$pie("DS-06", "REQ-F-04, F-06, F-09, NF-04, NF-13", "CU-01", "P-02, P-03")
+@enduml

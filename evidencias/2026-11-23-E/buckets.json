@@ -1,0 +1,16 @@
+{
+  "aviso": "AWS emulado: plano de control, sin tráfico",
+  "datos": {
+    "Buckets": [
+      {
+        "Name": "celeris-backups",
+        "CreationDate": "2026-11-23T06:05:47.000Z",
+        "BucketArn": "arn:aws:s3:::celeris-backups"
+      }
+    ],
+    "Owner": {
+      "ID": "f7b11509f4d675c3c44f0dd37ca830bb02e8cfa58f04c46283c4bfcbdce1ff45"
+    },
+    "Prefix": null
+  }
+}

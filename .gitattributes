@@ -2,3 +2,8 @@
 *.sh text eol=lf
 # Wazuh lee estas reglas dentro de un contenedor Linux.
 siem/wazuh/* text eol=lf
+# Las plantillas de user_data de OpenTofu son scripts de bash (cloud-init) y el JSON generado se compara byte a byte.
+*.tftpl text eol=lf
+deploy/opentofu/envs/demo/diseno.auto.tfvars.json text eol=lf
+# pen.dev guarda sus documentos con LF: se conservan tal cual en cualquier sistema.
+*.pen text eol=lf

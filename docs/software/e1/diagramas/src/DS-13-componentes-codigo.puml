@@ -1,0 +1,62 @@
+@startuml DS-13-componentes-codigo
+!include _estilo.iuml
+title DS-13 · Componentes C3 de celeris-node → archivos del código y crate destino
+caption «R1» el componente existe (archivos indicados) · «R2» no existe aún · crate destino según el plan de refactorización de C3.3
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor $INK
+  BackgroundColor<<R2>> $R2FILL
+  BorderColor<<R2>> $ACCENT
+}
+left to right direction
+
+package "celeris-node (binario)" {
+  [ingress\nhandler.rs · access.rs (ClientGate)] as ING <<R1>>
+  [admin\nadmin.rs · panel/ (puerto 9128;\nTLS propio pendiente, REQ-NF-14)] as ADM <<R1>>
+  [notice\nnotice.rs] as NOT <<R1>>
+  [agent\nenrolamiento, bundles firmados] as AG <<R2>>
+}
+package "celeris-tls" {
+  [tls\nhandler.rs (tls_decision) · ca.rs · secure.rs] as TLS <<R1>>
+  [upstream\nupstream.rs (GuardedResolver)] as UP <<R1>>
+}
+package "celeris-core" {
+  [policy\nconfig.rs · policy.rs (KeyNormalizer)] as POL <<R1>>
+  [privacy\npolicy.rs (strip_client_identity)] as PRV <<R1>>
+}
+package "celeris-store" {
+  [cache.index\nstore.rs (moka + DiskIndex)] as IDX <<R1>>
+  [cache.coalesce\ncoalesce.rs] as COA <<R1>>
+  [cache.store\nstore.rs (CAS SHA-256) · memory.rs] as ST <<R1>>
+  [cache.range\nREQ-F-08] as RG <<R2>>
+}
+package "celeris-security" {
+  [security\ndetect.rs · security.rs · clients.rs] as SEC <<R1>>
+}
+package "celeris-telemetry" {
+  [telemetry\nstats.rs · access_log.rs · live.rs · monitor.rs] as TEL <<R1>>
+}
+
+ING --> TLS
+TLS --> POL
+POL --> IDX
+IDX --> COA
+COA --> PRV
+PRV --> UP
+IDX --> ST
+ST --> RG
+POL --> SEC
+ING --> TEL
+ADM --> TEL
+NOT --> POL
+AG --> POL
+AG --> TLS
+
+note bottom of UP
+  Proxy padre / shield EC2-SHIELD 10.30.10.10:8443
+  con mTLS (REQ-F-29, flujo F9) es R2.
+end note
+
+$pie("DS-13", "REQ-F-01…F-15, F-28, NF-09, NF-10", "CU-01", "P-02, P-03, P-06, P-09")
+@enduml

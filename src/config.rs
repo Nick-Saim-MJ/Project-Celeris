@@ -59,6 +59,13 @@ pub struct Config {
     pub admin_listen: String,
     /// Archivo con el token de administración. Si no existe, se genera al arrancar.
     pub admin_token_file: PathBuf,
+    /// Sirve el puerto de administración solo por TLS (REQ-NF-14): el token nunca viaja en claro. Es obligatorio si
+    /// `admin_listen` no es de bucle local; una conexión HTTP en claro se cierra sin respuesta.
+    pub admin_tls: bool,
+    /// Certificado y llave del puerto de administración. Si no existen, se genera un certificado autofirmado de laboratorio
+    /// (con la IP de `admin_listen` y `localhost`) para que el cliente lo fije como ancla de confianza.
+    pub admin_tls_cert: PathBuf,
+    pub admin_tls_key: PathBuf,
     /// Espacio máximo de la caché en disco. Al llegar a él se borra lo usado hace más tiempo (0 = sin límite).
     pub max_disk_bytes: u64,
     /// Cada cuántos segundos se guardan los contadores y se evalúan las alertas.
@@ -101,6 +108,41 @@ pub struct Config {
     pub access_log_retention_days: u64,
     /// Qué se anota sobre el cliente. La IP real no es una opción.
     pub access_log_client_ip: ClientIpMode,
+    /// REQ-F-29: proxy padre (shield) `host:puerto` al que se envían las peticiones que saldrían a Internet. Se le habla por TLS y con
+    /// certificado de cliente (mTLS); sin `upstream_parent_cert` y `upstream_parent_key` el nodo no arranca. Vacío = salida directa.
+    pub upstream_parent: String,
+    /// Certificado y llave de cliente con los que este nodo se presenta al shield. La CA del shield va en `upstream_extra_ca`.
+    pub upstream_parent_cert: PathBuf,
+    pub upstream_parent_key: PathBuf,
+    /// REQ-F-29, lado shield: dirección `ip:puerto` donde se acepta TLS con certificado de cliente obligatorio. Las peticiones, ya
+    /// descifradas, pasan al proxy de `listen`, que debe ser de bucle local. Vacío = modo shield apagado.
+    pub shield_listen: String,
+    pub shield_cert: PathBuf,
+    pub shield_key: PathBuf,
+    /// CA que debe haber emitido el certificado de cada nodo que se conecta al shield.
+    pub shield_client_ca: PathBuf,
+    /// REQ-F-27: rutas señuelo. Pedir una de ellas (por ella o por un prefijo) genera el evento `honey_url` y devuelve 404; ningún usuario
+    /// legítimo las pide.
+    pub honey_urls: Vec<String>,
+    /// REQ-F-36: redes de origen BYOD (el Wi-Fi de estudiantes). El tráfico de estos clientes nunca se descifra, aunque el dominio esté
+    /// en `intercept_domains`.
+    pub byod_networks: Vec<String>,
+    /// REQ-F-17: archivo `config.toml` firmado por la consola; la firma (ed25519, hex) está en `<archivo>.sig`. Se recarga por intervalo o con SIGHUP.
+    pub signed_config: Option<PathBuf>,
+    /// Llave pública ed25519 (32 bytes en hexadecimal) fijada en el arranque. Solo se lee de la configuración de arranque.
+    pub config_public_key: Option<PathBuf>,
+    /// Cada cuántos segundos se revisa `signed_config`.
+    pub config_reload_secs: u64,
+    /// Versión de la configuración. Una configuración firmada con una versión menor que la aplicada se rechaza.
+    pub config_version: u64,
+    /// REQ-F-26: nodos del PAC, `ip:puerto`, en orden de preferencia. El PAC termina siempre en `DIRECT` como respaldo.
+    pub pac_nodes: Vec<String>,
+    /// REQ-F-26: redes (CIDR) que el PAC manda por `DIRECT` sin pasar por el proxy.
+    pub pac_direct_networks: Vec<String>,
+    /// REQ-F-26: nombre con el que se sirve el PAC; también va por `DIRECT`.
+    pub pac_host: String,
+    /// REQ-F-26: dirección `ip:puerto` donde el nodo sirve `/wpad.dat`. Vacío = no se sirve (se puede generar con `celeris-cache pac`).
+    pub pac_listen: String,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -179,6 +221,9 @@ impl Default for Config {
             upstream_extra_ca: vec![],
             admin_listen: "127.0.0.1:9128".into(),
             admin_token_file: "./ca/admin.token".into(),
+            admin_tls: false,
+            admin_tls_cert: "./ca/admin-tls.crt".into(),
+            admin_tls_key: "./ca/admin-tls.key".into(),
             max_disk_bytes: 10 * 1024 * 1024 * 1024,
             maintenance_interval_secs: 60,
             alert_disk_free_percent: 10,
@@ -199,6 +244,23 @@ impl Default for Config {
             access_log_dir: "./logs".into(),
             access_log_retention_days: 7,
             access_log_client_ip: ClientIpMode::Pseudonym,
+            upstream_parent: String::new(),
+            upstream_parent_cert: "./ca/parent-client.crt".into(),
+            upstream_parent_key: "./ca/parent-client.key".into(),
+            shield_listen: String::new(),
+            shield_cert: "./ca/shield.crt".into(),
+            shield_key: "./ca/shield.key".into(),
+            shield_client_ca: "./ca/shield-clients-ca.crt".into(),
+            honey_urls: vec![],
+            byod_networks: vec![],
+            signed_config: None,
+            config_public_key: None,
+            config_reload_secs: 15,
+            config_version: 0,
+            pac_nodes: vec![],
+            pac_direct_networks: vec![],
+            pac_host: String::new(),
+            pac_listen: String::new(),
         }
     }
 }
@@ -219,20 +281,6 @@ impl Config {
             tracing::info!("config por defecto escrita en {}", path.display());
             Ok(cfg)
         }
-    }
-
-    pub fn should_intercept(&self, host: &str) -> bool {
-        if self.is_never_intercept(host) {
-            return false;
-        }
-        let host = canonical_host(host);
-        self.intercept_domains.iter().any(|s| matches_suffix(&host, s))
-    }
-
-    /// Dominios protegidos: no se descifran ni se cachean, tampoco por HTTP plano.
-    pub fn is_never_intercept(&self, host: &str) -> bool {
-        let host = canonical_host(host);
-        self.never_intercept.iter().any(|s| matches_suffix(&host, s))
     }
 }
 

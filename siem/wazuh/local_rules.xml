@@ -43,6 +43,15 @@
     <group>access_denied,attack,</group>
   </rule>
 
+  <!-- Honey-URL (REQ-F-27, DET-07): nadie legítimo pide una ruta señuelo -->
+  <rule id="100135" level="12">
+    <if_sid>100100</if_sid>
+    <field name="event">^honey_url$</field>
+    <description>celeris-cache: se pidió la honey-URL $(path) desde $(srcip)</description>
+    <mitre><id>T1595.003</id></mitre>
+    <group>recon,attack,</group>
+  </rule>
+
   <!-- Puerto de administración -->
   <rule id="100120" level="5">
     <if_sid>100100</if_sid>
@@ -367,6 +376,65 @@
     <description>celeris-cache: ráfaga de ICMP desde $(srcip), posible ping flood o ping de la muerte fragmentado</description>
     <mitre><id>T1498.001</id></mitre>
     <group>dos,attack,</group>
+  </rule>
+
+</group>
+
+<!--
+  Reglas del laboratorio emulado (Modo L, Parte F4): una por detección de D1.14 que el laboratorio puede producir. Los archivos JSON de
+  cada nodo los lee su agente de Wazuh (F13). Nivel 10 o más = ataque probable (criterio de D1.14: cada escenario produce una alerta ≥ 10).
+-->
+<group name="celeris,lab,">
+
+  <!-- DET-02: Suricata IDS (IDS01), regla local de escaneo SYN (en S2: firmas ET SCAN) -->
+  <rule id="100300" level="10">
+    <if_sid>86601</if_sid>
+    <field name="alert.signature_id">^9000001$</field>
+    <description>Suricata (IDS01): escaneo SYN desde $(src_ip) hacia $(dest_ip)</description>
+    <mitre><id>T1046</id></mitre>
+    <group>attack,scan,</group>
+  </rule>
+
+  <!-- DET-05: canario interno (HNY02): cualquier conexión a sus puertos es una alerta -->
+  <rule id="100301" level="10">
+    <decoded_as>json</decoded_as>
+    <field name="evento">^conexion$</field>
+    <description>Canario interno (HNY02): conexión al puerto $(puerto) desde $(origen)</description>
+    <mitre><id>T1046</id></mitre>
+    <group>attack,scan,</group>
+  </rule>
+
+  <!-- DET-04: Cowrie (HNY01) -->
+  <rule id="100302" level="10">
+    <decoded_as>json</decoded_as>
+    <field name="eventid" type="pcre2">^cowrie\.(login\.(failed|success)|session\.connect)$</field>
+    <description>Cowrie (HNY01): $(eventid) desde $(src_ip)</description>
+    <mitre><id>T1110</id></mitre>
+    <group>attack,honeypot,</group>
+  </rule>
+
+  <!-- DET-03: WAF (WAF01): ModSecurity bloqueó la petición con 403 -->
+  <rule id="100303" level="10">
+    <decoded_as>json</decoded_as>
+    <field name="transaction.response.http_code">^403$</field>
+    <description>WAF01 (ModSecurity): petición bloqueada (403) desde $(transaction.client_ip)</description>
+    <mitre><id>T1190</id></mitre>
+    <group>attack,web,</group>
+  </rule>
+
+  <!-- DET-08: CrowdSec (FW01) bloqueó una IP; el evento llega por el syslog por TLS de F14 -->
+  <rule id="100305" level="10">
+    <match>fw01sim CROWDSEC ban</match>
+    <description>CrowdSec (FW01): IP bloqueada por comportamiento abusivo</description>
+    <mitre><id>T1110</id></mitre>
+    <group>attack,crowdsec,</group>
+  </rule>
+
+  <!-- F14: syslog de FW01 por TLS (6514): una denegación recibida -->
+  <rule id="100304" level="5">
+    <match>fw01sim DENEGADO</match>
+    <description>FW01 (syslog por TLS): denegación registrada</description>
+    <group>firewall,</group>
   </rule>
 
 </group>

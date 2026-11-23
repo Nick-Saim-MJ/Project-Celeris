@@ -1,0 +1,10 @@
+// GENERADO por infra/gen desde infra/inventory.yaml — no editar a mano. EMULADO (Modo L, Parte F4.2): no es el producto real.
+// REQ-F-26 · F1 (proxy explícito) · D-05: PAC por URL fija; sin autodescubrimiento.
+// Nodos: EDGE01, EDGE02. Si ambos caen, el navegador usa DIRECT (F6, solo piloto).
+function FindProxyForURL(url, host) {
+  if (isPlainHostName(host) || host === "localhost" || host === "pac.celeris.internal") return "DIRECT";
+  if (isInNet(host, "127.0.0.0", "255.0.0.0")) return "DIRECT";
+  if (isInNet(host, "10.20.0.0", "255.252.0.0")) return "DIRECT";
+  if (isInNet(host, "10.30.0.0", "255.255.0.0")) return "DIRECT";
+  return "PROXY 10.20.60.10:3128; PROXY 10.20.60.11:3128; DIRECT";
+}

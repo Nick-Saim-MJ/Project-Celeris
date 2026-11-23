@@ -1,0 +1,40 @@
+@startuml DS-08-secuencia-enrolamiento-nodo
+!include _estilo.iuml
+title DS-08 · Secuencia: registro (enrolamiento) de un nodo nuevo (CU-04)
+caption Todo «R2 — diseño». Flujo F10 del inventario: EDGE01/02 → CTRL01 TCP 8443 con mTLS. Pantalla P-05 «Registrar nodo».
+
+actor "Operador" as OP
+participant "Nodo nuevo\nEDGE02 10.20.60.11" as N <<R2>>
+box "celeris-control · CTRL01 10.20.20.10" #E8F1FB
+  participant "NodesApi" as API <<R2>>
+  participant "EnrollmentService" as ES <<R2>>
+  participant "Pki (step-ca)" as PKI <<R2>>
+end box
+database "PostgreSQL\nDB01 10.20.20.11" as DB
+
+OP -> API : P-05 «Registrar nodo» (sesión OIDC)
+API -> ES : crear registro pendiente
+ES -> DB : INSERT node (estado = Aprovisionado); audit_log
+ES --> OP : token de un solo uso con vencimiento corto [S-20]
+OP -> N : instalar imagen OCI firmada (REQ-NF-15)\ny entregar el token por un canal fuera de banda
+
+N -> N : generar llave mTLS y llave de la CA intermedia\n(no salen del nodo, REQ-NF-05)
+N -> API : POST /v1/nodes/enroll {CSR mTLS, CSR CA, token}\n(TLS al puerto 8443)
+API -> ES : enroll(csr, token)
+ES -> ES : validar token (un uso, no vencido)
+alt token inválido, vencido o ya usado
+  ES --> N : 401; evento de seguridad al SIEM
+end
+ES -> PKI : firmar certificado mTLS del nodo
+ES -> PKI : issue_node_ca(nodo, dominios vigentes) con Name Constraints (REQ-F-18)
+PKI --> ES : certificados
+ES -> DB : UPDATE node (estado = Enrolado); INSERT node_ca; audit_log
+ES --> N : certificado mTLS + CA intermedia
+N -> API : GET /v1/nodes/{id}/bundle (ya con mTLS)
+API --> N : bundle firmado vigente
+N -> N : verificar firma y aplicar (REQ-RN-08)
+N -> API : heartbeat {version_config}
+API -> DB : UPDATE node (estado = Activo, last_seen)
+
+$pie("DS-08", "REQ-F-16, F-18, RN-08, NF-05, NF-15", "CU-04", "P-05, P-07")
+@enduml

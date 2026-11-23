@@ -1,0 +1,522 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "celeris/trazabilidad.schema.json",
+  "title": "Trazabilidad y rúbrica (CE0311)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "meta",
+    "objetivos",
+    "amenazas",
+    "detecciones",
+    "docx_secciones",
+    "figuras",
+    "artefactos",
+    "rubrica",
+    "correspondencia_contenidos",
+    "supuestos",
+    "decisiones",
+    "requisitos"
+  ],
+  "properties": {
+    "meta": {
+      "type": "object"
+    },
+    "objetivos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "objetivo",
+          "indicador",
+          "meta",
+          "responsable"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^OD-\\d{2}$"
+          },
+          "objetivo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "indicador": {
+            "type": "string",
+            "minLength": 1
+          },
+          "meta": {
+            "type": "string",
+            "minLength": 1
+          },
+          "responsable": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "amenazas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "zona_activo",
+          "stride",
+          "amenaza",
+          "control",
+          "iso_27002",
+          "componentes",
+          "pruebas"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^AM-\\d{2}$"
+          },
+          "zona_activo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "stride": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "S",
+                "T",
+                "R",
+                "I",
+                "D",
+                "E"
+              ]
+            },
+            "minItems": 1
+          },
+          "amenaza": {
+            "type": "string",
+            "minLength": 1
+          },
+          "control": {
+            "type": "string",
+            "minLength": 1
+          },
+          "iso_27002": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+$"
+            },
+            "minItems": 1
+          },
+          "componentes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*$"
+            }
+          },
+          "pruebas": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^T(0[1-9]|[1-9][0-9])$"
+            }
+          },
+          "prueba_justificacion": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pendiente": {
+            "type": "boolean"
+          },
+          "cambio": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^CI-\\d{2}$"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^CI-\\d{2}$"
+                },
+                "minItems": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    "detecciones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "tecnologia",
+          "ubicacion",
+          "ubicacion_detalle",
+          "que_detecta",
+          "attack",
+          "validacion"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^DET-\\d{2}$"
+          },
+          "tecnologia": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ubicacion": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*$"
+          },
+          "ubicacion_detalle": {
+            "type": "string",
+            "minLength": 1
+          },
+          "que_detecta": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attack": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^T\\d{4}(\\.\\d{3})?$"
+            }
+          },
+          "validacion": {
+            "type": "object",
+            "required": [
+              "escenario",
+              "pruebas"
+            ],
+            "properties": {
+              "escenario": {
+                "type": "string",
+                "minLength": 1
+              },
+              "pruebas": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^T(0[1-9]|[1-9][0-9])$"
+                }
+              }
+            }
+          },
+          "pendiente": {
+            "type": "boolean"
+          },
+          "cambio": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^CI-\\d{2}$"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^CI-\\d{2}$"
+                },
+                "minItems": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    "docx_secciones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "titulo"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d+)?$"
+          },
+          "titulo": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "figuras": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "titulo",
+          "leyenda",
+          "seccion_docx",
+          "muestra"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^FIG-\\d\\.\\d(a|b)?$"
+          },
+          "titulo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "leyenda": {
+            "type": "string",
+            "minLength": 1
+          },
+          "seccion_docx": {
+            "type": "string",
+            "minLength": 1
+          },
+          "muestra": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pendiente": {
+            "type": "boolean"
+          },
+          "cambio": {
+            "oneOf": [
+              {
+                "type": "string",
+                "pattern": "^CI-\\d{2}$"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^CI-\\d{2}$"
+                },
+                "minItems": 1
+              }
+            ]
+          }
+        }
+      }
+    },
+    "artefactos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "descripcion"
+        ]
+      }
+    },
+    "rubrica": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {
+        "pattern": "^R[1-8]$"
+      },
+      "minProperties": 8,
+      "maxProperties": 8,
+      "patternProperties": {
+        "^R[1-8]$": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "nombre",
+            "peso",
+            "descriptor_nivel_4",
+            "evidencias"
+          ],
+          "properties": {
+            "nombre": {
+              "type": "string",
+              "minLength": 1
+            },
+            "peso": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "descriptor_nivel_4": {
+              "type": "string",
+              "minLength": 1
+            },
+            "elementos_evaluados": {
+              "type": "array",
+              "description": "Elementos del criterio que la matriz de pruebas debe cubrir (cada uno con ≥ 1 prueba).",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "elemento", "pruebas"],
+                "properties": {
+                  "id": {"type": "string", "pattern": "^R[1-8]-\\d{2}$"},
+                  "elemento": {"type": "string", "minLength": 1},
+                  "pruebas": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^T(0[1-9]|[1-9][0-9])$"}}
+                }
+              }
+            },
+            "evidencias": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "tipo",
+                  "ref"
+                ],
+                "properties": {
+                  "tipo": {
+                    "enum": [
+                      "seccion_docx",
+                      "figura",
+                      "hoja_xlsx",
+                      "prueba",
+                      "inventario",
+                      "demo"
+                    ]
+                  },
+                  "ref": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "detalle": {
+                    "type": "string"
+                  }
+                }
+              },
+              "minItems": 1
+            }
+          }
+        }
+      }
+    },
+    "correspondencia_contenidos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "n",
+          "d1",
+          "contenido",
+          "secciones_docx"
+        ],
+        "properties": {
+          "n": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 15
+          },
+          "d1": {
+            "type": "string",
+            "minLength": 1
+          },
+          "contenido": {
+            "type": "string",
+            "minLength": 1
+          },
+          "secciones_docx": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          }
+        }
+      },
+      "minItems": 15,
+      "maxItems": 15
+    },
+    "correspondencia_adicional": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "correspondencia_pendiente": {
+      "type": "boolean"
+    },
+    "defensa_profundidad": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["capa", "controles", "detalle"],
+        "additionalProperties": false,
+        "properties": {
+          "capa": { "type": "string", "minLength": 1 },
+          "controles": { "type": "string", "minLength": 1 },
+          "detalle": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "correspondencia_cambio": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^CI-\\d{2}$"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^CI-\\d{2}$"
+          },
+          "minItems": 1
+        }
+      ]
+    },
+    "supuestos": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^S-\\d{2}$"
+      },
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "supuesto",
+          "valor",
+          "validacion",
+          "responsable"
+        ]
+      }
+    },
+    "decisiones": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^D-\\d{2}$"
+      },
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "decision"
+        ]
+      }
+    },
+    "requisitos": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^REQ-(F|NF|RN)-\\d{2}$"
+      },
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

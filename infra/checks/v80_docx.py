@@ -213,7 +213,10 @@ def run(infra):
 
     # ------------------------------------------------------------------ V-85
     h = []
-    imagenes = len(doc.inline_shapes)
+    # Los logos de la portada institucional no son figuras: solo se cuentan las imágenes desde la tabla de contenidos.
+    hijos = list(doc.element.body.iterchildren())
+    toc = next((i for i, e in enumerate(hijos) if "".join(e.itertext()).strip().startswith("Tabla de contenidos")), 0)
+    imagenes = sum(1 for e in hijos[toc:] for x in e.iter() if isinstance(x.tag, str) and x.tag.endswith("}drawing"))
     figs = infra.traz["figuras"]
     if imagenes != len(figs):
         h.append(E(f"El informe tiene {imagenes} imágenes; trazabilidad.yaml declara {len(figs)} figuras", GENERAR))

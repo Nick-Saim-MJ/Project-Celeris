@@ -79,7 +79,7 @@
 | V-86 | Informe: cifras repetidas coherentes con la fuente | PASA | 7 VLAN · 31 componentes · T05 27,2 s · T09 8,7 s |
 | V-87 | Informe: evidencia citada para cada criterio de la rúbrica | PASA | criterios con toda su evidencia: R1, R2, R3, R4, R5, R6, R7, R8 |
 | V-88 | Informe: marcas [COMPLETAR] pendientes | PASA | 0 pendientes |
-| V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.1 · commit bb7172a |
+| V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.1 · commit 9620c3d |
 
 ## Errores
 

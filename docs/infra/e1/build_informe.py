@@ -58,16 +58,21 @@ TAM_TEXTO = 10.5
 TAM_TABLA = 8.5
 COMPLETAR = "[COMPLETAR"
 MARCO_COMUN = RAIZ / "docs" / "celeris" / "Celeris-00-Marco-Comun.md"
+PORTADA = AQUI / "portada-upeu.docx"      # portada institucional (UPeU, logos); su texto variable lo pone portada()
 AREA = "Infraestructura Tecnológica"
 
 
-def equipo() -> str:
+def equipo_lista() -> list[str]:
     """Nombres completos de los autores: el campo `equipo` del encabezado del Marco común (no los nombres de usuario de git)."""
     m = re.search(r"^equipo:\s*\[(.*?)\]\s*$", MARCO_COMUN.read_text(encoding="utf-8"), re.M)
     nombres = re.findall(r'"([^"]+)"', m.group(1)) if m else []
     if not nombres:
         raise SystemExit(f"no hay `equipo` en el encabezado de {MARCO_COMUN}")
-    return " y ".join(nombres)
+    return nombres
+
+
+def equipo() -> str:
+    return " y ".join(equipo_lista())
 
 
 FUENTES = ("infra/inventory.yaml", "infra/pruebas.yaml", "infra/trazabilidad.yaml")
@@ -891,26 +896,74 @@ class Constructor:
 
     # ---------------------------------------------------------------- plantilla
     def portada(self):
-        par = self.doc.paragraphs
+        """Sustituye la portada de la plantilla por la institucional (portada-upeu.docx: escuela, logos, título) y le pone lo que
+        sale de la fuente: área y responsables (equipo del Marco común) y la versión del inventario con su commit (V-89)."""
+        import io
+        from copy import deepcopy
+        cuerpo = self.doc.element.body
+        hijos = list(cuerpo.iterchildren())
+        fin = next(i for i, e in enumerate(hijos) if e.tag == qn("w:p") and e.xpath("./w:r/w:br[@w:type='page']"))
+        for e in hijos[:fin]:
+            cuerpo.remove(e)
+        origen = Document(str(PORTADA))
+        # Estilos de la portada que la plantilla no trae (p. ej. «Normal (Web)»).
+        ids = {st.get(qn("w:styleId")) for st in self.doc.styles.element.findall(qn("w:style"))}
+        for st in origen.styles.element.findall(qn("w:style")):
+            if st.get(qn("w:styleId")) not in ids:
+                self.doc.styles.element.append(deepcopy(st))
+        elementos = [deepcopy(e) for e in origen.element.body.iterchildren() if e.tag != qn("w:sectPr")]
+
+        def vacio(e):
+            return not "".join(e.xpath(".//w:t/text()")).strip() and not e.xpath(".//w:drawing")
+        while elementos and vacio(elementos[-1]):     # los párrafos vacíos del final empujarían el salto de página a una hoja en blanco
+            elementos.pop()
+        k0 = next(k for k, e in enumerate(elementos) if "".join(e.xpath(".//w:t/text()")).startswith("Juliaca"))
+        if k0 >= 2 and vacio(elementos[k0 - 1]) and vacio(elementos[k0 - 2]):
+            del elementos[k0 - 1]                     # hace sitio a la línea de versión
+        for e in elementos:                       # las imágenes (logos) viajan con su relación
+            for blip in e.xpath(".//a:blip"):
+                rid = blip.get(qn("r:embed"))
+                blob = origen.part.related_parts[rid].blob
+                nuevo_rid, _ = self.doc.part.get_or_add_image(io.BytesIO(blob))
+                blip.set(qn("r:embed"), nuevo_rid)
+        ancla = next(iter(cuerpo.iterchildren()))
+        for e in elementos:
+            ancla.addprevious(e)
+        from docx.text.paragraph import Paragraph
+        parrafos = [Paragraph(e, self.doc._body) for e in elementos if e.tag == qn("w:p")]
+        textos = [p.text.strip() for p in parrafos]
 
         def poner(p, texto):
             runs = p.runs
             runs[0].text = texto
             for r in runs[1:]:
                 r._r.getparent().remove(r._r)
-        for p in par[:12]:
-            t = p.text
-            if t.startswith("Plantilla y guía"):
-                poner(p, "Informe de análisis y diseño de red — Celeris Edge")
-            elif t.startswith("Preparado por"):
-                poner(p, f"Preparado por: {equipo()}")
-            elif t.startswith("Docente / curso"):
-                poner(p, f"Área: {AREA}")
-            elif t.startswith("Análisis y Diseño de Red"):
-                pass
-            elif re.fullmatch(r"20\d\d", t.strip()):
-                meta = self.x.inv["meta"]
-                poner(p, f"Versión {meta['inventario_version']} · inventario {meta['fecha']} · commit {commit_fuente()}")
+
+        def viñeta(p, texto):
+            """La plantilla no trae la numeración de la lista de la portada: la viñeta se escribe como texto con sangría francesa."""
+            poner(p, "•	" + texto)
+            ppr = p._p.get_or_add_pPr()
+            for n in ppr.findall(qn("w:numPr")):
+                ppr.remove(n)
+            p.paragraph_format.left_indent = Cm(1.27)
+            p.paragraph_format.first_line_indent = Cm(-0.63)
+        i = next(k for k, t in enumerate(textos) if t.startswith("ÁREA"))
+        poner(parrafos[i + 1], AREA)
+        j = next(k for k, t in enumerate(textos) if t.startswith("RESPONSABLES"))
+        nombres = equipo_lista()
+        modelo = parrafos[j + 1]
+        for k, nombre in enumerate(nombres):
+            if j + 1 + k < len(parrafos) and parrafos[j + 1 + k].text.strip() and not parrafos[j + 1 + k].text.startswith("SGSI"):
+                viñeta(parrafos[j + 1 + k], nombre)
+            else:                                  # más autores que párrafos: se clona el primero
+                nuevo_p = deepcopy(modelo._p)
+                parrafos[j + k]._p.addnext(nuevo_p)
+                viñeta(Paragraph(nuevo_p, self.doc._body), nombre)
+        k = next(k for k, t in enumerate(textos) if t.startswith("Juliaca"))
+        meta = self.x.inv["meta"]
+        version = deepcopy(parrafos[k]._p)
+        parrafos[k]._p.addnext(version)
+        poner(Paragraph(version, self.doc._body), f"Versión {meta['inventario_version']} · inventario {meta['fecha']} · commit {commit_fuente()}")
 
     def limpiar_guia(self):
         """Quita texto guía y tablas de ejemplo; deja títulos de sección, el campo TOC y los saltos de página."""

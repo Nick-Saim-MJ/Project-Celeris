@@ -382,9 +382,7 @@ mod tests {
     #[tokio::test]
     async fn fuera_del_equipo_local_sin_tls_no_arranca() {
         let s = state();
-        let mut cfg = Config::default();
-        cfg.admin_listen = "0.0.0.0:0".into();
-        cfg.admin_tls = false;
+        let cfg = Config { admin_listen: "0.0.0.0:0".into(), admin_tls: false, ..Config::default() };
         let err = start(&cfg, s.stats.clone(), s.monitor.clone(), s.clients.clone(), s.detector.clone(), s.live.clone(), s.traffic.clone(), s.security.clone())
             .await
             .expect_err("un puerto de administración abierto a la red sin TLS debe rechazarse");

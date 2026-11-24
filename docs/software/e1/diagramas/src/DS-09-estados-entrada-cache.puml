@@ -34,5 +34,5 @@ note right of Fresca
   ni se sirve si la petición trae Authorization o Cookie (REQ-RN-02).
 end note
 
-$pie("DS-09", "REQ-F-03, F-04, F-05, F-06, F-09, RN-01, RN-02, NF-04", "CU-01", "P-02, P-03")
+$pie("DS-09", "REQ-F-03, F-04, F-05, F-06, F-09, RN-01, RN-02, NF-04", "CU-01", "P-02, P-05, P-11")
 @enduml

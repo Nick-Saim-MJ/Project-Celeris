@@ -86,7 +86,7 @@ skinparam entity {
 
 ' Pie de trazabilidad uniforme: ID del diagrama, requisitos, casos de uso y pantallas.
 !procedure $pie($id, $req, $cu, $pant)
-footer $id · Requisitos: $req · Casos de uso: $cu · Pantallas: $pant · Fuente: documento maestro C4 y código en src/
+footer $id · Requisitos: $req · Casos de uso: $cu · Pantallas: $pant · Fuente: CE02 v0.4 C4, Arquitectura v0.4 y código en src/
 !endprocedure
 
 skinparam database {

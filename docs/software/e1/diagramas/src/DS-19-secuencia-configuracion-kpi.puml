@@ -1,0 +1,47 @@
+@startuml DS-19-secuencia-configuracion-kpi
+!include _estilo.iuml
+title DS-19 · Secuencia: un cambio de laboratorio llega firmado a los nodos y vuelven los KPI (F10, CU-04 + CU-06)
+caption «R2 — diseño»: consola y agente del nodo. El control de rangos en el nodo ya existe (REQ-F-10, hoy en config.toml). Pantallas: P-04, P-08, P-11.
+
+actor "Encargado LAB-03\n(ENC01 10.20.35.10)" as E
+box "celeris-console · CTRL01 10.20.20.10" #E8F1FB
+  participant "LabsService\n+ Rbac" as LAB <<R2>>
+  participant "Publisher\n+ FirmaEd25519" as PUB <<R2>>
+  participant "AuditLog" as AUD <<R2>>
+  participant "ReportsService" as REP <<R2>>
+end box
+participant "celeris-node\nEDGE01 10.20.60.10" as N1 <<R2>>
+participant "celeris-node\nEDGE02 10.20.60.11" as N2 <<R2>>
+
+E -> LAB : PATCH /v1/laboratorios/3 {habilitado, horario Lun–Vie 07–22, Sáb 08–13} (F28)
+LAB -> LAB : RBAC: LAB-03 asignado (REQ-RN-06) · el rango /26 no se edita
+LAB -> AUD : registrar antes y después (REQ-F-24)
+LAB -> PUB : compilar()
+PUB -> PUB : v44 = laboratorios + fuentes activas + precargas\n+ WIFI-EST en «nunca» (REQ-RN-11) · firma ed25519 (D-11)
+PUB -> AUD : registrar «Publicar v44»
+LAB --> E : 200 · «la configuración v44 llega a los nodos en ≤ 60 s»
+
+par EDGE01 (cada 30 s)
+  N1 -> PUB : GET /v1/nodos/EDGE01/config?desde=43 (F10, 8443 mTLS)
+  PUB --> N1 : v44 firmada
+  N1 -> N1 : verificar firma (REQ-RN-08)\nrechazar si habilita descifrado para BYOD (REQ-RN-11)
+  alt firma válida y configuración coherente
+    N1 -> N1 : aplicar allowed_clients: rango /26 de LAB-03 con su horario
+  else firma inválida o error al aplicar
+    N1 -> N1 : seguir con v43 (REQ-F-17)
+  end
+  N1 -> REP : POST /v1/nodos/EDGE01/kpi · version_aplicada, agregados de 30 s por laboratorio
+else EDGE02 (cada 30 s)
+  N2 -> PUB : GET /v1/nodos/EDGE02/config?desde=43 (F10)
+  PUB --> N2 : v44 firmada
+  N2 -> N2 : verificar y aplicar
+  N2 -> REP : POST /v1/nodos/EDGE02/kpi
+end
+
+REP -> AUD : «EDGE01 aplicó v44 (29 s) · EDGE02 (40 s)»: detalle de P-08 (REQ-NF-16)
+REP --> E : P-11: peticiones, HIT/MISS/BYPASS y 403 por laboratorio y nodo
+
+note over N1, N2 : Fuera del horario el nodo responde 403 a ese rango (T52). Los KPI no llevan URL, IP de equipos ni usuarios (REQ-NF-07).
+
+$pie("DS-19", "REQ-F-10, F-13, F-17, F-24, F-32, NF-07, NF-13, NF-16, RN-06, RN-08, RN-11", "CU-04, CU-06", "P-04, P-08, P-11")
+@enduml

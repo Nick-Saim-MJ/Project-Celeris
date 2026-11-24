@@ -52,11 +52,14 @@ ADM --> TEL
 NOT --> POL
 AG --> POL
 AG --> TLS
+AG --> ING : rangos y horarios
+AG --> TEL : KPI
+PAC --> ING
 
 note bottom of UP
-  Proxy padre / shield EC2-SHIELD 10.30.10.10:8443
-  con mTLS (REQ-F-29, flujo F9) es R2.
+  Sale a Internet por F8. El proxy padre (shield)
+  quedó fuera de alcance (D-19): REQ-F-29 retirado.
 end note
 
-$pie("DS-13", "REQ-F-01…F-15, F-28, NF-09, NF-10", "CU-01", "P-02, P-03, P-06, P-09")
+$pie("DS-13", "REQ-F-01…F-15, F-17, F-26, F-28, NF-09, NF-10", "CU-01, CU-04, CU-06", "P-02, P-04, P-09, P-11")
 @enduml

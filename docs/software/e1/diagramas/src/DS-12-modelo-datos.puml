@@ -1,126 +1,176 @@
 @startuml DS-12-modelo-datos
 !include _estilo.iuml
-title DS-12 · Modelo de datos del plano de control (C4.6, PostgreSQL 18 en DB01 10.20.20.11)
-caption «R2 — diseño», base para CE022 (S2). PK = clave primaria, FK = clave foránea. Las tablas marcadas «nueva» no están en C4.6 del maestro.
+title DS-12 · Modelo de datos de la consola (CE02 C4.8, PostgreSQL local en CTRL01 10.20.20.10)
+caption «R2 — diseño», base para CE022 (S2). PK = clave primaria, FK = clave foránea. «nueva» = no está en C4.8 (hueco H-10, ver README).
 skinparam linetype ortho
 
-entity tenant <<R3>> {
+entity usuario {
+  * id : uuid <<PK>>
+  --
+  * nombre : text <<unique>>
+  * rol : text (encargado | admin | auditor)
+  * hash_contraseña : text
+  * totp_secreto_cifrado : bytea
+  * bloqueado_hasta : timestamptz
+}
+entity asignacion {
+  * usuario_id : uuid <<FK>>
+  * laboratorio_id : smallint <<FK>>
+  --
+  PK (usuario_id, laboratorio_id)
+}
+entity laboratorio {
+  * id : smallint <<PK>>
+  --
+  * nombre : text (LAB-01 … LAB-10)
+  * rango_cidr : cidr (del inventario, solo lectura)
+  * habilitado : boolean
+  horario : jsonb
+}
+entity sesion <<nueva>> {
+  * id : uuid <<PK>>
+  --
+  * usuario_id : uuid <<FK>>
+  * origen : text (campus | remoto)
+  * equipo : text (ENC01 | JMP01 | EC2-GW)
+  * vence : timestamptz
+}
+entity fuente {
   * id : uuid <<PK>>
   --
   * nombre : text
+  * categoria : text
+  * modo : text (cachear | descifrar_y_cachear | nunca)
+  * estado : text (DS-17)
+  * fija : boolean (lista DTI, REQ-RN-09)
 }
-entity site {
+entity fuente_dominio {
+  * fuente_id : uuid <<FK>>
+  * sufijo : text
+  --
+  PK (fuente_id, sufijo)
+}
+entity aprobacion {
   * id : uuid <<PK>>
   --
-  * tenant_id : uuid <<FK>>
-  * nombre : text
-  * cidrs : cidr[]
+  * objeto_tipo : text (fuente | rotacion_ca)
+  * objeto_id : uuid
+  * decision : text (aprobada | rechazada)
+  * por : uuid <<FK>> (usuario admin)
+  * sesion_id : uuid <<FK>>
+  * fecha : timestamptz
+  ..
+  CHECK: la sesión es de origen campus (REQ-F-37)
 }
-entity node {
+entity solicitud {
+  * id : text <<PK>> (SOL-12…)
+  --
+  * docente : text
+  * laboratorio_id : smallint <<FK>>
+  * fecha_clase : timestamptz
+  * descripcion : text
+  * estado : text
+  precarga_id : uuid <<FK>>
+}
+entity precarga {
   * id : uuid <<PK>>
   --
-  * site_id : uuid <<FK>>
-  * hostname : text
-  * estado : node_state
-  version_config : bigint <<FK>>
-  last_seen : timestamptz
+  * laboratorio_id : smallint <<FK>>
+  * fecha : date
+  * estado : text (DS-18)
+  bytes_total : bigint
+  fuente_id : uuid <<FK>>
 }
-entity policy_version {
+entity precarga_item {
+  * precarga_id : uuid <<FK>>
+  * url_sin_query : text
+  --
+  sha256 : bytea
+  * estado : text
+}
+entity version_config {
   * version : bigint <<PK>>
   --
-  * tenant_id : uuid <<FK>>
-  * estado : policy_state
-  * contenido_cedar : text
-  firma : bytea (ed25519)
-  * propuesta_por : uuid <<FK>>
-  aprobada_por : uuid <<FK>>
-  * creada_en : timestamptz
+  * contenido : jsonb
+  * firma : bytea (ed25519)
+  * publicada_por : uuid <<FK>>
+  * publicada_en : timestamptz
   ..
-  CHECK (aprobada_por <> propuesta_por)
+  inmutable: sin UPDATE ni DELETE
 }
-entity node_ca {
-  * serial : text <<PK>>
+entity nodo {
+  * id : text <<PK>> (EDGE01, EDGE02)
   --
-  * node_id : uuid <<FK>>
-  * not_after : timestamptz
-  * name_constraints : text[]
+  * version_aplicada : bigint <<FK>>
+  * ultimo_informe : timestamptz
+}
+entity ca_intermedia <<nueva>> {
+  * serie : text <<PK>>
+  --
+  * nodo_id : text <<FK>>
+  * vence : timestamptz
   * huella_sha256 : text
-  revocada_en : timestamptz
+  * name_constraints : text[]
 }
-entity purge_job {
-  * id : uuid <<PK>>
+entity kpi_intervalo <<nueva>> {
+  * nodo_id : text <<FK>>
+  * laboratorio_id : smallint <<FK>>
+  * ts : timestamptz
   --
-  * selector : jsonb (url | prefijo | etiqueta)
-  * estado : text
-  * creado_por : uuid <<FK>>
+  hit, revalidated, miss, bypass : int
+  rechazos_403 : int
+  bytes_cache, bytes_origen : bigint
 }
-entity audit_log {
+entity kpi_diario {
+  * fecha : date
+  * laboratorio_id : smallint <<FK>>
+  * fuente_id : uuid <<FK>>
+  --
+  bytes_cache, bytes_origen : bigint
+  hits, misses : bigint
+}
+entity cambio {
   * id : bigserial <<PK>>
   --
-  * actor : uuid <<FK>>
+  * usuario_id : uuid <<FK>>
+  * sesion_id : uuid <<FK>>
   * accion : text
   * objeto : text
-  antes : jsonb
-  despues : jsonb
-  * ts : timestamptz
+  antes, despues : jsonb
+  resultado : text (aplicado | rechazado_403)
+  * fecha : timestamptz
   ..
-  solo INSERT (sin UPDATE ni DELETE)
-}
-entity kpi_daily {
-  * fecha : date <<PK>>
-  * node_id : uuid <<PK, FK>>
-  --
-  bytes_cache : bigint
-  bytes_origen : bigint
-  hits : bigint
-  misses : bigint
-  bypass : bigint
-}
-entity operador <<nueva>> {
-  * id : uuid <<PK>>
-  --
-  * sub_oidc : text (único)
-  * nombre : text
-  * rol : operador | analista | auditor
-}
-entity enrollment_token <<nueva>> {
-  * hash_token : text <<PK>>
-  --
-  * node_id : uuid <<FK>>
-  * vence_en : timestamptz [S-20]
-  usado_en : timestamptz
-}
-entity rollout <<nueva>> {
-  * version : bigint <<PK, FK>>
-  * node_id : uuid <<PK, FK>>
-  --
-  * fase : 10 % | 100 %
-  * estado : pendiente | aplicado | fallido
-  errores : integer
+  solo inserción (REQ-F-24)
 }
 
-tenant ||--o{ site
-site ||--o{ node
-tenant ||--o{ policy_version
-node ||--|{ node_ca
-node }o--|| policy_version : aplica
-node ||--o{ kpi_daily
-node ||--o| enrollment_token
-policy_version ||--o{ rollout
-node ||--o{ rollout
-operador ||--o{ policy_version : propone / aprueba
-operador ||--o{ purge_job
-operador ||--o{ audit_log
+usuario ||--o{ asignacion
+laboratorio ||--o{ asignacion
+usuario ||--o{ sesion
+fuente ||--|{ fuente_dominio
+fuente ||--o{ aprobacion
+usuario ||--o{ aprobacion
+laboratorio ||--o{ solicitud
+solicitud |o--o| precarga
+laboratorio ||--o{ precarga
+precarga ||--|{ precarga_item
+fuente |o--o{ precarga
+version_config ||--o{ nodo
+nodo ||--o{ ca_intermedia
+nodo ||--o{ kpi_intervalo
+laboratorio ||--o{ kpi_intervalo
+laboratorio ||--o{ kpi_diario
+fuente ||--o{ kpi_diario
+sesion ||--o{ cambio
+usuario ||--o{ cambio
 
-note bottom of policy_version
-  Inmutable: un cambio crea una versión nueva.
-  El CHECK hace cumplir los cuatro ojos en la base (REQ-RN-07),
-  además de PolicyService.approve().
+note bottom of kpi_intervalo
+  Ningún campo identifica a una PC o a una persona
+  (REQ-NF-07, D-22). Fuente de P-11 y, agregada por día, de kpi_diario.
 end note
-note bottom of kpi_daily
-  Agregados diarios sin IP ni URL:
-  alimentan /v1/reports/savings (REQ-F-25) y P-02.
+note bottom of version_config
+  Incluye laboratorios, fuentes activas, precargas y la red
+  WIFI-EST en «nunca» (REQ-RN-11). Los nodos la piden por F10.
 end note
 
-$pie("DS-12", "REQ-F-16, F-17, F-18, F-19, F-24, F-25, RN-07, NF-07", "CU-03, CU-04, CU-05, CU-06, CU-10", "P-02, P-04, P-05, P-07, P-08")
+$pie("DS-12", "REQ-F-17, F-18, F-24, F-25, F-31…F-35, F-37, NF-07, RN-06, RN-07, RN-09, RN-11", "CU-03…CU-07, CU-09…CU-11", "P-01…P-08, P-11")
 @enduml

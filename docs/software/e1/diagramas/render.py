@@ -12,7 +12,7 @@ Validación (regla del proyecto: no se inventan IP, nombres ni IDs):
   D-02  cada componente en MAYÚSCULAS (EDGE01, CTRL01…) existe en el inventario
   D-03  cada F-nn (flujo) existe en el inventario
   D-04  cada REQ-… existe en infra/trazabilidad.yaml (también la forma corta F-02, NF-14, RN-07 de los pies)
-  D-05  cada D-nn existe en infra/trazabilidad.yaml; cada CU-nn en el maestro (C1.6); cada P-nn en pantallas.md
+  D-05  cada D-nn existe en infra/trazabilidad.yaml; cada CU-nn en CE02 v0.4 (C1.6); cada P-nn en pantallas.md
   D-06  cada S-nn existe en infra/trazabilidad.yaml o en la tabla «Supuestos nuevos» de README.md
   D-07  cada CI-nn existe en docs/infra/e1/CAMBIOS-INVENTARIO.md
   D-08  cada diagrama tiene título con su propio ID (DS-nn) y pie de trazabilidad ($pie)
@@ -55,7 +55,7 @@ RE_CI = re.compile(r"\bCI-(\d{2})\b")
 
 def contexto() -> dict[str, set[str]]:
     infra = Infra.cargar(RAIZ)
-    maestro = (RAIZ / "docs" / "Celeris-Edge-Documento-Maestro.md").read_text(encoding="utf-8")
+    maestro = (RAIZ / "docs" / "celeris" / "Celeris-CE02-Ingenieria-Software.md").read_text(encoding="utf-8")
     pantallas = (RAIZ / "docs" / "software" / "e1" / "prototipo" / "pantallas.md").read_text(encoding="utf-8")
     readme = (AQUI / "README.md").read_text(encoding="utf-8") if (AQUI / "README.md").exists() else ""
     nuevos = set(re.findall(r"^\|\s*(S-\d{2})\s*\|", readme.split("## Supuestos nuevos", 1)[-1], flags=re.M)) \
@@ -108,7 +108,7 @@ def validar(archivo: Path, ctx: dict) -> list[str]:
             errores.append(f"D-05 decisión D-{n} no existe")
     for n in set(RE_CU.findall(cuerpo)):
         if f"CU-{n}" not in ctx["cu"]:
-            errores.append(f"D-05 caso de uso CU-{n} no existe en el maestro")
+            errores.append(f"D-05 caso de uso CU-{n} no existe en CE02 C1.6")
     for n in set(RE_PANT.findall(cuerpo)):
         if f"P-{n}" not in ctx["pant"]:
             errores.append(f"D-05 pantalla P-{n} no existe en pantallas.md")

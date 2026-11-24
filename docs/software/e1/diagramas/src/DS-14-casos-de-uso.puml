@@ -1,0 +1,76 @@
+@startuml DS-14-casos-de-uso
+!include _estilo.iuml
+title DS-14 · Casos de uso de Celeris Edge (CE02 C1.6, arquitectura v0.4)
+caption «R1» lo cubre el nodo actual · «R2» requiere la consola o el portal (S2). CU-08 aún no tiene pantalla (hueco H-01).
+left to right direction
+skinparam usecase {
+  BackgroundColor #FFFFFF
+  BorderColor $INK
+  BackgroundColor<<R2>> $R2FILL
+  BorderColor<<R2>> $ACCENT
+}
+skinparam actorStyle awesome
+
+actor "Usuario\n(PC institucional\nde laboratorio)" as U
+actor "Usuario BYOD\n(WIFI-EST)" as UB
+actor "Docente" as DOC
+actor "Encargado de\nlaboratorio" as ENC
+actor "Administrador DTI" as ADM
+actor "Auditor" as AUD
+
+rectangle "Celeris Edge (nodo EDGE01/EDGE02 + consola en CTRL01 + portal en PORTAL01)" {
+  usecase "CU-01 Descargar a través\nde la caché" as uc01 <<R1>>
+  usecase "CU-02 Consultar qué se descifra\ny la huella de la CA" as uc02 <<R2>>
+  usecase "CU-03 Agregar una fuente\nal catálogo" as uc03 <<R2>>
+  usecase "CU-04 Habilitar un laboratorio\ny su horario" as uc04 <<R2>>
+  usecase "CU-05 Programar una precarga\npara una clase" as uc05 <<R2>>
+  usecase "CU-06 Ver el ahorro y la\nactividad del laboratorio" as uc06 <<R2>>
+  usecase "CU-07 Aprobar una fuente que\nrequiere descifrado" as uc07 <<R2>>
+  usecase "CU-08 Purgar un contenido" as uc08 <<R2>>
+  usecase "CU-09 Registrar una solicitud\nde preparación" as uc09 <<R2>>
+  usecase "CU-10 Revisar la auditoría\nde cambios" as uc10 <<R2>>
+  usecase "CU-11 Usar la consola desde\nfuera del campus" as uc11 <<R2>>
+  usecase "Iniciar sesión con\nsegundo factor" as LOGIN <<R2>>
+}
+
+U --> uc01
+U --> uc02
+UB --> uc01 : sin descifrado\n(REQ-F-36)
+UB --> uc02
+DOC --> uc09
+ENC --> uc03
+ENC --> uc04
+ENC --> uc05
+ENC --> uc06
+ENC --> uc08
+ENC --> uc11
+ADM --> uc07
+ADM --> uc10
+ADM --> uc11
+AUD --> uc06
+AUD --> uc10
+AUD --> uc02
+
+uc03 ..> LOGIN : <<include>>
+uc04 ..> LOGIN : <<include>>
+uc05 ..> LOGIN : <<include>>
+uc06 ..> LOGIN : <<include>>
+uc07 ..> LOGIN : <<include>>
+uc10 ..> LOGIN : <<include>>
+uc07 .> uc03 : <<extend>>\nsi el modo es\ndescifrar_y_cachear
+uc05 ..> uc09 : <<extend>>\ndesde una solicitud
+uc11 ..> LOGIN : <<include>>
+
+note right of uc11
+  Llega por EC2-GW (F29 → F30).
+  Las acciones críticas quedan
+  bloqueadas: CU-07 solo desde
+  JMP01 o ENC01 (REQ-F-37).
+end note
+note right of uc09
+  Cómo entra el docente a registrarla
+  aún no está definido (hueco H-03).
+end note
+
+$pie("DS-14", "REQ-F-01…F-05, F-12, F-19, F-24, F-25, F-30…F-37, RN-05, RN-07", "CU-01…CU-11", "P-01…P-11")
+@enduml

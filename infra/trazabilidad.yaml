@@ -613,6 +613,12 @@ decisiones:
     decision: 'Laboratorio efímero: misma imagen OCI e IaC en local (Modo L), AWS (Modo A) y campus (Modo H)'
   D-19:
     decision: Sin caché (shield) en AWS; el código queda desactivado (H3)
+  D-20:
+    decision: Catálogo de contenido con tres modos (cachear, descifrar_y_cachear, nunca) y aprobación DTI solo para descifrar (CI-95)
+  D-21:
+    decision: Precarga en el nodo, no en un servicio aparte (CI-95)
+  D-22:
+    decision: Ahorro reportado por laboratorio, nunca por persona (CI-95)
   D-23:
     decision: Rango /26 por laboratorio dentro de la VLAN 30
   D-24:

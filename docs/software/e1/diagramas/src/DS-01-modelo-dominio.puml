@@ -1,100 +1,140 @@
 @startuml DS-01-modelo-dominio
 !include _estilo.iuml
-title DS-01 · Modelo de dominio (C4.1)
-caption «R1» existe en el código · «R2» diseño del plano de control · «R3» escalamiento
+title DS-01 · Modelo de dominio (CE02 C4.1, arquitectura v0.4)
+caption «R1» existe en el código del nodo · «R2» diseño de celeris-console (aún no existe) · el color siempre va con su estereotipo
 
-package "Plano de control (celeris-control, CTRL01 10.20.20.10)" {
-  class Tenant <<R3>> {
-    id: Uuid
-    nombre: String
+package "Consola del encargado (celeris-console, CTRL01 10.20.20.10, D-25)" {
+  class Usuario <<R2>> {
+    nombre
+    rol: encargado | admin | auditor
+    segundo_factor: TOTP (REQ-F-33)
   }
-  class Site <<R2>> {
-    id: Uuid
-    nombre: String
-    cidrs: Vec<Cidr>
+  class Sesion <<R2>> {
+    origen: campus | remoto
+    equipo: ENC01 | JMP01 | EC2-GW
+    inicio, vence
   }
-  class Node <<R2>> {
-    id: Uuid
-    hostname: String
-    estado: NodeState
-    version_config: u64
-    last_seen: DateTime
+  class Laboratorio <<R2>> {
+    nombre: LAB-01 … LAB-10
+    rango_cidr: /26 del inventario
+    horario
+    habilitado: bool
   }
-  class PolicyVersion <<R2>> {
-    version: u64
-    estado: PolicyState
-    firma_ed25519: Signature
-    propuesta_por: UserId
-    aprobada_por: UserId
+  class Fuente <<R2>> {
+    nombre, categoria
+    modo: cachear | descifrar_y_cachear | nunca
+    estado (DS-17)
+    fija: bool (lista de la DTI, REQ-RN-09)
   }
-  class NodeCa <<R2>> {
-    serial: String
-    not_after: DateTime
-    name_constraints: Vec<String>
-    revocada_en: Option<DateTime>
+  class Dominio <<R2>> {
+    sufijo
   }
-  class AuditEntry <<R2>> {
-    actor: UserId
-    accion: String
-    objeto: String
-    ts: DateTime
+  class Aprobacion <<R2>> {
+    objeto: fuente | rotación de CA
+    decision: aprobada | rechazada
+    por: Usuario (admin)
+    origen: campus (REQ-F-37)
+  }
+  class Solicitud <<R2>> {
+    docente, curso
+    fecha_clase
+    descripcion
+    estado: nueva | en_preparacion | lista
+  }
+  class Precarga <<R2>> {
+    fecha
+    ventana: la fija la DTI (REQ-RN-10)
+    estado (DS-18)
+    bytes_total
+  }
+  class VersionConfig <<R2>> {
+    version: v43, v44…
+    firma: ed25519 (D-11)
+    publicada_en
+    inmutable
+  }
+  class RedByod <<R2>> {
+    nombre: WIFI-EST
+    modo: nunca (fijo, REQ-RN-11)
+  }
+  class Cambio <<R2>> {
+    accion, objeto
+    antes, despues
+    origen + equipo
+    solo inserción (REQ-F-24)
+  }
+  class KpiIntervalo <<R2>> {
+    cada 30 s, por laboratorio y nodo
+    hit, revalidated, miss, bypass, rechazos_403
+    bytes_cache, bytes_origen
+  }
+  class KpiDiario <<R2>> {
+    fecha, laboratorio, fuente
+    GB evitados, BHR, minutos ahorrados
   }
 }
 
-package "Política (hoy config.toml; R2: bundle firmado)" {
-  class InterceptRule <<R1>> {
-    sufijo: String
-    accion: Interceptar | NuncaInterceptar
+package "Nodo de caché (celeris-node, EDGE01 10.20.60.10 / EDGE02 10.20.60.11)" {
+  class Nodo <<R2>> {
+    hostname
+    version_aplicada
+    ultimo_informe (F10)
   }
-  class StoreIdRule <<R1>> {
-    host_suffix: String
-    pattern: Regex
-    replacement: String
+  class CaIntermedia <<R2>> {
+    serie, vence, huella
+    name_constraints
   }
-}
-
-package "Plano de datos (celeris-node, EDGE01 10.20.60.10 / EDGE02 10.20.60.11)" {
   class CacheEntry <<R1>> {
     key_hash: Sha256
-    url_sin_query: String
-    estado: EntryState
-    expires_at: u64
-    etag: Option<String>
-    last_modified: Option<String>
+    url_sin_query
+    expires_at, etag
   }
   class ContentObject <<R1>> {
-    sha256: Sha256
-    size: u64
-    refcount: u32
+    sha256, size
+    refcount
   }
   class Detection <<R1>> {
-    kind: Volume | Denied | RarePort | HostMismatch
-    ip: IpAddr
-    count: u64
-    first_seen / last_seen: u64
+    kind, ip, count
   }
 }
 
-Tenant "1" --> "*" Site
-Site "1" --> "*" Node
-Tenant "1" --> "*" PolicyVersion
-PolicyVersion "1" *-- "*" InterceptRule
-PolicyVersion "1" *-- "*" StoreIdRule
-Node "1" --> "1..*" NodeCa : vigente + históricas
-Node "*" --> "1" PolicyVersion : aplica
-Node "1" *-- "*" CacheEntry
-CacheEntry "*" --> "1" ContentObject : deduplica por SHA-256
-Node "1" --> "*" Detection
-PolicyVersion "1" --> "*" AuditEntry : cada cambio
+Usuario "1" -- "*" Sesion
+Usuario "*" -- "*" Laboratorio : asignado a\n(REQ-RN-06)
+Fuente "1" *-- "1..*" Dominio
+Fuente "1" -- "0..1" Aprobacion : si descifra\n(REQ-RN-07)
+Solicitud "*" --> "1" Laboratorio
+Solicitud "0..1" --> "0..1" Precarga : se convierte en
+Precarga "*" --> "1" Laboratorio
+Precarga "*" ..> "0..1" Fuente : URLs de
+VersionConfig "1" o-- "*" Fuente : compila
+VersionConfig "1" o-- "*" Laboratorio
+VersionConfig "1" o-- "*" Precarga
+VersionConfig "1" o-- "1" RedByod
+Nodo "*" --> "1" VersionConfig : aplica si la firma\nes válida (REQ-RN-08)
+Nodo "1" -- "1" CaIntermedia
+Nodo "1" *-- "*" CacheEntry
+CacheEntry "*" --> "1" ContentObject : deduplica\npor SHA-256 (D-03)
+Nodo "1" --> "*" Detection
+Nodo "1" --> "*" KpiIntervalo : envía por F10
+KpiIntervalo "*" --> "1" Laboratorio
+KpiDiario "*" --> "1" Laboratorio
+Sesion "1" --> "*" Cambio : genera
+Aprobacion ..> Cambio : queda en
 
-note bottom of InterceptRule
-  never_intercept gana siempre
-  sobre intercept_domains (REQ-RN-03)
+note bottom of KpiIntervalo
+  Solo agregados por laboratorio:
+  sin URL, sin IP de equipos ni usuarios
+  (REQ-NF-07, D-22). Alimenta P-02 y P-11.
 end note
-note bottom of ContentObject
-  Se verifica el hash antes de servir (REQ-F-06).
-  refcount: varias claves → un objeto (D-03).
+note bottom of Detection
+  La IP solo se usa para seguridad
+  y va al SIEM (REQ-F-14, REQ-F-15).
+end note
+note top of Sesion
+  Una sesión «remoto» (llega por EC2-GW)
+  no puede aprobar descifrado, rotar llaves,
+  gestionar usuarios ni cambiar el perfil BYOD.
 end note
 
-$pie("DS-01", "REQ-F-02, F-06, F-07, F-15, F-16, F-17, F-18, F-24, RN-03", "CU-01, CU-03, CU-04, CU-07", "P-04, P-05, P-06, P-07")
+$pie("DS-01", "REQ-F-06, F-14, F-15, F-17, F-18, F-24, F-25, F-31…F-37, NF-07, RN-06…RN-11", "CU-03…CU-07, CU-09…CU-11", "P-02…P-08, P-11")
 @enduml

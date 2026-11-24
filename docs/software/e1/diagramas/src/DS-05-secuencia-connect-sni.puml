@@ -1,9 +1,9 @@
 @startuml DS-05-secuencia-connect-sni
 !include _estilo.iuml
-title DS-05 · Secuencia: CONNECT y decisión de intercepción por SNI (REQ-F-02, implementado)
+title DS-05 · Secuencia: CONNECT y decisión de descifrado por SNI (REQ-F-02, implementado; BYOD y catálogo en R2)
 caption «R1»: handler.rs (guard_connect, should_intercept_connect, should_intercept_tls, tls_decision) y config.rs (should_intercept).
 
-actor "Cliente\n(zona LAB)" as C
+actor "Cliente\n(LAB o WIFI-EST)" as C
 box "celeris-node · EDGE01 10.20.60.10" #FFFFFF
   participant "Hudsucker\n(D-02)" as HS <<R1>>
   participant "CacheHandler" as H <<R1>>
@@ -30,8 +30,12 @@ alt resuelve a una IP interna (SSRF)
   H --> C : 403 (REQ-F-11)
 end
 HS -> H : should_intercept_connect(cdn.example)
+alt la IP de origen está en una red BYOD (WIFI-EST, F31) «R2»
+  H --> HS : false → túnel sin descifrar, sea cual sea la fuente
+  note right of H : REQ-F-36 / REQ-RN-11: hoy never_intercept es por dominio;\nen R2 la configuración firmada trae la lista de redes BYOD.
+end
 H -> P : should_intercept(host)
-note right of P : never_intercept gana siempre\nsobre intercept_domains (REQ-RN-03)
+note right of P : R1: intercept_domains / never_intercept de config.toml.\nR2: solo descifra una fuente descifrar_y_cachear activa;\n«nunca» gana siempre (REQ-RN-03)
 
 alt dominio no listado o en never_intercept
   P --> H : false
@@ -55,7 +59,7 @@ else dominio en intercept_domains
   end
 end
 
-note over H, P : Por defecto no se descifra: sin SNI, sin coincidencia o con SNI distinto, tls_decision devuelve false.\nLa prueba de inyección de fallos de REQ-NF-08 (error interno del motor de políticas) es de R2 (Cedar, D-07).
+note over H, P : Por defecto no se descifra: sin SNI, sin coincidencia o con SNI distinto, tls_decision devuelve false.\nREQ-NF-08: ante un error del motor de políticas tampoco se descifra (prueba de inyección de fallos en R2).
 
-$pie("DS-05", "REQ-F-01, F-02, F-10, F-11, F-15, F-18, RN-03, NF-06, NF-08", "CU-01, CU-07", "P-04, P-06")
+$pie("DS-05", "REQ-F-01, F-02, F-10, F-11, F-15, F-18, F-36, RN-03, RN-11, NF-06, NF-08", "CU-01, CU-03", "P-03, P-04, P-09")
 @enduml

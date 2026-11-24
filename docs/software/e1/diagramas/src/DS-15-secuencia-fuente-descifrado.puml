@@ -1,0 +1,61 @@
+@startuml DS-15-secuencia-fuente-descifrado
+!include _estilo.iuml
+title DS-15 · Secuencia: el encargado agrega una fuente que requiere descifrado y la DTI la aprueba (CE02 C4.2, CU-03 + CU-07)
+caption «R2 — diseño»: la consola no existe y el nodo aún no descarga configuración firmada. Pantallas: P-03 (crear y simular), P-07 (aprobar), P-08 (auditoría), P-09 (aviso).
+
+actor "Encargado LAB-03\n(ENC01 10.20.35.10)" as E
+actor "Admin DTI\n(fuera del campus)" as AR
+actor "Admin DTI\n(JMP01 10.20.10.20)" as AC
+participant "EC2-GW\n10.30.0.10" as GW
+box "celeris-console · CTRL01 10.20.20.10" #E8F1FB
+  participant "OrigenMiddleware\n+ Rbac" as AUTH <<R2>>
+  participant "CatalogService" as CAT <<R2>>
+  participant "Publisher" as PUB <<R2>>
+  participant "AuditLog" as AUD <<R2>>
+end box
+participant "celeris-node\nEDGE01 / EDGE02" as N <<R2>>
+
+== Crear la fuente (P-03) ==
+E -> AUTH : POST /v1/fuentes «Instaladores de JetBrains»,\ndownload.jetbrains.com, descifrar_y_cachear (F28, 443)
+AUTH -> AUTH : sesión campus · RBAC: LAB-03 asignado (REQ-RN-06)
+AUTH -> CAT : crear_fuente
+CAT -> CAT : no está en «nunca» ni en la lista fija de la DTI\n(REQ-RN-03, REQ-RN-09)
+CAT -> AUD : registrar «Crear fuente» (REQ-F-24)
+CAT --> E : 201 · estado «Pendiente DTI» (REQ-RN-07)
+E -> CAT : POST /v1/fuentes/{id}/simular
+CAT --> E : 480 descargas, 36 GB pasarían a la caché;\nla CA de los nodos todavía no cubre el dominio (REQ-F-20, REQ-RN-04)
+
+== Intento de aprobar desde fuera del campus (CU-11) ==
+AR -> GW : HTTPS público (F29)
+GW -> AUTH : POST /v1/fuentes/{id}/aprobar\n(F30, 443 con certificado de cliente de EC2-GW, por la VPN)
+AUTH -> AUTH : origen = remoto (certificado de EC2-GW)
+AUTH -> AUD : registrar intento · resultado rechazado_403
+AUTH --> AR : 403 «acción crítica: solo desde JMP01 o ENC01» (REQ-F-37, T54)
+
+== Aprobar desde el campus (P-07) ==
+AC -> AUTH : POST /v1/fuentes/{id}/aprobar (F20, 443)
+AUTH -> AUTH : origen = campus · rol admin · segundo factor verificado
+AUTH -> CAT : aprobar
+CAT -> CAT : ca_cubre(EDGE01/EDGE02, download.jetbrains.com)
+alt la CA intermedia no cubre el dominio (REQ-RN-04)
+  CAT --> AC : la fuente sigue «Pendiente»: hay que emitir intermedias\ncon el dominio en sus Name Constraints (raíz offline, REQ-NF-05)
+  note right of CAT : La emisión es una ceremonia de la DTI fuera de la consola;\ndespués se repite la aprobación.
+else la CA lo cubre
+  CAT -> AUD : registrar «Aprobar fuente» (antes: pendiente, después: activa)
+  CAT -> PUB : compilar()
+  PUB -> PUB : configuración v44 firmada con ed25519 (D-11)\n+ sitio del aviso v44 firmado (REQ-F-30)
+  PUB -> AUD : registrar «Publicar v44»
+  CAT --> AC : 200 · fuente «Activa»
+end
+
+== Distribución (≤ 60 s, REQ-NF-16) ==
+loop cada 30 s
+  N -> PUB : GET /v1/nodos/{id}/config?desde=43 (F10, 8443 mTLS)
+end
+PUB --> N : v44 firmada
+N -> N : verificar firma (REQ-RN-08); aplicar; si falla, seguir con v43 (REQ-F-17)
+N -> PUB : POST /v1/nodos/{id}/kpi · version_aplicada = 44
+note over AC, N : El sitio del aviso v44 lo despliega JMP01 en PORTAL01 por F20: P-09 lista download.jetbrains.com como «se descifra»\nantes de que la fuente afecte a una PC (REQ-RN-05).
+
+$pie("DS-15", "REQ-F-17, F-20, F-24, F-30, F-31, F-37, RN-03, RN-04, RN-05, RN-06, RN-07, RN-08, RN-09, NF-05, NF-16", "CU-03, CU-07, CU-11", "P-03, P-07, P-08, P-09")
+@enduml

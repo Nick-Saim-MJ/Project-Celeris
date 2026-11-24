@@ -1,0 +1,52 @@
+@startuml DS-16-secuencia-precarga
+!include _estilo.iuml
+title DS-16 · Secuencia: precarga nocturna desde una solicitud y HIT al iniciar la clase (CE02 C4.3, CU-09 + CU-05)
+caption «R2 — diseño»: consola, precarga en el nodo (REQ-F-22, D-21) y KPI por laboratorio. El HIT con coalescencia ya existe (DS-04). Pantallas: P-06, P-05, P-02, P-11.
+
+actor "Docente de\nProgramación II" as D
+actor "Encargado LAB-03\n(ENC01 10.20.35.10)" as E
+box "celeris-console · CTRL01 10.20.20.10" #E8F1FB
+  participant "SolicitudService" as SOL <<R2>>
+  participant "PrefetchService" as PF <<R2>>
+  participant "Publisher" as PUB <<R2>>
+  participant "ReportsService" as REP <<R2>>
+end box
+participant "celeris-node\nEDGE01 10.20.60.10" as N <<R2>>
+participant "Origen\n(download.jetbrains.com)" as O
+participant "40 PCs de LAB-03\n(rango /26 de LAB-03)" as P
+
+== Solicitud y programación (P-06 → P-05) ==
+D -> SOL : registrar SOL-12: IntelliJ IDEA para la clase del 25/11 08:00 (REQ-F-35)
+note right of D : Cómo entra el docente aún no está definido (hueco H-03).
+E -> PF : POST /v1/precargas desde SOL-12 (F28)
+PF -> PF : RBAC LAB-03 (REQ-RN-06) · ventana y límite los fija la DTI:\n00:00–05:00, 50 Mbps por nodo (REQ-RN-10)
+PF -> PUB : compilar() → configuración firmada con la precarga
+PF --> E : precarga «Programada» para el 25/11 (DS-18)
+N -> PUB : GET /v1/nodos/{id}/config (F10, cada 30 s)
+PUB --> N : configuración firmada con la precarga
+
+== Ventana nocturna (25/11, 00:00–05:00) ==
+N -> O : GET ideaIC-2026.3.tar.gz una sola vez (F8), a ≤ 50 Mbps
+O --> N : 200 · 1,1 GB
+N -> N : guardar por SHA-256 y verificar (REQ-F-06)
+alt termina la ventana antes de completar
+  N -> N : «Pausada»: sigue en la ventana siguiente
+else el origen falla tras los reintentos
+  N -> REP : precarga «Fallida» (404) → alerta en P-02
+end
+N -> PF : POST /v1/nodos/{id}/kpi · precarga «Completada», 1,1 GB (F10)
+PF -> SOL : SOL-12 pasa a «Lista»
+
+== Clase (25/11, 08:00) ==
+P -> N : 40 × GET ideaIC-2026.3.tar.gz (F1, proxy 3128)
+alt la fuente «Instaladores de JetBrains» está aprobada (HTTPS descifrado)
+  N --> P : 200 desde la caché (HIT) · 1,1 GB por el enlace en vez de 44 GB
+else la fuente sigue pendiente de la DTI
+  N --> P : túnel sin descifrar (CONNECT): no hay HIT, cada PC descarga del origen
+  note right of N : Por eso P-05 avisa: «solo se cachea si la DTI aprueba la fuente».
+end
+N -> REP : KPI LAB-03 cada 30 s: hit, miss, bypass (sin IP ni URL, REQ-NF-07)
+REP --> E : P-11 en vivo · P-02 ahorro del mes (REQ-F-25)
+
+$pie("DS-16", "REQ-F-05, F-06, F-13, F-22, F-25, F-34, F-35, NF-07, NF-13, RN-06, RN-10", "CU-05, CU-06, CU-09", "P-02, P-05, P-06, P-11")
+@enduml

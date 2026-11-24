@@ -64,5 +64,5 @@ note over H, S
   El que esperó recibe HIT, no «collapsed».
 end note
 
-$pie("DS-04", "REQ-F-03, F-05, F-06, F-07, F-28, NF-04, NF-13", "CU-01", "P-02, P-03")
+$pie("DS-04", "REQ-F-03, F-05, F-06, F-07, F-28, NF-04, NF-13", "CU-01", "P-02, P-05, P-11")
 @enduml

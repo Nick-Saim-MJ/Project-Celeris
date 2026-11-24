@@ -1,0 +1,45 @@
+@startuml DS-17-estados-fuente
+!include _estilo.iuml
+title DS-17 · Estados de una fuente del catálogo (CE02 C4.5, D-20)
+caption «R2 — diseño» (celeris-console, catalog). Los nombres de estado son los que muestra P-03: Activa, Pendiente DTI, Inactiva, Fija.
+
+state Borrador <<R2>>
+state "Pendiente DTI" as Pendiente <<R2>>
+state Rechazada <<error>>
+state Inactiva <<R2>>
+[*] --> Borrador : el encargado la crea (P-03)
+Borrador --> Activa : modo cachear\n(sin aprobación, REQ-RN-07)
+Borrador --> Pendiente : modo descifrar_y_cachear
+Borrador --> Rechazada : choca con «nunca»\n(REQ-RN-03, REQ-RN-09)
+
+Pendiente --> Activa : un admin la aprueba desde el campus\ny la CA de cada nodo cubre el dominio\n(REQ-F-37, REQ-RN-04)
+Pendiente --> Pendiente : intento desde EC2-GW → 403\n(queda en la auditoría)
+Pendiente --> Rechazada : un admin la rechaza
+
+state Activa <<R2>> {
+  [*] --> EnConfiguracion
+  EnConfiguracion : entra en la próxima versión firmada
+  EnConfiguracion --> Aplicada : EDGE01 y EDGE02 la aplican (≤ 60 s)
+}
+Activa --> Inactiva : el encargado la desactiva
+Inactiva --> Activa : la reactiva (cachear)
+Inactiva --> Pendiente : la reactiva (descifrar_y_cachear)
+Activa --> Activa : purga de su contenido (CU-08, R2, sin pantalla)
+
+state Fija <<R2>>
+[*] --> Fija : lista de la DTI\n(bancos, inicios de sesión, identidad)
+Fija : modo «nunca»; no se edita ni se mueve de modo (REQ-RN-09)
+
+Rechazada --> [*]
+
+note right of Pendiente
+  Mientras está pendiente, el dominio pasa
+  sin descifrar y P-09 no lo lista.
+end note
+note bottom of Fija
+  WIFI-EST se trata igual que «nunca» para cualquier
+  fuente (REQ-F-36, REQ-RN-11); no es un estado de la fuente.
+end note
+
+$pie("DS-17", "REQ-F-19, F-31, F-36, F-37, RN-03, RN-04, RN-07, RN-09, RN-11, NF-16", "CU-03, CU-07, CU-08", "P-03, P-07, P-09")
+@enduml

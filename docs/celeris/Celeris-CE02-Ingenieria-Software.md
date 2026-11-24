@@ -1,7 +1,7 @@
 ---
 titulo: "Celeris Edge — CE02 Ingeniería de Software"
 version: "0.4"
-fecha: "2026-11-22"
+fecha: "2026-11-24"
 base: "Celeris-00-Marco-Comun.md v0.4 y Celeris-Arquitectura-v0.4.md"
 entregable: "E1 Requerimientos y Diseño del Sistema (CE0211 SRS, CE0212 prototipo, CE0213 arquitectura, CE0214 diseño detallado)"
 ---
@@ -16,7 +16,8 @@ El problema, el alcance, los actores y los supuestos están en **00 Marco común
 - La consola completa (SPA + API + PostgreSQL) vive en CTRL01, en el campus. En AWS solo hay un proxy inverso sin datos (EC2-GW) y respaldos (D-24, D-25).
 - Nuevos REQ-F-36 (el Wi-Fi de estudiantes nunca se descifra), REQ-F-37 (acciones críticas solo desde el campus), REQ-RN-11 y CU-11.
 - El estado del código se actualizó según las ramas del repositorio: REQ-F-26, F-28 y NF-14 ya están implementados en `e1/matriz-pruebas`.
-- El prototipo de la rama `ce02/e1-requerimientos-diseno` refleja la v0.2 y debe pasar a las pantallas de C2.1.
+- El prototipo pasó a las pantallas de C2.1 (prototipo v0.2 en `docs/software/e1/prototipo/`).
+- 24/11/2026: se agrega P-11 «Actividad en vivo» como desviación registrada de C2.1, pendiente de que el revisor la acepte (ver nota bajo la tabla). Solo usa los agregados por laboratorio que ya viajan por F10; no agrega requisitos, flujos ni componentes.
 
 **Formato del entregable (rúbrica oficial):** Word/PDF de 20–30 páginas: portada, resumen ejecutivo de 1 página, Sección 1 Requerimientos, Sección 2 Prototipo navegable, Sección 3 Diseño arquitectónico (C4 + ADR), Sección 4 Diseño detallado (UML), anexos (acta de validación, matriz de trazabilidad, diagramas complementarios, evidencia de sustentación).
 
@@ -247,6 +248,9 @@ Característica: Catálogo de contenido del encargado
 | P-08 | Auditoría de cambios | Auditor, admin | F-24 |
 | P-09 | Portal público: aviso de transparencia | Usuario | F-12, F-30 |
 | P-10 | Portal público: instalación de la CA con verificación de huella | Usuario | RN-05 |
+| P-11 | Actividad en vivo: peticiones, HIT/MISS/BYPASS y rechazos 403 por laboratorio y por nodo, cada 30 s | Encargado, admin | F-13, NF-13, NF-07 |
+
+**Desviación registrada (P-11, 24/11/2026).** La tabla original tenía 10 pantallas y daba por retirado el «registro en vivo» de la v0.2. P-11 lo reemplaza con estas condiciones: muestra solo lo que el nodo ya envía a CTRL01 por F10 (agregados por laboratorio, Arquitectura v0.4 §8.3); no muestra URL, IP de equipos ni usuarios (REQ-NF-07), y por eso no hay vista por PC; se apoya en REQ-F-13, REQ-NF-13 y CU-06, sin requisitos nuevos. Si el revisor no la acepta, se retira sin afectar a las demás pantallas.
 
 ```mermaid
 flowchart LR
@@ -257,12 +261,13 @@ flowchart LR
   P06[P-06 Solicitudes] --> P05
   P03 -- "fuente a descifrar" --> P07[P-07 Aprobaciones]
   P02 --> P08[P-08 Auditoría]
+  P02 --> P11[P-11 Actividad en vivo]
   P10[P-10 Instalación de la CA] --> P09[P-09 Aviso]
 ```
 
 **Herramienta:** Penpot (libre) o Figma (plan educativo). El prototipo usa datos de ejemplo coherentes con CE03 (laboratorios con sus rangos /26, nodos EDGE01/EDGE02).
 
-**Estado en el repositorio:** la rama `ce02/e1-requerimientos-diseno` tiene un prototipo navegable con las pantallas de la v0.2 (flota, certificados, registro en vivo, detecciones). Se reutilizan P-01 (login), P-02 (resumen), P-08 y P-09/P-10 (portal). P-03 a P-07 se rehacen según esta tabla. En P-01 y P-02 se muestra un distintivo "acceso remoto" cuando la sesión llega por EC2-GW, y las acciones críticas aparecen deshabilitadas con el motivo (REQ-F-37).
+**Estado en el repositorio:** el prototipo v0.2 (`docs/software/e1/prototipo/`: `celeris-prototipo.pen`, PNG, `navegable.html` y `pantallas.md`) tiene las 11 pantallas de esta tabla. Reemplaza al de la rama `ce02/e1-requerimientos-diseno` (flota, certificados, registro en vivo, detecciones). En P-01 y P-02 se muestra un distintivo "acceso remoto" cuando la sesión llega por EC2-GW, y las acciones críticas aparecen deshabilitadas con el motivo (REQ-F-37).
 
 ### C2.2 Validación con stakeholders
 

@@ -1,0 +1,34 @@
+@startuml DS-18-estados-precarga
+!include _estilo.iuml
+title DS-18 · Estados de una precarga (CE02 C4.6, D-21)
+caption «R2 — diseño» (consola: prefetch · nodo: prefetch). Estados visibles en P-05: Programada, Completada, Pausada, Fallida.
+
+state Programada <<R2>>
+state EnCurso <<R2>>
+state Pausada <<R2>>
+state Completada <<R2>>
+state Fallida <<error>>
+state Cancelada
+
+[*] --> Programada : el encargado la crea,\no la convierte desde una solicitud (P-06)
+Programada --> Programada : el encargado la edita (P-05)
+Programada --> Cancelada : el encargado la cancela
+Programada --> EnCurso : empieza la ventana de la DTI\n(00:00, REQ-RN-10)
+EnCurso --> Completada : todos los objetos guardados\ny verificados por SHA-256
+EnCurso --> Pausada : termina la ventana (05:00)\no se llega al límite de 50 Mbps
+Pausada --> EnCurso : ventana siguiente
+EnCurso --> Fallida : el origen falla tras los reintentos\n(p. ej. 404)
+Fallida --> Programada : el encargado corrige la URL
+Completada --> [*]
+Cancelada --> [*]
+
+EnCurso : el nodo descarga una sola vez por el enlace (F8)
+Completada : la solicitud de origen pasa a «Lista»;\nal iniciar la clase, las PCs obtienen HIT
+
+note right of Fallida
+  Genera una alerta en P-02
+  («precarga fallida SOL-10»).
+end note
+
+$pie("DS-18", "REQ-F-06, F-22, F-34, F-35, RN-10", "CU-05, CU-09", "P-02, P-05, P-06")
+@enduml

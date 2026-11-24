@@ -1046,3 +1046,11 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Qué pasaba:** las referencias iban con viñetas, sin la fecha de acceso de las fuentes en línea, agrupaban dos URL en una misma entrada y ningún `[n]` se citaba en el cuerpo. En CE0311, RFC 8915 (NTS) no tenía respaldo en el diseño, que sirve NTP desde FW01 sin NTS.
 - **Decisión aplicada:** lista numerada `[n]` con sangría francesa y numeración por orden de primera cita (IEEE). Cada fuente en línea termina en «[En línea]. Disponible en: URL. [Accedido: 24-nov-2026].»; las entradas con dos URL se separaron (OWASP CRS y Coraza; restic y pgBackRest). Cada `[n]` del cuerpo está en la lista y cada referencia está citada: CE0311 queda en 20 entradas (se quitó RFC 8915 y se separaron OWASP CRS y Coraza) y CE0331 en 18 (se separaron restic y pgBackRest). V-80 y V-95 comprueban el formato.
 - **Decide:** equipo del proyecto
+
+### CI-95 — D-20, D-21 y D-22 están en CE02 C3.4 pero no en `infra/trazabilidad.yaml`
+- **Estado:** resuelto (2026-11-24)
+- **Tipo:** faltante en la fuente de verdad
+- **Dónde:** `infra/trazabilidad.yaml` → `decisiones`; `docs/celeris/Celeris-CE02-Ingenieria-Software.md` C3.4 y C5; `docs/software/e1/diagramas/` (DS-01, DS-12)
+- **Qué pasa:** CE02 C3.4 define D-20 (catálogo con tres modos y aprobación DTI solo para descifrar), D-21 (precarga en el nodo) y D-22 (ahorro por laboratorio, nunca por persona), y C5 cita D-20…D-22. El YAML salta de D-19 a D-23. El validador de diagramas (`render.py`, D-05) los rechaza.
+- **Decisión aplicada:** D-20, D-21 y D-22 se agregaron a `infra/trazabilidad.yaml → decisiones` con el texto de CE02 C3.4 (sin cambiar su contenido). Los diagramas UML vuelven a citarlas: D-20 en DS-17, D-21 en DS-16 y DS-18, D-22 en DS-01 y DS-12.
+- **Decide:** equipo del proyecto

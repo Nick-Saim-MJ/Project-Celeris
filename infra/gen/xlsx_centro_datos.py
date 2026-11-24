@@ -74,7 +74,7 @@ def hoja_portada(wb, x, cd):
                   "AWS y costo (cantidad × precio [S-12]) · Continuidad (RTO/RPO, redundancia y 3-2-1-1-0)"),
         ("Figuras", "DC-0 Topología ejecutiva · DC-1 Topología física · DC-2 Hipervisor · DC-3 AWS / VPC. La integración híbrida es FIG-5.4 de CE0311, sin cambios."),
         ("Cómo leer las fórmulas", "Las celdas con fondo gris claro son datos de entrada (del YAML); las demás son fórmulas. Cambiar un dato de entrada recalcula todo."),
-        ("Pendientes", "CI abiertos que afectan esta matriz: ver la sección 11 del informe (CI-87 y CI-88) y el supuesto S-34 (plazo de reposición del servidor)."),
+        ("Pendientes", "CI abiertos que afectan esta matriz: ver la sección 11 del informe (CI-87) y los supuestos S-34 (plazo de reposición del servidor) y S-35 (contingencia de los laboratorios si cae ESX01, RTO objetivo de 30 min)."),
         ("Regla de seguridad", "Sin claves, tokens ni secretos. IP públicas solo de documentación (RFC 5737)."),
     ]
     for i, (k, v) in enumerate(filas, start=3):

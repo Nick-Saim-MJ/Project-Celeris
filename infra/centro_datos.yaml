@@ -7,8 +7,8 @@
 # Todo supuesto lleva [S-xx]. Lo que falta y no se pudo resolver lleva `ci: CI-nn` (registrado en CAMBIOS-INVENTARIO.md).
 
 meta:
-  version: "1.1"
-  fecha: "2026-11-23"
+  version: "1.2"
+  fecha: "2026-11-24"
   entregable: "CE0331 — Análisis y Diseño de Centro de Datos Híbrido (S1, E2)"
   inventario: infra/inventory.yaml
   fuentes: [docs/celeris/Celeris-CE03-Infraestructura.md, docs/celeris/Celeris-Arquitectura-v0.4.md, docs/celeris/Celeris-00-Marco-Comun.md]
@@ -324,7 +324,7 @@ continuidad:
     - { id: CT-06, servicio: "Portal de transparencia", componentes: [PORTAL01], redundancia: "Sin réplica", respaldo: "Se regenera desde la consola", rto_min: 30, rto_texto: "30 min", rpo_min: null, rpo_texto: "Última política" }
     - { id: CT-07, servicio: "Firewall", componentes: [FW01], redundancia: "Puerto break-glass (BRK01); CARP en H3", respaldo: "XML en Git", rto_min: 60, rto_texto: "1 h", rpo_min: null, rpo_texto: "Último cambio", prueba: T25 }
     - { id: CT-08, servicio: "CA raíz", componentes: [CTRL01], redundancia: "Offline, Shamir 2 de 3", respaldo: "Copias cifradas", rto_min: 60, rto_texto: "1 h", rpo_min: 0, rpo_texto: "0" }
-    - { id: CT-09, servicio: "Caída de ESX01 (host único)", componentes: [ESX01], redundancia: "Ninguna: un solo host (H3 excluido). Los laboratorios pasan a DIRECT por el PAC: navegación sin caché, si la salida de LAB sigue disponible (CI-88)", respaldo: "3-2-1-1-0: la consola y la caché se recuperan al reponer el host restaurando desde S3 (T59)", rto_min: null, rto_supuesto: S-34, rto_texto: "Plazo de reposición del servidor [S-34, por confirmar con la DTI] + 2 h de restauración (T59); navegación sin caché mientras tanto", rpo_min: 15, rpo_texto: "15 min en la consola; la caché no tiene RPO (se reconstruye)", prueba: T59 }
+    - { id: CT-09, servicio: "Caída de ESX01 (host único)", componentes: [ESX01], redundancia: "Un solo host (H3 excluido). FW01 cae con él y DIRECT no basta: contingencia manual, la DTI devuelve la puerta de enlace de la VLAN 30 al FortiGate (estado previo al proyecto) y los laboratorios navegan sin caché", respaldo: "3-2-1-1-0: la consola y la caché se recuperan al reponer el host restaurando desde S3 (T59)", rto_min: 30, rto_supuesto: S-35, recuperacion_supuesto: S-34, rto_texto: "Navegación: 30 min objetivo [S-35]; consola y caché: reposición del servidor [S-34] + 2 h (T59)", rpo_min: 15, rpo_texto: "15 min en la consola; la caché no tiene RPO (se reconstruye)", prueba: T59 }
   regla_3_2_1_1_0:
     copias:
       - { n: 1, que: "Original", donde: "DS-VM (datastore RAID 1)", medio: "SSD en RAID 1", fuera_del_sitio: false, inmutable: false }
@@ -342,8 +342,8 @@ continuidad:
       - "UPS01 con apagado ordenado por NUT en JMP01: evita la corrupción de datastores en un corte eléctrico."
       - "RAID 1 en DS-VM: tolera la falla de un SSD."
       - "VM reconstruibles desde plantillas e IaC; los nodos de caché se recrean desde la imagen OCI (CT-02)."
-      - "Escenario «cae ESX01»: los laboratorios pasan a DIRECT por el PAC (navegación sin caché), siempre que la salida de LAB siga disponible (CI-88); la consola y la caché se recuperan al reponer el host."
+      - "Escenario «cae ESX01»: FW01 cae con el host, así que DIRECT no basta. Contingencia manual: la DTI devuelve la puerta de enlace de la VLAN 30 al FortiGate (estado previo al proyecto) y los laboratorios navegan sin caché; RTO objetivo de 30 min [S-35, a confirmar con la DTI]. Sin FW01 los laboratorios quedan sin IPS ni reglas entre zonas y sin acceso a las otras VLAN (CI-88 resuelto); la consola y la caché se recuperan al reponer el host."
       - "Respaldo 3-2-1-1-0: al reponer el host, la consola y la configuración se restauran desde S3 (T59) y los nodos de caché se recrean desde la imagen OCI; la caché se vuelve a llenar sola. El simulacro T59 comprueba esa restauración en una EC2 temporal (EC2-DR)."
       - "BRK01 e IPMI01 para recuperar FW01 sin ruteo y sin ESXi."
     pendiente: "Segundo host y CARP (H3), fuera del alcance de S1 (D2.2)."
-    plazo: "El plazo de reposición del servidor es el supuesto S-34, por confirmar con la DTI; hasta entonces el diseño no compromete un RTO del host (CI-86 resuelto)."
+    plazo: "Dos plazos, ambos por confirmar con la DTI: el de reposición del servidor (S-34), del que dependen la consola y la caché, y el de la contingencia de los laboratorios, con RTO objetivo de 30 min (S-35). Hasta entonces el diseño no compromete un RTO del host (CI-86 y CI-88 resueltos)."

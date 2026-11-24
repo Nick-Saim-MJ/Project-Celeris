@@ -317,6 +317,17 @@ def run(infra):
                 h.append(E(f"{s['id']} {s['servicio']}: sin RTO numérico debe citar el supuesto que lo fijará", "rto_supuesto: S-34"))
             else:
                 h.append(I(f"{s['id']}: RTO pendiente del supuesto {s['rto_supuesto']} (por confirmar con la DTI)"))
+        else:
+            if s.get("rto_supuesto"):    # RTO objetivo que fija un supuesto (CT-09 con S-35): debe existir y se declara por confirmar
+                if s["rto_supuesto"] not in infra.supuestos:
+                    h.append(E(f"{s['id']}: rto_supuesto {s['rto_supuesto']} no es un supuesto vigente", "Registre el supuesto en trazabilidad.yaml"))
+                else:
+                    h.append(I(f"{s['id']}: RTO de {s['rto_min']} min es un objetivo del supuesto {s['rto_supuesto']} (por confirmar con la DTI)"))
+        if s.get("recuperacion_supuesto"):   # plazo previo a restaurar (CT-09 con S-34)
+            if s["recuperacion_supuesto"] not in infra.supuestos:
+                h.append(E(f"{s['id']}: recuperacion_supuesto {s['recuperacion_supuesto']} no es un supuesto vigente", "Registre el supuesto en trazabilidad.yaml"))
+            else:
+                h.append(I(f"{s['id']}: la recuperación de la consola y la caché espera el plazo del supuesto {s['recuperacion_supuesto']} (por confirmar con la DTI)"))
         if "rpo_texto" not in s or not s["rto_texto"] or not s["rpo_texto"]:
             h.append(E(f"{s['id']} {s['servicio']}: falta RTO o RPO", "Todo servicio lleva RTO y RPO (o «No aplica» con motivo)"))
         if crit in lim and s["rto_min"] is not None:

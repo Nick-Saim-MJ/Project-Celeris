@@ -9,8 +9,8 @@
 # docs/infra/e1/CAMBIOS-INVENTARIO.md (campo `cambio` apunta a la entrada CI-nn).
 
 meta:
-  inventario_version: "1.2"
-  fecha: "2026-11-23"
+  inventario_version: "1.3"
+  fecha: "2026-11-24"
   documento_base:
     archivo: docs/Celeris-Edge-Documento-Maestro.md
     version_declarada_en_cabecera: "0.2"

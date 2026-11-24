@@ -796,7 +796,7 @@ Es la VPN de D1.10, sin cambios: FW01 (detrás del FortiGate, NAT-T) ↔ VGW, ac
 | Portal | — | Se regenera desde la consola | 30 min | Última política |
 | Firewall | Break-glass (CARP en H3) | XML en Git | 1 h | Último cambio |
 | CA raíz | Offline, Shamir 2 de 3 | Copias cifradas | 1 h | 0 |
-| Caída de ESX01 (host único) | Laboratorios en `DIRECT` por el PAC (navegación sin caché) | Consola y caché se recuperan al reponer el host restaurando desde S3 (T59) | Plazo de reposición [S-34, por confirmar con la DTI] + 2 h | Consola 15 min; caché sin RPO |
+| Caída de ESX01 (host único) | FW01 cae con el host, así que `DIRECT` no basta: contingencia manual, la DTI devuelve la puerta de enlace de la VLAN 30 al FortiGate (estado previo al proyecto) y los laboratorios navegan sin caché (`DIRECT` por el PAC) | Consola y caché se recuperan al reponer el host restaurando desde S3 (T59) | Navegación: 30 min objetivo [S-35, por confirmar con la DTI]; consola y caché: plazo de reposición [S-34, por confirmar con la DTI] + 2 h | Consola 15 min; caché sin RPO |
 
 **Regla 3-2-1-1-0:**
 - 3 copias: original, copia local y S3.

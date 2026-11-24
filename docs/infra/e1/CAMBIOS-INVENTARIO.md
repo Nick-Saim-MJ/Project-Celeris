@@ -979,7 +979,7 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Estado:** resuelto (2026-11-23, decisión del equipo: escenario «cae ESX01» y supuesto S-34)
 - **Tipo:** vacío
 - **Dónde:** CE03 D2.9 (no había fila para ESX01); D2.2 excluye la alta disponibilidad entre hosts; `infra/centro_datos.yaml` → servicio CT-09 y `continuidad.punto_unico_de_falla`
-- **Decisión aplicada:** el escenario «cae ESX01» es: los laboratorios pasan a `DIRECT` por el PAC (navegación sin caché); la consola y la caché se recuperan al reponer el host restaurando desde S3 (T59). El plazo de reposición del servidor es el supuesto S-34, por confirmar con la DTI; se agregó CT-09 a la tabla de RTO/RPO sin RTO numérico hasta que S-34 tenga valor. CE03 D2.9 y Arquitectura §11 llevan la fila nueva. La EC2 temporal EC2-DR sigue siendo el medio del simulacro T59, no un destino de recuperación en producción.
+- **Decisión aplicada (ajustada por CI-88: `DIRECT` no basta, falta la contingencia manual con la DTI):** el escenario «cae ESX01» es: los laboratorios pasan a `DIRECT` por el PAC (navegación sin caché); la consola y la caché se recuperan al reponer el host restaurando desde S3 (T59). El plazo de reposición del servidor es el supuesto S-34, por confirmar con la DTI; se agregó CT-09 a la tabla de RTO/RPO sin RTO numérico hasta que S-34 tenga valor. CE03 D2.9 y Arquitectura §11 llevan la fila nueva. La EC2 temporal EC2-DR sigue siendo el medio del simulacro T59, no un destino de recuperación en producción.
 - **Decide:** equipo del proyecto; la DTI confirma S-34
 
 ### CI-87 — El trunk de 1 GbE hacia SW-ACC no deja holgura frente a D2.8
@@ -992,10 +992,26 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto con la DTI
 
 ### CI-88 — `DIRECT` con ESX01 caído depende de FW01, que es una VM de ESX01
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-24, decisión del equipo: contingencia manual y RTO objetivo de 30 min [S-35])
 - **Tipo:** contradicción (consecuencia de CI-86)
 - **Dónde:** `infra/inventory.yaml` → FW01 (`si_falla`: se pierde el ruteo entre VLAN y la salida a Internet; punto único de falla AM-12; puerta de enlace de la VLAN 30 en 10.20.32.1); D-17 (todo tráfico entre zonas pasa por FW01); CT-09
 - **Qué dicen las fuentes:** la decisión de CI-86 dice que, si cae ESX01, los laboratorios siguen en `DIRECT` por el PAC. Pero `DIRECT` solo evita los nodos de caché; el tráfico de los laboratorios sigue saliendo por FW01 hacia el FortiGate, y FW01 corre en ESX01.
-- **Decisión aplicada:** el informe presenta el escenario como lo decidió el equipo y declara la condición: `DIRECT` mantiene la navegación solo si la DTI conserva una salida de SW-ACC hacia el FortiGate sin pasar por FW01. El diseño no la prevé y no se promete RTO ≈ 0 de navegación con ESX01 caído.
-- **Propuesta:** (a) pedir a la DTI una ruta de contingencia de la VLAN de laboratorios directa al FortiGate, que se active con BRK01; o (b) aceptar que, sin ESX01, los laboratorios no tienen Internet hasta restaurar FW01 en el host repuesto (RTO de FW01 de 1 h desde el XML en Git, más el plazo S-34).
-- **Decide:** equipo del proyecto con la DTI
+- **Decisión aplicada:** CT-09 cambia. FW01 cae con el host, así que `DIRECT` no basta. Contingencia manual: la DTI devuelve la puerta de enlace de la VLAN 30 al FortiGate (estado previo al proyecto) y los laboratorios navegan sin caché (`DIRECT` por el PAC). RTO objetivo de 30 min [S-35, a confirmar con la DTI]. La consola y la caché siguen recuperándose al reponer el host restaurando desde S3 (T59), con el plazo de S-34. Durante la contingencia los laboratorios quedan sin IPS ni reglas de FW01 y sin acceso a las otras VLAN. Actualizados: informe §10 y resumen, hoja «Continuidad», autoevaluación, CE03 D2.9 y Arquitectura §11 (la misma fila), Marco común (S-35), `centro_datos.yaml` (CT-09) y V-94.
+- **Pendiente con la DTI:** FW01 es hoy el DNS de los laboratorios (Unbound en la interfaz .1 de cada VLAN, D-28), así que la contingencia también necesita un resolvedor que entregue la DTI; quedó dentro de S-35. El procedimiento no tiene una prueba T-nn en `pruebas.yaml` (no se creó una para no alterar CE0311): se ensaya y cronometra con la DTI en S2.
+- **Decide:** equipo del proyecto; la DTI confirma S-35
+
+### CI-89 — DC-2.png salía recortado: draw.io Desktop deja en blanco lo que pasa de ~8192 px
+- **Estado:** resuelto (2026-11-24)
+- **Tipo:** defecto de exportación
+- **Dónde:** `entregables/CE0331/diagramas/DC-2.png` (y el informe v1.1, que la incrusta); `infra/gen/exportar_drawio.py`; V-108
+- **Qué pasaba:** DC-2 mide 2830 × 1100 y a escala 3 el PNG era de 8437 × 3277 px; draw.io solo dibujó el 51 % superior, sin avisar, y faltaban 14 de los 30 `celeris_id` (PG-SEC, SIEM01, PG-EDGE, EDGE01, EDGE02, PG-FW-TRUNK, FW01, vSwitch1…). El .drawio y el PDF estaban completos y V-50 y V-100 no miraban los píxeles, así que nada falló.
+- **Decisión aplicada:** `escala_png()` calcula la escala de cada figura (3 si cabe; si no, la mayor con ancho y alto ≤ 8000 px y área ≤ 2^25 × 0,95): DC-2 sale a 2,84 y las otras 10 figuras siguen en 3. V-108 revisa los 11 PNG de CE0311 y CE0331: misma proporción que el dibujo y que el PDF, contenido en ≥ 90 % del alto y todo `celeris_id` dibujado. Las 7 figuras de CE0311 no estaban recortadas. DC-0…DC-3 se re-exportaron con draw.io Desktop y el ancho declarado de la página de DC-2 pasó de 2400 a 2840.
+- **Decide:** equipo del proyecto
+
+### CI-90 — Figuras de los informes: sección horizontal y ancho útil
+- **Estado:** resuelto (2026-11-24)
+- **Tipo:** decisión de maquetación
+- **Dónde:** `docs/infra/e1/build_informe.py` y `docs/infra/e2/build_informe.py` (`figura()`, `_es_apaisado()`)
+- **Qué pasaba:** FIG-1.1 y DC-0 iban en páginas verticales, y las demás tenían un tope de alto de 12,2 y 12,6 cm que las dejaba más angostas que el ancho útil de la página apaisada (25,7 cm).
+- **Decisión aplicada:** toda figura va en una sección apaisada y mide el ancho útil de la página (25,7 cm); el alto se limita a 13,4 cm (`ALTO_FIGURA_CM`) para que la figura, su leyenda y «Qué observar» quepan en la misma página. CE0311 se regeneró como v1.3 y CE0331 como v1.2.
+- **Decide:** equipo del proyecto

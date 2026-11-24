@@ -59,6 +59,19 @@ TAM_TABLA = 8.5
 COMPLETAR = "[COMPLETAR"
 
 
+FUENTES = ("infra/inventory.yaml", "infra/pruebas.yaml", "infra/trazabilidad.yaml")
+
+
+def huella_fuente() -> str:
+    """SHA-256 del contenido de los tres YAML (finales de línea normalizados). A diferencia del commit, no depende del
+    historial de git: el CI clona solo el último commit y ahí `git log` no encuentra el commit real de la fuente."""
+    import hashlib
+    h = hashlib.sha256()
+    for f in FUENTES:
+        h.update((RAIZ / f).read_bytes().replace(b"\r\n", b"\n"))
+    return h.hexdigest()[:16]
+
+
 def nombre_docx(x: Infra) -> str:
     return f"Informe_Diseno_Red_v{x.inv['meta']['inventario_version']}.docx"
 
@@ -1098,6 +1111,7 @@ def exportar_pdf(docx: Path) -> dict:
     info["docx"] = docx.relative_to(RAIZ).as_posix()
     info["pdf"] = pdf.relative_to(RAIZ).as_posix()
     info["commit_fuente"] = commit_fuente()
+    info["huella_fuente"] = huella_fuente()
     return info
 
 

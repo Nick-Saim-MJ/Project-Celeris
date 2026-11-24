@@ -1,7 +1,7 @@
 """Gancho V-80+ — Informe DOCX/PDF (H3): 11 secciones, sin texto guía, IDs vigentes, IP del inventario, figuras y evidencias.
 
 Lee entregables/CE0311/Informe_Diseno_Red_v<versión>.docx y .pdf (los genera docs/infra/e1/build_informe.py con `make informe`):
-    V-80  DOCX y PDF existen y abren; el PDF y docs/infra/e1/informe-paginas.json corresponden al mismo commit de la fuente.
+    V-80  DOCX y PDF existen y abren; docs/infra/e1/informe-paginas.json tiene la huella SHA-256 de la fuente actual.
     V-81  Las 11 secciones de la plantilla, en orden, con todas sus subsecciones y contenido bajo cada título.
     V-82  Ningún texto guía de la plantilla, marcador «[ Espacio para diagrama…», «____» ni red de ejemplo 192.168.x.x.
     V-83  Ningún ID retirado en v0.4 (componente, zona, flujo o prueba), salvo en una frase que diga que está retirado.
@@ -10,7 +10,7 @@ Lee entregables/CE0311/Informe_Diseno_Red_v<versión>.docx y .pdf (los genera do
     V-86  Cifras repetidas coherentes con la fuente: número de VLAN, PCs, laboratorios, resultados y mediciones del Modo L.
     V-87  Evidencia por criterio de la rúbrica (R1–R8): secciones con contenido, figuras y pruebas citadas en el texto.
     V-88  Marcas [COMPLETAR] pendientes — advertencia: datos que el equipo debe completar antes de entregar.
-    V-89  Control de versiones y portada citan la versión del inventario y el commit actual de la fuente.
+    V-89  Control de versiones y portada citan la versión del inventario y el commit de la fuente registrado al generar.
 """
 import ipaddress
 import json
@@ -114,11 +114,15 @@ def run(infra):
     info = {}
     if bi.PAGINAS_JSON.exists():
         info = json.loads(bi.PAGINAS_JSON.read_text(encoding="utf-8"))
-        if info.get("commit_fuente") != commit:
-            h.append(E(f"informe-paginas.json es del commit {info.get('commit_fuente')}, la fuente está en {commit}", GENERAR))
+        # Se compara el contenido de la fuente (huella), no el commit: en el CI el clon es superficial y `git log` devuelve
+        # el commit de prueba del PR. El commit citado en el informe es el que se registró al generarlo.
+        if info.get("huella_fuente") != bi.huella_fuente():
+            h.append(E("infra/*.yaml cambió después de generar el informe (la huella no coincide con informe-paginas.json)",
+                       GENERAR))
+        commit = info.get("commit_fuente") or commit
     else:
         h.append(W("Falta docs/infra/e1/informe-paginas.json (páginas por sección)", GENERAR))
-    resultado("V-80", "Informe: DOCX y PDF existen, abren y son del commit actual", h,
+    resultado("V-80", "Informe: DOCX y PDF existen, abren y son de la fuente actual", h,
               f"{rel}; PDF {paginas or '?'} páginas; motor {info.get('motor', '?')}")
 
     cuerpo, titulos = _cuerpo(doc)
@@ -283,7 +287,7 @@ def run(infra):
     if fila is None:
         h.append(E(f"El control de versiones no tiene una fila para la versión {version}", GENERAR))
     elif f"commit {commit}" not in fila:
-        h.append(E(f"El control de versiones no cita el commit actual de la fuente ({commit})", GENERAR))
+        h.append(E(f"El control de versiones no cita el commit de la fuente registrado al generarlo ({commit})", GENERAR))
     portada = " ".join(t for s, t in cuerpo if s == "portada")
     if f"commit {commit}" not in portada or f"Versión {version}" not in portada:
         h.append(E(f"La portada no cita «Versión {version}» y el commit {commit}", GENERAR))

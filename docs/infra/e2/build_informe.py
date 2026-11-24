@@ -348,7 +348,7 @@ def t_decisiones(x, d):
 
 def t_supuestos(x, d):
     x, cd = fuentes()
-    usados = ["S-04", "S-08", "S-11", "S-12", "S-13", "S-14", "S-26", "S-29", "S-30", "S-33", "S-34"]
+    usados = ["S-04", "S-08", "S-11", "S-12", "S-13", "S-14", "S-26", "S-29", "S-30", "S-33", "S-34", "S-35"]
     filas = [[s, x.supuestos[s]["supuesto"], re.sub(r"\s+", " ", str(x.supuestos[s]["valor"])), x.supuestos[s]["validacion"]] for s in usados]
     return (["ID", "Supuesto", "Valor", "Cómo se valida"], filas, [1.3, 4.2, 7.0, 4.5], False)
 
@@ -377,7 +377,7 @@ TABLAS = {n[2:]: f for n, f in globals().items() if n.startswith("t_") and calla
 class ConstructorDC(e1.Constructor):
     def _es_apaisado(self, b) -> bool:
         if b[0] == "figura":
-            return b[1] != "DC-0"
+            return True
         return b[0] == "tabla" and b[1] in TABLAS and TABLAS[b[1]](self.x, self.d)[3]
 
     def figura(self, fid: str, observar: str):
@@ -389,13 +389,13 @@ class ConstructorDC(e1.Constructor):
             png, leyenda = DIAGRAMAS / f"{fid}.png", cd.raw["figuras"][fid]["leyenda"]
         if not png.exists():
             raise SystemExit(f"Falta {png.relative_to(RAIZ)}: ejecute make diagrams-dc")
-        apaisada = fid != "DC-0"
-        if apaisada and not self.ultimo_fue_figura:
+        apaisada = True                         # CI-90: toda figura va en una sección horizontal, al ancho útil de la página
+        if not self.ultimo_fue_figura:
             self.salto_seccion(apaisada=False)
         from PIL import Image
         with Image.open(png) as im:
             ratio = im.size[0] / im.size[1]
-        ancho_cm = min(e1.ANCHO_APAISADO / e1.CM_TWIPS, 12.6 * ratio) if apaisada else min(e1.ANCHO_VERTICAL / e1.CM_TWIPS, 11.0 * ratio)
+        ancho_cm = min(e1.ANCHO_APAISADO / e1.CM_TWIPS, e1.ALTO_FIGURA_CM * ratio)
         p = self.doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         e1._espaciado(p, 0, 60)

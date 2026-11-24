@@ -53,6 +53,7 @@ A4_CORTO, A4_LARGO, MARGEN = 11906, 16838, 1134
 ANCHO_VERTICAL = A4_CORTO - 2 * MARGEN       # 9638
 ANCHO_APAISADO = A4_LARGO - 2 * MARGEN        # 14570
 CM_TWIPS = 567
+ALTO_FIGURA_CM = 13.4   # alto máximo de la imagen en la página apaisada (17 cm útiles menos entrada, leyenda y «qué observar»)
 COLOR_CABECERA = "1F3864"
 TAM_TEXTO = 10.5
 TAM_TABLA = 8.5
@@ -742,16 +743,13 @@ class Constructor:
         png = DIAGRAMAS / f"{fid}.png"
         if not png.exists():
             raise SystemExit(f"Falta {png.relative_to(RAIZ)}: ejecute make diagrams-check (H1)")
-        apaisada = fid != "FIG-1.1"
-        if apaisada and not self.ultimo_fue_figura:
+        apaisada = True                         # CI-90: toda figura va en una sección horizontal, al ancho útil de la página
+        if not self.ultimo_fue_figura:
             self.salto_seccion(apaisada=False)
         from PIL import Image
         with Image.open(png) as im:
             ratio = im.size[0] / im.size[1]
-        if apaisada:
-            ancho_cm = min(ANCHO_APAISADO / CM_TWIPS, 12.2 * ratio)
-        else:
-            ancho_cm = min(ANCHO_VERTICAL / CM_TWIPS, 11.0 * ratio)
+        ancho_cm = min(ANCHO_APAISADO / CM_TWIPS, ALTO_FIGURA_CM * ratio)
         p = self.doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         _espaciado(p, 0, 60)
@@ -834,7 +832,7 @@ class Constructor:
 
     def _es_apaisado(self, b) -> bool:
         if b[0] == "figura":
-            return b[1] != "FIG-1.1"
+            return True
         return b[0] == "tabla" and b[1] in TABLAS and TABLAS[b[1]](self.x, self.d)[3]
 
     def render(self, bloques, salto_h1=False):

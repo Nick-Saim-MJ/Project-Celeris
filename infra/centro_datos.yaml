@@ -44,6 +44,14 @@ objetivos:    # D2.3; `verificable` dice dónde se comprueba
   - { id: DC-OBJ-4, objetivo: "Respaldo inmutable", indicador: "Copias con bloqueo de borrado", meta: "100 % de la base de la consola y de las configuraciones", verificable: "V-94", responsable: Infraestructura }
   - { id: DC-OBJ-5, objetivo: "Reproducibilidad", indicador: "Tiempo para recrear EC2-GW y la VPC", meta: "≤ 15 min", verificable: "OpenTofu (S2)", responsable: Cloud }
 
+# Figuras de este entregable (la integración híbrida reutiliza FIG-5.4 de CE0311 tal cual, sin redibujarla)
+figuras:
+  DC-0: { leyenda: "Figura 1.1 — Topología ejecutiva del centro de datos híbrido", seccion: "1", muestra: "Rack on-premise (ESXi) y entorno AWS, y el punto de integración (la VPN de CE0311)" }
+  DC-1: { leyenda: "Figura 5.1 — Topología física propuesta del centro de datos on-premise", seccion: "5.1", muestra: "Disposición del rack de 12U, ESX01 con sus 4 NIC y sus datastores, SW-CORE01, UPS01, el enlace al FortiGate y los accesos de gestión" }
+  DC-2: { leyenda: "Figura 5.2 — Diseño interno del hipervisor VMware ESXi", seccion: "5.2", muestra: "vSwitch0 y vSwitch1, port groups con su VLAN, NIC físicas, las 11 VM con sus vCPU y RAM y los datastores" }
+  DC-3: { leyenda: "Figura 6.1 — Diseño de arquitectura AWS / VPC", seccion: "6.2", muestra: "Región, VPC y CIDR, subredes pub-a y app-a, IGW, VGW, tablas de rutas, endpoint de S3, S3 con Object Lock, Security Groups y NACL; EC2-DR y NAT-DR como temporales" }
+referencia_hibrida: { figura: FIG-5.4, origen: "entregables/CE0311/diagramas/FIG-5.4.png", leyenda: "Figura 7.1 — Integración híbrida: VPN IPsec entre FW01 y el VGW (FIG-5.4 del Entregable 1, sin cambios)", seccion: "7" }
+
 # ------------------------------------------------------------------------------------------------------------------
 # On-premise: host, almacenamiento, red del hipervisor, VM, rack y energía (D2.4)
 # ------------------------------------------------------------------------------------------------------------------

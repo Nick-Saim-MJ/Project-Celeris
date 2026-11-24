@@ -3,9 +3,11 @@
   "title": "infra/centro_datos.yaml (CE0331)",
   "type": "object",
   "additionalProperties": false,
-  "required": ["meta", "contexto", "objetivos", "host", "almacenamiento", "hipervisor_red", "maquinas_virtuales", "totales_d24", "orden_arranque", "rack", "energia", "dimensionamiento", "aws", "continuidad"],
+  "required": ["meta", "contexto", "figuras", "referencia_hibrida", "objetivos", "host", "almacenamiento", "hipervisor_red", "maquinas_virtuales", "totales_d24", "orden_arranque", "rack", "energia", "dimensionamiento", "aws", "continuidad"],
   "properties": {
     "meta": {"type": "object", "required": ["version", "fecha", "entregable", "inventario"]},
+    "figuras": {"type": "object"},
+    "referencia_hibrida": {"type": "object"},
     "contexto": {"type": "object", "required": ["problema", "onpremise", "cloud", "criterio_reparto", "alcance_excluye"]},
     "objetivos": {"type": "array", "minItems": 5, "items": {"type": "object", "required": ["id", "objetivo", "indicador", "meta", "verificable", "responsable"]}},
     "host": {"type": "object", "required": ["componente", "hipervisor", "cpu", "ram_gb", "nic", "vmk"],

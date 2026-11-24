@@ -1,0 +1,319 @@
+<mxfile host="celeris-infra-gen" type="device" version="24.7.17">
+  <diagram id="DC-3" name="DC-3">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="1230" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <object id="DC-3-1" label="&lt;b&gt;Figura 6.1 — Diseño de arquitectura AWS / VPC&lt;/b&gt;&lt;br&gt;DC-3 · Centro de datos v1.0 · 2026-11-23 · inventario v1.1 · huella de la fuente 09b67389 · CE0331 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="DC-3" titulo="Figura 6.1 — Diseño de arquitectura AWS / VPC">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;align=left;spacingLeft=10;fontSize=13;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="20" y="10" width="1560" height="44" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-2" label="&lt;b&gt;Internet&lt;/b&gt;&lt;br&gt;usuarios del panel y ACME" celeris_id="INTERNET" celeris_tipo="zona" confianza="Nula" proposito="Internet pública: ISP, orígenes web, ACME, feeds y S3 (bucket celeris-backups)" tooltip="INTERNET: Internet pública: ISP, orígenes web, ACME, feeds y S3 (bucket celeris-backups). Regla: Entrada solo 443 (y 80 → redirección) hacia PORTAL01 por NAT 1:1 en el FortiGate y 443 hacia EC2-GW; señuelos en ventana autorizada">
+          <mxCell style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#4D4D4D;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="60" y="100" width="240" height="90" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-3" label="&lt;b&gt;Campus Juliaca 10.20.0.0/16&lt;/b&gt;&lt;br&gt;FW01 (VTI1, VTI2), detrás de FGT-EXT: extremo VPN on-premise. La integración se dibuja en FIG-5.4 de CE0311 y no se repite aquí." celeris_rol="campus" celeris_ref="VGW">
+          <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#F3EDFF;strokeColor=#8C4FFF;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="20" y="760" width="250" height="150" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-4" label="&lt;b&gt;AWS&lt;/b&gt; · zona AWS · confianza Baja · región us-east-1 (laboratorio) · producción candidata sa-east-1 [S-11]" celeris_id="AWS" celeris_tipo="zona" cidr="10.30.0.0/16" confianza="Baja" proposito="VPC celeris (10.30.0.0/16): EC2-GW (panel remoto), S3 de respaldos y subred privada vacía para el simulacro de recuperación" tooltip="AWS: VPC celeris (10.30.0.0/16): EC2-GW (panel remoto), S3 de respaldos y subred privada vacía para el simulacro de recuperación. Regla: Alcanzable solo por VPN desde el campus; desde Internet solo EC2-GW:443; Security Groups y NACL de D2.5">
+          <mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud_alt;strokeColor=#232F3E;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacingLeft=30;fontSize=11;fontColor=#232F3E;container=0;dashed=0;" parent="1" vertex="1">
+            <mxGeometry x="310" y="80" width="1500" height="1080" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-5" label="&lt;b&gt;AWS-VPC&lt;/b&gt; · 10.30.0.0/16 · &lt;b&gt;ALTA&lt;/b&gt;" celeris_id="AWS-VPC" celeris_tipo="componente" ip="10.30.0.0/16" zona="AWS" criticidad="Alta" estado="diseño" por_que="Aísla los recursos del proyecto en AWS; región como variable var.region de OpenTofu [S-11]." aporta="El Internet Gateway y las tablas de rutas se dibujan dentro de AWS-VPC y no tienen ID propio (CI-13). Tablas rt-public y rt-private; 10.20.0.0/16 propagada desde el VGW; Gateway Endpoint de S3; sg-gw, sg-dr (simulacro), nacl-public y nacl-private de D2.5." si_falla="Se pierden los recursos de AWS; se recrean desde código (RTO 15 min, D2.9)." flujos="" pruebas="T04" placeholders="1" tooltip="AWS-VPC · Alta&#10;Por qué: Aísla los recursos del proyecto en AWS; región como variable var.region de OpenTofu [S-11].&#10;Aporta: El Internet Gateway y las tablas de rutas se dibujan dentro de AWS-VPC y no tienen ID propio (CI-13). Tablas rt-public y rt-private; 10.20.0.0/16 propagada desde el VGW; Gateway Endpoint de S3; sg-gw, sg-dr (simulacro), nacl-public y nacl-private de D2.5.&#10;Si falla: Se pierden los recursos de AWS; se recrean desde código (RTO 15 min, D2.9).">
+          <mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc2;strokeColor=#8C4FFF;fillColor=none;strokeWidth=3;html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacingLeft=30;fontSize=10;fontColor=#232F3E;container=0;dashed=0;" parent="1" vertex="1">
+            <mxGeometry x="400" y="130" width="1060" height="1000" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-6" label="&lt;b&gt;Reserva&lt;/b&gt; 10.30.128.0/17: crecimiento (sin subredes). Etiquetas: Proyecto=celeris-edge; Ttl en lo efímero." celeris_rol="reserva" celeris_ref="AWS-VPC">
+          <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1010" y="135" width="440" height="56" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-7" label="&lt;b&gt;IGW01&lt;/b&gt; · Internet Gateway · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;Entrada y salida de Internet de pub-a" celeris_id="IGW01" celeris_tipo="elemento" tipo="Red (puerta a Internet)" entorno="AWS" criticidad="Media" funcion="Salida y entrada de Internet de la subred pública" recursos="Sin costo por hora" por_que="pub-a necesita una ruta 0.0.0.0/0 a Internet para recibir el TCP 443 de los usuarios del panel (F29) y para ACME." si_falla="EC2-GW queda sin tráfico de Internet: se pierde el acceso remoto; el campus no se afecta. Se recrea con OpenTofu." tooltip="IGW01 · Media&#10;Función: Salida y entrada de Internet de la subred pública&#10;Por qué: pub-a necesita una ruta 0.0.0.0/0 a Internet para recibir el TCP 443 de los usuarios del panel (F29) y para ACME.&#10;Si falla: EC2-GW queda sin tráfico de Internet: se pierde el acceso remoto; el campus no se afecta. Se recrea con OpenTofu.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="700" y="138" width="280" height="56" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-8" label="&lt;b&gt;VGW&lt;/b&gt; · Virtual Private Gateway · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;2 túneles IPsec · ASN 64512 · propaga rutas por BGP&lt;br&gt;&lt;i&gt;Extremo AWS de la VPN con BGP&lt;/i&gt;" celeris_id="VGW" celeris_tipo="componente" ip="IP públicas asignadas por AWS (1 por túnel)" zona="AWS" criticidad="Alta" estado="diseño" por_que="Es el extremo AWS de la VPN site-to-site: anuncia 10.30.0.0/16 por BGP (ASN 64512) y aprende 10.20.0.0/16 sin cambios manuales. Transporta F30 y F13; lo exige la rúbrica de conectividad híbrida." aporta="Dos túneles IPsec IKEv2 (activo/pasivo) con IP asignadas por AWS; propaga rutas a rt-public y rt-private." si_falla="Se pierde la conectividad híbrida; el campus sigue funcionando (el DIRECT y los nodos no dependen de AWS). Mitigación: entorno AWS recreable desde OpenTofu, RTO 15 min (D2.9)." flujos="" pruebas="T01, T02, T05, T21, T58" placeholders="1" tooltip="VGW · Alta&#10;Por qué: Es el extremo AWS de la VPN site-to-site: anuncia 10.30.0.0/16 por BGP (ASN 64512) y aprende 10.20.0.0/16 sin cambios manuales. Transporta F30 y F13; lo exige la rúbrica de conectividad híbrida.&#10;Aporta: Dos túneles IPsec IKEv2 (activo/pasivo) con IP asignadas por AWS; propaga rutas a rt-public y rt-private.&#10;Si falla: Se pierde la conectividad híbrida; el campus sigue funcionando (el DIRECT y los nodos no dependen de AWS). Mitigación: entorno AWS recreable desde OpenTofu, RTO 15 min (D2.9).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8C4FFF;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="330" y="330" width="240" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpn_gateway;fillColor=#8C4FFF;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-3-9" value="">
+          <mxGeometry x="335" y="336" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-3-10" label="&lt;b&gt;AWS-PUB-A&lt;/b&gt; · 10.30.0.0/24 · AZ a · &lt;b&gt;MEDIA&lt;/b&gt;" celeris_id="AWS-PUB-A" celeris_tipo="componente" ip="10.30.0.0/24" zona="AWS" criticidad="Media" estado="diseño" por_que="Aloja EC2-GW; es la única subred con ruta al Internet Gateway." aporta="rt-public: 0.0.0.0/0 → Internet Gateway y 10.20.0.0/16 → VGW (propagada por BGP); EC2-GW en 10.30.0.10 y, solo durante el simulacro, NAT-DR." si_falla="Se pierde el acceso remoto al panel (ver EC2-GW)." flujos="" pruebas="" placeholders="1" tooltip="AWS-PUB-A · Media&#10;Por qué: Aloja EC2-GW; es la única subred con ruta al Internet Gateway.&#10;Aporta: rt-public: 0.0.0.0/0 → Internet Gateway y 10.20.0.0/16 → VGW (propagada por BGP); EC2-GW en 10.30.0.10 y, solo durante el simulacro, NAT-DR.&#10;Si falla: Se pierde el acceso remoto al panel (ver EC2-GW).">
+          <mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#7AA116;fillColor=#F2F6E8;strokeWidth=2;html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacingLeft=30;fontSize=10;fontColor=#232F3E;container=0;dashed=0;" parent="1" vertex="1">
+            <mxGeometry x="600" y="230" width="820" height="320" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-11" label="&lt;b&gt;EC2-GW&lt;/b&gt; · Proxy inverso del panel remoto · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;t3.micro · 2 vCPU · 1 GiB · 8 GB gp3 · 10.30.0.10&lt;br&gt;&lt;i&gt;Panel remoto sin exponer ningún puerto del campus&lt;/i&gt;" celeris_id="EC2-GW" celeris_tipo="componente" ip="10.30.0.10" zona="AWS" criticidad="Media" estado="diseño" por_que="Permite al encargado usar la consola desde fuera del campus sin publicar ningún puerto del campus: termina TLS, aplica el WAF y reenvía solo la consola a CTRL01:443 por la VPN. No guarda datos ni llaves de firma." aporta="Caddy con certificado público (ACME), TLS 1.3, HSTS, Coraza (OWASP CRS) y límite de intentos; recibe TCP 443 de Internet (F29) y reenvía solo a CTRL01:443 por IPsec con su certificado de cliente (mTLS, F30); su salida está limitada a CTRL01:443, SIEM01:1514/1515 (F13) y TCP 443 a Internet (ACME y actualizaciones). t3.micro con 8 GB gp3 en pub-a." si_falla="Solo se pierde el acceso remoto; la consola local sigue (ENC01). Si se compromete, se destruye y se recrea con OpenTofu en 15 min." flujos="F13, F29, F30" pruebas="T01, T02, T03, T05, T11, T18, T19, T21, T27, T30, T31, T47, T53, T54, T58" placeholders="1" tooltip="EC2-GW · Media&#10;Por qué: Permite al encargado usar la consola desde fuera del campus sin publicar ningún puerto del campus: termina TLS, aplica el WAF y reenvía solo la consola a CTRL01:443 por la VPN. No guarda datos ni llaves de firma.&#10;Aporta: Caddy con certificado público (ACME), TLS 1.3, HSTS, Coraza (OWASP CRS) y límite de intentos; recibe TCP 443 de Internet (F29) y reenvía solo a CTRL01:443 por IPsec con su certificado de cliente (mTLS, F30); su salida está limitada a CTRL01:443, SIEM01:1514/1515 (F13) y TCP 443 a Internet (ACME y actualizaciones). t3.micro con 8 GB gp3 en pub-a.&#10;Si falla: Solo se pierde el acceso remoto; la consola local sigue (ENC01). Si se compromete, se destruye y se recrea con OpenTofu en 15 min.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="620" y="270" width="330" height="110" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;fillColor=#ED7100;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-3-12" value="">
+          <mxGeometry x="625" y="276" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-3-13" label="&lt;b&gt;NAT-DR&lt;/b&gt; · Instancia NAT temporal del simulacro · &lt;b&gt;BAJA&lt;/b&gt; · &lt;i&gt;temporal&lt;/i&gt;&lt;br&gt;t3.micro · solo en el simulacro T59&lt;br&gt;&lt;i&gt;NAT solo durante el simulacro de recuperación&lt;/i&gt;" celeris_id="NAT-DR" celeris_tipo="componente" ip="Temporal: IP privada de pub-a asignada al crearla" zona="AWS" criticidad="Baja" estado="temporal" por_que="Permite que EC2-DR instale paquetes durante el simulacro y demuestra NAT (rúbrica de S2) sin una instancia NAT 24×7." aporta="t3.micro en pub-a; rt-private apunta a ella 0.0.0.0/0 solo durante el simulacro (sg-dr); lleva la etiqueta Ttl y se destruye al terminar T59." si_falla="Sin efecto en operación normal; EC2-DR no puede instalar paquetes durante el simulacro." flujos="" pruebas="T59" placeholders="1" tooltip="NAT-DR · Baja&#10;Por qué: Permite que EC2-DR instale paquetes durante el simulacro y demuestra NAT (rúbrica de S2) sin una instancia NAT 24×7.&#10;Aporta: t3.micro en pub-a; rt-private apunta a ella 0.0.0.0/0 solo durante el simulacro (sg-dr); lleva la etiqueta Ttl y se destruye al terminar T59.&#10;Si falla: Sin efecto en operación normal; EC2-DR no puede instalar paquetes durante el simulacro.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;dashed=1;dashPattern=3 3;" parent="1" vertex="1">
+            <mxGeometry x="620" y="400" width="330" height="90" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;fillColor=#ED7100;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-3-14" value="">
+          <mxGeometry x="625" y="406" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-3-15" label="&lt;b&gt;sg-gw&lt;/b&gt; · Security Group de EC2-GW · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;entrada TCP 443 desde 0.0.0.0/0 (F29)&lt;br&gt;&lt;i&gt;salida: 443 → 10.20.20.10 · 1514/1515 → 10.20.50.10 · 443 Internet&lt;/i&gt;" celeris_id="sg-gw" celeris_tipo="elemento" tipo="Seguridad (Security Group)" entorno="AWS" criticidad="Media" funcion="Firewall con estado de EC2-GW" recursos="1 regla(s) de entrada · 3 de salida" por_que="Limita a TCP 443 la entrada pública y la salida a CTRL01:443, SIEM01:1514/1515 y 443 a Internet." si_falla="Si se abre de más, EC2-GW queda más expuesta; la NACL de la subred y la ausencia de datos en la instancia limitan el daño." tooltip="sg-gw · Media&#10;Función: Firewall con estado de EC2-GW&#10;Por qué: Limita a TCP 443 la entrada pública y la salida a CTRL01:443, SIEM01:1514/1515 y 443 a Internet.&#10;Si falla: Si se abre de más, EC2-GW queda más expuesta; la NACL de la subred y la ausencia de datos en la instancia limitan el daño.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#7AA116;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="980" y="270" width="420" height="110" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-16" label="&lt;b&gt;nacl-public&lt;/b&gt; · NACL de pub-a · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;deniega TCP 22 y 3389 desde Internet; permite 443 y retorno efímero" celeris_id="nacl-public" celeris_tipo="elemento" tipo="Seguridad (NACL)" entorno="AWS" criticidad="Media" funcion="Filtro sin estado de la subred AWS-PUB-A" recursos="3 regla(s) de entrada" por_que="Niega TCP 22 y 3389 desde Internet y permite 443 y el retorno efímero." si_falla="Queda solo el Security Group como filtro; se restaura desde OpenTofu." tooltip="nacl-public · Media&#10;Función: Filtro sin estado de la subred AWS-PUB-A&#10;Por qué: Niega TCP 22 y 3389 desde Internet y permite 443 y el retorno efímero.&#10;Si falla: Queda solo el Security Group como filtro; se restaura desde OpenTofu.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#7AA116;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="980" y="400" width="420" height="90" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-17" label="&lt;b&gt;rt-public&lt;/b&gt; · Tabla de rutas de pub-a · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;0.0.0.0/0 → IGW01 · 10.20.0.0/16 → VGW (BGP)" celeris_id="rt-public" celeris_tipo="elemento" tipo="Red (tabla de rutas)" entorno="AWS" criticidad="Media" funcion="0.0.0.0/0 → IGW01; 10.20.0.0/16 → VGW" recursos="Subred: AWS-PUB-A" por_que="Decide a dónde va el tráfico de la subred: Internet por el IGW, el campus por el VGW (BGP) y S3 por el endpoint." si_falla="Sin la ruta correcta la subred pierde su destino; se recrea con OpenTofu (RTO 15 min)." tooltip="rt-public · Media&#10;Función: 0.0.0.0/0 → IGW01; 10.20.0.0/16 → VGW&#10;Por qué: Decide a dónde va el tráfico de la subred: Internet por el IGW, el campus por el VGW (BGP) y S3 por el endpoint.&#10;Si falla: Sin la ruta correcta la subred pierde su destino; se recrea con OpenTofu (RTO 15 min).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#7AA116;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="620" y="500" width="780" height="40" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-18" label="&lt;b&gt;AWS-APP-A&lt;/b&gt; · 10.30.10.0/24 · AZ a · &lt;b&gt;BAJA&lt;/b&gt;" celeris_id="AWS-APP-A" celeris_tipo="componente" ip="10.30.10.0/24" zona="AWS" criticidad="Baja" estado="diseño" por_que="Vacía en operación normal; en el simulacro de recuperación (T59) aloja una EC2 temporal que restaura la consola desde S3." aporta="rt-private: 10.20.0.0/16 → VGW y prefijo S3 por Gateway Endpoint; solo en el simulacro, 0.0.0.0/0 → instancia NAT temporal." si_falla="Sin efecto en operación normal; el simulacro de recuperación (T59) no puede ejecutarse." flujos="" pruebas="T04, T59" placeholders="1" tooltip="AWS-APP-A · Baja&#10;Por qué: Vacía en operación normal; en el simulacro de recuperación (T59) aloja una EC2 temporal que restaura la consola desde S3.&#10;Aporta: rt-private: 10.20.0.0/16 → VGW y prefijo S3 por Gateway Endpoint; solo en el simulacro, 0.0.0.0/0 → instancia NAT temporal.&#10;Si falla: Sin efecto en operación normal; el simulacro de recuperación (T59) no puede ejecutarse.">
+          <mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_security_group;grStroke=0;strokeColor=#00A4A6;fillColor=#E6F6F7;strokeWidth=1;html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacingLeft=30;fontSize=10;fontColor=#232F3E;container=0;dashed=0;" parent="1" vertex="1">
+            <mxGeometry x="600" y="600" width="820" height="320" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-19" label="&lt;b&gt;EC2-DR&lt;/b&gt; · EC2 temporal del simulacro de recuperación · &lt;b&gt;BAJA&lt;/b&gt; · &lt;i&gt;temporal&lt;/i&gt;&lt;br&gt;t3.small · 2 vCPU · 2 GiB · sin entrada desde Internet&lt;br&gt;&lt;i&gt;Restaura la consola desde S3 durante el simulacro&lt;/i&gt;" celeris_id="EC2-DR" celeris_tipo="componente" ip="Temporal: IP privada de app-a asignada al crearla" zona="AWS" criticidad="Baja" estado="temporal" por_que="La rúbrica de S2 pide recuperar un recurso en AWS: se crea solo durante el simulacro (T59), restaura la consola desde S3 y se destruye, sin pagar 24×7." aporta="t3.small en app-a, sin entrada desde Internet; salida a S3 por el Gateway Endpoint y a NAT-DR (sg-dr); lleva la etiqueta Ttl y se destruye al terminar T59." si_falla="Sin efecto en operación normal; el simulacro (T59) no demostraría la recuperación." flujos="" pruebas="T59" placeholders="1" tooltip="EC2-DR · Baja&#10;Por qué: La rúbrica de S2 pide recuperar un recurso en AWS: se crea solo durante el simulacro (T59), restaura la consola desde S3 y se destruye, sin pagar 24×7.&#10;Aporta: t3.small en app-a, sin entrada desde Internet; salida a S3 por el Gateway Endpoint y a NAT-DR (sg-dr); lleva la etiqueta Ttl y se destruye al terminar T59.&#10;Si falla: Sin efecto en operación normal; el simulacro (T59) no demostraría la recuperación.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;dashed=1;dashPattern=3 3;" parent="1" vertex="1">
+            <mxGeometry x="620" y="640" width="330" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;fillColor=#ED7100;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-3-20" value="">
+          <mxGeometry x="625" y="646" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-3-21" label="&lt;b&gt;sg-dr&lt;/b&gt; · Security Group de EC2-DR · &lt;b&gt;BAJA&lt;/b&gt;&lt;br&gt;sin entrada; salida a S3 (endpoint) y a NAT-DR" celeris_id="sg-dr" celeris_tipo="elemento" tipo="Seguridad (Security Group)" entorno="AWS" criticidad="Baja" funcion="Firewall con estado de EC2-DR" recursos="0 regla(s) de entrada · 2 de salida" por_que="Sin entrada desde Internet; solo sale a S3 por el endpoint y a NAT-DR durante el simulacro." si_falla="Sin efecto en operación normal (existe solo en el simulacro)." tooltip="sg-dr · Baja&#10;Función: Firewall con estado de EC2-DR&#10;Por qué: Sin entrada desde Internet; solo sale a S3 por el endpoint y a NAT-DR durante el simulacro.&#10;Si falla: Sin efecto en operación normal (existe solo en el simulacro).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#00A4A6;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;dashed=1;dashPattern=3 3;" parent="1" vertex="1">
+            <mxGeometry x="980" y="640" width="420" height="70" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-22" label="&lt;b&gt;nacl-private&lt;/b&gt; · NACL de app-a · &lt;b&gt;BAJA&lt;/b&gt;&lt;br&gt;permite TCP 443 desde pub-a y retorno efímero; sin SSH" celeris_id="nacl-private" celeris_tipo="elemento" tipo="Seguridad (NACL)" entorno="AWS" criticidad="Baja" funcion="Filtro sin estado de la subred AWS-APP-A" recursos="2 regla(s) de entrada" por_que="Permite solo TCP 443 desde pub-a y el retorno efímero; sin SSH." si_falla="Queda solo el Security Group como filtro; se restaura desde OpenTofu." tooltip="nacl-private · Baja&#10;Función: Filtro sin estado de la subred AWS-APP-A&#10;Por qué: Permite solo TCP 443 desde pub-a y el retorno efímero; sin SSH.&#10;Si falla: Queda solo el Security Group como filtro; se restaura desde OpenTofu.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#00A4A6;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="980" y="720" width="420" height="70" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-23" label="&lt;b&gt;VPCE-S3&lt;/b&gt; · Endpoint · &lt;b&gt;BAJA&lt;/b&gt;&lt;br&gt;Gateway Endpoint de S3 · sin costo por hora" celeris_id="VPCE-S3" celeris_tipo="elemento" tipo="Red (endpoint de pasarela)" entorno="AWS" criticidad="Baja" funcion="Acceso privado a S3 desde la subred privada" recursos="Sin costo por hora" por_que="EC2-DR restaura desde S3 sin necesitar NAT para ello: el tráfico a S3 va por el endpoint, que no tiene costo por hora." si_falla="Sin efecto en operación normal; el simulacro (T59) usaría NAT-DR para llegar a S3." tooltip="VPCE-S3 · Baja&#10;Función: Acceso privado a S3 desde la subred privada&#10;Por qué: EC2-DR restaura desde S3 sin necesitar NAT para ello: el tráfico a S3 va por el endpoint, que no tiene costo por hora.&#10;Si falla: Sin efecto en operación normal; el simulacro (T59) usaría NAT-DR para llegar a S3.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="620" y="760" width="330" height="56" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-24" label="&lt;b&gt;rt-private&lt;/b&gt; · Tabla de rutas de app-a · &lt;b&gt;BAJA&lt;/b&gt;&lt;br&gt;10.20.0.0/16 → VGW · prefijo S3 → VPCE-S3 · 0.0.0.0/0 → NAT-DR (solo en el simulacro)" celeris_id="rt-private" celeris_tipo="elemento" tipo="Red (tabla de rutas)" entorno="AWS" criticidad="Baja" funcion="10.20.0.0/16 → VGW; prefijo S3 → VPCE-S3; 0.0.0.0/0 → NAT-DR (solo en el simulacro)" recursos="Subred: AWS-APP-A" por_que="La subred privada no tiene ruta a Internet: solo al campus (VGW) y a S3 (endpoint); la ruta por NAT-DR existe solo en el simulacro." si_falla="Sin la ruta correcta la subred pierde su destino; se recrea con OpenTofu (RTO 15 min)." tooltip="rt-private · Baja&#10;Función: 10.20.0.0/16 → VGW; prefijo S3 → VPCE-S3; 0.0.0.0/0 → NAT-DR (solo en el simulacro)&#10;Por qué: La subred privada no tiene ruta a Internet: solo al campus (VGW) y a S3 (endpoint); la ruta por NAT-DR existe solo en el simulacro.&#10;Si falla: Sin la ruta correcta la subred pierde su destino; se recrea con OpenTofu (RTO 15 min).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#00A4A6;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="620" y="830" width="780" height="70" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-25" label="&lt;b&gt;Sin NAT permanente.&lt;/b&gt; app-a está vacía en operación normal y EC2-GW está en una subred pública con su propia IP: nada del diseño necesita salir a Internet desde una subred privada. El acceso a S3 va por el Gateway Endpoint. NAT-DR existe solo durante el simulacro T59 (etiqueta Ttl) para que EC2-DR instale paquetes; rt-private apunta a ella solo entonces." celeris_rol="nat" celeris_ref="NAT-DR">
+          <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="420" y="950" width="1020" height="76" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-26" label="&lt;b&gt;Administración:&lt;/b&gt; MFA en la cuenta, CloudTrail, AWS Budgets al 80 % y etiqueta Ttl en los recursos efímeros; administración por SSM Session Manager o EC2 Instance Connect, sin puerto 22 público (D2.5).&lt;br&gt;&lt;b&gt;Región:&lt;/b&gt; A AWS no llegan datos personales: por EC2-GW pasan sesiones cifradas que no se almacenan y a S3 llegan respaldos cifrados en origen sin su llave. La residencia de datos (Ley 29733) no obliga a una región de Sudamérica." celeris_rol="gobierno" celeris_ref="AWS-VPC">
+          <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="420" y="1034" width="1020" height="90" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-27" label="&lt;b&gt;S3&lt;/b&gt; · Respaldos con Object Lock · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;≈ 300 GB · versionado · Object Lock 30 d (compliance) · regional&lt;br&gt;&lt;i&gt;Copia fuera del sitio inmutable por 30 días&lt;/i&gt;" celeris_id="S3" celeris_tipo="componente" ip="bucket celeris-backups · Object Lock 30 días" zona="AWS" criticidad="Alta" estado="diseño" por_que="Es la copia fuera del sitio que nadie del campus puede borrar: Object Lock de 30 días en modo compliance sobre respaldos que restic cifra en origen." aporta="Bucket celeris-backups regional con versionado y Object Lock (30 días, modo compliance); recibe TCP 443 de CTRL01 por Internet (F18) y solo acepta la IP pública del campus; credencial aparte con solo s3:PutObject y condición de IP de origen [S-30]; la llave de restic no está en AWS." si_falla="Se pierde la copia externa; queda la copia local en el datastore (D2.9)." flujos="" pruebas="T40, T59" placeholders="1" tooltip="S3 · Alta&#10;Por qué: Es la copia fuera del sitio que nadie del campus puede borrar: Object Lock de 30 días en modo compliance sobre respaldos que restic cifra en origen.&#10;Aporta: Bucket celeris-backups regional con versionado y Object Lock (30 días, modo compliance); recibe TCP 443 de CTRL01 por Internet (F18) y solo acepta la IP pública del campus; credencial aparte con solo s3:PutObject y condición de IP de origen [S-30]; la llave de restic no está en AWS.&#10;Si falla: Se pierde la copia externa; queda la copia local en el datastore (D2.9).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1500" y="330" width="290" height="120" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;fillColor=#7AA116;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-3-28" value="">
+          <mxGeometry x="1505" y="336" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-3-29" label="Recibe TCP 443 de CTRL01 por Internet (F18); solo acepta la IP pública del campus; credencial solo s3:PutObject [S-30]; la llave de restic no está en AWS." celeris_rol="s3_nota" celeris_ref="S3">
+          <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1500" y="460" width="290" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-30" label="TCP 443 (F29)" celeris_id="INTERNET&gt;IGW01" celeris_tipo="enlace" enlace_a="INTERNET" enlace_b="IGW01" etiqueta="TCP 443 (F29)">
+          <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="180" y="190" as="sourcePoint" />
+              <mxPoint x="700" y="166" as="targetPoint" />
+              <Array as="points">
+                <mxPoint x="180" y="166" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-3-31" label="" celeris_id="IGW01&gt;EC2-GW" celeris_tipo="enlace" enlace_a="IGW01" enlace_b="EC2-GW" etiqueta="">
+          <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="840" y="194" as="sourcePoint" />
+              <mxPoint x="700" y="270" as="targetPoint" />
+              <Array as="points">
+                <mxPoint x="840" y="230" />
+                <mxPoint x="700" y="230" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-3-32" label="F30 · F13 por IPsec" celeris_id="EC2-GW&gt;VGW" celeris_tipo="enlace" enlace_a="EC2-GW" enlace_b="VGW" etiqueta="F30 · F13 por IPsec">
+          <mxCell style="html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="620" y="325" as="sourcePoint" />
+              <mxPoint x="570" y="380" as="targetPoint" />
+              <Array as="points">
+                <mxPoint x="595" y="325" />
+                <mxPoint x="595" y="380" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-3-33" label="VPN IPsec IKEv2 · 2 túneles · BGP" celeris_id="VGW&gt;campus" celeris_tipo="enlace" enlace_a="VGW" enlace_b="campus" etiqueta="VPN IPsec IKEv2 · 2 túneles · BGP">
+          <mxCell style="html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="330" y="380" as="sourcePoint" />
+              <mxPoint x="270" y="800" as="targetPoint" />
+              <Array as="points">
+                <mxPoint x="300" y="380" />
+                <mxPoint x="300" y="800" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-3-34" label="instala paquetes (solo T59)" celeris_id="EC2-DR&gt;NAT-DR" celeris_tipo="enlace" enlace_a="EC2-DR" enlace_b="NAT-DR" etiqueta="instala paquetes (solo T59)">
+          <mxCell style="dashed=1;dashPattern=3 3;html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="785" y="640" as="sourcePoint" />
+              <mxPoint x="785" y="490" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-3-35" label="" celeris_id="VPCE-S3&gt;EC2-DR" celeris_tipo="enlace" enlace_a="VPCE-S3" enlace_b="EC2-DR" etiqueta="">
+          <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="785" y="760" as="sourcePoint" />
+              <mxPoint x="785" y="740" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-3-36" label="restauración desde S3 (T59)" celeris_id="VPCE-S3&gt;S3" celeris_tipo="enlace" enlace_a="VPCE-S3" enlace_b="S3" etiqueta="restauración desde S3 (T59)">
+          <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="620" y="788" as="sourcePoint" />
+              <mxPoint x="1500" y="420" as="targetPoint" />
+              <Array as="points">
+                <mxPoint x="560" y="788" />
+                <mxPoint x="560" y="928" />
+                <mxPoint x="1480" y="928" />
+                <mxPoint x="1480" y="420" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-3-37" label="respaldos F18: TCP 443 cifrado en origen" celeris_id="INTERNET&gt;S3" celeris_tipo="enlace" enlace_a="INTERNET" enlace_b="S3" etiqueta="respaldos F18: TCP 443 cifrado en origen">
+          <mxCell style="dashed=1;dashPattern=3 3;html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="300" y="122" as="sourcePoint" />
+              <mxPoint x="1640" y="330" as="targetPoint" />
+              <Array as="points">
+                <mxPoint x="1640" y="122" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-3-38" label="&lt;b&gt;Leyenda&lt;/b&gt;" celeris_rol="leyenda">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1840" y="70" width="540" height="170" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-3-39" value="&lt;b&gt;Criticidad&lt;/b&gt; (grosor del borde + etiqueta):">
+          <mxGeometry x="1848" y="96" width="360" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-3-40" value="&lt;b&gt;ALTA&lt;/b&gt; · borde 3 px">
+          <mxGeometry x="1848" y="116" width="164" height="28" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-3-41" value="&lt;b&gt;MEDIA&lt;/b&gt; · borde 2 px">
+          <mxGeometry x="2020" y="116" width="164" height="28" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-3-42" value="&lt;b&gt;BAJA&lt;/b&gt; · borde 1 px">
+          <mxGeometry x="2192" y="116" width="164" height="28" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;dashed=1;dashPattern=2 2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-3-43" value="interfaz de un equipo en otra zona">
+          <mxGeometry x="1848" y="150" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=6 3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-3-44" value="existente, fuera de alcance">
+          <mxGeometry x="2106" y="150" width="250" height="26" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-3-45" value="&lt;b&gt;Íconos&lt;/b&gt; (draw.io redes / AWS4):">
+          <mxGeometry x="1848" y="184" width="300" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;fillColor=#ED7100;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-3-46" value="">
+          <mxGeometry x="1848" y="204" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-3-47" value="Instancia EC2">
+          <mxGeometry x="1872" y="204" width="148" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;fillColor=#7AA116;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-3-48" value="">
+          <mxGeometry x="2022" y="204" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-3-49" value="Bucket S3">
+          <mxGeometry x="2046" y="204" width="148" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpn_gateway;fillColor=#8C4FFF;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-3-50" value="">
+          <mxGeometry x="2196" y="204" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-3-51" value="VGW de AWS">
+          <mxGeometry x="2220" y="204" width="148" height="20" as="geometry" />
+        </mxCell>
+        <object id="DC-3-52" label="&lt;b&gt;Enlaces&lt;/b&gt; (el estilo y el texto de la etiqueta dicen qué es):" celeris_rol="leyenda_enlaces">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1840" y="248" width="540" height="54" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1" id="DC-3-53" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1848" y="285" as="sourcePoint" />
+            <mxPoint x="1892" y="285" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-3-54" value="tráfico de aplicación">
+          <mxGeometry x="1898" y="276" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1" id="DC-3-55" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2022" y="285" as="sourcePoint" />
+            <mxPoint x="2066" y="285" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-3-56" value="VPN IPsec">
+          <mxGeometry x="2072" y="276" width="120" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="dashed=1;dashPattern=3 3;html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1" id="DC-3-57" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="2196" y="285" as="sourcePoint" />
+            <mxPoint x="2240" y="285" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-3-58" value="temporal / punteado">
+          <mxGeometry x="2246" y="276" width="120" height="20" as="geometry" />
+        </mxCell>
+        <object id="DC-3-59" label="&lt;b&gt;Qué aporta y qué pasa si falla&lt;/b&gt;&lt;br&gt;&lt;b&gt;AWS-VPC&lt;/b&gt; — Aislamiento de los recursos del proyecto en AWS. &lt;i&gt;Si falla:&lt;/i&gt; Se pierden los recursos de AWS&lt;br&gt;&lt;b&gt;IGW01&lt;/b&gt; — Salida y entrada de Internet de la subred pública. &lt;i&gt;Si falla:&lt;/i&gt; EC2-GW queda sin tráfico de Internet: se pierde el acceso remoto&lt;br&gt;&lt;b&gt;VGW&lt;/b&gt; — Extremo AWS de la VPN con BGP. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde la conectividad híbrida&lt;br&gt;&lt;b&gt;AWS-PUB-A&lt;/b&gt; — Aloja EC2-GW, el proxy inverso del panel remoto. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde el acceso remoto al panel (ver EC2-GW)&lt;br&gt;&lt;b&gt;EC2-GW&lt;/b&gt; — Panel remoto sin exponer ningún puerto del campus. &lt;i&gt;Si falla:&lt;/i&gt; Solo se pierde el acceso remoto&lt;br&gt;&lt;b&gt;NAT-DR&lt;/b&gt; — NAT solo durante el simulacro de recuperación. &lt;i&gt;Si falla:&lt;/i&gt; Sin efecto en operación normal&lt;br&gt;&lt;b&gt;sg-gw&lt;/b&gt; — Firewall con estado de EC2-GW. &lt;i&gt;Si falla:&lt;/i&gt; Si se abre de más, EC2-GW queda más expuesta&lt;br&gt;&lt;b&gt;nacl-public&lt;/b&gt; — Filtro sin estado de la subred AWS-PUB-A. &lt;i&gt;Si falla:&lt;/i&gt; Queda solo el Security Group como filtro" celeris_rol="panel" componentes="AWS-VPC, IGW01, VGW, AWS-PUB-A, EC2-GW, NAT-DR, sg-gw, nacl-public, rt-public, AWS-APP-A, EC2-DR, sg-dr, nacl-private, VPCE-S3, rt-private, S3">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1840.0" y="318" width="265.0" height="270" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-3-60" label="&lt;b&gt;…continúa&lt;/b&gt;&lt;br&gt;&lt;b&gt;rt-public&lt;/b&gt; — 0.0.0.0/0 → IGW01. &lt;i&gt;Si falla:&lt;/i&gt; Sin la ruta correcta la subred pierde su destino&lt;br&gt;&lt;b&gt;AWS-APP-A&lt;/b&gt; — Vacía; aloja la EC2 temporal del simulacro. &lt;i&gt;Si falla:&lt;/i&gt; Sin efecto en operación normal&lt;br&gt;&lt;b&gt;EC2-DR&lt;/b&gt; — Restaura la consola desde S3 durante el simulacro. &lt;i&gt;Si falla:&lt;/i&gt; Sin efecto en operación normal&lt;br&gt;&lt;b&gt;sg-dr&lt;/b&gt; — Firewall con estado de EC2-DR. &lt;i&gt;Si falla:&lt;/i&gt; Sin efecto en operación normal (existe solo en el simulacro)&lt;br&gt;&lt;b&gt;nacl-private&lt;/b&gt; — Filtro sin estado de la subred AWS-APP-A. &lt;i&gt;Si falla:&lt;/i&gt; Queda solo el Security Group como filtro&lt;br&gt;&lt;b&gt;VPCE-S3&lt;/b&gt; — Acceso privado a S3 desde la subred privada. &lt;i&gt;Si falla:&lt;/i&gt; Sin efecto en operación normal&lt;br&gt;&lt;b&gt;rt-private&lt;/b&gt; — 10.20.0.0/16 → VGW. &lt;i&gt;Si falla:&lt;/i&gt; Sin la ruta correcta la subred pierde su destino&lt;br&gt;&lt;b&gt;S3&lt;/b&gt; — Copia fuera del sitio inmutable por 30 días. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde la copia externa" celeris_rol="panel" componentes="AWS-VPC, IGW01, VGW, AWS-PUB-A, EC2-GW, NAT-DR, sg-gw, nacl-public, rt-public, AWS-APP-A, EC2-DR, sg-dr, nacl-private, VPCE-S3, rt-private, S3">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="2115.0" y="318" width="265.0" height="246" as="geometry" />
+          </mxCell>
+        </object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

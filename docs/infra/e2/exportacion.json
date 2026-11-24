@@ -1,0 +1,5 @@
+{
+  "motor": "respaldo propio con msedge sin interfaz (sin draw.io Desktop)",
+  "escala_png": 3,
+  "nota": "Con el respaldo, los stencils de draw.io se dibujan como glifos; el .drawio conserva los íconos de draw.io y es el editable. Con draw.io Desktop: python infra/gen/exportar_dc.py"
+}

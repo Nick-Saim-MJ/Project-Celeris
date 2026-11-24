@@ -1,0 +1,91 @@
+{
+  "DC-0": {
+    "ids": [
+      "CTRL01",
+      "EC2-GW",
+      "EDGE01",
+      "ESX01",
+      "FGT-EXT",
+      "FW01",
+      "S3",
+      "SIEM01",
+      "VGW"
+    ]
+  },
+  "DC-1": {
+    "ids": [
+      "BRK01",
+      "CD-ORG01",
+      "CD-PDU01",
+      "CD-PP01",
+      "DS-CACHE1",
+      "DS-CACHE2",
+      "DS-VM",
+      "ESX01",
+      "FGT-EXT",
+      "IPMI01",
+      "JMP01",
+      "RACK01",
+      "SW-ACC",
+      "SW-CORE01",
+      "UPS01",
+      "vmnic0",
+      "vmnic1",
+      "vmnic2",
+      "vmnic3"
+    ]
+  },
+  "DC-2": {
+    "ids": [
+      "CTRL01",
+      "DS-CACHE1",
+      "DS-CACHE2",
+      "DS-VM",
+      "EDGE01",
+      "EDGE02",
+      "FW01",
+      "HNY01",
+      "HNY02",
+      "JMP01",
+      "KALI01",
+      "LABCLI01",
+      "PG-DMZ-HONEY",
+      "PG-DMZ-SVC",
+      "PG-EDGE",
+      "PG-FW-TRUNK",
+      "PG-LAB",
+      "PG-MGMT",
+      "PG-SEC",
+      "PG-SERVERS",
+      "PG-TRANSITO",
+      "PORTAL01",
+      "SIEM01",
+      "vSwitch0",
+      "vSwitch1",
+      "vmnic0",
+      "vmnic1",
+      "vmnic2",
+      "vmnic3"
+    ]
+  },
+  "DC-3": {
+    "ids": [
+      "AWS-APP-A",
+      "AWS-PUB-A",
+      "AWS-VPC",
+      "EC2-DR",
+      "EC2-GW",
+      "IGW01",
+      "NAT-DR",
+      "S3",
+      "VGW",
+      "VPCE-S3",
+      "nacl-private",
+      "nacl-public",
+      "rt-private",
+      "rt-public",
+      "sg-dr",
+      "sg-gw"
+    ]
+  }
+}

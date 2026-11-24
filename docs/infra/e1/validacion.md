@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.1 · fecha 2026-11-22
 - Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 9 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **0 FALLA**, 4 con advertencias, 71 PASA, 0 pendientes de P2–P5.
+- Resultado: **0 FALLA**, 4 con advertencias, 75 PASA, 0 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -85,6 +85,10 @@
 | V-92 | Dimensionamiento: sumas = tablas D2.4; núcleos, RAM y disco recalculados; holgura ≥ 15 % y la caché cabe | PASA con advertencias | F2: 27 vCPU → 9.75 núcleos de 12 (holgura 18.8%) · RAM 84.5 de 96 GB (holgura 26.7%; tras crecimiento 12.0%) · disco 1206 de 1920 GB (holgura 37.2%) |
 | V-93 | Hipervisor: NIC → vSwitch → port group → VLAN de la zona; teaming; seguridad; rack de 12U y energía | PASA | 2 vSwitch · 9 port groups · 4 NIC · rack: U libres [4, 5] · UPS 480 W |
 | V-94 | AWS y continuidad: CIDR, instancias, NAT temporal, costo ≤ US$ 75, RTO/RPO coherentes con la criticidad y 3-2-1-1-0 | PASA con advertencias | costo 69.58 US$/mes · lab 0.0908 US$/h · 8 servicios con RTO y RPO |
+| V-100 | Diagramas DC-0…DC-3: .drawio, .png y .pdf presentes, con XML embebido y al día | PASA | — |
+| V-101 | Todo celeris_id es un ID del contrato y cada figura dibuja todo lo que debe (cobertura) | PASA | 0 errores, 0 advertencias |
+| V-102 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | PASA | — |
+| V-103 | Título, leyenda, panel; criticidad (borde + texto); vCPU, RAM, VLAN y CIDR coinciden con los YAML | PASA | — |
 
 ## Errores
 
@@ -107,6 +111,7 @@ Ninguno.
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 32 de 60 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 605 fórmulas recalculadas con LibreOffice sin errores
 - **V-94** — Criticidad derivada de los servicios: {'CT-01': 'Alta', 'CT-02': 'Media', 'CT-03': 'Alta', 'CT-04': 'Media', 'CT-05': 'Alta', 'CT-06': 'Alta', 'CT-07': 'Alta', 'CT-08': 'Alta'}
+- **V-101** — Huella de la fuente al generar: 09b67389
 
 ## Cobertura
 

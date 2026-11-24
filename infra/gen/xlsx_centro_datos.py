@@ -485,12 +485,11 @@ def verificar(ruta: Path, cd: CentroDatos) -> dict:
     res = gx.verificar(ruta)
     valores = {}
     if res.get("motor"):
-        lo = shutil.which("soffice") or shutil.which("libreoffice")
         with tempfile.TemporaryDirectory() as tmp:
             origen = Path(tmp) / ruta.name
             shutil.copy(ruta, origen)
             destino = Path(tmp) / ("recalc_" + ruta.name)
-            (gx._recalcular_libreoffice(lo, origen, destino) if lo else gx._recalcular_excel(origen, destino))
+            gx.recalcular_copia(origen, destino)
             wb = load_workbook(destino, data_only=True)
             ws = wb["Dimensionamiento"]
             for fila in ws.iter_rows(min_row=5, values_only=True):

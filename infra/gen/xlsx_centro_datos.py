@@ -245,13 +245,13 @@ def hoja_dim(wb, x, cd, vm):
     f("k_esxi", "Factor de sobrecarga de ESXi", d["sobrecarga_esxi"], "×", "Memoria del hipervisor y sobrecarga por VM", entrada=True)
     f("k_crec", "Factor de crecimiento", d["crecimiento"], "×", "Reserva del 20 % para crecimiento", entrada=True)
     f("ram_esxi", "RAM con sobrecarga de ESXi", f"={R('ram_asig')}*{R('k_esxi')}", "GB", "asignada × 1,1", fmt="0.0")
-    f("ram_crec", "RAM requerida con crecimiento", f"={R('ram_esxi')}*{R('k_crec')}", "GB", "asignada × 1,1 × 1,2 (≈ 84,5 GB en D2.8)", fmt="0.0", negrita=True)
+    f("ram_crec", "RAM requerida con crecimiento", f"={R('ram_esxi')}*{R('k_crec')}", "GB", "asignada × 1,1 × 1,2 (D2.8)", fmt="0.0", negrita=True)
     f("ram_host", "RAM del host ESX01", h["ram_gb"], "GB", "96 GB [S-08]", entrada=True)
     f("h_ram", "Holgura de RAM tras la sobrecarga de ESXi", f"=({R('ram_host')}-{R('ram_esxi')})/{R('ram_host')}", "%", "(RAM del host − asignada × 1,1) ÷ RAM del host", fmt="0.0%", negrita=True)
     ws.cell(row=fila[0] - 1, column=5).value = f'=IF({R("h_ram")}>={d["holgura_minima"]},"Cumple ≥ 15 %","Por debajo de 15 %")'
     f("m_ram", "Margen de RAM tras reservar el crecimiento", f"=({R('ram_host')}-{R('ram_crec')})/{R('ram_host')}", "%", "(RAM del host − asignada × 1,1 × 1,2) ÷ RAM del host", fmt="0.0%", negrita=True)
-    ws.cell(row=fila[0] - 1, column=5).value = f'=IF({R("m_ram")}>={d["holgura_minima"]},"Cumple ≥ 15 %","Bajo 15 %: CI-78 abierto")'
-    f("ram_libre", "RAM libre tras reservar el crecimiento", f"={R('ram_host')}-{R('ram_crec')}", "GB", "96 − 84,5", fmt="0.0")
+    ws.cell(row=fila[0] - 1, column=5).value = f'=IF({R("m_ram")}>={d["holgura_minima"]},"Cumple ≥ 15 %","Por debajo de 15 %")'
+    f("ram_libre", "RAM libre tras reservar el crecimiento", f"={R('ram_host')}-{R('ram_crec')}", "GB", "RAM del host − requerida con crecimiento", fmt="0.0")
     sec("3. Disco: × 1,3 más la copia local de restic, sobre el datastore RAID 1")
     f("dk_sin", "Disco de las VM sin caché (F2)", f"={VM_HOJA}!E{t2}", "GB", "Suma de la hoja Máquinas virtuales (774 GB en D2.8)")
     f("k_disco", "Factor de disco", d["factor_disco"], "×", "Instantáneas, sobrecarga y crecimiento", entrada=True)

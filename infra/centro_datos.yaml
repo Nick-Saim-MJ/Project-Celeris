@@ -149,7 +149,7 @@ maquinas_virtuales:   # mismas VM que el inventario (V-91). `disco_gb` no incluy
   - { componente: FW01,      fase: F1, vcpu: 4, ram_gb: 8,  disco_gb: 40,  cache_gb: 0,   so: OPNsense,       port_groups: [PG-TRANSITO, PG-FW-TRUNK], datastore: DS-VM, sensible: true }
   - { componente: EDGE01,    fase: F1, vcpu: 4, ram_gb: 8,  disco_gb: 40,  cache_gb: 500, so: "Debian 13",    port_groups: [PG-EDGE],                  datastore: DS-VM, sensible: true,  datastore_cache: DS-CACHE1 }
   - { componente: CTRL01,    fase: F1, vcpu: 2, ram_gb: 8,  disco_gb: 100, cache_gb: 0,   so: "Debian 13",    port_groups: [PG-SERVERS],               datastore: DS-VM, sensible: false }
-  - { componente: SIEM01,    fase: F1, vcpu: 4, ram_gb: 16, disco_gb: 300, cache_gb: 0,   so: "Ubuntu 24.04", port_groups: [PG-SEC],                   datastore: DS-VM, sensible: false }
+  - { componente: SIEM01,    fase: F1, vcpu: 4, ram_gb: 12, disco_gb: 300, cache_gb: 0,   so: "Ubuntu 24.04", port_groups: [PG-SEC],                   datastore: DS-VM, sensible: false }
   - { componente: PORTAL01,  fase: F1, vcpu: 1, ram_gb: 2,  disco_gb: 20,  cache_gb: 0,   so: "Debian 13",    port_groups: [PG-DMZ-SVC],               datastore: DS-VM, sensible: false }
   - { componente: HNY01,     fase: F1, vcpu: 1, ram_gb: 1,  disco_gb: 20,  cache_gb: 0,   so: "Debian 13",    port_groups: [PG-DMZ-HONEY],             datastore: DS-VM, sensible: false }
   - { componente: HNY02,     fase: F1, vcpu: 1, ram_gb: 1,  disco_gb: 10,  cache_gb: 0,   so: "Debian 13",    port_groups: [PG-LAB],                   datastore: DS-VM, sensible: false }
@@ -158,7 +158,7 @@ maquinas_virtuales:   # mismas VM que el inventario (V-91). `disco_gb` no incluy
   - { componente: KALI01,    fase: F1, vcpu: 2, ram_gb: 4,  disco_gb: 80,  cache_gb: 0,   so: "Kali Linux",   port_groups: [PG-LAB],                   datastore: DS-VM, sensible: false }
   - { componente: EDGE02,    fase: F2, vcpu: 4, ram_gb: 8,  disco_gb: 40,  cache_gb: 500, so: "Debian 13",    port_groups: [PG-EDGE],                  datastore: DS-VM, sensible: true,  datastore_cache: DS-CACHE2 }
   # Se declara aparte para que V-92 compare con las tablas de D2.4: totales por fase (el disco incluye la caché).
-totales_d24: { F1: { vcpu: 23, ram_gb: 56, disco_gb: 1234 }, F2: { vcpu: 27, ram_gb: 64, disco_gb: 1774 } }
+totales_d24: { F1: { vcpu: 23, ram_gb: 52, disco_gb: 1234 }, F2: { vcpu: 27, ram_gb: 60, disco_gb: 1774 } }
 orden_arranque: [[FW01], [CTRL01], [EDGE01, EDGE02], [SIEM01], [resto]]
 vm_fisicas_excluidas: { ENC01: "PC física del laboratorio, no una VM; la validación del cliente se hace además en 2–3 PCs reales (D2.4)" }
 
@@ -205,14 +205,14 @@ dimensionamiento:    # D2.8
   holgura_minima: 0.15
   holgura_definicion:
     cpu: "(núcleos del host − núcleos necesarios) / núcleos del host"
-    ram: "(RAM del host − RAM asignada × 1,1 de sobrecarga de ESXi) / RAM del host; con el 20 % de crecimiento reservado además, el margen resultante es menor (CI-78)"
+    ram: "(RAM del host − RAM asignada × 1,1 de sobrecarga de ESXi) / RAM del host; con el 20 % de crecimiento reservado además, el margen resultante sigue sobre el 15 % (CI-78 resuelto: SIEM01 a 12 GB)"
     disco: "(capacidad del datastore − requerido) / capacidad del datastore"
   ci: CI-78
   red:
     objetivo_gbps: 1
     razon: "Un laboratorio de 40 PCs que descarga a la vez necesita ≈ 1 Gbps desde la caché (REQ-NF-02, ≥ 900 Mbps agregados); de ahí los 10 GbE del host."
     riesgo: "Los HIT atraviesan FW01 (D-17): en S2 se mide con iperf3 LAB → EDGE con y sin IPS; si FW01 limita, se revisa D-17."
-  siem: "≈ 8 agentes + Suricata + WAF + firewall → 16 GB y 300 GB para ≈ 90 días (D2.8)."
+  siem: "≈ 8 agentes + Suricata + WAF + firewall → 12 GB y 300 GB para ≈ 90 días (D2.8). Wazuh todo en uno admite hasta 25 agentes con 8 GiB: con ≈ 8 agentes, 12 GB dan holgura (CI-78)."
 
 # ------------------------------------------------------------------------------------------------------------------
 # AWS (D2.5). Las subredes, rutas, SG, NACL y el bucket los define infra/inventory.yaml (aws, componentes).

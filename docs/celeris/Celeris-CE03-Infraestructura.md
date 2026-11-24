@@ -674,16 +674,16 @@ El vSwitch estándar no soporta LACP (requiere vDS y vCenter); por eso el teamin
 | FW01 | F1 | 4 | 8 | 40 | OPNsense | Firewall, VPN, IPS, DNS, NTP | TRANSITO + FW-TRUNK |
 | EDGE01 | F1 | 4 | 8 | 40 + 500 caché | Debian 13 | Nodo de caché + PAC | EDGE |
 | CTRL01 | F1 | 2 | 8 | 100 | Debian 13 | Consola (SPA + API + PostgreSQL), step-ca | SERVERS |
-| SIEM01 | F1 | 4 | 16 | 300 | Ubuntu 24.04 | Wazuh | SEC |
+| SIEM01 | F1 | 4 | 12 | 300 | Ubuntu 24.04 | Wazuh | SEC |
 | PORTAL01 | F1 | 1 | 2 | 20 | Debian 13 | WAF + portal estático | DMZ-SVC |
 | HNY01 | F1 | 1 | 1 | 20 | Debian 13 | Honeypot | DMZ-HONEY |
 | HNY02 | F1 | 1 | 1 | 10 | Debian 13 | Canary | LAB |
 | JMP01 | F1 | 2 | 4 | 60 | Debian 13 | Jump host, NUT | MGMT |
 | LABCLI01 | F1 | 2 | 4 | 64 | Windows 11 | Cliente de prueba | LAB |
 | KALI01 | F1 | 2 | 4 | 80 | Kali Linux | Pruebas de ataque (apagado fuera de ventanas) | LAB |
-| **Total F1** | | **23** | **56** | **1 234** | | | |
+| **Total F1** | | **23** | **52** | **1 234** | | | |
 | EDGE02 | F2 | 4 | 8 | 40 + 500 caché | Debian 13 | Nodo de caché + PAC | EDGE |
-| **Total F2** | | **27** | **64** | **1 774** | | | |
+| **Total F2** | | **27** | **60** | **1 774** | | | |
 
 ENC01 es una PC física del laboratorio, no una VM. La validación del cliente se hace además en 2–3 PCs reales.
 
@@ -777,11 +777,11 @@ Es la VPN de D1.10, sin cambios: FW01 (detrás del FortiGate, NAT-T) ↔ VGW, ac
 ### D2.8 Dimensionamiento (contenido 10)
 
 - **CPU:** 27 vCPU en F2. Las sensibles (FW01, EDGE01/02 = 12 vCPU) van a 2:1, que son 6 núcleos. El resto (15) va a 4:1, que son 3,75. Total ≈ 9,75 núcleos → host de **12 núcleos** (≈ 19 % de margen).
-- **RAM:** 64 GB × 1,1 × 1,2 ≈ 84,5 GB → **96 GB**.
+- **RAM:** 60 GB × 1,1 × 1,2 ≈ 79,2 GB → **96 GB** (margen 17,5 %; CI-78).
 - **Disco:** VM sin caché 774 GB × 1,3 ≈ 1 006 GB, más ≈ 200 GB de copia local de restic → RAID 1 de 1,92 TB (≈ 63 %).
 - **Caché:** 500 GB por nodo como punto de partida [S-04], que se ajusta con la curva de fallos medida en el piloto. Un ciclo de 3 GB por PC con contenido común ocupa 3 GB, no 120 GB.
 - **Red:** un laboratorio de 40 PCs que descarga a la vez necesita ≈ 1 Gbps desde la caché (REQ-NF-02); de ahí los 10 GbE del host. Como los HIT atraviesan FW01 (D-17), en S2 se mide con iperf3 el rendimiento LAB → EDGE con y sin IPS; si FW01 limita, se revisa D-17.
-- **SIEM:** ≈ 8 agentes + Suricata + WAF + firewall → 16 GB y 300 GB para ≈ 90 días.
+- **SIEM:** ≈ 8 agentes + Suricata + WAF + firewall → 12 GB y 300 GB para ≈ 90 días (Wazuh todo en uno admite hasta 25 agentes con 8 GiB).
 - **AWS:** EC2-GW solo atiende sesiones del panel (pocos usuarios); t3.micro sobra; se vigilan los créditos de CPU.
 
 ### D2.9 Disponibilidad y continuidad (contenido 11)

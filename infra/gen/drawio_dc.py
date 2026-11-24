@@ -41,6 +41,11 @@ VPN_LINEA = "html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;fontSize=10;
 TEMPORAL = "dashed=1;dashPattern=3 3;"
 
 
+def vm_txt(cd: CentroDatos, cid: str) -> str:
+    v = cd.vm_por_id[cid]
+    return f"{v['vcpu']} vCPU · {v['ram_gb']} GB"
+
+
 def huella_dc() -> str:
     h = hashlib.sha256()
     for f in ("infra/centro_datos.yaml", "infra/inventory.yaml"):
@@ -420,10 +425,10 @@ def dc_0(x: Infra, cd: CentroDatos) -> DiagramaDC:
            f"spacingLeft=8;spacingTop=4;fontSize=11;fontColor={TEXTO};", "<b>On-premise · Campus Juliaca</b> · un rack de 12U · ESXi gratuito, un host", {"celeris_rol": "campus"})
     d.comp("FGT-EXT", 300, 130, 300, 90, "WAN 203.0.113.10 · tránsito 10.20.0.1", x.componentes["FGT-EXT"]["aporta_corto"], dashed=True)
     d.comp("ESX01", 300, 260, 600, 330, f"{cd.recursos_de('ESX01')} · {t['vms']} VM · {t['vcpu']} vCPU · {t['ram_gb']} GB (F2)", x.componentes["ESX01"]["aporta_corto"])
-    d.comp("FW01", 320, 330, 270, 100, "4 vCPU · 8 GB · tránsito 10.20.0.2", x.componentes["FW01"]["aporta_corto"])
-    d.comp("EDGE01", 610, 330, 270, 100, "4 vCPU · 8 GB · 10.20.60.10", x.componentes["EDGE01"]["aporta_corto"])
-    d.comp("CTRL01", 320, 450, 270, 100, "2 vCPU · 8 GB · 10.20.20.10", x.componentes["CTRL01"]["aporta_corto"])
-    d.comp("SIEM01", 610, 450, 270, 100, "4 vCPU · 16 GB · 10.20.50.10", x.componentes["SIEM01"]["aporta_corto"])
+    d.comp("FW01", 320, 330, 270, 100, f"{vm_txt(cd, 'FW01')} · tránsito 10.20.0.2", x.componentes["FW01"]["aporta_corto"])
+    d.comp("EDGE01", 610, 330, 270, 100, f"{vm_txt(cd, 'EDGE01')} · 10.20.60.10", x.componentes["EDGE01"]["aporta_corto"])
+    d.comp("CTRL01", 320, 450, 270, 100, f"{vm_txt(cd, 'CTRL01')} · 10.20.20.10", x.componentes["CTRL01"]["aporta_corto"])
+    d.comp("SIEM01", 610, 450, 270, 100, f"{vm_txt(cd, 'SIEM01')} · 10.20.50.10", x.componentes["SIEM01"]["aporta_corto"])
     d.zona("AWS", 1040, 90, 520, 520, f" · {esc(cd.aws['region']['laboratorio'])} · {esc(next(s['cidr'] for s in x.inv['supernets'] if s['id'] == 'AWS-CELERIS'))}")
     d.comp("VGW", 1060, 130, 480, 80, "2 túneles IPsec · ASN 64512", x.componentes["VGW"]["aporta_corto"], borde="#8C4FFF")
     d.comp("EC2-GW", 1060, 250, 480, 100, cd.recursos_de("EC2-GW") + " · 10.30.0.10", x.componentes["EC2-GW"]["aporta_corto"])

@@ -838,11 +838,11 @@ componentes:
     funcion: "Wazuh"
     criticidad: Alta
     estado: diseño
-    vm: { fase: F1, vcpu: 4, ram_gb: 16, disco_gb: 300, so: "Ubuntu 24.04", port_group: "PG-SEC" }
+    vm: { fase: F1, vcpu: 4, ram_gb: 12, disco_gb: 300, so: "Ubuntu 24.04", port_group: "PG-SEC" }
     por_que: "Correlaciona la telemetría de todo el diseño (agentes, Suricata, WAF, honeypots, Celeris, firewall) y es la evidencia de que cada escenario de ataque produce una alerta de nivel ≥ 10. Queda en el campus porque las alertas incluyen IP del campus."
     cambio: CI-73
     aporta_corto: "Correlación de alertas de todo el diseño"
-    aporta: "Recibe agentes en TCP 1514/1515 (F13) y syslog TLS en 6514 (F14); dashboard por HTTPS (F20); descarga reglas y feeds por TCP 443 (F26). ≈ 8 agentes + Suricata + WAF + firewall en 16 GB y 300 GB para ≈ 90 días (D2.8)."
+    aporta: "Recibe agentes en TCP 1514/1515 (F13) y syslog TLS en 6514 (F14); dashboard por HTTPS (F20); descarga reglas y feeds por TCP 443 (F26). ≈ 8 agentes + Suricata + WAF + firewall en 12 GB y 300 GB para ≈ 90 días (D2.8; Wazuh todo en uno admite hasta 25 agentes con 8 GiB, CI-78)."
     si_falla: "Se pierde la correlación y el registro centralizado. Mitigación: snapshots del indexer en el datastore local y semanales en S3, RTO 4 h, RPO 24 h (D2.9)."
     dependencias: [FW01]
     controles: "Cifrado AES del protocolo Wazuh, syslog sobre TLS, nftables de host, acceso web solo desde JMP01"

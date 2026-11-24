@@ -918,14 +918,12 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto (confirmar con la ficha del servidor y de la UPS)
 
 ### CI-78 — Holgura de RAM: ≥ 15 % (D2.3) frente a 12,0 % tras el crecimiento (D2.8)
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-23, decisión del equipo: SIEM01 a 12 GB)
 - **Tipo:** contradicción
-- **Dónde:** CE03 D2.3 («100 % cubierto con ≥ 15 % de holgura»); D2.8 y Arquitectura §10.1 (64 GB × 1,1 × 1,2 ≈ 84,5 GB sobre 96 GB); S-08
-- **Qué dice cada fuente:** el host de 96 GB deja libres 96 − 84,48 = 11,52 GB, es decir 12,0 % del host, si además de la sobrecarga de ESXi se reserva el 20 % de crecimiento. Medida sobre lo asignado más la sobrecarga de ESXi (70,4 GB) la holgura es 26,7 %.
-- **Decisión aplicada:** `dimensionamiento.holgura_definicion` define la holgura de RAM como la que queda tras la sobrecarga de ESXi (26,7 % ≥ 15 %) y V-92 emite una advertencia con el margen tras el crecimiento (12,0 %). No se inventa un host mayor.
-- **Propuesta:** (a) comprar 128 GB de RAM (el host de la v0.3 los tenía): margen 34 %; (b) aceptar 12 % porque el crecimiento del 20 % es una reserva y no un requisito; (c) reducir SIEM01 a 12 GB.
+- **Dónde:** CE03 D2.3 («100 % cubierto con ≥ 15 % de holgura»); D2.8 y Arquitectura §10.1; `infra/inventory.yaml` → SIEM01.`vm.ram_gb`; `infra/centro_datos.yaml`
+- **Qué decían las fuentes:** con SIEM01 en 16 GB, 64 GB × 1,1 × 1,2 = 84,5 GB sobre 96 GB dejaban 12,0 % de margen.
+- **Decisión aplicada:** SIEM01 pasa de 16 a 12 GB: Wazuh todo en uno admite hasta 25 agentes con 8 GiB y el diseño tiene ≈ 8 agentes. Las VM suman 52 GB en F1 y 60 GB en F2; 60 × 1,1 × 1,2 = 79,2 GB, así que quedan 16,8 GB libres (17,5 % del host) y la holgura tras la sobrecarga de ESXi es 31,3 %. Se actualizaron el inventario, `centro_datos.yaml`, CE03 D2.4 y D2.8 y la Arquitectura §10.1.
 - **Decide:** equipo del proyecto (Nick)
-- **Efecto al resolver:** si (a), cambiar S-08 y `host.ram_gb`; si (b), cerrar la advertencia de V-92.
 
 ### CI-79 — Rack: ESX01 ocupa 2U pero D2.4 le asigna el rango U6–9 (4U)
 - **Estado:** abierto

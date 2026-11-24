@@ -4,4 +4,4 @@ Los cinco objetivos son medibles y orientados a capacidad y disponibilidad. La �
 
 {{tabla:objetivos}}
 
-El objetivo DC-OBJ-1 se cumple con una salvedad que este informe declara: la holgura de RAM es {{dato:h_ram}} después de la sobrecarga de ESXi, pero queda en {{dato:m_ram}} si además se reserva por completo el 20 % de crecimiento. La diferencia se registra como CI-78 (sección 9) y la decide el equipo.
+El objetivo DC-OBJ-1 se cumple en CPU, RAM y disco. La RAM queda con {{dato:h_ram}} de holgura después de la sobrecarga de ESXi y con {{dato:m_ram}} aun reservando por completo el 20 % de crecimiento: para lograrlo, SIEM01 se dimensionó en 12 GB (CI-78, sección 9).

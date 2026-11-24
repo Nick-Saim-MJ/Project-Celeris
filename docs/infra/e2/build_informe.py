@@ -91,7 +91,7 @@ def datos(x: Infra) -> dict[str, str]:
         "vcpu_sens": str(dm["vcpu_sensibles"]), "vcpu_resto": str(dm["vcpu_resto"]),
         "h_cpu": pct(dm["holgura_cpu"]), "h_ram": pct(dm["holgura_ram"]), "m_ram": pct(dm["margen_ram_tras_crecimiento"]), "h_disco": pct(dm["holgura_disco"]),
         "ram_host": str(dm["ram_host"]), "ram_esxi": coma(dm["ram_con_sobrecarga"], 1), "ram_crec": coma(dm["ram_con_crecimiento"], 1),
-        "ram_libre": coma(dm["ram_libre_tras_crecimiento"], 1),
+        "ram_libre": coma(dm["ram_libre_tras_crecimiento"], 1), "disco_libre": coma(dm["disco_capacidad"] - dm["disco_con_copia"], 0),
         "disco_req": coma(dm["disco_requerido"], 0), "disco_tot": coma(dm["disco_con_copia"], 0), "disco_cap": coma(dm["disco_capacidad"], 0),
         "uso_disco": pct(dm["uso_disco"]), "rel_cpu": coma(dm["relacion_vcpu_nucleos"], 2),
         "costo_total": coma(c["total"], 2), "costo_meta": str(c["meta"]), "costo_lab_h": coma(c["lab_hora"], 4), "costo_sim": coma(c["simulacro_total"], 2),
@@ -137,7 +137,7 @@ def t_control_versiones(x, d):
 
 def t_objetivos(x, d):
     x, cd = fuentes()
-    res = {"DC-OBJ-1": f"CPU {d['h_cpu']}, RAM {d['h_ram']} (tras el 20 % de crecimiento, {d['m_ram']}: CI-78), disco {d['h_disco']}",
+    res = {"DC-OBJ-1": f"CPU {d['h_cpu']}, RAM {d['h_ram']} ({d['m_ram']} aun reservando el 20 % de crecimiento), disco {d['h_disco']}",
            "DC-OBJ-2": f"US$ {d['costo_total']} al mes; laboratorio efímero US$ {d['costo_lab_h']} por hora",
            "DC-OBJ-3": "Consola: RTO 2 h y RPO 15 min (CT-03); descargas: RTO ≈ 0 (CT-01)",
            "DC-OBJ-4": "S3 con Object Lock de 30 días (modo compliance) para la base de la consola y las configuraciones",
@@ -294,7 +294,7 @@ def t_dim(x, d):
     x, cd = fuentes()
     return (["Recurso", "Cálculo", "Requerido", "Capacidad del host", "Holgura", "Estado"],
             [["CPU (F2)", f"{d['vcpu_sens']} vCPU sensibles ÷ 2 + {d['vcpu_resto']} vCPU ÷ 4 = {d['nuc_sens']} + {d['nuc_resto']}", f"{d['nucleos_nec']} núcleos", f"{d['nucleos_host']} núcleos", d["h_cpu"], "Cumple ≥ 15 %"],
-             ["RAM (F2)", f"{d['ram_f2']} GB × 1,1 = {d['ram_esxi']} GB; × 1,2 = {d['ram_crec']} GB", f"{d['ram_crec']} GB", f"{d['ram_host']} GB", f"{d['h_ram']} tras ESXi; {d['m_ram']} tras crecimiento", "Cumple ≥ 15 % tras ESXi; 12,0 % tras crecimiento: CI-78"],
+             ["RAM (F2)", f"{d['ram_f2']} GB × 1,1 = {d['ram_esxi']} GB; × 1,2 = {d['ram_crec']} GB", f"{d['ram_crec']} GB", f"{d['ram_host']} GB", f"{d['h_ram']} tras ESXi; {d['m_ram']} tras el crecimiento", "Cumple ≥ 15 % en ambos casos"],
              ["Disco de VM (F2)", f"{d['disco_sin_cache_f2']} GB × 1,3 = {d['disco_req']} GB; + 200 GB de copia local = {d['disco_tot']} GB", f"{d['disco_tot']} GB", f"{d['disco_cap']} GB (DS-VM)", d["h_disco"], "Cumple ≥ 15 %"],
              ["Caché por nodo", "500 GB como punto de partida [S-04]", "500 GB", "1 000 GB (NVMe)", "50,0 %", "Cumple ≥ 15 %"],
              ["Red hacia un laboratorio", "40 PCs a la vez ≈ 1 Gbps (REQ-NF-02)", "1 Gbps", "2 × 10 GbE", "95 %", "Cumple; se mide con iperf3 en S2"]],

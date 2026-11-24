@@ -10,7 +10,7 @@ La organización es una universidad; el escenario es el Campus Juliaca y su Dire
 | Caché de descargas y PAC | EDGE01, EDGE02 | 4 vCPU y 8 GB por nodo; 500 GB de caché en NVMe propio; ≈ 1 Gbps hacia un laboratorio (REQ-NF-02) | Campus (ESX01) |
 | Consola del encargado | CTRL01 | SPA, API y PostgreSQL; 2 vCPU, 8 GB, 100 GB; la base es el dato crítico | Campus (ESX01) |
 | Firewall, VPN, IPS, DNS y NTP | FW01 | 4 vCPU y 8 GB; es el punto de paso de todo el tráfico entre zonas (D-17) | Campus (ESX01) |
-| Correlación de eventos | SIEM01 | 4 vCPU, 16 GB y 300 GB para ≈ 90 días de eventos | Campus (ESX01) |
+| Correlación de eventos | SIEM01 | 4 vCPU, 12 GB y 300 GB para ≈ 90 días de eventos | Campus (ESX01) |
 | Portal de transparencia, señuelos, jump host y pruebas | PORTAL01, HNY01, HNY02, JMP01, LABCLI01, KALI01 | VM pequeñas de 1 a 2 vCPU | Campus (ESX01) |
 | Entrada pública al panel | EC2-GW | Termina TLS y reenvía; sin datos | AWS (EC2) |
 | Respaldo fuera del sitio e inmutable | S3 celeris-backups | ≈ 300 GB con Object Lock de 30 días | AWS (S3) |

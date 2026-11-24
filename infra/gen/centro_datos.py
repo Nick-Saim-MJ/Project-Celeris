@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import re
+from decimal import ROUND_HALF_UP, Decimal
 import sys
 from pathlib import Path
 
@@ -27,7 +28,8 @@ ORDEN_CRIT = {"Alta": 3, "Media": 2, "Baja": 1}
 
 def coma(v: float, d: int = 1) -> str:
     """Número con coma decimal y espacio fino como separador de miles (formato del informe)."""
-    s = f"{v:,.{d}f}".replace(",", " ").replace(".", ",")
+    q = Decimal(1).scaleb(-d)
+    s = f"{Decimal(repr(round(v, 9))).quantize(q, rounding=ROUND_HALF_UP):,.{d}f}".replace(",", " ").replace(".", ",")
     return s
 
 

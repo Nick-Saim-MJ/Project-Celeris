@@ -1,8 +1,8 @@
-# Autoevaluación del informe de CE0331 contra la rúbrica oficial (v1.2)
+# Autoevaluación del informe de CE0331 contra la rúbrica oficial (v1.3)
 
 Rúbrica: `docs/fuentes/CE03/Rubrica_S1_E2_Diseno_Centro_de_Datos.xlsx` (8 criterios, puntaje = peso × nivel ÷ 4). Es una estimación del equipo, no la nota del docente. Cada afirmación remite a una sección, una figura o un chequeo de `make validate`.
 
-Producto revisado: `Informe_Centro_Datos_v1.2.docx` y `.pdf` (31 páginas), cuatro diagramas propios (DC-0…DC-3) más FIG-5.4 de CE0311, y `Matriz_Componentes_DC_v1.2.xlsx` (56 elementos). Las versiones anteriores están en `entregables/CE0331/historial/`. Cambios de la v1.2: CI-88 resuelto (el escenario «cae ESX01» pasa a contingencia manual con la DTI y RTO objetivo de 30 min [S-35]), DC-2.png re-exportado completo (CI-89: la v1.1 lo llevaba recortado al 51 % superior) y todas las figuras en páginas horizontales al ancho útil (CI-90).
+Producto revisado: `Informe_Centro_Datos_v1.3.docx` y `.pdf` (31 páginas), cuatro diagramas propios (DC-0…DC-3) más FIG-5.4 de CE0311, y `Matriz_Componentes_DC_v1.3.xlsx` (56 elementos). Las versiones anteriores están en `entregables/CE0331/historial/`. Cambios de la v1.2: CI-88 resuelto (el escenario «cae ESX01» pasa a contingencia manual con la DTI y RTO objetivo de 30 min [S-35]), DC-2.png re-exportado completo (CI-89: la v1.1 lo llevaba recortado al 51 % superior) y todas las figuras en páginas horizontales al ancho útil (CI-90). Cambios de la v1.3: la organización queda nombrada (Universidad Peruana Unión, Campus Juliaca, y la DTI como área que opera la red; CI-91) y las 18 referencias pasan a formato IEEE, todas citadas en el texto y con fecha de acceso (CI-94; V-95 lo comprueba). El puntaje no cambia.
 
 | # | Criterio (peso) | Nivel estimado | Evidencia | Qué falta para el nivel 4 |
 | ---: | --- | :-: | --- | --- |

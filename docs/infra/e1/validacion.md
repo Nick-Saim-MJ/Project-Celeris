@@ -2,7 +2,7 @@
 
 > Generado por `infra/validate.py` (`make validate`). No editar a mano.
 
-- Inventario: versión 1.3 · fecha 2026-11-24
+- Inventario: versión 1.4 · fecha 2026-11-24
 - Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 9 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
 - Resultado: **0 FALLA**, 1 con advertencias, 88 PASA, 0 pendientes de P2–P5.
 
@@ -57,7 +57,7 @@
 | V-54 | Flujos F-nn: FIG-5.5a ∪ FIG-5.5b completas y etiquetas derivadas del inventario | PASA | — |
 | V-55 | Título, leyenda y panel «Qué aporta y qué pasa si falla» en cada figura | PASA | — |
 | V-56 | Criticidad (borde + texto) y color de zona según CLAUDE.md | PASA | — |
-| V-60 | Matriz de componentes: archivo y hojas | PASA | entregables/CE0311/Matriz_Componentes_Red_v1.3.xlsx |
+| V-60 | Matriz de componentes: archivo y hojas | PASA | entregables/CE0311/Matriz_Componentes_Red_v1.4.xlsx |
 | V-61 | Matriz 1 a 1 con el inventario (ID, nombre, IP, zona, criticidad, estado) | PASA | 31 filas · 31 componentes en el inventario |
 | V-62 | Componentes dibujados en los .drawio = 100 % en la matriz | PASA | — |
 | V-63 | Ninguna celda obligatoria vacía en la hoja Matriz | PASA | — |
@@ -70,7 +70,7 @@
 | V-73 | Ensayo L: ninguna FALLA sin causa y acción; NO_APLICA, PARCIAL y sin ensayo nunca como PASA | PASA | — |
 | V-74 | XLSX de pruebas: fórmulas sin errores tras recalcular con LibreOffice y coherentes con la biblioteca | PASA | 0 errores, 0 advertencias |
 | V-75 | XLSX de pruebas: el archivo versionado está al día con pruebas.yaml, el inventario y el último ensayo | PASA | — |
-| V-80 | Informe: DOCX y PDF existen, abren y son de la fuente actual | PASA | entregables/CE0311/Informe_Diseno_Red_v1.3.docx; PDF 47 páginas; motor Microsoft Word (COM) |
+| V-80 | Informe: DOCX y PDF existen, abren, son de la fuente actual y las referencias están en formato IEEE | PASA | entregables/CE0311/Informe_Diseno_Red_v1.4.docx; PDF 47 páginas; motor Microsoft Word (COM) |
 | V-81 | Informe: 11 secciones de la plantilla, en orden y con contenido | PASA | 26 títulos de sección |
 | V-82 | Informe: sin texto guía ni marcadores de la plantilla | PASA | 48 textos guía comprobados |
 | V-83 | Informe: ningún ID retirado en v0.4 presentado como vigente | PASA | 35 IDs retirados buscados |
@@ -79,13 +79,13 @@
 | V-86 | Informe: cifras repetidas coherentes con la fuente | PASA | 7 VLAN · 31 componentes · T05 27,2 s · T09 8,7 s |
 | V-87 | Informe: evidencia citada para cada criterio de la rúbrica | PASA | criterios con toda su evidencia: R1, R2, R3, R4, R5, R6, R7, R8 |
 | V-88 | Informe: marcas [COMPLETAR] pendientes | PASA | 0 pendientes |
-| V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.3 · commit 286cbc6 |
+| V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.4 · commit c47b7b4 |
 | V-90 | centro_datos.yaml: esquema, referencias (componentes, zonas, S-xx, CI-nn) e IDs retirados | PASA | 11 VM · 9 port groups · 30 elementos propios · 9 servicios |
 | V-91 | VM: 1 a 1 con el inventario, mismos recursos, port group y zona; ninguna > 8 vCPU | PASA | 11 VM en el YAML · 11 en el inventario · máx. 4 vCPU |
 | V-92 | Dimensionamiento: sumas = tablas D2.4; núcleos, RAM y disco recalculados; holgura ≥ 15 % y la caché cabe | PASA | F2: 27 vCPU → 9.75 núcleos de 12 (holgura 18.8%) · RAM 79.2 de 96 GB (holgura 31.2%; tras crecimiento 17.5%) · disco 1206 de 1920 GB (holgura 37.2%) |
 | V-93 | Hipervisor: NIC → vSwitch → port group → VLAN de la zona; teaming; seguridad; rack de 12U y energía | PASA | 2 vSwitch · 9 port groups · 4 NIC · rack: U libres [4, 5, 8, 9] · UPS 480 W |
 | V-94 | AWS y continuidad: CIDR, instancias, NAT temporal, costo ≤ US$ 75, RTO/RPO coherentes con la criticidad y 3-2-1-1-0 | PASA | costo 69.58 US$/mes · lab 0.0908 US$/h · 9 servicios con RTO y RPO |
-| V-95 | Informe DC: DOCX y PDF existen, abren y son de la fuente actual | PASA | entregables/CE0331/Informe_Centro_Datos_v1.2.docx; PDF 31 páginas; motor Microsoft Word (COM) |
+| V-95 | Informe DC: DOCX y PDF existen, abren, son de la fuente actual y las referencias están en formato IEEE | PASA | entregables/CE0331/Informe_Centro_Datos_v1.3.docx; PDF 31 páginas; motor Microsoft Word (COM) |
 | V-96 | Informe DC: 12 secciones de la plantilla, en orden y con contenido | PASA | 21 títulos de sección · 3 anexos |
 | V-97 | Informe DC: sin texto guía, sin IDs retirados como vigentes, toda IP del inventario | PASA | 37 textos guía comprobados · 16 IP/redes distintas citadas |
 | V-98 | Informe DC: figuras DC-0…DC-3 y FIG-5.4 (sin cambios) con leyenda y «Qué observar» | PASA | 8 imágenes · 5 leyendas |
@@ -94,7 +94,7 @@
 | V-101 | Todo celeris_id es un ID del contrato y cada figura dibuja todo lo que debe (cobertura) | PASA | 0 errores, 0 advertencias |
 | V-102 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | PASA | — |
 | V-103 | Título, leyenda, panel; criticidad (borde + texto); vCPU, RAM, VLAN y CIDR coinciden con los YAML | PASA | — |
-| V-104 | Matriz DC: archivo y las 6 hojas | PASA | entregables/CE0331/Matriz_Componentes_DC_v1.2.xlsx |
+| V-104 | Matriz DC: archivo y las 6 hojas | PASA | entregables/CE0331/Matriz_Componentes_DC_v1.3.xlsx |
 | V-105 | Matriz DC: 100 % de lo dibujado en DC-0…DC-3 (y viceversa), criticidad y celdas obligatorias | PASA | 56 elementos en la matriz · 56 dibujados |
 | V-106 | Matriz DC: máquinas virtuales 1 a 1 con centro_datos.yaml y totales por fórmula | PASA | 11 VM · 12 fórmulas de total |
 | V-107 | Matriz DC: fórmulas recalculadas sin errores y coherentes con el cálculo en Python | PASA | LibreOffice headless (WSL) · 130 fórmulas · 0 errores |
@@ -113,7 +113,7 @@ Ninguno.
 ## Información
 
 - **V-27** — 28 de 60 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 0 elementos pendientes en los YAML; 84 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-01', 'CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-06', 'CI-07', 'CI-08', 'CI-09', 'CI-10', 'CI-11', 'CI-12', 'CI-13', 'CI-14', 'CI-15', 'CI-16', 'CI-17', 'CI-18', 'CI-19', 'CI-20', 'CI-21', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-27', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-49', 'CI-50', 'CI-51', 'CI-52', 'CI-53', 'CI-54', 'CI-55', 'CI-56', 'CI-57', 'CI-58', 'CI-59', 'CI-60', 'CI-61', 'CI-62', 'CI-63', 'CI-70', 'CI-71', 'CI-72', 'CI-73', 'CI-74', 'CI-75', 'CI-76', 'CI-77', 'CI-78', 'CI-79', 'CI-80', 'CI-81', 'CI-82', 'CI-83', 'CI-84', 'CI-85', 'CI-86', 'CI-87', 'CI-88', 'CI-89', 'CI-90']
+- **V-29** — 0 elementos pendientes en los YAML; 88 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-01', 'CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-06', 'CI-07', 'CI-08', 'CI-09', 'CI-10', 'CI-11', 'CI-12', 'CI-13', 'CI-14', 'CI-15', 'CI-16', 'CI-17', 'CI-18', 'CI-19', 'CI-20', 'CI-21', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-27', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-49', 'CI-50', 'CI-51', 'CI-52', 'CI-53', 'CI-54', 'CI-55', 'CI-56', 'CI-57', 'CI-58', 'CI-59', 'CI-60', 'CI-61', 'CI-62', 'CI-63', 'CI-70', 'CI-71', 'CI-72', 'CI-73', 'CI-74', 'CI-75', 'CI-76', 'CI-77', 'CI-78', 'CI-79', 'CI-80', 'CI-81', 'CI-82', 'CI-83', 'CI-84', 'CI-85', 'CI-86', 'CI-87', 'CI-88', 'CI-89', 'CI-90', 'CI-91', 'CI-92', 'CI-93', 'CI-94']
 - **V-42** — Resultados de 2026-11-23-L (commit descono): {'PASA': 34, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 32 de 60 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 605 fórmulas recalculadas con LibreOffice sin errores
@@ -121,7 +121,7 @@ Ninguno.
 - **V-94** — CT-09: RTO de 30 min es un objetivo del supuesto S-35 (por confirmar con la DTI)
 - **V-94** — CT-09: la recuperación de la consola y la caché espera el plazo del supuesto S-34 (por confirmar con la DTI)
 - **V-94** — Criticidad derivada de los servicios: {'CT-01': 'Alta', 'CT-02': 'Media', 'CT-03': 'Alta', 'CT-04': 'Media', 'CT-05': 'Alta', 'CT-06': 'Alta', 'CT-07': 'Alta', 'CT-08': 'Alta', 'CT-09': 'Alta'}
-- **V-101** — Huella de la fuente al generar: 41349b36
+- **V-101** — Huella de la fuente al generar: 915b1e2d
 - **V-108** — 11 figuras revisadas · escala de exportación por figura: máx. 3, ancho/alto ≤ 8000 px
 
 ## Cobertura

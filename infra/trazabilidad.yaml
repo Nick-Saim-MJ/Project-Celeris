@@ -568,6 +568,11 @@ supuestos:
     valor: Si cae ESX01 cae FW01, la puerta de enlace de la VLAN 30, así que DIRECT en el PAC no basta. La DTI devuelve la puerta de enlace de la VLAN 30 al FortiGate (estado previo al proyecto) y los laboratorios navegan sin caché, con RTO objetivo de 30 min. FW01 es hoy el DNS de los laboratorios, así que la contingencia también necesita un resolvedor que entregue la DTI
     validacion: Confirmar con la DTI el procedimiento, quién lo ejecuta y el RTO de 30 min antes de S2, y ensayarlo y cronometrarlo en S2 (con FW01 apagado, devolver la puerta de enlace y medir hasta que un laboratorio navega)
     responsable: Henyelrey
+  S-36:
+    supuesto: Personas usuarias del servicio
+    valor: "Personas que usan o administran el servicio: hasta 400 estudiantes y docentes simultáneos en laboratorio (una persona por PC, derivado de S-26) y 10 encargados de laboratorio (uno por laboratorio). Sin cifra definida: administradores de la DTI, auditor y usuarios BYOD del Wi-Fi, que no se han levantado"
+    validacion: "Levantamiento con la DTI antes de S2: cuántos administradores de la DTI tendrán rol sobre FW01 y JMP01, cuántos auditores tendrán acceso de lectura y cuántos dispositivos BYOD se conectan a la vez. Hasta entonces ninguna cifra del diseño depende de esos tres números"
+    responsable: Henyelrey
 
 decisiones:
   D-01:

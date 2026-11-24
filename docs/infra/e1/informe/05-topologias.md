@@ -4,17 +4,17 @@ El diseño se presenta en seis vistas, cada una con un propósito. Todas se gene
 
 ## 5.1 Topología general de infraestructura de red
 
-La Figura 5.1 muestra los dos entornos completos. En el campus, Internet llega al FortiGate existente (FGT-EXT), que conserva la IP pública 203.0.113.10 [S-15] y entrega a FW01 solo lo que el proyecto necesita por la red de tránsito 10.20.0.0/29 (FortiGate 10.20.0.1, FW01 10.20.0.2). FW01 enruta las {{dato:n_vlan}} VLAN del proyecto sobre un trunk 802.1Q hacia SW-CORE01 y el host ESX01; la capa de acceso existente (SW-ACC) conecta las PCs de los diez laboratorios. El Wi-Fi de estudiantes cuelga del FortiGate y no de FW01. En AWS, la VPC 10.30.0.0/16 contiene la subred pública pub-a (EC2-GW 10.30.0.10) y la privada app-a, vacía en operación normal. Los dos túneles VTI1 y VTI2 unen FW01 con el VGW.
+La Figura 5.1 muestra los dos entornos completos. En el campus, Internet llega al FortiGate existente (FGT-EXT), que conserva la IP pública 203.0.113.10 (bloque de documentación [10]) [S-15] y entrega a FW01 solo lo que el proyecto necesita por la red de tránsito 10.20.0.0/29 (FortiGate 10.20.0.1, FW01 10.20.0.2). FW01 enruta las {{dato:n_vlan}} VLAN del proyecto sobre un trunk 802.1Q hacia SW-CORE01 y el host ESX01; la capa de acceso existente (SW-ACC) conecta las PCs de los diez laboratorios. El Wi-Fi de estudiantes cuelga del FortiGate y no de FW01. Dentro de esa topología, la zona MGMT (VLAN 10) agrupa la gestión de ESXi, del switch, de IPMI y de la UPS, y solo se administra desde JMP01; las zonas DMZ-SVC (VLAN 40, portal de transparencia PORTAL01, F21) y DMZ-HONEY (VLAN 41, señuelo HNY01, F24 solo en la ventana autorizada) son las que se publican a Internet, y no tienen ningún flujo hacia MGMT ni SERVERS (sección 5.3). En AWS, la VPC 10.30.0.0/16 contiene la subred pública pub-a (EC2-GW 10.30.0.10) y la privada app-a, vacía en operación normal. Los dos túneles VTI1 y VTI2 unen FW01 con el VGW.
 
 {{figura:FIG-5.1|Qué observar: FW01 no reemplaza al FortiGate, queda detrás de él (D-26); el Wi-Fi no pasa por FW01; los túneles VTI1/VTI2 salen por el FortiGate con NAT-T; cada caja tiene su ID e IP, y el panel lateral resume qué aporta cada componente y qué pasa si falla.}}
 
-**Por qué FW01 detrás del FortiGate y no en su lugar (D-26).** El FortiGate ya tiene la IP pública, filtra con FortiGuard para todo el campus y lo opera la DTI. Reemplazarlo obligaría a rediseñar una red ajena y a duplicar un filtrado que la universidad ya paga. Colocar FW01 detrás, en una red de tránsito propia, da al proyecto un firewall que sí controla: separa sus zonas con *deny-all*, termina la VPN y ejecuta Suricata, sin tocar la política del resto del campus. El costo son tres pedidos a la DTI que se registran como supuesto [S-29]: NAT 1:1 de la IP pública hacia 10.20.0.2 solo para UDP 500/4500 y TCP 80/443, una ruta estática a 10.20.0.0/16 vía 10.20.0.2 y la exclusión de EDGE01/02 de la inspección SSL profunda. Sin esa exclusión el nodo no podría verificar el certificado real del origen (sección 5.5).
+**Por qué FW01 detrás del FortiGate y no en su lugar (D-26).** El FortiGate ya tiene la IP pública, filtra con FortiGuard para todo el campus y lo opera la DTI [11]. Reemplazarlo obligaría a rediseñar una red ajena y a duplicar un filtrado que la universidad ya paga. Colocar FW01 detrás, en una red de tránsito propia, da al proyecto un firewall que sí controla: separa sus zonas con *deny-all*, termina la VPN y ejecuta Suricata, sin tocar la política del resto del campus. El costo son tres pedidos a la DTI que se registran como supuesto [S-29]: NAT 1:1 de la IP pública hacia 10.20.0.2 solo para UDP 500/4500 y TCP 80/443, una ruta estática a 10.20.0.0/16 vía 10.20.0.2 y la exclusión de EDGE01/02 de la inspección SSL profunda. Sin esa exclusión el nodo no podría verificar el certificado real del origen (sección 5.5).
 
 **Por qué un solo host.** Todas las VM caben en un servidor de 12 núcleos y 96 GB [S-08]: el dimensionamiento detallado corresponde al entregable de centro de datos (CE0331). Un solo host simplifica la operación, pero convierte a ESX01 y a FW01 en puntos únicos de falla; la sección 9 explica cómo se recuperan.
 
 ## 5.2 Topología lógica de red — VLAN y subredes
 
-El plan usa la supernet 10.20.0.0/16 para el campus y 10.30.0.0/16 para AWS, sin solapamiento con la red del Wi-Fi (valor provisional 172.16.0.0/16 [S-28]). La convención es que el número de VLAN coincide con el tercer octeto; la única excepción es LAB, que necesita un /22 para diez laboratorios y crecimiento. La puerta de enlace de cada VLAN es la interfaz .1 de FW01, que además presta DNS (Unbound con DNSSEC) y NTP en esa misma dirección (D-28).
+El plan usa la supernet 10.20.0.0/16 para el campus y 10.30.0.0/16 para AWS, ambas del espacio privado de la RFC 1918 [12], sin solapamiento con la red del Wi-Fi (valor provisional 172.16.0.0/16 [S-28]). La convención es que el número de VLAN coincide con el tercer octeto; la única excepción es LAB, que necesita un /22 para diez laboratorios y crecimiento. La puerta de enlace de cada VLAN es la interfaz .1 de FW01, que además presta DNS (Unbound con DNSSEC) y NTP en esa misma dirección (D-28).
 
 {{tabla:vlan}}
 
@@ -36,7 +36,7 @@ La Figura 5.2 reúne el plan de direccionamiento, las tablas de rutas y la matri
 
 ## 5.3 Diseño de seguridad perimetral y zonas
 
-La Figura 5.3 ordena las zonas por nivel de confianza y muestra, sobre la misma topología lógica, dónde actúa cada control: el FortiGate en el borde del campus, Suricata y CrowdSec en FW01, el WAF delante del portal y del panel remoto, los señuelos y el SIEM que recibe los eventos. Las amenazas AM-xx aparecen marcadas en el punto donde se mitigan (anexo B).
+La Figura 5.3 ordena las zonas por nivel de confianza (la segregación de redes que pide el control 8.22 de ISO/IEC 27002 [13]) y muestra, sobre la misma topología lógica, dónde actúa cada control: el FortiGate en el borde del campus, Suricata y CrowdSec en FW01, el WAF delante del portal y del panel remoto, los señuelos y el SIEM que recibe los eventos. Las amenazas AM-xx aparecen marcadas en el punto donde se mitigan (anexo B).
 
 {{tabla:zonas_confianza}}
 
@@ -50,7 +50,7 @@ La zona AWS figura con confianza «Baja, expuesta», igual que DMZ-SVC, porque E
 
 ## 5.4 Diseño de conectividad VPN híbrida
 
-La VPN es IPsec *site-to-site* basada en rutas (interfaces VTI) entre FW01 y el Virtual Private Gateway de la VPC. Como FW01 está detrás del NAT del FortiGate, usa NAT-T (UDP 4500) y se identifica ante AWS con la IP pública 203.0.113.10. Los parámetros no incluyen secretos: la llave precompartida la genera AWS, se guarda cifrada con SOPS y no aparece en este informe ni en el repositorio.
+La VPN es IPsec *site-to-site* basada en rutas (interfaces VTI) entre FW01 y el Virtual Private Gateway de la VPC [14], [15]. Como FW01 está detrás del NAT del FortiGate, usa NAT-T (UDP 4500) y se identifica ante AWS con la IP pública 203.0.113.10. Los parámetros no incluyen secretos: la llave precompartida la genera AWS, se guarda cifrada con SOPS y no aparece en este informe ni en el repositorio.
 
 {{tabla:vpn}}
 

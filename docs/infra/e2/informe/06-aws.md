@@ -6,11 +6,11 @@ La región es una variable de OpenTofu (`var.region`). El laboratorio y el costo
 
 {{tabla:region}}
 
-Los tres criterios del enunciado se resuelven así. **Latencia:** no se ha medido; us-east-1 suele tener menor latencia desde Perú, pero por eso la prueba queda como pendiente de S2. El tráfico que depende de la latencia es solo el panel remoto, de pocos usuarios. **Cumplimiento:** a AWS no llegan datos personales. Por EC2-GW pasan sesiones cifradas que no se almacenan y a S3 llegan respaldos cifrados en origen por restic, sin la llave; por eso la residencia de datos de la Ley 29733 no obliga a una región de Sudamérica. **Disponibilidad de servicios:** las tres piezas usadas (VPC con VGW, EC2 y S3 con Object Lock) existen en ambas regiones, y us-east-1 es la región disponible en AWS Academy [S-13].
+Los tres criterios del enunciado se resuelven así. **Latencia:** no se ha medido; us-east-1 suele tener menor latencia desde Perú, pero por eso la prueba queda como pendiente de S2. El tráfico que depende de la latencia es solo el panel remoto, de pocos usuarios. **Cumplimiento:** a AWS no llegan datos personales. Por EC2-GW pasan sesiones cifradas que no se almacenan y a S3 llegan respaldos cifrados en origen por restic, sin la llave; por eso la residencia de datos de la Ley 29733 [10] no obliga a una región de Sudamérica. **Disponibilidad de servicios:** las tres piezas usadas (VPC con VGW, EC2 y S3 con Object Lock) existen en ambas regiones, y us-east-1 es la región disponible en AWS Academy [S-13].
 
 ## 6.2 Diseño de VPC
 
-La VPC es 10.30.0.0/16. No se solapa con el campus (10.20.0.0/16) ni con sus reservas, requisito para que BGP intercambie ambas redes sin traducción.
+La VPC es 10.30.0.0/16 [3]. No se solapa con el campus (10.20.0.0/16) ni con sus reservas, requisito para que BGP intercambie ambas redes sin traducción.
 
 {{tabla:subredes}}
 
@@ -22,7 +22,7 @@ Se usa una sola zona de disponibilidad (a). La alta disponibilidad entre zonas s
 
 **VGW.** Es el extremo AWS de la VPN de CE0311 (sección 7). Propaga a las dos tablas la ruta 10.20.0.0/16 aprendida por BGP.
 
-**Gateway Endpoint de S3 (VPCE-S3).** La subred privada llega a S3 por este endpoint, que no tiene costo por hora. Sirve a EC2-DR durante el simulacro, que restaura la consola desde S3.
+**Gateway Endpoint de S3 (VPCE-S3).** La subred privada llega a S3 por este endpoint [4], que no tiene costo por hora. Sirve a EC2-DR durante el simulacro, que restaura la consola desde S3.
 
 **Por qué no hay NAT permanente.** app-a está vacía en operación normal y EC2-GW está en una subred pública con su propia IP: nada del diseño necesita salir a Internet desde una subred privada, y el acceso a S3 va por el endpoint. Un NAT Gateway administrado costaría US$ {{dato:nat_gw_mes}} al mes, el {{dato:nat_gw_pct}} del presupuesto total de AWS, para no usarse. NAT-DR existe solo durante el simulacro T59 (etiqueta Ttl) para que EC2-DR instale paquetes y demuestre NAT; rt-private apunta a ella únicamente entonces, y el simulacro de {{dato:costo_sim}} US$ en total no pesa en el costo mensual.
 
@@ -36,13 +36,13 @@ EC2-GW es la única instancia permanente. EC2-DR y NAT-DR son temporales y se cr
 
 {{tabla:instancias_aws}}
 
-**Por qué un t3.micro para EC2-GW.** El tipo se elige frente a la carga: EC2-GW solo termina TLS, aplica el WAF (Coraza con OWASP CRS) y reenvía a CTRL01:443; no guarda datos ni llaves. Un t3.micro tiene 2 vCPU, 1 GiB y una línea base de CPU de 10 % por vCPU, es decir {{dato:gw_base}} vCPU sostenidos, y gana {{dato:gw_cred_g}} créditos de CPU por hora. Con la carga de diseño de la tabla siguiente el margen es de {{dato:gw_margen_cpu}} en CPU y {{dato:gw_margen_ram}} en RAM, y el saldo de créditos crece. Un t3.small duplicaría la RAM y el precio sin que la carga lo pida; se sube de tipo si el piloto mide los créditos agotándose.
+**Por qué un t3.micro para EC2-GW.** El tipo se elige frente a la carga: EC2-GW solo termina TLS, aplica el WAF (Coraza con OWASP CRS) y reenvía a CTRL01:443; no guarda datos ni llaves. Un t3.micro tiene 2 vCPU, 1 GiB y una línea base de CPU de 10 % por vCPU [9], es decir {{dato:gw_base}} vCPU sostenidos, y gana {{dato:gw_cred_g}} créditos de CPU por hora. Con la carga de diseño de la tabla siguiente el margen es de {{dato:gw_margen_cpu}} en CPU y {{dato:gw_margen_ram}} en RAM, y el saldo de créditos crece. Un t3.small duplicaría la RAM y el precio sin que la carga lo pida; se sube de tipo si el piloto mide los créditos agotándose.
 
 {{tabla:gw}}
 
 > La carga de diseño es el supuesto S-33, derivado de S-26 (una sesión por laboratorio): 10 sesiones, 5 solicitudes por segundo, 0,10 vCPU y 512 MiB. D2.8 solo decía «pocos usuarios» (CI-82, resuelto con S-33). Se mide con el piloto en S2 y, si la media supera la línea base del t3.micro, se pasa a t3.small.
 
-**Costo mensual 24×7.** Con precios de lista de noviembre de 2026 en us-east-1 [S-12], la AWS del diseño cuesta ≈ US$ {{dato:costo_total}} al mes (meta de D2.3: ≤ US$ {{dato:costo_meta}}). La mayor parte es la VPN (US$ 36,50) y las tres IPv4 públicas, entre ellas las dos de los túneles, que AWS cobra por hora. El laboratorio efímero (Modo A) cuesta US$ {{dato:costo_lab_h}} por hora, bajo la meta de US$ 0,10. Los precios se confirman en AWS Pricing Calculator.
+**Costo mensual 24×7.** Con precios de lista de noviembre de 2026 en us-east-1 [S-12], la AWS del diseño cuesta ≈ US$ {{dato:costo_total}} al mes (meta de D2.3: ≤ US$ {{dato:costo_meta}}). La mayor parte es la VPN (US$ 36,50) y las tres IPv4 públicas, entre ellas las dos de los túneles, que AWS cobra por hora. El laboratorio efímero (Modo A) cuesta US$ {{dato:costo_lab_h}} por hora, bajo la meta de US$ 0,10. Los precios se confirman en AWS Pricing Calculator [11].
 
 {{tabla:costo}}
 

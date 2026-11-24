@@ -1,7 +1,8 @@
 """Gancho V-95+ — Informe DOCX/PDF del Entregable 2 (CE0331), al estilo de V-80.
 
 Lee entregables/CE0331/Informe_Centro_Datos_v<versión>.docx y .pdf (los genera docs/infra/e2/build_informe.py con `make informe-dc`):
-    V-95  DOCX y PDF existen y abren; la huella de infra/centro_datos.yaml e inventory.yaml es la del informe generado.
+    V-95  DOCX y PDF existen y abren; la huella de infra/centro_datos.yaml e inventory.yaml es la del informe generado;
+          las referencias están en formato IEEE (mismo chequeo que V-80).
     V-96  Las 12 secciones de la plantilla, en orden, con todas sus subsecciones y contenido bajo cada título; anexos presentes.
     V-97  Ningún texto guía de la plantilla, marcador «[ Espacio para diagrama…» ni «____»; ningún ID retirado en v0.4 presentado
           como vigente; toda IP o red citada existe en el inventario.
@@ -86,7 +87,8 @@ def run(infra):
             h.append(W(f"El PDF tiene {paginas} páginas y el registro dice {info['paginas']}", GENERAR))
     else:
         h.append(W("Falta docs/infra/e2/informe-paginas.json", GENERAR))
-    resultado("V-95", "Informe DC: DOCX y PDF existen, abren y son de la fuente actual", h, f"{rel}; PDF {paginas or '?'} páginas; motor {info.get('motor', '?')}")
+    h += v80.chequeo_ieee(doc, E)
+    resultado("V-95", "Informe DC: DOCX y PDF existen, abren, son de la fuente actual y las referencias están en formato IEEE", h, f"{rel}; PDF {paginas or '?'} páginas; motor {info.get('motor', '?')}")
 
     cuerpo, titulos = v80._cuerpo(doc)
     texto_total = "\n".join(t for _, t in cuerpo) + "\n" + "\n".join(t for _, t, _ in titulos)

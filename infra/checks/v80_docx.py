@@ -1,7 +1,8 @@
 """Gancho V-80+ — Informe DOCX/PDF (H3): 11 secciones, sin texto guía, IDs vigentes, IP del inventario, figuras y evidencias.
 
 Lee entregables/CE0311/Informe_Diseno_Red_v<versión>.docx y .pdf (los genera docs/infra/e1/build_informe.py con `make informe`):
-    V-80  DOCX y PDF existen y abren; docs/infra/e1/informe-paginas.json tiene la huella SHA-256 de la fuente actual.
+    V-80  DOCX y PDF existen y abren; docs/infra/e1/informe-paginas.json tiene la huella SHA-256 de la fuente actual;
+          las referencias están en formato IEEE (lista [n] sin viñetas, «Accedido» en las fuentes en línea, citas = lista).
     V-81  Las 11 secciones de la plantilla, en orden, con todas sus subsecciones y contenido bajo cada título.
     V-82  Ningún texto guía de la plantilla, marcador «[ Espacio para diagrama…», «____» ni red de ejemplo 192.168.x.x.
     V-83  Ningún ID retirado en v0.4 (componente, zona, flujo o prueba), salvo en una frase que diga que está retirado.
@@ -75,6 +76,68 @@ def _ips_inventario(infra) -> tuple[set[str], list]:
     return tokens, redes
 
 
+def chequeo_ieee(doc, E) -> list:
+    """Referencias en formato IEEE: lista numerada [n] con sangría francesa y sin viñetas, fuentes en línea con «Accedido»,
+    cada [n] citado en el texto existe en la lista, cada referencia está citada y la numeración sigue el orden de primera cita."""
+    from docx.oxml.ns import qn
+    nombres = {st.style_id: st.name.replace(" ", "") for st in doc.styles}
+    hallazgos, refs, cuerpo, en_refs = [], [], [], False
+    for e in doc.element.body.iterchildren():
+        if e.tag == qn("w:tbl"):
+            if not en_refs:
+                cuerpo.append(_texto(e))
+            continue
+        if e.tag != qn("w:p"):
+            continue
+        ppr = e.find(qn("w:pPr"))
+        estilo = ppr.find(qn("w:pStyle")) if ppr is not None else None
+        nombre = nombres.get(estilo.get(qn("w:val")), "") if estilo is not None else ""
+        t = _texto(e).strip()
+        if nombre in ("Heading1", "Heading2") and t:
+            en_refs = bool(re.match(r"^\d+\. Referencias$", t))
+            continue
+        if not t:
+            continue
+        if not en_refs:
+            cuerpo.append(t)
+            continue
+        refs.append((t, ppr, nombre))
+    if not refs:
+        return [E("No se encontró la sección de referencias (N. Referencias) con entradas", GENERAR)]
+    for i, (t, ppr, nombre) in enumerate(refs, 1):
+        m = re.match(r"^\[(\d+)\]\s*\S", t)  # la tabulación («w:tab») no es texto: «[1]» + tab + «Autor» se lee «[1]Autor»
+        if not m:
+            hallazgos.append(E(f"Referencia sin el formato «[n] texto»: «{t[:50]}…» (sin viñetas ni guiones)", "Escribir «[n] Autor, «Título», …»"))
+            continue
+        if int(m.group(1)) != i:
+            hallazgos.append(E(f"La referencia {i} está numerada [{m.group(1)}]: la lista debe ser consecutiva desde [1]", "Renumerar"))
+        if (ppr is not None and ppr.find(qn("w:numPr")) is not None) or nombre.startswith("ListBullet") or t[:1] in "•·-–—":
+            hallazgos.append(E(f"La referencia [{i}] lleva viñeta o lista automática: IEEE usa solo «[n]»", "Quitar la viñeta"))
+        ind = ppr.find(qn("w:ind")) if ppr is not None else None
+        if ind is None or not (ind.get(qn("w:hanging")) or (ind.get(qn("w:firstLine")) or "0").startswith("-")):
+            hallazgos.append(E(f"La referencia [{i}] no tiene sangría francesa", "Usar bloque ref en build_informe.py"))
+        if "http" in t:
+            if "[En línea]. Disponible en: http" not in t:
+                hallazgos.append(E(f"La referencia [{i}] tiene URL sin «[En línea]. Disponible en: URL»", "Completar la fuente"))
+            if not re.search(r"\[Accedido: \d{1,2}-[a-z]{3}-\d{4}\]\.$", t):
+                hallazgos.append(E(f"La referencia [{i}] tiene URL y no termina en «[Accedido: dd-mmm-aaaa].»", "Agregar la fecha de acceso"))
+    citados: list[int] = []
+    for t in cuerpo:
+        for n in re.findall(r"\[(\d+)\]", t):
+            if int(n) not in citados:
+                citados.append(int(n))
+    for n in citados:
+        if not 1 <= n <= len(refs):
+            hallazgos.append(E(f"El texto cita [{n}] y la lista solo tiene {len(refs)} referencias", "Agregar la referencia o corregir la cita"))
+    for n in range(1, len(refs) + 1):
+        if n not in citados:
+            hallazgos.append(E(f"La referencia [{n}] no se cita en el texto", "Citarla donde se use o quitarla"))
+    validos = [n for n in citados if 1 <= n <= len(refs)]
+    if validos != sorted(validos):
+        hallazgos.append(E("Las referencias no están numeradas por orden de primera cita (IEEE)", "Renumerar por orden de aparición"))
+    return hallazgos
+
+
 def run(infra):
     from docx import Document
     from validate import E, Resultado, W, estado_de
@@ -122,7 +185,8 @@ def run(infra):
         commit = info.get("commit_fuente") or commit
     else:
         h.append(W("Falta docs/infra/e1/informe-paginas.json (páginas por sección)", GENERAR))
-    resultado("V-80", "Informe: DOCX y PDF existen, abren y son de la fuente actual", h,
+    h += chequeo_ieee(doc, E)
+    resultado("V-80", "Informe: DOCX y PDF existen, abren, son de la fuente actual y las referencias están en formato IEEE", h,
               f"{rel}; PDF {paginas or '?'} páginas; motor {info.get('motor', '?')}")
 
     cuerpo, titulos = _cuerpo(doc)

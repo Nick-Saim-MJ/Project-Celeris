@@ -6,7 +6,7 @@
 
 ## Modo L: laboratorio emulado local
 
-Es una topología containerlab con un contenedor por equipo del diseño y las mismas IP del inventario. La WAN emulada usa direcciones de documentación (RFC 5737). FW01 se emula con Debian, nftables (reglas generadas del inventario), strongSwan, FRR, Suricata, Unbound, NTP y CrowdSec. Los nodos de caché ejecutan el mismo binario de producción y el SIEM es un Wazuh 4.9.2 real.
+Es una topología containerlab con un contenedor por equipo del diseño y las mismas IP del inventario. La WAN emulada usa direcciones de documentación (RFC 5737 [10]). FW01 se emula con Debian, nftables (reglas generadas del inventario), strongSwan, FRR, Suricata, Unbound, NTP y CrowdSec. Los nodos de caché ejecutan el mismo binario de producción y el SIEM es un Wazuh 4.9.2 real.
 
 **Resultado del ensayo del {{dato:l_fecha}}:** {{dato:l_pasa}} PASA, {{dato:l_falla}} FALLA, {{dato:l_parcial}} PARCIAL y {{dato:l_no_aplica}} NO_APLICA. Un resultado PARCIAL o NO_APLICA nunca cuenta como PASA.
 

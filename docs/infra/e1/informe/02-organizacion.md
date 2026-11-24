@@ -2,11 +2,12 @@
 
 ## 2.1 Descripción general
 
-La organización es una universidad. El escenario es el Campus Juliaca y su Dirección de Tecnologías de la Información (DTI), que opera el FortiGate perimetral, la red Wi-Fi y la capa de acceso de los laboratorios. El servicio que se diseña da soporte a la actividad académica: las clases en laboratorio dependen de que los equipos tengan instalado y actualizado el software de cada curso antes de la sesión.
+La organización es la Universidad Peruana Unión (UPeU), Campus Juliaca. La Dirección de Tecnologías de la Información (DTI) es el área de la UPeU que opera la red: el FortiGate perimetral, la red Wi-Fi y la capa de acceso de los laboratorios. El servicio que se diseña da soporte a la actividad académica: las clases en laboratorio dependen de que los equipos tengan instalado y actualizado el software de cada curso antes de la sesión.
 
 | Necesidad | Valor de diseño | Fuente |
 | --- | --- | --- |
 | Equipos institucionales en alcance | 400 PCs en 10 laboratorios de 40 | [S-01, S-26] |
+| Usuarios (personas, no equipos) | Estudiantes y docentes en laboratorio: hasta 400 puestos simultáneos (una persona por PC). Encargados de laboratorio: 10 (uno por laboratorio). Administradores de la DTI, auditor y usuarios BYOD del Wi-Fi: sin cifra definida | [S-26, S-28, S-36] |
 | Equipos personales | BYOD en el Wi-Fi de estudiantes (red de la DTI) | [S-28] |
 | Sedes | Una (Juliaca); las sedes futuras tienen bloques reservados en el plan de direccionamiento | Sección 9 |
 | Enlace a Internet | 300 Mbps simétricos; IP pública fija en el FortiGate | [S-02, S-15, S-29] |
@@ -17,7 +18,7 @@ La organización es una universidad. El escenario es el Campus Juliaca y su Dire
 | Disponibilidad | La navegación de los laboratorios no debe depender de la caché (≥ 99,5 %, REQ-NF-03) | Sección 9 |
 | Crecimiento | Hasta 16 laboratorios de /26 dentro del mismo /22 y paso a /21 sin renumerar | Sección 9 |
 
-El dato que justifica el diseño es la repetición: un laboratorio de {{dato:n_pcs_lab}} PCs que descarga 3 GB por equipo mueve unos 120 GB por el enlace cuando bastaría con traerlos una vez [S-27]. Por eso la pieza central es un nodo de caché dentro de la LAN y no un aumento del ancho de banda.
+El dato que justifica el diseño es la repetición: un laboratorio de {{dato:n_pcs_lab}} PCs que descarga 3 GB por equipo mueve unos 120 GB por el enlace cuando bastaría con traerlos una vez [S-27]. Por eso la pieza central es un nodo de caché HTTP [8] dentro de la LAN y no un aumento del ancho de banda.
 
 ## 2.2 Servicios y procesos críticos dependientes de la red
 
@@ -44,4 +45,4 @@ La criticidad se asigna según el efecto de una caída sobre la clase o sobre la
 | Dirección del campus | Dirección | Liberar el enlace sin pagar más ancho de banda; riesgo controlado y medible |
 | ISP local | Proveedor | Enlace e IP pública fija estables [S-15] |
 | AWS | Proveedor de nube | Extremo VPN, EC2 y S3 operados con mínimo privilegio y costo acotado (≈ US$ 70 al mes) |
-| Oficial de datos personales y Autoridad Nacional de Protección de Datos Personales | Organismo regulador | Cumplimiento de la Ley 29733: sin datos personales hacia orígenes ni hacia la nube (AM-07, T26) |
+| Oficial de datos personales y Autoridad Nacional de Protección de Datos Personales | Organismo regulador | Cumplimiento de la Ley 29733 [9]: sin datos personales hacia orígenes ni hacia la nube (AM-07, T26) |

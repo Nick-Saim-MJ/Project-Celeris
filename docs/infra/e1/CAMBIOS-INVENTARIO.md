@@ -1015,3 +1015,34 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Qué pasaba:** FIG-1.1 y DC-0 iban en páginas verticales, y las demás tenían un tope de alto de 12,2 y 12,6 cm que las dejaba más angostas que el ancho útil de la página apaisada (25,7 cm).
 - **Decisión aplicada:** toda figura va en una sección apaisada y mide el ancho útil de la página (25,7 cm); el alto se limita a 13,4 cm (`ALTO_FIGURA_CM`) para que la figura, su leyenda y «Qué observar» quepan en la misma página. CE0311 se regeneró como v1.3 y CE0331 como v1.2.
 - **Decide:** equipo del proyecto
+
+### CI-91 — Los informes no nombraban a la universidad ni a la DTI como quien opera la red
+- **Estado:** resuelto (2026-11-24)
+- **Tipo:** decisión de redacción
+- **Dónde:** `docs/infra/e1/informe/01-resumen.md` y `02-organizacion.md`; `docs/infra/e2/informe/01-resumen.md` y `02-organizacion.md`
+- **Qué pasaba:** los textos decían «una universidad» y «el Campus Juliaca» sin nombrar a la Universidad Peruana Unión, y la DTI aparecía sin decir que es el área que opera la red.
+- **Decisión aplicada:** §1 y §2 de ambos informes dicen «Universidad Peruana Unión (UPeU), Campus Juliaca» y «la Dirección de Tecnologías de la Información (DTI) es el área de la UPeU que opera la red». Ningún dato técnico cambia.
+- **Decide:** equipo del proyecto
+
+### CI-92 — La tabla de necesidades de CE0311 §2.1 solo contaba equipos, no personas
+- **Estado:** resuelto (2026-11-24, supuesto nuevo S-36)
+- **Tipo:** supuesto nuevo
+- **Dónde:** `docs/infra/e1/informe/02-organizacion.md` (tabla de necesidades); `infra/trazabilidad.yaml` → S-36
+- **Qué pasaba:** la tabla listaba PCs, Wi-Fi y enlaces, pero no las personas que usan o administran el servicio.
+- **Decisión aplicada:** fila «Usuarios (personas, no equipos)»: hasta 400 estudiantes y docentes simultáneos en laboratorio (una persona por PC, de S-26) y 10 encargados (uno por laboratorio). Los administradores de la DTI, el auditor y los usuarios BYOD no tienen cifra en ninguna fuente: se declaran «sin cifra definida» en S-36 y se levantan con la DTI antes de S2. No se inventó ninguna cantidad.
+- **Decide:** equipo del proyecto; la DTI aporta las cifras pendientes de S-36
+
+### CI-93 — CE0311 §5.1 no nombraba las zonas MGMT, DMZ-SVC y DMZ-HONEY en la topología general
+- **Estado:** resuelto (2026-11-24)
+- **Tipo:** decisión de redacción
+- **Dónde:** `docs/infra/e1/informe/05-topologias.md` (§5.1)
+- **Decisión aplicada:** una frase ubica MGMT (VLAN 10, solo desde JMP01), DMZ-SVC (VLAN 40, PORTAL01, F21) y DMZ-HONEY (VLAN 41, HNY01, F24 en la ventana autorizada) dentro de la topología general. Los datos salen de `infra/inventory.yaml`; DMZ-SVC y DMZ-HONEY no tienen ningún flujo hacia MGMT ni SERVERS.
+- **Decide:** equipo del proyecto
+
+### CI-94 — Referencias de ambos informes sin formato IEEE y sin citas en el texto
+- **Estado:** resuelto (2026-11-24)
+- **Tipo:** defecto de formato
+- **Dónde:** `docs/infra/e1/informe/11-referencias.md`, `docs/infra/e2/informe/12-referencias.md`; `build_informe.py` (E1, bloque `ref`); V-80 y V-95
+- **Qué pasaba:** las referencias iban con viñetas, sin la fecha de acceso de las fuentes en línea, agrupaban dos URL en una misma entrada y ningún `[n]` se citaba en el cuerpo. En CE0311, RFC 8915 (NTS) no tenía respaldo en el diseño, que sirve NTP desde FW01 sin NTS.
+- **Decisión aplicada:** lista numerada `[n]` con sangría francesa y numeración por orden de primera cita (IEEE). Cada fuente en línea termina en «[En línea]. Disponible en: URL. [Accedido: 24-nov-2026].»; las entradas con dos URL se separaron (OWASP CRS y Coraza; restic y pgBackRest). Cada `[n]` del cuerpo está en la lista y cada referencia está citada: CE0311 queda en 20 entradas (se quitó RFC 8915 y se separaron OWASP CRS y Coraza) y CE0331 en 18 (se separaron restic y pgBackRest). V-80 y V-95 comprueban el formato.
+- **Decide:** equipo del proyecto

@@ -1,12 +1,12 @@
 # 10. Consideraciones de disponibilidad y continuidad en el diseño
 
-El diseño contempla la disponibilidad a nivel de diseño, sin implementarla. Los RTO y RPO son objetivos preliminares que se validan en el entregable de implementación de S2; la consola se valida con el simulacro T59. La criticidad de cada servicio es la del componente más crítico que lo presta, y ningún servicio de la clase Alta supera el RTO de 4 h ni el RPO de 24 h, el mayor de la tabla (SIEM).
+El diseño contempla la disponibilidad a nivel de diseño, sin implementarla. Los RTO y RPO se fijan por servicio, como pide el pilar de Fiabilidad de AWS Well-Architected [14], y son objetivos preliminares que se validan en el entregable de implementación de S2; la consola se valida con el simulacro T59. La criticidad de cada servicio es la del componente más crítico que lo presta, y ningún servicio de la clase Alta supera el RTO de 4 h ni el RPO de 24 h, el mayor de la tabla (SIEM).
 
 {{tabla:continuidad}}
 
-**Redundancia.** El almacenamiento de las VM está en RAID 1 por hardware; los nodos de caché tienen un datastore cada uno y no se protegen porque se reconstruyen. La navegación de los laboratorios no depende de un nodo de caché: EDGE01, EDGE02 y la salida `DIRECT` del PAC dan un RTO de ≈ 0 si cae uno de ellos o los dos (la prueba T09 midió 8,7 s en el Modo L, que es emulado). Si cae el host es otro escenario, el de CT-09, más abajo. La red tiene un solo switch y un solo host; son los puntos únicos de falla que se declaran más abajo.
+**Redundancia.** Las medidas de esta sección siguen los controles 8.13 (respaldo), 8.14 (redundancia) y 7.11 (servicios de apoyo) de ISO/IEC 27002 [15], que desarrolla el Anexo A de ISO/IEC 27001 [16]. El almacenamiento de las VM está en RAID 1 por hardware; los nodos de caché tienen un datastore cada uno y no se protegen porque se reconstruyen. La navegación de los laboratorios no depende de un nodo de caché: EDGE01, EDGE02 y la salida `DIRECT` del PAC dan un RTO de ≈ 0 si cae uno de ellos o los dos (la prueba T09 midió 8,7 s en el Modo L, que es emulado). Si cae el host es otro escenario, el de CT-09, más abajo. La red tiene un solo switch y un solo host; son los puntos únicos de falla que se declaran más abajo.
 
-**Estrategia de respaldo y regla 3-2-1-1-0.** La consola y su base se respaldan con pgBackRest y restic: una copia local en DS-VM y una copia en S3. El respaldo corre dentro de cada VM porque ESXi gratuito no ofrece VADP. La regla se cumple así:
+**Estrategia de respaldo y regla 3-2-1-1-0.** La consola y su base se respaldan con pgBackRest [17] y restic [18]: una copia local en DS-VM y una copia en S3. El respaldo corre dentro de cada VM porque ESXi gratuito no ofrece VADP. La regla se cumple así:
 
 {{tabla:regla_respaldo}}
 

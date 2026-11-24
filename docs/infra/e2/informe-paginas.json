@@ -140,7 +140,7 @@
     {
       "texto": "12. Referencias",
       "nivel": 1,
-      "pagina": 26
+      "pagina": 27
     },
     {
       "texto": "Anexo A. Supuestos, decisiones y cambios registrados",
@@ -168,10 +168,10 @@
       "pagina": 31
     }
   ],
-  "docx": "entregables/CE0331/Informe_Centro_Datos_v1.2.docx",
-  "pdf": "entregables/CE0331/Informe_Centro_Datos_v1.2.pdf",
-  "commit_fuente": "41349b36",
-  "huella_fuente": "41349b36",
+  "docx": "entregables/CE0331/Informe_Centro_Datos_v1.3.docx",
+  "pdf": "entregables/CE0331/Informe_Centro_Datos_v1.3.pdf",
+  "commit_fuente": "915b1e2d",
+  "huella_fuente": "915b1e2d",
   "figuras": [
     "DC-0",
     "DC-1",
@@ -180,6 +180,6 @@
     "FIG-5.4"
   ],
   "completar": [],
-  "version": "1.2",
-  "fig54_sha256": "175a961136094645e370c42c9ae7a03b4c8b4fa32be376c16e1179329167d821"
+  "version": "1.3",
+  "fig54_sha256": "42da917bb9fea7d7077fb1039cbf42cd0537c022d2f043a413d2acd989e331a0"
 }

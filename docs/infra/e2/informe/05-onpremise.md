@@ -24,11 +24,11 @@ El centro de datos del campus es un rack de 12U con cuatro grupos de equipos: la
 
 ## 5.2 Diseño del hipervisor
 
-**Por qué ESXi gratuito.** El host es uno solo, no hay presupuesto de licencias y el proyecto no necesita vMotion, DRS ni HA entre hosts. Proxmox VE es la alternativa si se necesitara API para IaC o un clúster (D4). El costo es aceptar tres límites que condicionan el diseño:
+**Por qué ESXi gratuito.** El host es uno solo, no hay presupuesto de licencias y el proyecto no necesita vMotion, DRS ni HA entre hosts. Proxmox VE es la alternativa si se necesitara API para IaC o un clúster (D4). El costo es aceptar tres límites que condicionan el diseño [8]:
 
 {{tabla:limites_esxi}}
 
-**vSwitch y port groups.** vSwitch0 tiene dos uplinks con teaming por puerto virtual de origen (activo/activo): reparte las VM entre los enlaces y, si uno cae, sus VM pasan al otro. Un vSwitch estándar no soporta LACP, que exigiría un vDS y vCenter. Cada VLAN del proyecto tiene su port group; PG-FW-TRUNK (VLAN 4095) entrega a FW01 todas las VLAN etiquetadas, y FW01 enruta entre ellas con una subinterfaz por VLAN. vSwitch1 usa solo vmnic2 y tiene un único port group, PG-TRANSITO, al que solo se conecta FW01: la red de tránsito 10.20.0.0/29 hacia el FortiGate no comparte vSwitch con ninguna otra VM. En todos los port groups, el modo promiscuo, los cambios de MAC y las transmisiones falsificadas están en **rechazar**; en la v0.4 no hay port groups de captura (no hay IDS01) ni vSwitch de almacenamiento (no hay NAS01), de modo que no existe ninguna excepción.
+**vSwitch y port groups.** vSwitch0 tiene dos uplinks con teaming por puerto virtual de origen (activo/activo): reparte las VM entre los enlaces y, si uno cae, sus VM pasan al otro. Un vSwitch estándar no soporta LACP [2], que exigiría un vDS y vCenter. Cada VLAN del proyecto tiene su port group; PG-FW-TRUNK (VLAN 4095) entrega a FW01 todas las VLAN etiquetadas, y FW01 enruta entre ellas con una subinterfaz por VLAN. vSwitch1 usa solo vmnic2 y tiene un único port group, PG-TRANSITO, al que solo se conecta FW01: la red de tránsito 10.20.0.0/29 hacia el FortiGate no comparte vSwitch con ninguna otra VM. En todos los port groups, el modo promiscuo, los cambios de MAC y las transmisiones falsificadas están en **rechazar**; en la v0.4 no hay port groups de captura (no hay IDS01) ni vSwitch de almacenamiento (no hay NAS01), de modo que no existe ninguna excepción.
 
 {{tabla:vswitch}}
 

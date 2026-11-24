@@ -1,6 +1,6 @@
 # 1. Resumen ejecutivo del diseño de red
 
-**Proyecto y escenario.** Celeris Edge es un servicio de caché de descargas para los laboratorios de cómputo del Campus Juliaca [S-01]. El alcance son {{dato:n_lab}} laboratorios de {{dato:n_pcs_lab}} PCs institucionales ({{dato:n_pcs}} equipos) [S-26] y, como cliente sin descifrado, el Wi-Fi de estudiantes que administra la DTI [S-28].
+**Proyecto y escenario.** Celeris Edge es un servicio de caché de descargas para los laboratorios de cómputo de la Universidad Peruana Unión (UPeU), Campus Juliaca [S-01]. La Dirección de Tecnologías de la Información (DTI) es el área de la UPeU que opera la red: el FortiGate perimetral, el Wi-Fi y la capa de acceso de los laboratorios. El alcance son {{dato:n_lab}} laboratorios de {{dato:n_pcs_lab}} PCs institucionales ({{dato:n_pcs}} equipos) [S-26] y, como cliente sin descifrado, el Wi-Fi de estudiantes que opera la DTI [S-28].
 
 **Problema de conectividad.** Cada PC descarga por separado los mismos archivos grandes: actualizaciones del sistema operativo, instaladores de los cursos y paquetes, del orden de 3 GB por PC en cada ciclo [S-27]. Cuando un laboratorio entero lo hace a la vez, el enlace de {{dato:enlace}} [S-02] se satura y las clases se retrasan. El FortiGate existente filtra categorías de sitios, pero no evita que el mismo archivo cruce el enlace 40 veces.
 

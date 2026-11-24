@@ -4,7 +4,7 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <object id="DC-0-1" label="&lt;b&gt;Figura 1.1 — Topología ejecutiva del centro de datos híbrido&lt;/b&gt;&lt;br&gt;DC-0 · Centro de datos v1.2 · 2026-11-24 · inventario v1.3 · huella de la fuente 41349b36 · CE0331 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="DC-0" titulo="Figura 1.1 — Topología ejecutiva del centro de datos híbrido">
+        <object id="DC-0-1" label="&lt;b&gt;Figura 1.1 — Topología ejecutiva del centro de datos híbrido&lt;/b&gt;&lt;br&gt;DC-0 · Centro de datos v1.3 · 2026-11-24 · inventario v1.4 · huella de la fuente 915b1e2d · CE0331 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="DC-0" titulo="Figura 1.1 — Topología ejecutiva del centro de datos híbrido">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;align=left;spacingLeft=10;fontSize=13;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="20" y="10" width="1200" height="44" as="geometry" />
           </mxCell>

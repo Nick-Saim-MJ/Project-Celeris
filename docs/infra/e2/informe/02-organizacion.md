@@ -1,6 +1,6 @@
 # 2. Descripción de la organización y necesidades de infraestructura
 
-La organización es una universidad; el escenario es el Campus Juliaca y su Dirección de Tecnologías de la Información (DTI), que opera el FortiGate perimetral, el Wi-Fi y la capa de acceso de los laboratorios. La actividad principal es académica: las clases en laboratorio dependen de que cada PC tenga el software del curso instalado y actualizado antes de la sesión. El servicio Celeris Edge evita que esas descargas repetidas saturen el enlace del campus.
+La organización es la Universidad Peruana Unión (UPeU), Campus Juliaca. La Dirección de Tecnologías de la Información (DTI) es el área de la UPeU que opera la red: el FortiGate perimetral, el Wi-Fi y la capa de acceso de los laboratorios. La actividad principal es académica: las clases en laboratorio dependen de que cada PC tenga el software del curso instalado y actualizado antes de la sesión. El servicio Celeris Edge evita que esas descargas repetidas saturen el enlace del campus.
 
 **Servicios que necesitan cómputo, almacenamiento o base de datos**
 
@@ -27,7 +27,7 @@ La organización es una universidad; el escenario es el Campus Juliaca y su Dire
 | AWS | Ya va cifrado en origen | Respaldos en S3: restic cifra y la llave no está en AWS |
 | Ninguno | Un MISS servido desde AWS igual cruza el enlace del campus | Caché en AWS (D-19): no existe |
 
-La consola no va en la nube por cuatro razones: el nodo dejaría de recibir cambios justo cuando el enlace está mal; la llave que firma debe estar donde está el control físico; la base guarda uso por laboratorio y la Ley 29733 exige cuidar el flujo de datos personales; y una VM más en el host existente cuesta menos que base y API en AWS 24×7. La SPA tampoco va en S3: es estática y sin secretos, y separarla obligaría a abrir CORS y a publicar la API de todos modos.
+La consola no va en la nube por cuatro razones: el nodo dejaría de recibir cambios justo cuando el enlace está mal; la llave que firma debe estar donde está el control físico; la base guarda uso por laboratorio y la Ley 29733 [10] exige cuidar el flujo de datos personales; y una VM más en el host existente cuesta menos que base y API en AWS 24×7. La SPA tampoco va en S3: es estática y sin secretos, y separarla obligaría a abrir CORS y a publicar la API de todos modos.
 
 **Crecimiento e importancia de la información**
 

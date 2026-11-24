@@ -21,13 +21,13 @@ Las contradicciones y vacíos encontrados en los documentos base se registran co
 | Zona | Conjunto de equipos con el mismo nivel de confianza y las mismas reglas. En el campus, cada zona interna es una VLAN. |
 | DMZ | Zona que aloja servicios alcanzables desde redes menos confiables. Este diseño separa la de servicios (DMZ-SVC) de la de señuelos (DMZ-HONEY). |
 | VTI | Interfaz de túnel virtual. Permite una VPN basada en rutas, en la que BGP decide por qué túnel va el tráfico. |
-| BGP | Protocolo de ruteo dinámico (RFC 4271). Aquí intercambia las redes del campus y de AWS por la VPN. |
-| NAT-T | Encapsulado de IPsec en UDP 4500 que permite cruzar un equipo que hace NAT, como el FortiGate. |
+| BGP | Protocolo de ruteo dinámico (RFC 4271) [1]. Aquí intercambia las redes del campus y de AWS por la VPN. |
+| NAT-T | Encapsulado de IPsec en UDP 4500 que permite cruzar un equipo que hace NAT, como el FortiGate (RFC 3948) [2]. |
 | mTLS | TLS en el que cliente y servidor presentan certificado; el servidor sabe con certeza qué equipo lo llama. |
-| WAF | Firewall de aplicaciones web (Coraza con OWASP CRS). Filtra inyecciones y ataques web conocidos. |
-| IDS / IPS | Sistema que detecta (IDS) o además bloquea (IPS) tráfico malicioso. Aquí es Suricata dentro de FW01. |
+| WAF | Firewall de aplicaciones web (Coraza [3] con OWASP CRS [4]). Filtra inyecciones y ataques web conocidos. |
+| IDS / IPS | Sistema que detecta (IDS) o además bloquea (IPS) tráfico malicioso. Aquí es Suricata [5] dentro de FW01. |
 | Honeypot / canary | Servicio señuelo sin uso legítimo: cualquier contacto con él es sospechoso. HNY01 es el honeypot de DMZ-HONEY; HNY02, el canary dentro de LAB. |
-| SIEM | Sistema que reúne y correlaciona eventos de seguridad (Wazuh, en SIEM01). |
-| Object Lock | Función de S3 que impide borrar o modificar una copia durante un período fijo, incluso con credenciales válidas. |
+| SIEM | Sistema que reúne y correlaciona eventos de seguridad (Wazuh [6], en SIEM01). |
+| Object Lock | Función de S3 que impide borrar o modificar una copia durante un período fijo, incluso con credenciales válidas [7]. |
 | Modo L / Modo A / Modo H | Ejecuciones del diseño: L = laboratorio emulado local; A = AWS efímero; H = hardware del campus (S2). Los resultados del Modo L son de una **emulación** y no de equipos reales. |
 | F-nn, T-nn, OD-nn, AM-nn, DET-nn, D-nn, S-nn | Identificadores de flujo, prueba, objetivo de diseño, amenaza, detección, decisión y supuesto del repositorio. Un ID retirado no se reutiliza. |

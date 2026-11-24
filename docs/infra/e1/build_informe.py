@@ -638,6 +638,16 @@ class Constructor:
         self._mover(p._p)
         self.ultimo_fue_figura = False
 
+    def referencia(self, texto):
+        """Referencia IEEE: «[n]», tabulación y texto con sangría francesa (sin viñeta ni lista automática)."""
+        m = re.match(r"^(\[\d+\]) (.*)$", texto)
+        p = self.parrafo(f"{m.group(1)}	{m.group(2)}", despues=80)
+        pf = p.paragraph_format
+        pf.left_indent = Cm(1.0)
+        pf.first_line_indent = Cm(-1.0)
+        pf.tab_stops.add_tab_stop(Cm(1.0))
+        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+
     def nota(self, texto):
         p = self.parrafo(texto, cursiva=False, color="1F3864", despues=200, antes=60)
         ppr = p._p.get_or_add_pPr()
@@ -814,6 +824,9 @@ class Constructor:
             elif s.startswith("- "):
                 cerrar()
                 out.append(("li", s[2:].strip()))
+            elif re.match(r"^\[\d+\] ", s):
+                cerrar()
+                out.append(("ref", s.strip()))
             elif re.match(r"^\d+\. ", s) and not buf:
                 out.append(("num", s.strip()))
             elif s.startswith("> "):
@@ -873,6 +886,8 @@ class Constructor:
                 self.vineta(b[1])
             elif tipo == "num":
                 self.numerado(b[1])
+            elif tipo == "ref":
+                self.referencia(b[1])
             elif tipo == "nota":
                 self.nota(b[1])
             elif tipo == "tabla_md":

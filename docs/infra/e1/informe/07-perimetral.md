@@ -2,7 +2,7 @@
 
 ## 7.1 Firewall
 
-**Producto.** FW01 es OPNsense en una VM de ESX01 (4 vCPU, 8 GB). Se elige porque integra en un solo equipo lo que el diseño necesita en el perímetro del proyecto: filtrado con estado, IPsec con VTI y BGP (FRR), Suricata en modo IPS, CrowdSec, Unbound con DNSSEC, NTP y DHCP. Además exporta su configuración completa como XML, que se versiona en Git y permite restaurarlo en una hora (sección 9). Detrás de FW01, el FortiGate de la DTI sigue siendo el perímetro del campus.
+**Producto.** FW01 es OPNsense [17] en una VM de ESX01 (4 vCPU, 8 GB). Se elige porque integra en un solo equipo lo que el diseño necesita en el perímetro del proyecto: filtrado con estado, IPsec con VTI y BGP (FRR), Suricata en modo IPS, CrowdSec, Unbound con DNSSEC, NTP y DHCP. Además exporta su configuración completa como XML, que se versiona en Git y permite restaurarlo en una hora (sección 9). Detrás de FW01, el FortiGate de la DTI sigue siendo el perímetro del campus.
 
 **Interfaces previstas.**
 
@@ -31,7 +31,7 @@ La DMZ se divide en dos VLAN porque sus equipos tienen propósitos opuestos (D-1
 | Capa | Control | Por qué |
 | --- | --- | --- |
 | Perímetro | NAT 1:1 del FortiGate solo para TCP 80/443; Suricata IPS en FW01; CrowdSec | Superficie mínima expuesta |
-| WAF | Caddy + Coraza con OWASP CRS; límite de peticiones por IP | Bloquea inyecciones y escáneres web (T17, T18) |
+| WAF | Caddy + Coraza [3] con OWASP CRS [4]; límite de peticiones por IP | Bloquea inyecciones y escáneres web (T17, T18) |
 | TLS | Certificado público (ACME), TLS 1.3 con 1.2 de respaldo, HSTS | El visitante aún no tiene instalada la CA del proyecto (T16) |
 | Contenido | Sitio estático firmado que genera la consola; sin base de datos ni login; sistema de archivos de solo lectura | Lo que no existe no se puede explotar |
 | Salida | Ninguna hacia la WAN; solo el agente Wazuh hacia SIEM01 (F13) | No sirve de trampolín (T19) |

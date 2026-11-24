@@ -5,7 +5,7 @@
 **Por qué el backend queda en el campus (D-25).**
 - **El nodo depende de la consola.** El nodo consulta su configuración firmada de forma periódica por F10. Con la consola en AWS, una caída del enlace o de la VPN dejaría al nodo sin recibir cambios justo cuando el enlace está mal, que es cuando más se necesita la caché.
 - **La llave que firma debe estar donde hay control físico.** La llave ed25519 decide qué aplica cada nodo. Llevarla a la nube agregaría superficies de ataque (cuenta de AWS, IAM, una instancia pública) sin ganar protección.
-- **Datos personales.** La base guarda el uso por laboratorio y registros con IP de equipos del campus. En el campus no hay flujo transfronterizo de datos (Ley 29733).
+- **Datos personales.** La base guarda el uso por laboratorio y registros con IP de equipos del campus. En el campus no hay flujo transfronterizo de datos (Ley 29733 [9]).
 - **Costo y latencia.** Una base y una API 24×7 en AWS cuestan más que una VM adicional en el host que ya existe. Además, el encargado en ENC01 llega a CTRL01 sin salir a Internet (F28).
 
 **Por qué el frontend tampoco va a la nube.** La interfaz son archivos estáticos sin secretos: lo sensible es la API. Separarla en S3 obligaría a abrir CORS, manejar dos dominios y publicar la API de todos modos. Servida desde el mismo origen que la API, las cookies quedan en un solo sitio y la política CSP puede ser `default-src 'self'`.

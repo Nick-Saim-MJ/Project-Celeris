@@ -1,6 +1,6 @@
 # 6. Diseño de conectividad híbrida
 
-**Tecnología y extremos.** El extremo del campus es FW01 (OPNsense con strongSwan, IPsec basado en rutas sobre VTI1 y VTI2), detrás del FortiGate, que hace NAT 1:1 de 203.0.113.10 hacia 10.20.0.2 para UDP 500 y 4500 [S-15, S-29]. El extremo de AWS es un Virtual Private Gateway adjunto a la VPC, con dos IP públicas que asigna AWS, una por túnel. Los parámetros completos están en la tabla de la sección 5.4.
+**Tecnología y extremos.** El extremo del campus es FW01 (OPNsense con strongSwan, IPsec con IKEv2 [16] basado en rutas sobre VTI1 y VTI2), detrás del FortiGate, que hace NAT 1:1 de 203.0.113.10 hacia 10.20.0.2 para UDP 500 y 4500 [S-15, S-29]. El extremo de AWS es un Virtual Private Gateway adjunto a la VPC, con dos IP públicas que asigna AWS, una por túnel. Los parámetros completos están en la tabla de la sección 5.4.
 
 **Redes y rutas.** El campus anuncia 10.20.0.0/16 (ASN 65020) y AWS anuncia 10.30.0.0/16 (ASN 64512). El VGW propaga 10.20.0.0/16 a las tablas rt-public y rt-private, de modo que no hay rutas estáticas que mantener. Cuando lleguen las sedes reservadas, el campus podrá anunciar el resumen 10.20.0.0/14 sin cambiar la VPC.
 

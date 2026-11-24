@@ -70,7 +70,7 @@
 | V-73 | Ensayo L: ninguna FALLA sin causa y acción; NO_APLICA, PARCIAL y sin ensayo nunca como PASA | PASA | — |
 | V-74 | XLSX de pruebas: fórmulas sin errores tras recalcular con LibreOffice y coherentes con la biblioteca | PASA | 0 errores, 0 advertencias |
 | V-75 | XLSX de pruebas: el archivo versionado está al día con pruebas.yaml, el inventario y el último ensayo | PASA | — |
-| V-80 | Informe: DOCX y PDF existen, abren y son de la fuente actual | PASA | entregables/CE0311/Informe_Diseno_Red_v1.2.docx; PDF ? páginas; motor Microsoft Word (COM) |
+| V-80 | Informe: DOCX y PDF existen, abren y son de la fuente actual | PASA | entregables/CE0311/Informe_Diseno_Red_v1.2.docx; PDF 46 páginas; motor Microsoft Word (COM) |
 | V-81 | Informe: 11 secciones de la plantilla, en orden y con contenido | PASA | 26 títulos de sección |
 | V-82 | Informe: sin texto guía ni marcadores de la plantilla | PASA | 48 textos guía comprobados |
 | V-83 | Informe: ningún ID retirado en v0.4 presentado como vigente | PASA | 35 IDs retirados buscados |

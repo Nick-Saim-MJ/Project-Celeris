@@ -4,7 +4,7 @@
 
 Este informe se genera con `make informe-dc` desde la fuente única del repositorio: `infra/centro_datos.yaml` (centro de datos, transcrito de CE03 D2.3–D2.9) e `infra/inventory.yaml` (IP, VLAN, zonas, componentes y reglas, compartido con el Entregable 1). Las tablas de VM, vSwitch, rack, rutas, Security Groups, dimensionamiento, costo, RTO/RPO y la matriz de componentes no se escriben a mano: si un dato cambia, el informe, los diagramas y la matriz XLSX cambian juntos. La huella indicada arriba identifica la versión exacta de esos datos.
 
-Las contradicciones y vacíos hallados en los documentos base se registran como CI-77 a CI-86 en `docs/infra/e1/CAMBIOS-INVENTARIO.md`; la sección 11 y el anexo A dicen cuáles siguen abiertos y qué efecto tienen sobre el diseño.
+Las contradicciones y vacíos hallados en los documentos base se registran como CI-77 a CI-88 en `docs/infra/e1/CAMBIOS-INVENTARIO.md`; la sección 11 y el anexo A dicen cuáles siguen abiertos y qué efecto tienen sobre el diseño.
 
 # Glosario
 

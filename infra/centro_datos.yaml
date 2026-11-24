@@ -317,13 +317,14 @@ continuidad:
     Alta: { rto_max_min: 240, rpo_max_min: 1440 }
   servicios:
     - { id: CT-01, servicio: "Descargas de los laboratorios", componentes: [EDGE01, EDGE02], redundancia: "EDGE01 + EDGE02 + DIRECT en el PAC", respaldo: "No aplica", rto_min: 0, rto_texto: "≈ 0 (medido en T09)", rpo_min: null, rpo_texto: "No aplica", prueba: T09 }
-    - { id: CT-02, servicio: "Contenido en caché", componentes: [EDGE01, EDGE02], redundancia: "Un datastore por nodo", respaldo: "No se respalda: se reconstruye", rto_min: 15, rto_texto: "15 min (nodo nuevo desde la imagen)", rpo_min: null, rpo_texto: "No aplica", prueba: null, criticidad_propia: Media, datastores: [DS-CACHE1, DS-CACHE2] }
-    - { id: CT-03, servicio: "Consola del encargado", componentes: [CTRL01], redundancia: "Sin réplica; ENC01 es solo el puesto de acceso", respaldo: "pgBackRest/restic: copia local + S3", rto_min: 120, rto_texto: "2 h (T59)", rpo_min: 15, rpo_texto: "15 min", prueba: T59 }
+    - { id: CT-02, servicio: "Contenido en caché", componentes: [EDGE01, EDGE02], redundancia: "Un datastore por nodo", respaldo: "No se respalda: se reconstruye", rto_min: 15, rto_texto: "15 min (nodo nuevo desde la imagen; la caché se vuelve a llenar)", rpo_min: null, rpo_texto: "No aplica", prueba: null, criticidad_propia: Media, datastores: [DS-CACHE1, DS-CACHE2] }
+    - { id: CT-03, servicio: "Consola del encargado", componentes: [CTRL01], redundancia: "Sin réplica; ENC01 es solo el puesto de acceso", respaldo: "pgBackRest/restic: copia local + S3; si cae ESX01, se restaura en el host repuesto", rto_min: 120, rto_texto: "2 h de restauración tras reponer el host (T59)", rpo_min: 15, rpo_texto: "15 min", prueba: T59 }
     - { id: CT-04, servicio: "Panel remoto", componentes: [EC2-GW], redundancia: "ENC01 como acceso alternativo en el campus", respaldo: "EC2-GW recreable con OpenTofu", rto_min: 15, rto_texto: "15 min", rpo_min: null, rpo_texto: "Último commit" }
     - { id: CT-05, servicio: "SIEM", componentes: [SIEM01], redundancia: "Sin réplica", respaldo: "Snapshots del indexer en el datastore local y semanales en S3", rto_min: 240, rto_texto: "4 h", rpo_min: 1440, rpo_texto: "24 h" }
     - { id: CT-06, servicio: "Portal de transparencia", componentes: [PORTAL01], redundancia: "Sin réplica", respaldo: "Se regenera desde la consola", rto_min: 30, rto_texto: "30 min", rpo_min: null, rpo_texto: "Última política" }
     - { id: CT-07, servicio: "Firewall", componentes: [FW01], redundancia: "Puerto break-glass (BRK01); CARP en H3", respaldo: "XML en Git", rto_min: 60, rto_texto: "1 h", rpo_min: null, rpo_texto: "Último cambio", prueba: T25 }
     - { id: CT-08, servicio: "CA raíz", componentes: [CTRL01], redundancia: "Offline, Shamir 2 de 3", respaldo: "Copias cifradas", rto_min: 60, rto_texto: "1 h", rpo_min: 0, rpo_texto: "0" }
+    - { id: CT-09, servicio: "Caída de ESX01 (host único)", componentes: [ESX01], redundancia: "Ninguna: un solo host (H3 excluido). Los laboratorios pasan a DIRECT por el PAC: navegación sin caché, si la salida de LAB sigue disponible (CI-88)", respaldo: "3-2-1-1-0: la consola y la caché se recuperan al reponer el host restaurando desde S3 (T59)", rto_min: null, rto_supuesto: S-34, rto_texto: "Plazo de reposición del servidor [S-34, por confirmar con la DTI] + 2 h de restauración (T59); navegación sin caché mientras tanto", rpo_min: 15, rpo_texto: "15 min en la consola; la caché no tiene RPO (se reconstruye)", prueba: T59 }
   regla_3_2_1_1_0:
     copias:
       - { n: 1, que: "Original", donde: "DS-VM (datastore RAID 1)", medio: "SSD en RAID 1", fuera_del_sitio: false, inmutable: false }
@@ -341,7 +342,8 @@ continuidad:
       - "UPS01 con apagado ordenado por NUT en JMP01: evita la corrupción de datastores en un corte eléctrico."
       - "RAID 1 en DS-VM: tolera la falla de un SSD."
       - "VM reconstruibles desde plantillas e IaC; los nodos de caché se recrean desde la imagen OCI (CT-02)."
-      - "Respaldo 3-2-1-1-0: la consola se restaura en CTRL01 o en una EC2 temporal (EC2-DR) desde S3 en ≤ 2 h, aun sin el host (CT-03)."
+      - "Escenario «cae ESX01»: los laboratorios pasan a DIRECT por el PAC (navegación sin caché), siempre que la salida de LAB siga disponible (CI-88); la consola y la caché se recuperan al reponer el host."
+      - "Respaldo 3-2-1-1-0: al reponer el host, la consola y la configuración se restauran desde S3 (T59) y los nodos de caché se recrean desde la imagen OCI; la caché se vuelve a llenar sola. El simulacro T59 comprueba esa restauración en una EC2 temporal (EC2-DR)."
       - "BRK01 e IPMI01 para recuperar FW01 sin ruteo y sin ESXi."
     pendiente: "Segundo host y CARP (H3), fuera del alcance de S1 (D2.2)."
-    sin_dato: "El plazo de reposición del servidor físico no está definido en D2.9: no se compromete un RTO del host (CI-86)."
+    plazo: "El plazo de reposición del servidor es el supuesto S-34, por confirmar con la DTI; hasta entonces el diseño no compromete un RTO del host (CI-86 resuelto)."

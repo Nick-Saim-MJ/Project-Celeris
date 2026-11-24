@@ -348,7 +348,7 @@ def t_decisiones(x, d):
 
 def t_supuestos(x, d):
     x, cd = fuentes()
-    usados = ["S-04", "S-08", "S-11", "S-12", "S-13", "S-14", "S-26", "S-29", "S-30", "S-33"]
+    usados = ["S-04", "S-08", "S-11", "S-12", "S-13", "S-14", "S-26", "S-29", "S-30", "S-33", "S-34"]
     filas = [[s, x.supuestos[s]["supuesto"], re.sub(r"\s+", " ", str(x.supuestos[s]["valor"])), x.supuestos[s]["validacion"]] for s in usados]
     return (["ID", "Supuesto", "Valor", "Cómo se valida"], filas, [1.3, 4.2, 7.0, 4.5], False)
 

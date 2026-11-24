@@ -558,6 +558,11 @@ supuestos:
     valor: 10 sesiones simultáneas del panel (una por laboratorio, derivadas de S-26), 5 solicitudes por segundo, 0,10 vCPU de media y 512 MiB de RAM (TLS, Coraza con OWASP CRS y el sistema operativo)
     validacion: Medición con el piloto en S2 (créditos de CPU y memoria de EC2-GW en CloudWatch); si la media supera la línea base de 0,20 vCPU del t3.micro, se pasa a t3.small
     responsable: Nick
+  S-34:
+    supuesto: Plazo de reposición del servidor físico
+    valor: Sin plazo definido; el que acuerde la DTI (garantía, repuesto o servidor de contingencia). Hasta que se confirme, el diseño no compromete un RTO del host
+    validacion: Confirmar con la DTI antes de S2 y registrar el plazo como RTO del servicio «caída de ESX01» (CT-09)
+    responsable: Henyelrey
 
 decisiones:
   D-01:

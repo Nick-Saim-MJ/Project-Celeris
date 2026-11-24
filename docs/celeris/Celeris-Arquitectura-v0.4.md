@@ -418,6 +418,7 @@ AWS cobra cada IP pública de los túneles de la VPN a US$ 0,005 por hora. En el
 | Panel remoto | EC2-GW se recrea con OpenTofu | 15 min | Último commit |
 | Firewall | XML en Git + puerto *break-glass* | 1 h | Último cambio |
 | CA raíz | Offline, dividida en 2 de 3 partes (Shamir) | 1 h | 0 |
+| Caída de ESX01 (host único) | Laboratorios en `DIRECT` por el PAC (navegación sin caché); consola y caché se recuperan al reponer el host restaurando desde S3 (T59) | Plazo de reposición [S-34] + 2 h | Consola 15 min |
 
 ---
 

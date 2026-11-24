@@ -312,9 +312,14 @@ def run(infra):
     lim = cd.continuidad["limites_por_criticidad"]
     for s in cd.servicios.values():
         crit = cd.criticidad_servicio(s)
-        if s["rto_min"] is None or "rpo_texto" not in s or not s["rto_texto"] or not s["rpo_texto"]:
+        if s["rto_min"] is None:
+            if s.get("rto_supuesto") not in infra.supuestos:
+                h.append(E(f"{s['id']} {s['servicio']}: sin RTO numérico debe citar el supuesto que lo fijará", "rto_supuesto: S-34"))
+            else:
+                h.append(I(f"{s['id']}: RTO pendiente del supuesto {s['rto_supuesto']} (por confirmar con la DTI)"))
+        if "rpo_texto" not in s or not s["rto_texto"] or not s["rpo_texto"]:
             h.append(E(f"{s['id']} {s['servicio']}: falta RTO o RPO", "Todo servicio lleva RTO y RPO (o «No aplica» con motivo)"))
-        if crit in lim:
+        if crit in lim and s["rto_min"] is not None:
             if s["rto_min"] > lim[crit]["rto_max_min"]:
                 h.append(E(f"{s['id']}: RTO {s['rto_min']} min excede el máximo de la clase {crit} ({lim[crit]['rto_max_min']} min)", "Mejore la recuperación o reclasifique"))
             if s["rpo_min"] is not None and s["rpo_min"] > lim[crit]["rpo_max_min"]:

@@ -976,12 +976,11 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto
 
 ### CI-86 — Plazo de reposición del servidor físico
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-23, decisión del equipo: escenario «cae ESX01» y supuesto S-34)
 - **Tipo:** vacío
-- **Dónde:** CE03 D2.9 (no hay fila para ESX01); D2.2 excluye la alta disponibilidad entre hosts
-- **Qué dice cada fuente:** no hay RTO ni RPO del host. Lo que sí hay: la consola se restaura en ≤ 2 h en una EC2 temporal desde S3 aunque el host no esté (T59).
-- **Decisión aplicada:** el informe no promete un RTO del host; documenta el punto único de falla y sus mitigaciones. No se inventa el plazo de un proveedor.
-- **Decide:** equipo del proyecto (cotización y garantía del servidor, S-08)
+- **Dónde:** CE03 D2.9 (no había fila para ESX01); D2.2 excluye la alta disponibilidad entre hosts; `infra/centro_datos.yaml` → servicio CT-09 y `continuidad.punto_unico_de_falla`
+- **Decisión aplicada:** el escenario «cae ESX01» es: los laboratorios pasan a `DIRECT` por el PAC (navegación sin caché); la consola y la caché se recuperan al reponer el host restaurando desde S3 (T59). El plazo de reposición del servidor es el supuesto S-34, por confirmar con la DTI; se agregó CT-09 a la tabla de RTO/RPO sin RTO numérico hasta que S-34 tenga valor. CE03 D2.9 y Arquitectura §11 llevan la fila nueva. La EC2 temporal EC2-DR sigue siendo el medio del simulacro T59, no un destino de recuperación en producción.
+- **Decide:** equipo del proyecto; la DTI confirma S-34
 
 ### CI-87 — El trunk de 1 GbE hacia SW-ACC no deja holgura frente a D2.8
 - **Estado:** abierto
@@ -990,4 +989,13 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Qué dicen las fuentes:** el host tiene 2 × 10 GbE y la caché sirve ≈ 1 Gbps a un laboratorio, pero el enlace SW-CORE01 ↔ SW-ACC (1 GbE por SW-ACC [S-14]) iguala ese objetivo: holgura 0 % y un solo laboratorio a la vez; varios laboratorios comparten 1 Gbps.
 - **Decisión aplicada:** el informe y la matriz lo declaran como cuello de botella («sin holgura») y no lo ocultan; no se cambia la velocidad del SW-ACC, que es de la DTI.
 - **Propuesta:** medir con iperf3 en S2 (LAB → EDGE con y sin IPS) y pedir a la DTI un enlace SFP+ de 10 GbE entre SW-CORE01 y SW-ACC si los laboratorios descargan a la vez.
+- **Decide:** equipo del proyecto con la DTI
+
+### CI-88 — `DIRECT` con ESX01 caído depende de FW01, que es una VM de ESX01
+- **Estado:** abierto
+- **Tipo:** contradicción (consecuencia de CI-86)
+- **Dónde:** `infra/inventory.yaml` → FW01 (`si_falla`: se pierde el ruteo entre VLAN y la salida a Internet; punto único de falla AM-12; puerta de enlace de la VLAN 30 en 10.20.32.1); D-17 (todo tráfico entre zonas pasa por FW01); CT-09
+- **Qué dicen las fuentes:** la decisión de CI-86 dice que, si cae ESX01, los laboratorios siguen en `DIRECT` por el PAC. Pero `DIRECT` solo evita los nodos de caché; el tráfico de los laboratorios sigue saliendo por FW01 hacia el FortiGate, y FW01 corre en ESX01.
+- **Decisión aplicada:** el informe presenta el escenario como lo decidió el equipo y declara la condición: `DIRECT` mantiene la navegación solo si la DTI conserva una salida de SW-ACC hacia el FortiGate sin pasar por FW01. El diseño no la prevé y no se promete RTO ≈ 0 de navegación con ESX01 caído.
+- **Propuesta:** (a) pedir a la DTI una ruta de contingencia de la VLAN de laboratorios directa al FortiGate, que se active con BRK01; o (b) aceptar que, sin ESX01, los laboratorios no tienen Internet hasta restaurar FW01 en el host repuesto (RTO de FW01 de 1 h desde el XML en Git, más el plazo S-34).
 - **Decide:** equipo del proyecto con la DTI

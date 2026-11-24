@@ -1,6 +1,6 @@
 # 11. Conclusiones y hoja de ruta hacia la implementación
 
-**Resumen del diseño.** Un host ESXi gratuito de 12 núcleos y 96 GB aloja las {{dato:n_vm}} VM del servicio con {{dato:h_cpu}} de holgura de CPU, {{dato:h_ram}} de RAM (después de la sobrecarga de ESXi) y {{dato:h_disco}} de disco; dos vSwitch separan el trunk de las siete zonas de la red de tránsito del FortiGate. En AWS, una VPC 10.30.0.0/16 con EC2-GW (t3.micro) y S3 con Object Lock completan el diseño por unos US$ {{dato:costo_total}} al mes, sin NAT permanente. La integración con el Entregable 1 es la misma VPN, y los RTO y RPO cubren los {{dato:n_servicios}} servicios con una consola recuperable en 2 h aun sin el host.
+**Resumen del diseño.** Un host ESXi gratuito de 12 núcleos y 96 GB aloja las {{dato:n_vm}} VM del servicio con {{dato:h_cpu}} de holgura de CPU, {{dato:h_ram}} de RAM (después de la sobrecarga de ESXi) y {{dato:h_disco}} de disco; dos vSwitch separan el trunk de las siete zonas de la red de tránsito del FortiGate. En AWS, una VPC 10.30.0.0/16 con EC2-GW (t3.micro) y S3 con Object Lock completan el diseño por unos US$ {{dato:costo_total}} al mes, sin NAT permanente. La integración con el Entregable 1 es la misma VPN, y los RTO y RPO cubren los {{dato:n_servicios}} servicios, incluida la caída del host: los laboratorios pasan a `DIRECT` y la consola se restaura desde S3 en 2 h una vez repuesto el servidor (plazo S-34, por confirmar).
 
 **Qué queda pendiente y se hace en CE0332 y CE0333 (Semestre 2).**
 

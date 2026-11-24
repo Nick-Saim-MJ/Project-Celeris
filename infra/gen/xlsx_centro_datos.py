@@ -74,7 +74,7 @@ def hoja_portada(wb, x, cd):
                   "AWS y costo (cantidad × precio [S-12]) · Continuidad (RTO/RPO, redundancia y 3-2-1-1-0)"),
         ("Figuras", "DC-0 Topología ejecutiva · DC-1 Topología física · DC-2 Hipervisor · DC-3 AWS / VPC. La integración híbrida es FIG-5.4 de CE0311, sin cambios."),
         ("Cómo leer las fórmulas", "Las celdas con fondo gris claro son datos de entrada (del YAML); las demás son fórmulas. Cambiar un dato de entrada recalcula todo."),
-        ("Pendientes", "CI abiertos que afectan esta matriz: ver la sección 11 del informe (CI-86 y CI-87)."),
+        ("Pendientes", "CI abiertos que afectan esta matriz: ver la sección 11 del informe (CI-87 y CI-88) y el supuesto S-34 (plazo de reposición del servidor)."),
         ("Regla de seguridad", "Sin claves, tokens ni secretos. IP públicas solo de documentación (RFC 5737)."),
     ]
     for i, (k, v) in enumerate(filas, start=3):
@@ -399,15 +399,15 @@ def hoja_continuidad(wb, x, cd):
     lim = co["limites_por_criticidad"]
     for s in cd.servicios.values():
         crit = cd.criticidad_servicio(s)
-        xc.escribir_fila(ws, r, [s["id"], s["servicio"], ", ".join(s["componentes"]), crit, s["redundancia"], s["respaldo"], s["rto_texto"], s["rto_min"],
+        xc.escribir_fila(ws, r, [s["id"], s["servicio"], ", ".join(s["componentes"]), crit, s["redundancia"], s["respaldo"], s["rto_texto"], s["rto_min"] if s["rto_min"] is not None else s["rto_supuesto"],
                                  s["rpo_texto"], s["rpo_min"] if s["rpo_min"] is not None else "n/a", lim[crit]["rto_max_min"] if crit in lim else "—",
-                                 f'=IF(K{r}="—","Sin límite de clase",IF(H{r}<=K{r},"Cumple","Excede"))', s.get("prueba") or "—"], centrar={1, 4, 8, 10, 11, 12, 13})
+                                 f'=IF(K{r}="—","Sin límite de clase",IF(ISNUMBER(H{r}),IF(H{r}<=K{r},"Cumple","Excede"),"Pendiente "&H{r}))', s.get("prueba") or "—"], centrar={1, 4, 8, 10, 11, 12, 13})
         crit_celda(ws.cell(row=r, column=4), crit)
         ws.cell(row=r, column=8).fill = xc.relleno("E7E6E6")
         r += 1
     ultimo = r - 1
     ws.cell(row=r, column=2, value="Servicios con RTO y RPO").font = NEG
-    ws.cell(row=r, column=8, value=f"=COUNT(H5:H{ultimo})")
+    ws.cell(row=r, column=8, value=f"=COUNTA(H5:H{ultimo})")
     ws.cell(row=r + 1, column=2, value="Servicios que exceden su clase").font = NEG
     ws.cell(row=r + 1, column=8, value=f'=COUNTIF(L5:L{ultimo},"Excede")')
     ws.cell(row=r + 2, column=2, value="Objetivo D2.3: RTO de la consola ≤ 120 min").font = NEG
@@ -456,7 +456,7 @@ def hoja_continuidad(wb, x, cd):
         ws.merge_cells(start_row=r + 2 + k, start_column=2, end_row=r + 2 + k, end_column=8)
     k = len(sp["mitigaciones"])
     ws.cell(row=r + 2 + k, column=1, value="Pendiente")
-    ws.cell(row=r + 2 + k, column=2, value=sp["pendiente"] + " " + sp["sin_dato"])
+    ws.cell(row=r + 2 + k, column=2, value=sp["pendiente"] + " " + sp["plazo"])
     ws.merge_cells(start_row=r + 2 + k, start_column=2, end_row=r + 2 + k, end_column=8)
     xc.configurar_hoja(ws, 4, len(cols), ultimo, congelar="C5", filtro=False)
 

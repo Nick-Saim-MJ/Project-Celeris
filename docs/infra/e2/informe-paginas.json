@@ -1,0 +1,185 @@
+{
+  "motor": "Microsoft Word (COM)",
+  "paginas": 29,
+  "marcas": [
+    {
+      "texto": "Control de versiones",
+      "nivel": 1,
+      "pagina": 2
+    },
+    {
+      "texto": "Glosario",
+      "nivel": 1,
+      "pagina": 2
+    },
+    {
+      "texto": "1. Resumen ejecutivo del diseño del centro de datos híbrido",
+      "nivel": 1,
+      "pagina": 4
+    },
+    {
+      "texto": "Figura 1.1 — Topología ejecutiva del centro de datos híbrido",
+      "nivel": 10,
+      "pagina": 4
+    },
+    {
+      "texto": "2. Descripción de la organización y necesidades de infraestructura",
+      "nivel": 1,
+      "pagina": 4
+    },
+    {
+      "texto": "3. Alcance del diseño de centro de datos híbrido",
+      "nivel": 1,
+      "pagina": 6
+    },
+    {
+      "texto": "3.1 Declaración de alcance",
+      "nivel": 2,
+      "pagina": 6
+    },
+    {
+      "texto": "3.2 Límites",
+      "nivel": 2,
+      "pagina": 6
+    },
+    {
+      "texto": "3.3 Exclusiones",
+      "nivel": 2,
+      "pagina": 6
+    },
+    {
+      "texto": "4. Objetivos del diseño de centro de datos",
+      "nivel": 1,
+      "pagina": 7
+    },
+    {
+      "texto": "5. Arquitectura on-premise — diseño (VMware ESXi)",
+      "nivel": 1,
+      "pagina": 7
+    },
+    {
+      "texto": "5.1 Topología física propuesta",
+      "nivel": 2,
+      "pagina": 7
+    },
+    {
+      "texto": "Figura 5.1 — Topología física propuesta del centro de datos on-premise",
+      "nivel": 10,
+      "pagina": 9
+    },
+    {
+      "texto": "5.2 Diseño del hipervisor",
+      "nivel": 2,
+      "pagina": 10
+    },
+    {
+      "texto": "Figura 5.2 — Diseño interno del hipervisor VMware ESXi",
+      "nivel": 10,
+      "pagina": 12
+    },
+    {
+      "texto": "6. Arquitectura AWS — diseño",
+      "nivel": 1,
+      "pagina": 13
+    },
+    {
+      "texto": "6.1 Selección de región y justificación",
+      "nivel": 2,
+      "pagina": 13
+    },
+    {
+      "texto": "6.2 Diseño de VPC",
+      "nivel": 2,
+      "pagina": 13
+    },
+    {
+      "texto": "Figura 6.1 — Diseño de arquitectura AWS / VPC",
+      "nivel": 10,
+      "pagina": 15
+    },
+    {
+      "texto": "6.3 Servicios EC2 planeados",
+      "nivel": 2,
+      "pagina": 16
+    },
+    {
+      "texto": "6.4 Security Groups y NACL planeados",
+      "nivel": 2,
+      "pagina": 16
+    },
+    {
+      "texto": "7. Mecanismo de integración híbrida",
+      "nivel": 1,
+      "pagina": 17
+    },
+    {
+      "texto": "Figura 7.1 — Integración híbrida: VPN IPsec entre FW01 y el VGW (FIG-5.4 del Entregable 1, sin cambios)",
+      "nivel": 10,
+      "pagina": 18
+    },
+    {
+      "texto": "8. Matriz de componentes del centro de datos",
+      "nivel": 1,
+      "pagina": 19
+    },
+    {
+      "texto": "9. Dimensionamiento y capacidad",
+      "nivel": 1,
+      "pagina": 22
+    },
+    {
+      "texto": "10. Consideraciones de disponibilidad y continuidad en el diseño",
+      "nivel": 1,
+      "pagina": 23
+    },
+    {
+      "texto": "11. Conclusiones y hoja de ruta hacia la implementación",
+      "nivel": 1,
+      "pagina": 24
+    },
+    {
+      "texto": "12. Referencias",
+      "nivel": 1,
+      "pagina": 25
+    },
+    {
+      "texto": "Anexo A. Supuestos, decisiones y cambios registrados",
+      "nivel": 1,
+      "pagina": 26
+    },
+    {
+      "texto": "Decisiones de diseño que sustentan este informe",
+      "nivel": 2,
+      "pagina": 26
+    },
+    {
+      "texto": "Contradicciones y vacíos (CI) del Entregable 2",
+      "nivel": 2,
+      "pagina": 26
+    },
+    {
+      "texto": "Anexo B. Rúbrica de CE0331 y dónde se evidencia",
+      "nivel": 1,
+      "pagina": 28
+    },
+    {
+      "texto": "Anexo C. Validación emulada del plano de control de AWS",
+      "nivel": 1,
+      "pagina": 29
+    }
+  ],
+  "docx": "entregables/CE0331/Informe_Centro_Datos_v1.0.docx",
+  "pdf": "entregables/CE0331/Informe_Centro_Datos_v1.0.pdf",
+  "commit_fuente": "09b67389",
+  "huella_fuente": "09b67389",
+  "figuras": [
+    "DC-0",
+    "DC-1",
+    "DC-2",
+    "DC-3",
+    "FIG-5.4"
+  ],
+  "completar": [],
+  "version": "1.0",
+  "fig54_sha256": "07c2fcbec83f62337bd1bf4fcebd073b94b3a58c1bbb154f48b0f2ddcb4ee9dd"
+}

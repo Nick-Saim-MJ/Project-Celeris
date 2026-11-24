@@ -277,6 +277,14 @@ def run(infra):
     nat_rutas = [r for r in rt["rt-private"]["rutas"] if str(r["salto"]).startswith("nat:")]
     if cd.aws["nat"]["permanente"] or not all(r.get("solo_en_simulacro") for r in nat_rutas):
         h.append(E("Ninguna ruta por NAT puede ser permanente", "La ruta por NAT-DR existe solo en el simulacro (D2.5)"))
+    # integración híbrida idéntica a CE0311: las rutas de la VPC hacia el campus son las redes que anuncia la VPN
+    vpn = infra.inv["vpn"]
+    dest = {infra.inv["supernets"][[s["id"] for s in infra.inv["supernets"]].index(r["destino"].split(":", 1)[1])]["cidr"]
+            for t in aws_inv["tablas_de_rutas"] for r in t["rutas"] if r["salto"] == "vgw"}
+    if dest != set(vpn["extremo_onpremise"]["redes_anunciadas"]):
+        h.append(E(f"Las rutas hacia el VGW {sorted(dest)} ≠ redes anunciadas por el campus {vpn['extremo_onpremise']['redes_anunciadas']}", "Misma VPN que CE0311"))
+    if vpn["extremo_aws"]["redes_anunciadas"] != [inv_comp["AWS-VPC"]["cidr"]]:
+        h.append(E("La red que anuncia el VGW no es el CIDR de la VPC", "Misma VPN que CE0311"))
     s3 = aws_inv["s3"]
     inm = cd.continuidad["regla_3_2_1_1_0"]["inmutable"]
     if (inm["dias"], inm["mecanismo"].split()[-1]) != (s3["object_lock"]["dias"], s3["object_lock"]["modo"]):

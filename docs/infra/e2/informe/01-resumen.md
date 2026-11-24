@@ -1,0 +1,15 @@
+# 1. Resumen ejecutivo del diseño del centro de datos híbrido
+
+**Proyecto y organización.** Celeris Edge es un servicio de caché de descargas para los laboratorios de cómputo del Campus Juliaca [S-01]: 10 laboratorios de 40 PCs institucionales [S-26]. Este informe es el segundo entregable del Semestre 1: diseña el centro de datos que lo aloja, sin implementarlo. La red, las zonas, la VPN y las reglas están en el informe de CE0311, cuyo inventario se reutiliza tal cual.
+
+**Problema de capacidad, disponibilidad y costo.** El servicio necesita alojar, con poco presupuesto, los nodos de caché, la consola del encargado, el firewall y la seguridad. Además debe dar acceso remoto seguro al panel sin gastar el enlace del campus y no perder la configuración si el sitio falla.
+
+**Tecnología on-premise: VMware ESXi 8.0U3e gratuito, un host.** Una licencia gratuita no cuesta nada y alcanza para un servidor: todas las VM caben en un host de 12 núcleos y 96 GB [S-08]. Sus límites son de diseño: máximo 8 vCPU por VM (la mayor tiene 4), sin vCenter y sin VADP, por lo que el respaldo corre dentro de cada VM. Un host único es un punto único de falla; la sección 10 explica cómo se mitiga.
+
+**Tecnología cloud: AWS, solo dos piezas.** EC2-GW (un t3.micro, proxy inverso sin datos ni llaves) da entrada pública al panel sin exponer el campus, y un bucket S3 con Object Lock guarda respaldos cifrados en origen, fuera del sitio e inmutables por 30 días. La consola completa vive en el campus (D-25) y no hay caché en AWS (D-19). Una VPC 10.30.0.0/16 en us-east-1 las aloja; no hay NAT permanente.
+
+**Dimensionamiento.** Las {{dato:n_vm}} VM suman {{dato:vcpu_f2}} vCPU, {{dato:ram_f2}} GB de RAM y {{dato:disco_f2}} GB de disco en la fase F2. Con sobreasignación 2:1 y 4:1 necesitan {{dato:nucleos_nec}} núcleos de {{dato:nucleos_host}} (holgura {{dato:h_cpu}}); la RAM, con la sobrecarga de ESXi y el 20 % de crecimiento, {{dato:ram_crec}} GB de {{dato:ram_host}}; el disco, {{dato:disco_tot}} GB de {{dato:disco_cap}} GB ({{dato:uso_disco}} de uso). La AWS cuesta unos US$ {{dato:costo_total}} al mes en 24×7, por debajo de la meta de US$ {{dato:costo_meta}}.
+
+**Resultados esperados y siguiente paso.** El diseño fija RTO de 2 h y RPO de 15 min para la consola, RTO ≈ 0 para las descargas y respaldo 3-2-1-1-0. En el Semestre 2 se instala ESXi, se crea la VPC con OpenTofu, se ejecuta el simulacro de recuperación (T59) y se miden los valores que aquí son propuestas (sección 11). La Figura 1.1 muestra el conjunto.
+
+{{figura:DC-0|Qué observar: el rack del campus con ESX01 y sus VM (firewall, nodo de caché, consola y SIEM) y, a la derecha, solo EC2-GW y S3 en AWS; la VPN une FW01 con el VGW (el detalle está en FIG-5.4 de CE0311) y el respaldo cifrado sale de CTRL01 hacia S3 (F18).}}

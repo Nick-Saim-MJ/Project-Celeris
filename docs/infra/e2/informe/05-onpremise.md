@@ -10,7 +10,7 @@ El centro de datos del campus es un rack de 12U con cuatro grupos de equipos: la
 
 {{tabla:host}}
 
-**Red física.** Las cuatro NIC se reparten por función. Dos de 10 GbE (vmnic0 y vmnic1) forman el trunk 802.1Q hacia SW-CORE01: un laboratorio de 40 PCs que descarga a la vez necesita ≈ 1 Gbps desde la caché y los HIT atraviesan FW01 (D-17), de modo que el trunk debe tener holgura. Una de 1 GbE (vmnic2) va dedicada al FortiGate y lleva solo la red de tránsito 10.20.0.0/29, separada del trunk de las zonas; así un error de VLAN no puede mezclar el tráfico externo con el interno. La cuarta (vmnic3) queda libre para crecer sin rediseñar. SW-CORE01 es el único switch del diseño: si cae, ESX01 pierde la capa de acceso; se mitiga con su configuración en Git y es parte del riesgo de la sección 10. La velocidad y el puerto del enlace de SW-CORE01 hacia la capa de acceso existente no están definidos en D2.4 (CI-80).
+**Red física.** Las cuatro NIC se reparten por función. Dos de 10 GbE (vmnic0 y vmnic1) forman el trunk 802.1Q hacia SW-CORE01: un laboratorio de 40 PCs que descarga a la vez necesita ≈ 1 Gbps desde la caché y los HIT atraviesan FW01 (D-17), de modo que el trunk debe tener holgura. Una de 1 GbE (vmnic2) va dedicada al FortiGate y lleva solo la red de tránsito 10.20.0.0/29, separada del trunk de las zonas; así un error de VLAN no puede mezclar el tráfico externo con el interno. La cuarta (vmnic3) queda libre, sin enlace, para crecer sin rediseñar. SW-CORE01 es el único switch del diseño: si cae, ESX01 pierde la capa de acceso; se mitiga con su configuración en Git y es parte del riesgo de la sección 10. El enlace de SW-CORE01 hacia la capa de acceso existente (SW-ACC) es un trunk de 1 GbE [S-14] (CI-80): limita a ≈ 1 Gbps lo que llega a los laboratorios, justo lo que pide un laboratorio a la vez y sin holgura para varios; es el cuello de botella del diseño y se registra como CI-87.
 
 {{tabla:nic}}
 
@@ -18,7 +18,7 @@ El centro de datos del campus es un rack de 12U con cuatro grupos de equipos: la
 
 **Energía.** UPS01 es una UPS online de 1,5 kVA con tarjeta de red (10.20.10.40). El consumo de ESX01 es de ≈ {{dato:consumo_w}} W (D2.4 decía ≈ 400 W; manda el inventario, CI-77) y la autonomía de {{dato:autonomia}} min está por confirmar con el fabricante. No está pensada para operar durante un corte largo sino para un apagado ordenado: JMP01 es el servidor NUT, lee UPS01 y apaga por SSH las VM y luego ESXi. El orden de arranque es FW01, CTRL01, EDGE01 y EDGE02, SIEM01 y el resto: primero el firewall, porque sin él no hay ruteo; luego la consola, que el nodo necesita para su configuración.
 
-**Rack.** D2.4 asigna el rango U6–9 a un equipo de 2U y deja las U4–5 sin uso; no dice cuáles dos U ocupa ESX01 (CI-79). La figura lo dibuja tal como está escrito.
+**Rack.** ESX01 es un equipo de 2U y ocupa U6–U7 (CI-79). Quedan libres U8–U9, entre el organizador y el servidor, y U4–U5, entre el servidor y la UPS; D2.4 no les asigna uso. La figura rotula las U reales, pero dibuja más alta la fila del servidor para mostrar sus NIC y datastores.
 
 {{figura:DC-1|Qué observar: el rack de 12U con la U12 arriba; ESX01 con sus cuatro NIC, sus tres datastores, IPMI01 y JMP01 (servidor NUT) dentro; los cables 10 GbE de vmnic0 y vmnic1 a SW-CORE01, el de 1 GbE de vmnic2 al FortiGate, el puerto break-glass BRK01 y la alimentación UPS01 → PDU → ESX01.}}
 

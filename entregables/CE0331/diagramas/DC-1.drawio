@@ -1,198 +1,188 @@
 <mxfile host="celeris-infra-gen" type="device" version="24.7.17">
   <diagram id="DC-1" name="DC-1">
-    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2300" pageHeight="1170" background="#FFFFFF" math="0" shadow="0">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2300" pageHeight="1230" background="#FFFFFF" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <object id="DC-1-1" label="&lt;b&gt;Figura 5.1 — Topología física propuesta del centro de datos on-premise&lt;/b&gt;&lt;br&gt;DC-1 · Centro de datos v1.0 · 2026-11-23 · inventario v1.1 · huella de la fuente 09b67389 · CE0331 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="DC-1" titulo="Figura 5.1 — Topología física propuesta del centro de datos on-premise">
+        <object id="DC-1-1" label="&lt;b&gt;Figura 5.1 — Topología física propuesta del centro de datos on-premise&lt;/b&gt;&lt;br&gt;DC-1 · Centro de datos v1.0 · 2026-11-23 · inventario v1.1 · huella de la fuente 13d216b1 · CE0331 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="DC-1" titulo="Figura 5.1 — Topología física propuesta del centro de datos on-premise">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;align=left;spacingLeft=10;fontSize=13;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="20" y="10" width="1180" height="44" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-2" label="&lt;b&gt;RACK01&lt;/b&gt; · Rack de 12U · &lt;b&gt;ALTA&lt;/b&gt; · 12U: U1–3 y U6–12 asignadas; U4–5 libres · U12 arriba" celeris_id="RACK01" celeris_tipo="elemento" tipo="Rack" entorno="On-premise" criticidad="Alta" funcion="Aloja y alimenta los equipos del centro de datos" recursos="12U: U1–3 y U6–12 asignadas; U4–5 libres" por_que="Un solo rack de 12U alcanza para un host de 2U, un switch, la UPS y la distribución; mantiene el cableado corto y el acceso físico controlado." si_falla="Un incidente físico en el rack (incendio, inundación, robo) detiene todo el servicio; la copia en S3 con Object Lock es lo que sobrevive (D2.9).">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-2" value="U12">
+          <mxGeometry x="2" y="143" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-3" value="U11">
+          <mxGeometry x="2" y="223" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-4" value="U10">
+          <mxGeometry x="2" y="303" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-5" value="U8–9">
+          <mxGeometry x="2" y="385" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-6" value="U6–7">
+          <mxGeometry x="2" y="597" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-7" value="U4–5">
+          <mxGeometry x="2" y="809" width="40" height="18" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-8" value="U1–3">
+          <mxGeometry x="2" y="971" width="40" height="18" as="geometry" />
+        </mxCell>
+        <object id="DC-1-9" label="&lt;b&gt;RACK01&lt;/b&gt; · Rack de 12U · &lt;b&gt;ALTA&lt;/b&gt; · 12U: U1–U3, U6–U7 y U10–U12 asignadas; U4–U5 y U8–U9 libres · U12 arriba · el alto de cada fila no es a escala" celeris_id="RACK01" celeris_tipo="elemento" tipo="Rack" entorno="On-premise" criticidad="Alta" funcion="Aloja y alimenta los equipos del centro de datos" recursos="12U: U1–U3, U6–U7 y U10–U12 asignadas; U4–U5 y U8–U9 libres" por_que="Un solo rack de 12U alcanza para un host de 2U, un switch, la UPS y la distribución; mantiene el cableado corto y el acceso físico controlado." si_falla="Un incidente físico en el rack (incendio, inundación, robo) detiene todo el servicio; la copia en S3 con Object Lock es lo que sobrevive (D2.9).">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#1A1A1A;strokeWidth=3;verticalAlign=top;align=left;spacingLeft=8;spacingTop=3;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="80" width="770" height="1004" as="geometry" />
+            <mxGeometry x="40" y="80" width="750" height="1040" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-3" value="U1">
-          <mxGeometry x="2" y="1018" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-4" value="U2">
-          <mxGeometry x="2" y="938" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-5" value="U3">
-          <mxGeometry x="2" y="858" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-6" value="U4">
-          <mxGeometry x="2" y="778" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-7" value="U5">
-          <mxGeometry x="2" y="698" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-8" value="U6">
-          <mxGeometry x="2" y="618" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-9" value="U7">
-          <mxGeometry x="2" y="538" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-10" value="U8">
-          <mxGeometry x="2" y="458" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-11" value="U9">
-          <mxGeometry x="2" y="378" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-12" value="U10">
-          <mxGeometry x="2" y="298" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-13" value="U11">
-          <mxGeometry x="2" y="218" width="18" height="18" as="geometry" />
-        </mxCell>
-        <mxCell style="text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;" parent="1" vertex="1" id="DC-1-14" value="U12">
-          <mxGeometry x="2" y="138" width="18" height="18" as="geometry" />
-        </mxCell>
-        <object id="DC-1-15" label="&lt;b&gt;CD-PP01&lt;/b&gt; · Patch panel 24 puertos · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;24 puertos; U12&lt;br&gt;&lt;i&gt;Ordena los enlaces hacia la capa de acceso&lt;/i&gt;" celeris_id="CD-PP01" celeris_tipo="elemento" tipo="Cableado" entorno="On-premise" criticidad="Alta" funcion="Ordena y rotula los enlaces del rack hacia la capa de acceso y el FortiGate" recursos="24 puertos; U12" por_que="Separa el cableado fijo del cableado del equipo: un cambio de puerto no obliga a tocar el switch." si_falla="Un puerto dañado se puentea con un cable directo; no hay pérdida de datos." tooltip="CD-PP01 · Alta&#10;Función: Ordena y rotula los enlaces del rack hacia la capa de acceso y el FortiGate&#10;Por qué: Separa el cableado fijo del cableado del equipo: un cambio de puerto no obliga a tocar el switch.&#10;Si falla: Un puerto dañado se puentea con un cable directo; no hay pérdida de datos.">
+        <object id="DC-1-10" label="&lt;b&gt;CD-PP01&lt;/b&gt; · Patch panel 24 puertos · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;24 puertos; U12&lt;br&gt;&lt;i&gt;Ordena los enlaces hacia la capa de acceso&lt;/i&gt;" celeris_id="CD-PP01" celeris_tipo="elemento" tipo="Cableado" entorno="On-premise" criticidad="Alta" funcion="Ordena y rotula los enlaces del rack hacia la capa de acceso y el FortiGate" recursos="24 puertos; U12" por_que="Separa el cableado fijo del cableado del equipo: un cambio de puerto no obliga a tocar el switch." si_falla="Un puerto dañado se puentea con un cable directo; no hay pérdida de datos." tooltip="CD-PP01 · Alta&#10;Función: Ordena y rotula los enlaces del rack hacia la capa de acceso y el FortiGate&#10;Por qué: Separa el cableado fijo del cableado del equipo: un cambio de puerto no obliga a tocar el switch.&#10;Si falla: Un puerto dañado se puentea con un cable directo; no hay pérdida de datos.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="70" y="116" width="640" height="72" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-16" label="&lt;b&gt;SW-CORE01&lt;/b&gt; · Switch núcleo L2 · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10.20.10.2 · 24× 1 GbE + 2–4× SFP+ 10 GbE · U11&lt;br&gt;&lt;i&gt;Conmutación 802.1Q y puerto break-glass&lt;/i&gt;" celeris_id="SW-CORE01" celeris_tipo="componente" ip="10.20.10.2" zona="MGMT" criticidad="Alta" estado="diseño" por_que="FW01 enruta (router-on-a-stick) y SW-CORE01 solo conmuta: necesita 802.1Q con lista explícita de VLAN y el puerto break-glass rotulado." aporta="24× 1 GbE + 2–4× SFP+ 10 GbE; trunks con VLAN permitidas explícitas, nativa 999, puertos sin uso apagados; incluye el puerto de emergencia en VLAN 10." si_falla="Cae la conectividad física de ESX01 y la capa de acceso. Mitigación: configuración en Git; el servicio de los laboratorios depende de su reemplazo (no hay segundo switch en el diseño)." flujos="F20" pruebas="T06, T23, T25, T27, T34, T54" placeholders="1" tooltip="SW-CORE01 · Alta&#10;Por qué: FW01 enruta (router-on-a-stick) y SW-CORE01 solo conmuta: necesita 802.1Q con lista explícita de VLAN y el puerto break-glass rotulado.&#10;Aporta: 24× 1 GbE + 2–4× SFP+ 10 GbE; trunks con VLAN permitidas explícitas, nativa 999, puertos sin uso apagados; incluye el puerto de emergencia en VLAN 10.&#10;Si falla: Cae la conectividad física de ESX01 y la capa de acceso. Mitigación: configuración en Git; el servicio de los laboratorios depende de su reemplazo (no hay segundo switch en el diseño).">
+        <object id="DC-1-11" label="&lt;b&gt;SW-CORE01&lt;/b&gt; · Switch núcleo L2 · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10.20.10.2 · 24× 1 GbE + 2–4× SFP+ 10 GbE · U11&lt;br&gt;&lt;i&gt;Conmutación 802.1Q y puerto break-glass&lt;/i&gt;" celeris_id="SW-CORE01" celeris_tipo="componente" ip="10.20.10.2" zona="MGMT" criticidad="Alta" estado="diseño" por_que="FW01 enruta (router-on-a-stick) y SW-CORE01 solo conmuta: necesita 802.1Q con lista explícita de VLAN y el puerto break-glass rotulado." aporta="24× 1 GbE + 2–4× SFP+ 10 GbE; trunks con VLAN permitidas explícitas, nativa 999, puertos sin uso apagados; incluye el puerto de emergencia en VLAN 10." si_falla="Cae la conectividad física de ESX01 y la capa de acceso. Mitigación: configuración en Git; el servicio de los laboratorios depende de su reemplazo (no hay segundo switch en el diseño)." flujos="F20" pruebas="T06, T23, T25, T27, T34, T54" placeholders="1" tooltip="SW-CORE01 · Alta&#10;Por qué: FW01 enruta (router-on-a-stick) y SW-CORE01 solo conmuta: necesita 802.1Q con lista explícita de VLAN y el puerto break-glass rotulado.&#10;Aporta: 24× 1 GbE + 2–4× SFP+ 10 GbE; trunks con VLAN permitidas explícitas, nativa 999, puertos sin uso apagados; incluye el puerto de emergencia en VLAN 10.&#10;Si falla: Cae la conectividad física de ESX01 y la capa de acceso. Mitigación: configuración en Git; el servicio de los laboratorios depende de su reemplazo (no hay segundo switch en el diseño).">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0072B2;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="70" y="196" width="640" height="72" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="shape=mxgraph.networks.switch;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-17" value="">
+        <mxCell style="shape=mxgraph.networks.switch;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-12" value="">
           <mxGeometry x="75" y="202" width="22" height="22" as="geometry" />
         </mxCell>
-        <object id="DC-1-18" label="&lt;b&gt;CD-ORG01&lt;/b&gt; · Organizador de cables · &lt;b&gt;BAJA&lt;/b&gt;&lt;br&gt;1U; U10&lt;br&gt;&lt;i&gt;Guía los cables entre el switch y el servidor&lt;/i&gt;" celeris_id="CD-ORG01" celeris_tipo="elemento" tipo="Cableado" entorno="On-premise" criticidad="Baja" funcion="Guía los cables entre el switch y el servidor" recursos="1U; U10" por_que="Evita cables tensos o cruzados entre SW-CORE01 y ESX01." si_falla="Sin efecto funcional; aumenta el riesgo de desconexión accidental." tooltip="CD-ORG01 · Baja&#10;Función: Guía los cables entre el switch y el servidor&#10;Por qué: Evita cables tensos o cruzados entre SW-CORE01 y ESX01.&#10;Si falla: Sin efecto funcional; aumenta el riesgo de desconexión accidental.">
+        <object id="DC-1-13" label="&lt;b&gt;CD-ORG01&lt;/b&gt; · Organizador de cables · &lt;b&gt;BAJA&lt;/b&gt;&lt;br&gt;1U; U10&lt;br&gt;&lt;i&gt;Guía los cables entre el switch y el servidor&lt;/i&gt;" celeris_id="CD-ORG01" celeris_tipo="elemento" tipo="Cableado" entorno="On-premise" criticidad="Baja" funcion="Guía los cables entre el switch y el servidor" recursos="1U; U10" por_que="Evita cables tensos o cruzados entre SW-CORE01 y ESX01." si_falla="Sin efecto funcional; aumenta el riesgo de desconexión accidental." tooltip="CD-ORG01 · Baja&#10;Función: Guía los cables entre el switch y el servidor&#10;Por qué: Evita cables tensos o cruzados entre SW-CORE01 y ESX01.&#10;Si falla: Sin efecto funcional; aumenta el riesgo de desconexión accidental.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="70" y="276" width="640" height="72" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-19" label="&lt;b&gt;ESX01&lt;/b&gt; · Servidor ESXi · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10.20.10.10 (vmk0) · 12 núcleos · 96 GB RAM · 4 NIC · formato 2U · rango U6–9 (CI-79)&lt;br&gt;&lt;i&gt;Hospeda las 10 VM de la fase F1 (23 vCPU)&lt;/i&gt;" celeris_id="ESX01" celeris_tipo="componente" ip="10.20.10.10" zona="MGMT" criticidad="Alta" estado="diseño" por_que="Aloja todas las VM del diseño en un solo servidor 2U de 12 núcleos y 96 GB [S-08]; la licencia gratuita limita cada VM a 8 vCPU." aporta="vSwitch0 (vmnic0 + vmnic1, trunk con PG-MGMT, PG-SERVERS, PG-LAB, PG-DMZ-SVC, PG-DMZ-HONEY, PG-SEC, PG-EDGE y PG-FW-TRUNK) y vSwitch1 (vmnic2, PG-TRANSITO hacia el FortiGate, solo FW01); sin port groups de captura ni vSwitch de almacenamiento (se retiró vmk1, CI-39)." si_falla="Caen todas las VM, incluido FW01. Mitigación: UPS01 con apagado ordenado por NUT, VM reconstruibles desde plantillas e IaC, respaldos 3-2-1-1-0 (D2.9)." flujos="F20" pruebas="T06, T13, T25, T27, T34, T45, T46, T47, T54, T57" placeholders="1" tooltip="ESX01 · Alta&#10;Por qué: Aloja todas las VM del diseño en un solo servidor 2U de 12 núcleos y 96 GB [S-08]; la licencia gratuita limita cada VM a 8 vCPU.&#10;Aporta: vSwitch0 (vmnic0 + vmnic1, trunk con PG-MGMT, PG-SERVERS, PG-LAB, PG-DMZ-SVC, PG-DMZ-HONEY, PG-SEC, PG-EDGE y PG-FW-TRUNK) y vSwitch1 (vmnic2, PG-TRANSITO hacia el FortiGate, solo FW01); sin port groups de captura ni vSwitch de almacenamiento (se retiró vmk1, CI-39).&#10;Si falla: Caen todas las VM, incluido FW01. Mitigación: UPS01 con apagado ordenado por NUT, VM reconstruibles desde plantillas e IaC, respaldos 3-2-1-1-0 (D2.9).">
+        <object id="DC-1-14" label="&lt;b&gt;U8–U9 libres.&lt;/b&gt; ESX01 es un equipo de 2U y ocupa U6–U7 (CI-79); las U sobrantes quedan sin uso asignado." celeris_rol="libre" celeris_ref="RACK01">
+          <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="70" y="356" width="640" height="76" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-1-15" label="&lt;b&gt;ESX01&lt;/b&gt; · Servidor ESXi · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10.20.10.10 (vmk0) · 12 núcleos · 96 GB RAM · 4 NIC · formato 2U · U6–U7&lt;br&gt;&lt;i&gt;Hospeda las 10 VM de la fase F1 (23 vCPU)&lt;/i&gt;" celeris_id="ESX01" celeris_tipo="componente" ip="10.20.10.10" zona="MGMT" criticidad="Alta" estado="diseño" por_que="Aloja todas las VM del diseño en un solo servidor 2U de 12 núcleos y 96 GB [S-08]; la licencia gratuita limita cada VM a 8 vCPU." aporta="vSwitch0 (vmnic0 + vmnic1, trunk con PG-MGMT, PG-SERVERS, PG-LAB, PG-DMZ-SVC, PG-DMZ-HONEY, PG-SEC, PG-EDGE y PG-FW-TRUNK) y vSwitch1 (vmnic2, PG-TRANSITO hacia el FortiGate, solo FW01); sin port groups de captura ni vSwitch de almacenamiento (se retiró vmk1, CI-39)." si_falla="Caen todas las VM, incluido FW01. Mitigación: UPS01 con apagado ordenado por NUT, VM reconstruibles desde plantillas e IaC, respaldos 3-2-1-1-0 (D2.9)." flujos="F20" pruebas="T06, T13, T25, T27, T34, T45, T46, T47, T54, T57" placeholders="1" tooltip="ESX01 · Alta&#10;Por qué: Aloja todas las VM del diseño en un solo servidor 2U de 12 núcleos y 96 GB [S-08]; la licencia gratuita limita cada VM a 8 vCPU.&#10;Aporta: vSwitch0 (vmnic0 + vmnic1, trunk con PG-MGMT, PG-SERVERS, PG-LAB, PG-DMZ-SVC, PG-DMZ-HONEY, PG-SEC, PG-EDGE y PG-FW-TRUNK) y vSwitch1 (vmnic2, PG-TRANSITO hacia el FortiGate, solo FW01); sin port groups de captura ni vSwitch de almacenamiento (se retiró vmk1, CI-39).&#10;Si falla: Caen todas las VM, incluido FW01. Mitigación: UPS01 con apagado ordenado por NUT, VM reconstruibles desde plantillas e IaC, respaldos 3-2-1-1-0 (D2.9).">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0072B2;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="70" y="356" width="640" height="312" as="geometry" />
+            <mxGeometry x="70" y="440" width="640" height="332" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="shape=mxgraph.networks.virtual_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-20" value="">
-          <mxGeometry x="75" y="362" width="22" height="22" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.virtual_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-16" value="">
+          <mxGeometry x="75" y="446" width="22" height="22" as="geometry" />
         </mxCell>
-        <object id="DC-1-21" label="&lt;b&gt;vmnic0&lt;/b&gt; · NIC física · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10 GbE · vSwitch0" celeris_id="vmnic0" celeris_tipo="elemento" tipo="Red (NIC física)" entorno="On-premise" criticidad="Alta" funcion="Trunk 802.1Q hacia SW-CORE01 (puerto SFP+)" recursos="10 GbE · vSwitch0" por_que="Enlace de 10 GbE: un laboratorio de 40 PCs necesita ≈ 1 Gbps desde la caché (REQ-NF-02)." si_falla="El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio." tooltip="vmnic0 · Alta&#10;Función: Trunk 802.1Q hacia SW-CORE01 (puerto SFP+)&#10;Por qué: Enlace de 10 GbE: un laboratorio de 40 PCs necesita ≈ 1 Gbps desde la caché (REQ-NF-02).&#10;Si falla: El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio.">
+        <object id="DC-1-17" label="&lt;b&gt;vmnic0&lt;/b&gt; · NIC física · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10 GbE · vSwitch0" celeris_id="vmnic0" celeris_tipo="elemento" tipo="Red (NIC física)" entorno="On-premise" criticidad="Alta" funcion="Trunk 802.1Q hacia SW-CORE01 (puerto SFP+)" recursos="10 GbE · vSwitch0" por_que="Enlace de 10 GbE: un laboratorio de 40 PCs necesita ≈ 1 Gbps desde la caché (REQ-NF-02)." si_falla="El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio." tooltip="vmnic0 · Alta&#10;Función: Trunk 802.1Q hacia SW-CORE01 (puerto SFP+)&#10;Por qué: Enlace de 10 GbE: un laboratorio de 40 PCs necesita ≈ 1 Gbps desde la caché (REQ-NF-02).&#10;Si falla: El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="515" y="428" width="190" height="50" as="geometry" />
+            <mxGeometry x="515" y="512" width="190" height="50" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-22" label="&lt;b&gt;vmnic1&lt;/b&gt; · NIC física · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10 GbE · vSwitch0" celeris_id="vmnic1" celeris_tipo="elemento" tipo="Red (NIC física)" entorno="On-premise" criticidad="Alta" funcion="Trunk 802.1Q hacia SW-CORE01 (puerto SFP+)" recursos="10 GbE · vSwitch0" por_que="Enlace de 10 GbE: un laboratorio de 40 PCs necesita ≈ 1 Gbps desde la caché (REQ-NF-02)." si_falla="El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio." tooltip="vmnic1 · Alta&#10;Función: Trunk 802.1Q hacia SW-CORE01 (puerto SFP+)&#10;Por qué: Enlace de 10 GbE: un laboratorio de 40 PCs necesita ≈ 1 Gbps desde la caché (REQ-NF-02).&#10;Si falla: El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio.">
+        <object id="DC-1-18" label="&lt;b&gt;vmnic1&lt;/b&gt; · NIC física · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10 GbE · vSwitch0" celeris_id="vmnic1" celeris_tipo="elemento" tipo="Red (NIC física)" entorno="On-premise" criticidad="Alta" funcion="Trunk 802.1Q hacia SW-CORE01 (puerto SFP+)" recursos="10 GbE · vSwitch0" por_que="Enlace de 10 GbE: un laboratorio de 40 PCs necesita ≈ 1 Gbps desde la caché (REQ-NF-02)." si_falla="El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio." tooltip="vmnic1 · Alta&#10;Función: Trunk 802.1Q hacia SW-CORE01 (puerto SFP+)&#10;Por qué: Enlace de 10 GbE: un laboratorio de 40 PCs necesita ≈ 1 Gbps desde la caché (REQ-NF-02).&#10;Si falla: El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="515" y="486" width="190" height="50" as="geometry" />
+            <mxGeometry x="515" y="570" width="190" height="50" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-23" label="&lt;b&gt;vmnic2&lt;/b&gt; · NIC física · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;1 GbE · vSwitch1" celeris_id="vmnic2" celeris_tipo="elemento" tipo="Red (NIC física)" entorno="On-premise" criticidad="Alta" funcion="NIC dedicada a la red de tránsito hacia el FortiGate" recursos="1 GbE · vSwitch1" por_que="NIC dedicada a la red de tránsito, separada del trunk de las zonas." si_falla="FW01 pierde la salida a Internet y la VPN." tooltip="vmnic2 · Alta&#10;Función: NIC dedicada a la red de tránsito hacia el FortiGate&#10;Por qué: NIC dedicada a la red de tránsito, separada del trunk de las zonas.&#10;Si falla: FW01 pierde la salida a Internet y la VPN.">
+        <object id="DC-1-19" label="&lt;b&gt;vmnic2&lt;/b&gt; · NIC física · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;1 GbE · vSwitch1" celeris_id="vmnic2" celeris_tipo="elemento" tipo="Red (NIC física)" entorno="On-premise" criticidad="Alta" funcion="NIC dedicada a la red de tránsito hacia el FortiGate" recursos="1 GbE · vSwitch1" por_que="NIC dedicada a la red de tránsito, separada del trunk de las zonas." si_falla="FW01 pierde la salida a Internet y la VPN." tooltip="vmnic2 · Alta&#10;Función: NIC dedicada a la red de tránsito hacia el FortiGate&#10;Por qué: NIC dedicada a la red de tránsito, separada del trunk de las zonas.&#10;Si falla: FW01 pierde la salida a Internet y la VPN.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="515" y="544" width="190" height="50" as="geometry" />
+            <mxGeometry x="515" y="628" width="190" height="50" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-24" label="&lt;b&gt;vmnic3&lt;/b&gt; · NIC física · &lt;b&gt;BAJA&lt;/b&gt;&lt;br&gt;libre · sin vSwitch" celeris_id="vmnic3" celeris_tipo="elemento" tipo="Red (NIC física)" entorno="On-premise" criticidad="Baja" funcion="Libre (reserva)" recursos="Libre, velocidad sin definir (CI-80)" por_que="Reserva para un enlace adicional sin rediseñar el host." si_falla="Sin efecto: no transporta tráfico." tooltip="vmnic3 · Baja&#10;Función: Libre (reserva)&#10;Por qué: Reserva para un enlace adicional sin rediseñar el host.&#10;Si falla: Sin efecto: no transporta tráfico.">
+        <object id="DC-1-20" label="&lt;b&gt;vmnic3&lt;/b&gt; · NIC física · &lt;b&gt;BAJA&lt;/b&gt;&lt;br&gt;libre · sin vSwitch" celeris_id="vmnic3" celeris_tipo="elemento" tipo="Red (NIC física)" entorno="On-premise" criticidad="Baja" funcion="Libre (reserva), sin enlace" recursos="Libre (reserva), sin enlace" por_que="Reserva para un enlace adicional sin rediseñar el host." si_falla="Sin efecto: no transporta tráfico." tooltip="vmnic3 · Baja&#10;Función: Libre (reserva), sin enlace&#10;Por qué: Reserva para un enlace adicional sin rediseñar el host.&#10;Si falla: Sin efecto: no transporta tráfico.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="515" y="602" width="190" height="50" as="geometry" />
+            <mxGeometry x="515" y="686" width="190" height="50" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-25" label="&lt;b&gt;DS-VM&lt;/b&gt; · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;RAID 1 · 1,92 TB&lt;br&gt;&lt;i&gt;SSD&lt;/i&gt;" celeris_id="DS-VM" celeris_tipo="elemento" tipo="Almacenamiento" entorno="On-premise" criticidad="Alta" funcion="Discos de las VM (sin caché) y la copia local de restic" recursos="2× SSD de 1,92 TB en RAID 1 por hardware · 1,92 TB" por_que="Una pareja de SSD en RAID 1 por hardware tolera la falla de un disco y aloja los discos de las 11 VM y la copia local de restic." si_falla="Si fallan los dos SSD o la controladora se pierden las VM y la copia local; se reconstruyen desde plantillas e IaC y los datos desde S3 (D2.9)." tooltip="DS-VM · Alta&#10;Función: Discos de las VM (sin caché) y la copia local de restic&#10;Por qué: Una pareja de SSD en RAID 1 por hardware tolera la falla de un disco y aloja los discos de las 11 VM y la copia local de restic.&#10;Si falla: Si fallan los dos SSD o la controladora se pierden las VM y la copia local; se reconstruyen desde plantillas e IaC y los datos desde S3 (D2.9).">
+        <object id="DC-1-21" label="&lt;b&gt;DS-VM&lt;/b&gt; · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;RAID 1 · 1,92 TB&lt;br&gt;&lt;i&gt;SSD&lt;/i&gt;" celeris_id="DS-VM" celeris_tipo="elemento" tipo="Almacenamiento" entorno="On-premise" criticidad="Alta" funcion="Discos de las VM (sin caché) y la copia local de restic" recursos="2× SSD de 1,92 TB en RAID 1 por hardware · 1,92 TB" por_que="Una pareja de SSD en RAID 1 por hardware tolera la falla de un disco y aloja los discos de las 11 VM y la copia local de restic." si_falla="Si fallan los dos SSD o la controladora se pierden las VM y la copia local; se reconstruyen desde plantillas e IaC y los datos desde S3 (D2.9)." tooltip="DS-VM · Alta&#10;Función: Discos de las VM (sin caché) y la copia local de restic&#10;Por qué: Una pareja de SSD en RAID 1 por hardware tolera la falla de un disco y aloja los discos de las 11 VM y la copia local de restic.&#10;Si falla: Si fallan los dos SSD o la controladora se pierden las VM y la copia local; se reconstruyen desde plantillas e IaC y los datos desde S3 (D2.9).">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="76" y="428" width="138" height="56" as="geometry" />
+            <mxGeometry x="76" y="512" width="138" height="56" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-26" label="&lt;b&gt;DS-CACHE1&lt;/b&gt; · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;sin RAID · 1,00 TB&lt;br&gt;&lt;i&gt;NVMe&lt;/i&gt;" celeris_id="DS-CACHE1" celeris_tipo="elemento" tipo="Almacenamiento" entorno="On-premise" criticidad="Media" funcion="Caché de EDGE01 (500 GB como punto de partida [S-04])" recursos="NVMe de 1 TB sin RAID · 1,00 TB" por_que="NVMe dedicado a la caché de EDGE01: el contenido se reconstruye solo, por eso no lleva RAID y no compite por E/S con las VM." si_falla="EDGE01 pierde su caché: sirve MISS hasta volver a llenarla; la navegación sigue por EDGE02 o DIRECT. Se reconstruye (CT-02)." tooltip="DS-CACHE1 · Media&#10;Función: Caché de EDGE01 (500 GB como punto de partida [S-04])&#10;Por qué: NVMe dedicado a la caché de EDGE01: el contenido se reconstruye solo, por eso no lleva RAID y no compite por E/S con las VM.&#10;Si falla: EDGE01 pierde su caché: sirve MISS hasta volver a llenarla; la navegación sigue por EDGE02 o DIRECT. Se reconstruye (CT-02).">
+        <object id="DC-1-22" label="&lt;b&gt;DS-CACHE1&lt;/b&gt; · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;sin RAID · 1,00 TB&lt;br&gt;&lt;i&gt;NVMe&lt;/i&gt;" celeris_id="DS-CACHE1" celeris_tipo="elemento" tipo="Almacenamiento" entorno="On-premise" criticidad="Media" funcion="Caché de EDGE01 (500 GB como punto de partida [S-04])" recursos="NVMe de 1 TB sin RAID · 1,00 TB" por_que="NVMe dedicado a la caché de EDGE01: el contenido se reconstruye solo, por eso no lleva RAID y no compite por E/S con las VM." si_falla="EDGE01 pierde su caché: sirve MISS hasta volver a llenarla; la navegación sigue por EDGE02 o DIRECT. Se reconstruye (CT-02)." tooltip="DS-CACHE1 · Media&#10;Función: Caché de EDGE01 (500 GB como punto de partida [S-04])&#10;Por qué: NVMe dedicado a la caché de EDGE01: el contenido se reconstruye solo, por eso no lleva RAID y no compite por E/S con las VM.&#10;Si falla: EDGE01 pierde su caché: sirve MISS hasta volver a llenarla; la navegación sigue por EDGE02 o DIRECT. Se reconstruye (CT-02).">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="223" y="428" width="138" height="56" as="geometry" />
+            <mxGeometry x="223" y="512" width="138" height="56" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-27" label="&lt;b&gt;DS-CACHE2&lt;/b&gt; · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;sin RAID · 1,00 TB&lt;br&gt;&lt;i&gt;NVMe&lt;/i&gt;" celeris_id="DS-CACHE2" celeris_tipo="elemento" tipo="Almacenamiento" entorno="On-premise" criticidad="Media" funcion="Caché de EDGE02 (500 GB como punto de partida [S-04])" recursos="NVMe de 1 TB sin RAID · 1,00 TB" por_que="NVMe dedicado a la caché de EDGE02 (fase F2), igual que el de EDGE01." si_falla="EDGE02 pierde su caché: sirve MISS hasta volver a llenarla; EDGE01 y DIRECT mantienen la navegación (CT-02)." tooltip="DS-CACHE2 · Media&#10;Función: Caché de EDGE02 (500 GB como punto de partida [S-04])&#10;Por qué: NVMe dedicado a la caché de EDGE02 (fase F2), igual que el de EDGE01.&#10;Si falla: EDGE02 pierde su caché: sirve MISS hasta volver a llenarla; EDGE01 y DIRECT mantienen la navegación (CT-02).">
+        <object id="DC-1-23" label="&lt;b&gt;DS-CACHE2&lt;/b&gt; · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;sin RAID · 1,00 TB&lt;br&gt;&lt;i&gt;NVMe&lt;/i&gt;" celeris_id="DS-CACHE2" celeris_tipo="elemento" tipo="Almacenamiento" entorno="On-premise" criticidad="Media" funcion="Caché de EDGE02 (500 GB como punto de partida [S-04])" recursos="NVMe de 1 TB sin RAID · 1,00 TB" por_que="NVMe dedicado a la caché de EDGE02 (fase F2), igual que el de EDGE01." si_falla="EDGE02 pierde su caché: sirve MISS hasta volver a llenarla; EDGE01 y DIRECT mantienen la navegación (CT-02)." tooltip="DS-CACHE2 · Media&#10;Función: Caché de EDGE02 (500 GB como punto de partida [S-04])&#10;Por qué: NVMe dedicado a la caché de EDGE02 (fase F2), igual que el de EDGE01.&#10;Si falla: EDGE02 pierde su caché: sirve MISS hasta volver a llenarla; EDGE01 y DIRECT mantienen la navegación (CT-02).">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="370" y="428" width="138" height="56" as="geometry" />
+            <mxGeometry x="370" y="512" width="138" height="56" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-28" label="&lt;b&gt;IPMI01&lt;/b&gt; · iDRAC/iLO · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;10.20.10.11 · MGMT&lt;br&gt;&lt;i&gt;Consola remota del servidor sin depender de ESXi&lt;/i&gt;" celeris_id="IPMI01" celeris_tipo="componente" ip="10.20.10.11" zona="MGMT" criticidad="Media" estado="diseño" por_que="Permite encender, apagar y ver la consola del servidor aunque ESXi y FW01 no estén disponibles." aporta="Acceso de recuperación en T25 desde BRK01; solo es alcanzable desde JMP01 (F20) o desde el puerto break-glass." si_falla="Sin consola remota la recuperación del servidor exige presencia física. Mitigación: BRK01 y acceso físico al rack." flujos="F20" pruebas="T06, T25, T27, T34, T54" placeholders="1" tooltip="IPMI01 · Media&#10;Por qué: Permite encender, apagar y ver la consola del servidor aunque ESXi y FW01 no estén disponibles.&#10;Aporta: Acceso de recuperación en T25 desde BRK01; solo es alcanzable desde JMP01 (F20) o desde el puerto break-glass.&#10;Si falla: Sin consola remota la recuperación del servidor exige presencia física. Mitigación: BRK01 y acceso físico al rack.">
+        <object id="DC-1-24" label="&lt;b&gt;IPMI01&lt;/b&gt; · iDRAC/iLO · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;10.20.10.11 · MGMT&lt;br&gt;&lt;i&gt;Consola remota del servidor sin depender de ESXi&lt;/i&gt;" celeris_id="IPMI01" celeris_tipo="componente" ip="10.20.10.11" zona="MGMT" criticidad="Media" estado="diseño" por_que="Permite encender, apagar y ver la consola del servidor aunque ESXi y FW01 no estén disponibles." aporta="Acceso de recuperación en T25 desde BRK01; solo es alcanzable desde JMP01 (F20) o desde el puerto break-glass." si_falla="Sin consola remota la recuperación del servidor exige presencia física. Mitigación: BRK01 y acceso físico al rack." flujos="F20" pruebas="T06, T25, T27, T34, T54" placeholders="1" tooltip="IPMI01 · Media&#10;Por qué: Permite encender, apagar y ver la consola del servidor aunque ESXi y FW01 no estén disponibles.&#10;Aporta: Acceso de recuperación en T25 desde BRK01; solo es alcanzable desde JMP01 (F20) o desde el puerto break-glass.&#10;Si falla: Sin consola remota la recuperación del servidor exige presencia física. Mitigación: BRK01 y acceso físico al rack.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0072B2;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="76" y="496" width="222" height="76" as="geometry" />
+            <mxGeometry x="76" y="580" width="222" height="76" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="shape=mxgraph.networks.terminal;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-29" value="">
-          <mxGeometry x="81" y="502" width="22" height="22" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.terminal;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-25" value="">
+          <mxGeometry x="81" y="586" width="22" height="22" as="geometry" />
         </mxCell>
-        <object id="DC-1-30" label="&lt;b&gt;JMP01&lt;/b&gt; · Jump host de administración · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;10.20.10.20 · VM 2 vCPU, 4 GB&lt;br&gt;&lt;i&gt;Servidor NUT: apaga VM y ESXi&lt;/i&gt;" celeris_id="JMP01" celeris_tipo="componente" ip="10.20.10.20" zona="MGMT" criticidad="Media" estado="diseño" por_que="Es el único origen de conexiones administrativas hacia cualquier zona (F20) y de la GUI de OPNsense; concentra el MFA y el registro de acceso." aporta="SSH con llave y MFA; interfaces web por HTTPS (3000 Grafana, 5601 Wazuh, 9128 administración de Celeris); despliega el sitio de PORTAL01 por SSH y es el servidor NUT." si_falla="No hay administración remota de la plataforma. Mitigación: BRK01 para ESXi/IPMI/FW01; configuración en Git." flujos="F20, F27" pruebas="T27, T34, T35, T54" placeholders="1" tooltip="JMP01 · Media&#10;Por qué: Es el único origen de conexiones administrativas hacia cualquier zona (F20) y de la GUI de OPNsense; concentra el MFA y el registro de acceso.&#10;Aporta: SSH con llave y MFA; interfaces web por HTTPS (3000 Grafana, 5601 Wazuh, 9128 administración de Celeris); despliega el sitio de PORTAL01 por SSH y es el servidor NUT.&#10;Si falla: No hay administración remota de la plataforma. Mitigación: BRK01 para ESXi/IPMI/FW01; configuración en Git.">
+        <object id="DC-1-26" label="&lt;b&gt;JMP01&lt;/b&gt; · Jump host de administración · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;10.20.10.20 · VM 2 vCPU, 4 GB&lt;br&gt;&lt;i&gt;Servidor NUT: apaga VM y ESXi&lt;/i&gt;" celeris_id="JMP01" celeris_tipo="componente" ip="10.20.10.20" zona="MGMT" criticidad="Media" estado="diseño" por_que="Es el único origen de conexiones administrativas hacia cualquier zona (F20) y de la GUI de OPNsense; concentra el MFA y el registro de acceso." aporta="SSH con llave y MFA; interfaces web por HTTPS (3000 Grafana, 5601 Wazuh, 9128 administración de Celeris); despliega el sitio de PORTAL01 por SSH y es el servidor NUT." si_falla="No hay administración remota de la plataforma. Mitigación: BRK01 para ESXi/IPMI/FW01; configuración en Git." flujos="F20, F27" pruebas="T27, T34, T35, T54" placeholders="1" tooltip="JMP01 · Media&#10;Por qué: Es el único origen de conexiones administrativas hacia cualquier zona (F20) y de la GUI de OPNsense; concentra el MFA y el registro de acceso.&#10;Aporta: SSH con llave y MFA; interfaces web por HTTPS (3000 Grafana, 5601 Wazuh, 9128 administración de Celeris); despliega el sitio de PORTAL01 por SSH y es el servidor NUT.&#10;Si falla: No hay administración remota de la plataforma. Mitigación: BRK01 para ESXi/IPMI/FW01; configuración en Git.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0072B2;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="308" y="496" width="194" height="76" as="geometry" />
+            <mxGeometry x="308" y="580" width="194" height="76" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-31" value="">
-          <mxGeometry x="313" y="502" width="22" height="22" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-27" value="">
+          <mxGeometry x="313" y="586" width="22" height="22" as="geometry" />
         </mxCell>
-        <object id="DC-1-32" label="&lt;b&gt;VM de ESX01:&lt;/b&gt; FW01, EDGE01, CTRL01, SIEM01, PORTAL01, HNY01, HNY02, JMP01, LABCLI01, KALI01 (F1) y EDGE02 (F2); detalle en DC-2." celeris_rol="vm_lista" celeris_ref="ESX01">
+        <object id="DC-1-28" label="&lt;b&gt;VM de ESX01:&lt;/b&gt; FW01, EDGE01, CTRL01, SIEM01, PORTAL01, HNY01, HNY02, JMP01, LABCLI01, KALI01 (F1) y EDGE02 (F2); detalle en DC-2." celeris_rol="vm_lista" celeris_ref="ESX01">
           <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="76" y="580" width="426" height="44" as="geometry" />
+            <mxGeometry x="76" y="664" width="426" height="44" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-33" label="&lt;b&gt;U4–U5 libres.&lt;/b&gt; D2.4 asigna el rango U6–9 a ESX01, un equipo de 2U; no se define el uso de las U sobrantes (CI-79)." celeris_rol="libre" celeris_ref="RACK01">
+        <object id="DC-1-29" label="&lt;b&gt;U4–U5 libres.&lt;/b&gt; Entre ESX01 y la UPS; sin uso asignado en D2.4." celeris_rol="libre" celeris_ref="RACK01">
           <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="70" y="676" width="640" height="152" as="geometry" />
+            <mxGeometry x="70" y="780" width="640" height="76" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-34" label="&lt;b&gt;UPS01&lt;/b&gt; · UPS con tarjeta de red · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10.20.10.40 (tarjeta de red) · 1,5 kVA online · carga ≈ 480 W · autonomía 15–20 min&lt;br&gt;&lt;i&gt;Apagado ordenado del servidor ante un corte&lt;/i&gt;" celeris_id="UPS01" celeris_tipo="componente" ip="10.20.10.40" zona="MGMT" criticidad="Alta" estado="diseño" por_que="UPS online de 1,5 kVA con autonomía de 15–20 min a ≈ 480 W; alcanza para un apagado ordenado automatizado con NUT, no para operar en un corte largo." aporta="UPS → JMP01 como servidor NUT → ESXi y VM (apagado por SSH), con orden de arranque FW01 → CTRL01 → EDGE01/02 → SIEM01 → resto (D2.4)." si_falla="Un corte eléctrico apaga ESX01 sin orden, con riesgo de corrupción de datastores. Mitigación: NUT y respaldos (D2.9)." flujos="F20" pruebas="T27, T34, T54" placeholders="1" tooltip="UPS01 · Alta&#10;Por qué: UPS online de 1,5 kVA con autonomía de 15–20 min a ≈ 480 W; alcanza para un apagado ordenado automatizado con NUT, no para operar en un corte largo.&#10;Aporta: UPS → JMP01 como servidor NUT → ESXi y VM (apagado por SSH), con orden de arranque FW01 → CTRL01 → EDGE01/02 → SIEM01 → resto (D2.4).&#10;Si falla: Un corte eléctrico apaga ESX01 sin orden, con riesgo de corrupción de datastores. Mitigación: NUT y respaldos (D2.9).">
+        <object id="DC-1-30" label="&lt;b&gt;UPS01&lt;/b&gt; · UPS con tarjeta de red · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;10.20.10.40 (tarjeta de red) · 1,5 kVA online · carga ≈ 480 W · autonomía 15–20 min&lt;br&gt;&lt;i&gt;Apagado ordenado del servidor ante un corte&lt;/i&gt;" celeris_id="UPS01" celeris_tipo="componente" ip="10.20.10.40" zona="MGMT" criticidad="Alta" estado="diseño" por_que="UPS online de 1,5 kVA con autonomía de 15–20 min a ≈ 480 W; alcanza para un apagado ordenado automatizado con NUT, no para operar en un corte largo." aporta="UPS → JMP01 como servidor NUT → ESXi y VM (apagado por SSH), con orden de arranque FW01 → CTRL01 → EDGE01/02 → SIEM01 → resto (D2.4)." si_falla="Un corte eléctrico apaga ESX01 sin orden, con riesgo de corrupción de datastores. Mitigación: NUT y respaldos (D2.9)." flujos="F20" pruebas="T27, T34, T54" placeholders="1" tooltip="UPS01 · Alta&#10;Por qué: UPS online de 1,5 kVA con autonomía de 15–20 min a ≈ 480 W; alcanza para un apagado ordenado automatizado con NUT, no para operar en un corte largo.&#10;Aporta: UPS → JMP01 como servidor NUT → ESXi y VM (apagado por SSH), con orden de arranque FW01 → CTRL01 → EDGE01/02 → SIEM01 → resto (D2.4).&#10;Si falla: Un corte eléctrico apaga ESX01 sin orden, con riesgo de corrupción de datastores. Mitigación: NUT y respaldos (D2.9).">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0072B2;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="70" y="840" width="340" height="120" as="geometry" />
+            <mxGeometry x="70" y="868" width="340" height="120" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="shape=mxgraph.networks.ups_enterprise;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-35" value="">
-          <mxGeometry x="75" y="846" width="22" height="22" as="geometry" />
+        <mxCell style="shape=mxgraph.networks.ups_enterprise;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-31" value="">
+          <mxGeometry x="75" y="874" width="22" height="22" as="geometry" />
         </mxCell>
-        <object id="DC-1-36" label="&lt;b&gt;CD-PDU01&lt;/b&gt; · PDU · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;En U1–3 junto a UPS01&lt;br&gt;&lt;i&gt;Reparte la UPS a ESX01 y SW-CORE01&lt;/i&gt;" celeris_id="CD-PDU01" celeris_tipo="elemento" tipo="Energía" entorno="On-premise" criticidad="Alta" funcion="Distribuye la salida de la UPS a ESX01 y SW-CORE01" recursos="En U1–3 junto a UPS01" por_que="Reparte la energía de la UPS a los dos equipos sin cadenas de regletas." si_falla="ESX01 y SW-CORE01 pierden energía aunque la UPS funcione; se reemplaza la PDU o se conecta cada equipo directo a la UPS." tooltip="CD-PDU01 · Alta&#10;Función: Distribuye la salida de la UPS a ESX01 y SW-CORE01&#10;Por qué: Reparte la energía de la UPS a los dos equipos sin cadenas de regletas.&#10;Si falla: ESX01 y SW-CORE01 pierden energía aunque la UPS funcione; se reemplaza la PDU o se conecta cada equipo directo a la UPS.">
+        <object id="DC-1-32" label="&lt;b&gt;CD-PDU01&lt;/b&gt; · PDU · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;En U1–3 junto a UPS01&lt;br&gt;&lt;i&gt;Reparte la UPS a ESX01 y SW-CORE01&lt;/i&gt;" celeris_id="CD-PDU01" celeris_tipo="elemento" tipo="Energía" entorno="On-premise" criticidad="Alta" funcion="Distribuye la salida de la UPS a ESX01 y SW-CORE01" recursos="En U1–3 junto a UPS01" por_que="Reparte la energía de la UPS a los dos equipos sin cadenas de regletas." si_falla="ESX01 y SW-CORE01 pierden energía aunque la UPS funcione; se reemplaza la PDU o se conecta cada equipo directo a la UPS." tooltip="CD-PDU01 · Alta&#10;Función: Distribuye la salida de la UPS a ESX01 y SW-CORE01&#10;Por qué: Reparte la energía de la UPS a los dos equipos sin cadenas de regletas.&#10;Si falla: ESX01 y SW-CORE01 pierden energía aunque la UPS funcione; se reemplaza la PDU o se conecta cada equipo directo a la UPS.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="440" y="840" width="270" height="120" as="geometry" />
+            <mxGeometry x="440" y="868" width="270" height="120" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-37" label="&lt;b&gt;Energía:&lt;/b&gt; consumo ≈ 480 W; autonomía 15–20 min (a confirmar con el fabricante (d2.4)). &lt;b&gt;NUT:&lt;/b&gt; Lee UPS01 y apaga por SSH las VM y luego ESXi (F20); intrazona de MGMT, no cruza FW01.&lt;br&gt;&lt;b&gt;Arranque:&lt;/b&gt; FW01 → CTRL01 → EDGE01/02 → SIEM01 → resto (D2.4)." celeris_rol="energia" celeris_ref="UPS01">
+        <object id="DC-1-33" label="&lt;b&gt;Energía:&lt;/b&gt; consumo ≈ 480 W; autonomía 15–20 min (a confirmar con el fabricante (d2.4)). &lt;b&gt;NUT:&lt;/b&gt; Lee UPS01 y apaga por SSH las VM y luego ESXi (F20); intrazona de MGMT, no cruza FW01.&lt;br&gt;&lt;b&gt;Arranque:&lt;/b&gt; FW01 → CTRL01 → EDGE01/02 → SIEM01 → resto (D2.4)." celeris_rol="energia" celeris_ref="UPS01">
           <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="70" y="968" width="640" height="90" as="geometry" />
+            <mxGeometry x="70" y="996" width="640" height="96" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-38" label="&lt;b&gt;SW-ACC&lt;/b&gt; · Switches de acceso existentes · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;Según levantamiento AS-IS [S-14]&lt;br&gt;&lt;i&gt;Conecta los PC de laboratorio a la VLAN 30&lt;/i&gt;" celeris_id="SW-ACC" celeris_tipo="componente" ip="Según levantamiento AS-IS [S-14]" zona="MGMT, LAB" criticidad="Alta" estado="fuera_de_alcance" por_que="Es la capa de acceso que ya existe en los laboratorios. Se documenta AS-IS y se exige soporte 802.1Q y los controles de capa 2; su rediseño queda fuera de alcance [S-14]." aporta="Acceso a la VLAN 30 con DHCP snooping, DAI, IP source guard, RA guard, port-security y BPDU guard si el modelo los soporta; si no, se registra como brecha [S-14]." si_falla="Un laboratorio entero pierde conectividad; el resto de la red no se afecta. Mitigación: ninguna dentro del alcance (rediseño excluido, S-14)." flujos="" pruebas="T23" placeholders="1" tooltip="SW-ACC · Alta&#10;Por qué: Es la capa de acceso que ya existe en los laboratorios. Se documenta AS-IS y se exige soporte 802.1Q y los controles de capa 2; su rediseño queda fuera de alcance [S-14].&#10;Aporta: Acceso a la VLAN 30 con DHCP snooping, DAI, IP source guard, RA guard, port-security y BPDU guard si el modelo los soporta; si no, se registra como brecha [S-14].&#10;Si falla: Un laboratorio entero pierde conectividad; el resto de la red no se afecta. Mitigación: ninguna dentro del alcance (rediseño excluido, S-14).">
+        <object id="DC-1-34" label="&lt;b&gt;SW-ACC&lt;/b&gt; · Switches de acceso existentes · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;Según levantamiento AS-IS [S-14]&lt;br&gt;&lt;i&gt;Conecta los PC de laboratorio a la VLAN 30&lt;/i&gt;" celeris_id="SW-ACC" celeris_tipo="componente" ip="Según levantamiento AS-IS [S-14]" zona="MGMT, LAB" criticidad="Alta" estado="fuera_de_alcance" por_que="Es la capa de acceso que ya existe en los laboratorios. Se documenta AS-IS y se exige soporte 802.1Q y los controles de capa 2; su rediseño queda fuera de alcance [S-14]." aporta="Acceso a la VLAN 30 con DHCP snooping, DAI, IP source guard, RA guard, port-security y BPDU guard si el modelo los soporta; si no, se registra como brecha [S-14]." si_falla="Un laboratorio entero pierde conectividad; el resto de la red no se afecta. Mitigación: ninguna dentro del alcance (rediseño excluido, S-14)." flujos="" pruebas="T23" placeholders="1" tooltip="SW-ACC · Alta&#10;Por qué: Es la capa de acceso que ya existe en los laboratorios. Se documenta AS-IS y se exige soporte 802.1Q y los controles de capa 2; su rediseño queda fuera de alcance [S-14].&#10;Aporta: Acceso a la VLAN 30 con DHCP snooping, DAI, IP source guard, RA guard, port-security y BPDU guard si el modelo los soporta; si no, se registra como brecha [S-14].&#10;Si falla: Un laboratorio entero pierde conectividad; el resto de la red no se afecta. Mitigación: ninguna dentro del alcance (rediseño excluido, S-14).">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0072B2;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;dashed=1;dashPattern=3 3;" parent="1" vertex="1">
             <mxGeometry x="930" y="98" width="300" height="100" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="shape=mxgraph.networks.switch;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-39" value="">
+        <mxCell style="shape=mxgraph.networks.switch;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-35" value="">
           <mxGeometry x="935" y="104" width="22" height="22" as="geometry" />
         </mxCell>
-        <object id="DC-1-40" label="&lt;b&gt;BRK01&lt;/b&gt; · Puerto break-glass · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;laptop 10.20.10.250 · VLAN 10&lt;br&gt;&lt;i&gt;Recupera FW01 sin depender del ruteo&lt;/i&gt;" celeris_id="BRK01" celeris_tipo="componente" ip="10.20.10.250" zona="MGMT" criticidad="Media" estado="diseño" por_que="Si FW01 cae no hay ruteo entre VLAN; el puerto rotulado en VLAN 10 permite llegar a ESXi, IPMI y DCUI para restaurar FW01 desde su XML en Git." aporta="Puerto de acceso de SW-CORE01 en VLAN 10, desactivado administrativamente y activado desde la consola del switch; la laptop usa 10.20.10.250." si_falla="Si el puerto no funciona, la recuperación de FW01 requiere acceso físico al servidor (iDRAC/iLO sin red). Mitigación: probado en T25." flujos="" pruebas="T25" placeholders="1" tooltip="BRK01 · Media&#10;Por qué: Si FW01 cae no hay ruteo entre VLAN; el puerto rotulado en VLAN 10 permite llegar a ESXi, IPMI y DCUI para restaurar FW01 desde su XML en Git.&#10;Aporta: Puerto de acceso de SW-CORE01 en VLAN 10, desactivado administrativamente y activado desde la consola del switch; la laptop usa 10.20.10.250.&#10;Si falla: Si el puerto no funciona, la recuperación de FW01 requiere acceso físico al servidor (iDRAC/iLO sin red). Mitigación: probado en T25.">
+        <object id="DC-1-36" label="&lt;b&gt;BRK01&lt;/b&gt; · Puerto break-glass · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;laptop 10.20.10.250 · VLAN 10&lt;br&gt;&lt;i&gt;Recupera FW01 sin depender del ruteo&lt;/i&gt;" celeris_id="BRK01" celeris_tipo="componente" ip="10.20.10.250" zona="MGMT" criticidad="Media" estado="diseño" por_que="Si FW01 cae no hay ruteo entre VLAN; el puerto rotulado en VLAN 10 permite llegar a ESXi, IPMI y DCUI para restaurar FW01 desde su XML en Git." aporta="Puerto de acceso de SW-CORE01 en VLAN 10, desactivado administrativamente y activado desde la consola del switch; la laptop usa 10.20.10.250." si_falla="Si el puerto no funciona, la recuperación de FW01 requiere acceso físico al servidor (iDRAC/iLO sin red). Mitigación: probado en T25." flujos="" pruebas="T25" placeholders="1" tooltip="BRK01 · Media&#10;Por qué: Si FW01 cae no hay ruteo entre VLAN; el puerto rotulado en VLAN 10 permite llegar a ESXi, IPMI y DCUI para restaurar FW01 desde su XML en Git.&#10;Aporta: Puerto de acceso de SW-CORE01 en VLAN 10, desactivado administrativamente y activado desde la consola del switch; la laptop usa 10.20.10.250.&#10;Si falla: Si el puerto no funciona, la recuperación de FW01 requiere acceso físico al servidor (iDRAC/iLO sin red). Mitigación: probado en T25.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0072B2;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="930" y="232" width="300" height="86" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="shape=mxgraph.networks.laptop;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-41" value="">
+        <mxCell style="shape=mxgraph.networks.laptop;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-37" value="">
           <mxGeometry x="935" y="238" width="22" height="22" as="geometry" />
         </mxCell>
-        <object id="DC-1-42" label="&lt;b&gt;FGT-EXT&lt;/b&gt; · FortiGate existente · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;WAN 203.0.113.10 · tránsito 10.20.0.1&lt;br&gt;&lt;i&gt;FortiGate existente: IP pública, NAT 1:1 y FortiGuard&lt;/i&gt;" celeris_id="FGT-EXT" celeris_tipo="componente" ip="WAN 203.0.113.10 · tránsito 10.20.0.1" zona="PERIMETRO, TRANSITO" criticidad="Alta" estado="existente" por_que="Ya filtra con FortiGuard y tiene la IP pública 203.0.113.10; FW01 cuelga de su red de tránsito 10.20.0.0/29. Reemplazarlo sería sobreingeniería y no lo controla el equipo [S-29]." aporta="Conserva la IP pública 203.0.113.10 [S-15] y hace NAT 1:1 hacia 10.20.0.2 solo para UDP 500/4500 (IPsec con NAT-T) y TCP 80/443 (portal); excluye a EDGE01/02 de su inspección SSL profunda [S-29]; FortiGuard filtra la salida de los nodos; necesita una ruta estática a 10.20.0.0/16 vía 10.20.0.2." si_falla="Todo el campus sin Internet y FW01 (10.20.0.2) sin salida a la WAN, incluida la VPN a AWS (VTI1 y VTI2); no depende del proyecto." flujos="" pruebas="T26, T56" placeholders="1" tooltip="FGT-EXT · Alta&#10;Por qué: Ya filtra con FortiGuard y tiene la IP pública 203.0.113.10; FW01 cuelga de su red de tránsito 10.20.0.0/29. Reemplazarlo sería sobreingeniería y no lo controla el equipo [S-29].&#10;Aporta: Conserva la IP pública 203.0.113.10 [S-15] y hace NAT 1:1 hacia 10.20.0.2 solo para UDP 500/4500 (IPsec con NAT-T) y TCP 80/443 (portal); excluye a EDGE01/02 de su inspección SSL profunda [S-29]; FortiGuard filtra la salida de los nodos; necesita una ruta estática a 10.20.0.0/16 vía 10.20.0.2.&#10;Si falla: Todo el campus sin Internet y FW01 (10.20.0.2) sin salida a la WAN, incluida la VPN a AWS (VTI1 y VTI2); no depende del proyecto.">
+        <object id="DC-1-38" label="&lt;b&gt;FGT-EXT&lt;/b&gt; · FortiGate existente · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;WAN 203.0.113.10 · tránsito 10.20.0.1&lt;br&gt;&lt;i&gt;FortiGate existente: IP pública, NAT 1:1 y FortiGuard&lt;/i&gt;" celeris_id="FGT-EXT" celeris_tipo="componente" ip="WAN 203.0.113.10 · tránsito 10.20.0.1" zona="PERIMETRO, TRANSITO" criticidad="Alta" estado="existente" por_que="Ya filtra con FortiGuard y tiene la IP pública 203.0.113.10; FW01 cuelga de su red de tránsito 10.20.0.0/29. Reemplazarlo sería sobreingeniería y no lo controla el equipo [S-29]." aporta="Conserva la IP pública 203.0.113.10 [S-15] y hace NAT 1:1 hacia 10.20.0.2 solo para UDP 500/4500 (IPsec con NAT-T) y TCP 80/443 (portal); excluye a EDGE01/02 de su inspección SSL profunda [S-29]; FortiGuard filtra la salida de los nodos; necesita una ruta estática a 10.20.0.0/16 vía 10.20.0.2." si_falla="Todo el campus sin Internet y FW01 (10.20.0.2) sin salida a la WAN, incluida la VPN a AWS (VTI1 y VTI2); no depende del proyecto." flujos="" pruebas="T26, T56" placeholders="1" tooltip="FGT-EXT · Alta&#10;Por qué: Ya filtra con FortiGuard y tiene la IP pública 203.0.113.10; FW01 cuelga de su red de tránsito 10.20.0.0/29. Reemplazarlo sería sobreingeniería y no lo controla el equipo [S-29].&#10;Aporta: Conserva la IP pública 203.0.113.10 [S-15] y hace NAT 1:1 hacia 10.20.0.2 solo para UDP 500/4500 (IPsec con NAT-T) y TCP 80/443 (portal); excluye a EDGE01/02 de su inspección SSL profunda [S-29]; FortiGuard filtra la salida de los nodos; necesita una ruta estática a 10.20.0.0/16 vía 10.20.0.2.&#10;Si falla: Todo el campus sin Internet y FW01 (10.20.0.2) sin salida a la WAN, incluida la VPN a AWS (VTI1 y VTI2); no depende del proyecto.">
           <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#999999;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;dashed=1;dashPattern=3 3;" parent="1" vertex="1">
             <mxGeometry x="930" y="560" width="300" height="112" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-43" value="">
+        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-39" value="">
           <mxGeometry x="935" y="566" width="22" height="22" as="geometry" />
         </mxCell>
-        <object id="DC-1-44" label="&lt;b&gt;Internet&lt;/b&gt;&lt;br&gt;salida del campus" celeris_id="INTERNET" celeris_tipo="zona" confianza="Nula" proposito="Internet pública: ISP, orígenes web, ACME, feeds y S3 (bucket celeris-backups)" tooltip="INTERNET: Internet pública: ISP, orígenes web, ACME, feeds y S3 (bucket celeris-backups). Regla: Entrada solo 443 (y 80 → redirección) hacia PORTAL01 por NAT 1:1 en el FortiGate y 443 hacia EC2-GW; señuelos en ventana autorizada">
+        <object id="DC-1-40" label="&lt;b&gt;Internet&lt;/b&gt;&lt;br&gt;salida del campus" celeris_id="INTERNET" celeris_tipo="zona" confianza="Nula" proposito="Internet pública: ISP, orígenes web, ACME, feeds y S3 (bucket celeris-backups)" tooltip="INTERNET: Internet pública: ISP, orígenes web, ACME, feeds y S3 (bucket celeris-backups). Regla: Entrada solo 443 (y 80 → redirección) hacia PORTAL01 por NAT 1:1 en el FortiGate y 443 hacia EC2-GW; señuelos en ventana autorizada">
           <mxCell style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#4D4D4D;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="970" y="740" width="220" height="96" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-45" label="trunk 802.1Q a la capa de acceso · velocidad sin definir (CI-80)" celeris_id="CD-PP01&gt;SW-ACC" celeris_tipo="enlace" enlace_a="CD-PP01" enlace_b="SW-ACC" etiqueta="trunk 802.1Q a la capa de acceso · velocidad sin definir (CI-80)">
+        <object id="DC-1-41" label="trunk 802.1Q a SW-ACC · 1 GbE [S-14]" celeris_id="CD-PP01&gt;SW-ACC" celeris_tipo="enlace" enlace_a="CD-PP01" enlace_b="SW-ACC" etiqueta="trunk 802.1Q a SW-ACC · 1 GbE [S-14]">
           <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
-              <mxPoint x="710" y="152" as="sourcePoint" />
+              <mxPoint x="710" y="156" as="sourcePoint" />
               <mxPoint x="930" y="148" as="targetPoint" />
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-46" label="" celeris_id="SW-CORE01&gt;CD-PP01" celeris_tipo="enlace" enlace_a="SW-CORE01" enlace_b="CD-PP01" etiqueta="">
+        <object id="DC-1-42" label="" celeris_id="SW-CORE01&gt;CD-PP01" celeris_tipo="enlace" enlace_a="SW-CORE01" enlace_b="CD-PP01" etiqueta="">
           <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
               <mxPoint x="630" y="196" as="sourcePoint" />
@@ -200,7 +190,7 @@
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-47" label="puerto break-glass · VLAN 10 · apagado por defecto" celeris_id="BRK01&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="BRK01" enlace_b="SW-CORE01" etiqueta="puerto break-glass · VLAN 10 · apagado por defecto">
+        <object id="DC-1-43" label="puerto break-glass · VLAN 10 · apagado por defecto" celeris_id="BRK01&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="BRK01" enlace_b="SW-CORE01" etiqueta="puerto break-glass · VLAN 10 · apagado por defecto">
           <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
               <mxPoint x="930" y="275" as="sourcePoint" />
@@ -212,95 +202,95 @@
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-48" label="10 GbE · trunk 802.1Q (vSwitch0)" celeris_id="vmnic0&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="vmnic0" enlace_b="SW-CORE01" etiqueta="10 GbE · trunk 802.1Q (vSwitch0)">
+        <object id="DC-1-44" label="10 GbE · trunk 802.1Q (vSwitch0)" celeris_id="vmnic0&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="vmnic0" enlace_b="SW-CORE01" etiqueta="10 GbE · trunk 802.1Q (vSwitch0)">
           <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=4;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
-              <mxPoint x="700" y="453" as="sourcePoint" />
+              <mxPoint x="700" y="537" as="sourcePoint" />
               <mxPoint x="710" y="232" as="targetPoint" />
               <Array as="points">
-                <mxPoint x="725" y="453" />
+                <mxPoint x="725" y="537" />
                 <mxPoint x="725" y="232" />
               </Array>
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-49" label="" celeris_id="vmnic1&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="vmnic1" enlace_b="SW-CORE01" etiqueta="">
+        <object id="DC-1-45" label="" celeris_id="vmnic1&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="vmnic1" enlace_b="SW-CORE01" etiqueta="">
           <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=4;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
-              <mxPoint x="700" y="511" as="sourcePoint" />
+              <mxPoint x="700" y="595" as="sourcePoint" />
               <mxPoint x="710" y="220" as="targetPoint" />
               <Array as="points">
-                <mxPoint x="742" y="511" />
+                <mxPoint x="742" y="595" />
                 <mxPoint x="742" y="220" />
               </Array>
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-50" label="1 GbE · NIC dedicada · tránsito 10.20.0.0/29 (vSwitch1)" celeris_id="vmnic2&gt;FGT-EXT" celeris_tipo="enlace" enlace_a="vmnic2" enlace_b="FGT-EXT" etiqueta="1 GbE · NIC dedicada · tránsito 10.20.0.0/29 (vSwitch1)">
+        <object id="DC-1-46" label="1 GbE · NIC dedicada · tránsito 10.20.0.0/29 (vSwitch1)" celeris_id="vmnic2&gt;FGT-EXT" celeris_tipo="enlace" enlace_a="vmnic2" enlace_b="FGT-EXT" etiqueta="1 GbE · NIC dedicada · tránsito 10.20.0.0/29 (vSwitch1)">
           <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
-              <mxPoint x="700" y="569" as="sourcePoint" />
+              <mxPoint x="700" y="653" as="sourcePoint" />
               <mxPoint x="930" y="616" as="targetPoint" />
               <Array as="points">
-                <mxPoint x="850" y="569" />
+                <mxPoint x="850" y="653" />
                 <mxPoint x="850" y="616" />
               </Array>
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-51" label="" celeris_id="IPMI01&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="IPMI01" enlace_b="SW-CORE01" etiqueta="">
+        <object id="DC-1-47" label="" celeris_id="IPMI01&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="IPMI01" enlace_b="SW-CORE01" etiqueta="">
           <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
-              <mxPoint x="70" y="534" as="sourcePoint" />
+              <mxPoint x="70" y="618" as="sourcePoint" />
               <mxPoint x="70" y="244" as="targetPoint" />
               <Array as="points">
-                <mxPoint x="54" y="534" />
+                <mxPoint x="54" y="618" />
                 <mxPoint x="54" y="244" />
               </Array>
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-52" label="" celeris_id="UPS01&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="UPS01" enlace_b="SW-CORE01" etiqueta="">
+        <object id="DC-1-48" label="" celeris_id="UPS01&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="UPS01" enlace_b="SW-CORE01" etiqueta="">
           <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
-              <mxPoint x="70" y="940" as="sourcePoint" />
+              <mxPoint x="70" y="968" as="sourcePoint" />
               <mxPoint x="70" y="222" as="targetPoint" />
               <Array as="points">
-                <mxPoint x="42" y="940" />
+                <mxPoint x="42" y="968" />
                 <mxPoint x="42" y="222" />
               </Array>
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-53" label="" celeris_id="UPS01&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="UPS01" enlace_b="SW-CORE01" etiqueta="">
+        <object id="DC-1-49" label="" celeris_id="UPS01&gt;SW-CORE01" celeris_tipo="enlace" enlace_a="UPS01" enlace_b="SW-CORE01" etiqueta="">
           <mxCell style="html=1;endArrow=none;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=10 3 2 3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
-              <mxPoint x="70" y="952" as="sourcePoint" />
+              <mxPoint x="70" y="980" as="sourcePoint" />
               <mxPoint x="70" y="205" as="targetPoint" />
               <Array as="points">
-                <mxPoint x="30" y="952" />
+                <mxPoint x="30" y="980" />
                 <mxPoint x="30" y="205" />
               </Array>
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-54" label="" celeris_id="UPS01&gt;CD-PDU01" celeris_tipo="enlace" enlace_a="UPS01" enlace_b="CD-PDU01" etiqueta="">
+        <object id="DC-1-50" label="" celeris_id="UPS01&gt;CD-PDU01" celeris_tipo="enlace" enlace_a="UPS01" enlace_b="CD-PDU01" etiqueta="">
           <mxCell style="html=1;endArrow=none;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=10 3 2 3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
-              <mxPoint x="410" y="900" as="sourcePoint" />
-              <mxPoint x="440" y="900" as="targetPoint" />
+              <mxPoint x="410" y="928" as="sourcePoint" />
+              <mxPoint x="440" y="928" as="targetPoint" />
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-55" label="alimentación" celeris_id="CD-PDU01&gt;ESX01" celeris_tipo="enlace" enlace_a="CD-PDU01" enlace_b="ESX01" etiqueta="alimentación">
+        <object id="DC-1-51" label="alimentación" celeris_id="CD-PDU01&gt;ESX01" celeris_tipo="enlace" enlace_a="CD-PDU01" enlace_b="ESX01" etiqueta="alimentación">
           <mxCell style="html=1;endArrow=none;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=10 3 2 3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
-              <mxPoint x="575" y="840" as="sourcePoint" />
-              <mxPoint x="575" y="668" as="targetPoint" />
+              <mxPoint x="575" y="868" as="sourcePoint" />
+              <mxPoint x="575" y="772" as="targetPoint" />
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-56" label="" celeris_id="FGT-EXT&gt;INTERNET" celeris_tipo="enlace" enlace_a="FGT-EXT" enlace_b="INTERNET" etiqueta="">
+        <object id="DC-1-52" label="" celeris_id="FGT-EXT&gt;INTERNET" celeris_tipo="enlace" enlace_a="FGT-EXT" enlace_b="INTERNET" etiqueta="">
           <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1">
             <mxGeometry relative="1" as="geometry">
               <mxPoint x="1080" y="672" as="sourcePoint" />
@@ -308,142 +298,142 @@
             </mxGeometry>
           </mxCell>
         </object>
-        <object id="DC-1-57" label="&lt;b&gt;Cables&lt;/b&gt; (las etiquetas llevan la velocidad):&lt;br&gt;vmnic0 y vmnic1 (10 GbE) → SW-CORE01, teaming por puerto virtual de origen.&lt;br&gt;vmnic2 (1 GbE) → FortiGate, dedicada. vmnic3 libre.&lt;br&gt;IPMI01 y la tarjeta de la UPS en MGMT (VLAN 10)." celeris_rol="cables" celeris_ref="ESX01">
+        <object id="DC-1-53" label="&lt;b&gt;Cables&lt;/b&gt; (las etiquetas llevan la velocidad):&lt;br&gt;vmnic0 y vmnic1 (10 GbE) → SW-CORE01, teaming por puerto virtual de origen.&lt;br&gt;vmnic2 (1 GbE) → FortiGate, dedicada. vmnic3 libre, sin enlace.&lt;br&gt;IPMI01 y la tarjeta de la UPS en MGMT (VLAN 10)." celeris_rol="cables" celeris_ref="ESX01">
           <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="930" y="380" width="300" height="150" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-58" label="Lados del trunk: las 7 VLAN del proyecto con lista explícita y nativa 999 (D1.9)." celeris_rol="trunk" celeris_ref="SW-CORE01">
+        <object id="DC-1-54" label="Lados del trunk: las 7 VLAN del proyecto con lista explícita y nativa 999 (D1.9)." celeris_rol="trunk" celeris_ref="SW-CORE01">
           <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="930" y="860" width="300" height="70" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-59" label="Líneas de las tres columnas izquierdas del rack: negro punteado = alimentación; gris fino = gestión (IPMI01 y red de UPS01 hacia SW-CORE01)." celeris_rol="carriles" celeris_ref="RACK01">
+        <object id="DC-1-55" label="Líneas de la izquierda del rack: negro punteado = alimentación; gris fino = gestión (IPMI01 y red de UPS01 hacia SW-CORE01)." celeris_rol="carriles" celeris_ref="RACK01">
           <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
-            <mxGeometry x="20" y="1060" width="770" height="44" as="geometry" />
+            <mxGeometry x="40" y="1130" width="750" height="44" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-60" label="&lt;b&gt;Leyenda&lt;/b&gt;" celeris_rol="leyenda">
+        <object id="DC-1-56" label="&lt;b&gt;Leyenda&lt;/b&gt;" celeris_rol="leyenda">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1260" y="70" width="1000" height="196" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-61" value="&lt;b&gt;Criticidad&lt;/b&gt; (grosor del borde + etiqueta):">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-57" value="&lt;b&gt;Criticidad&lt;/b&gt; (grosor del borde + etiqueta):">
           <mxGeometry x="1268" y="96" width="360" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-1-62" value="&lt;b&gt;ALTA&lt;/b&gt; · borde 3 px">
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-1-58" value="&lt;b&gt;ALTA&lt;/b&gt; · borde 3 px">
           <mxGeometry x="1268" y="116" width="317" height="28" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-1-63" value="&lt;b&gt;MEDIA&lt;/b&gt; · borde 2 px">
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-1-59" value="&lt;b&gt;MEDIA&lt;/b&gt; · borde 2 px">
           <mxGeometry x="1593" y="116" width="317" height="28" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-1-64" value="&lt;b&gt;BAJA&lt;/b&gt; · borde 1 px">
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-1-60" value="&lt;b&gt;BAJA&lt;/b&gt; · borde 1 px">
           <mxGeometry x="1918" y="116" width="317" height="28" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;dashed=1;dashPattern=2 2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-1-65" value="interfaz de un equipo en otra zona">
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;dashed=1;dashPattern=2 2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-1-61" value="interfaz de un equipo en otra zona">
           <mxGeometry x="1268" y="150" width="479" height="26" as="geometry" />
         </mxCell>
-        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=6 3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-1-66" value="existente, fuera de alcance">
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=6 3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-1-62" value="existente, fuera de alcance">
           <mxGeometry x="1755" y="150" width="479" height="26" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-67" value="&lt;b&gt;Íconos&lt;/b&gt; (draw.io redes / AWS4):">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-63" value="&lt;b&gt;Íconos&lt;/b&gt; (draw.io redes / AWS4):">
           <mxGeometry x="1268" y="184" width="300" height="16" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-68" value="">
+        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-64" value="">
           <mxGeometry x="1268" y="204" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-69" value="Firewall existente (DTI)">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-65" value="Firewall existente (DTI)">
           <mxGeometry x="1292" y="204" width="220" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.terminal;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-70" value="">
+        <mxCell style="shape=mxgraph.networks.terminal;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-66" value="">
           <mxGeometry x="1514" y="204" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-71" value="Gestión fuera de banda">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-67" value="Gestión fuera de banda">
           <mxGeometry x="1538" y="204" width="220" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.virtual_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-72" value="">
+        <mxCell style="shape=mxgraph.networks.virtual_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-68" value="">
           <mxGeometry x="1760" y="204" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-73" value="Hipervisor">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-69" value="Hipervisor">
           <mxGeometry x="1784" y="204" width="220" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.laptop;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-74" value="">
+        <mxCell style="shape=mxgraph.networks.laptop;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-70" value="">
           <mxGeometry x="2006" y="204" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-75" value="Puerto break-glass (laptop)">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-71" value="Puerto break-glass (laptop)">
           <mxGeometry x="2030" y="204" width="220" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-76" value="">
+        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-72" value="">
           <mxGeometry x="1268" y="230" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-77" value="Servidor / VM">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-73" value="Servidor / VM">
           <mxGeometry x="1292" y="230" width="220" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.switch;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-78" value="">
+        <mxCell style="shape=mxgraph.networks.switch;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-74" value="">
           <mxGeometry x="1514" y="230" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-79" value="Switch">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-75" value="Switch">
           <mxGeometry x="1538" y="230" width="220" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.switch;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-80" value="">
+        <mxCell style="shape=mxgraph.networks.switch;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-76" value="">
           <mxGeometry x="1760" y="230" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-81" value="Switch existente (fuera de alcance)">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-77" value="Switch existente (fuera de alcance)">
           <mxGeometry x="1784" y="230" width="220" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="shape=mxgraph.networks.ups_enterprise;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-82" value="">
+        <mxCell style="shape=mxgraph.networks.ups_enterprise;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-1-78" value="">
           <mxGeometry x="2006" y="230" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-83" value="UPS">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-79" value="UPS">
           <mxGeometry x="2030" y="230" width="220" height="20" as="geometry" />
         </mxCell>
-        <object id="DC-1-84" label="&lt;b&gt;Enlaces&lt;/b&gt; (el estilo y el texto de la etiqueta dicen qué es):" celeris_rol="leyenda_enlaces">
+        <object id="DC-1-80" label="&lt;b&gt;Enlaces&lt;/b&gt; (el estilo y el texto de la etiqueta dicen qué es):" celeris_rol="leyenda_enlaces">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1260" y="274" width="1000" height="78" as="geometry" />
           </mxCell>
         </object>
-        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=4;" parent="1" edge="1" id="DC-1-85" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=4;" parent="1" edge="1" id="DC-1-81" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1268" y="311" as="sourcePoint" />
             <mxPoint x="1312" y="311" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-86" value="10 GbE trunk">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-82" value="10 GbE trunk">
           <mxGeometry x="1318" y="302" width="274" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1" id="DC-1-87" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1" id="DC-1-83" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1596" y="311" as="sourcePoint" />
             <mxPoint x="1640" y="311" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-88" value="1 GbE / trunk de acceso">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-84" value="1 GbE / trunk de acceso">
           <mxGeometry x="1646" y="302" width="274" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1" id="DC-1-89" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1" id="DC-1-85" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1924" y="311" as="sourcePoint" />
             <mxPoint x="1968" y="311" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-90" value="gestión (MGMT)">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-86" value="gestión (MGMT)">
           <mxGeometry x="1974" y="302" width="274" height="20" as="geometry" />
         </mxCell>
-        <mxCell style="html=1;endArrow=none;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=10 3 2 3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1" id="DC-1-91" value="">
+        <mxCell style="html=1;endArrow=none;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=10 3 2 3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1" id="DC-1-87" value="">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1268" y="335" as="sourcePoint" />
             <mxPoint x="1312" y="335" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-92" value="alimentación eléctrica">
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-1-88" value="alimentación eléctrica">
           <mxGeometry x="1318" y="326" width="274" height="20" as="geometry" />
         </mxCell>
-        <object id="DC-1-93" label="&lt;b&gt;Qué aporta y qué pasa si falla&lt;/b&gt;&lt;br&gt;&lt;b&gt;RACK01&lt;/b&gt; — Aloja y alimenta los equipos del centro de datos. &lt;i&gt;Si falla:&lt;/i&gt; Un incidente físico en el rack (incendio, inundación, robo) detiene todo el…&lt;br&gt;&lt;b&gt;CD-PP01&lt;/b&gt; — Ordena y rotula los enlaces del rack hacia la capa de acceso y el…. &lt;i&gt;Si falla:&lt;/i&gt; Un puerto dañado se puentea con un cable directo&lt;br&gt;&lt;b&gt;SW-CORE01&lt;/b&gt; — Conmutación 802.1Q y puerto break-glass. &lt;i&gt;Si falla:&lt;/i&gt; Cae la conectividad física de ESX01 y la capa de acceso&lt;br&gt;&lt;b&gt;CD-ORG01&lt;/b&gt; — Guía los cables entre el switch y el servidor. &lt;i&gt;Si falla:&lt;/i&gt; Sin efecto funcional&lt;br&gt;&lt;b&gt;ESX01&lt;/b&gt; — Hospeda las 10 VM de la fase F1 (23 vCPU). &lt;i&gt;Si falla:&lt;/i&gt; Caen todas las VM, incluido FW01&lt;br&gt;&lt;b&gt;vmnic0&lt;/b&gt; — Trunk 802.1Q hacia SW-CORE01 (puerto SFP+). &lt;i&gt;Si falla:&lt;/i&gt; El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio&lt;br&gt;&lt;b&gt;vmnic1&lt;/b&gt; — Trunk 802.1Q hacia SW-CORE01 (puerto SFP+). &lt;i&gt;Si falla:&lt;/i&gt; El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio&lt;br&gt;&lt;b&gt;vmnic2&lt;/b&gt; — NIC dedicada a la red de tránsito hacia el FortiGate. &lt;i&gt;Si falla:&lt;/i&gt; FW01 pierde la salida a Internet y la VPN&lt;br&gt;&lt;b&gt;vmnic3&lt;/b&gt; — Libre (reserva). &lt;i&gt;Si falla:&lt;/i&gt; Sin efecto: no transporta tráfico&lt;br&gt;&lt;b&gt;DS-VM&lt;/b&gt; — Discos de las VM (sin caché) y la copia local de restic. &lt;i&gt;Si falla:&lt;/i&gt; Si fallan los dos SSD o la controladora se pierden las VM y la copia local" celeris_rol="panel" componentes="RACK01, CD-PP01, SW-CORE01, CD-ORG01, ESX01, vmnic0, vmnic1, vmnic2, vmnic3, DS-VM, DS-CACHE1, DS-CACHE2, IPMI01, JMP01, UPS01, CD-PDU01, SW-ACC, BRK01, FGT-EXT">
+        <object id="DC-1-89" label="&lt;b&gt;Qué aporta y qué pasa si falla&lt;/b&gt;&lt;br&gt;&lt;b&gt;RACK01&lt;/b&gt; — Aloja y alimenta los equipos del centro de datos. &lt;i&gt;Si falla:&lt;/i&gt; Un incidente físico en el rack (incendio, inundación, robo) detiene todo el…&lt;br&gt;&lt;b&gt;CD-PP01&lt;/b&gt; — Ordena y rotula los enlaces del rack hacia la capa de acceso y el…. &lt;i&gt;Si falla:&lt;/i&gt; Un puerto dañado se puentea con un cable directo&lt;br&gt;&lt;b&gt;SW-CORE01&lt;/b&gt; — Conmutación 802.1Q y puerto break-glass. &lt;i&gt;Si falla:&lt;/i&gt; Cae la conectividad física de ESX01 y la capa de acceso&lt;br&gt;&lt;b&gt;CD-ORG01&lt;/b&gt; — Guía los cables entre el switch y el servidor. &lt;i&gt;Si falla:&lt;/i&gt; Sin efecto funcional&lt;br&gt;&lt;b&gt;ESX01&lt;/b&gt; — Hospeda las 10 VM de la fase F1 (23 vCPU). &lt;i&gt;Si falla:&lt;/i&gt; Caen todas las VM, incluido FW01&lt;br&gt;&lt;b&gt;vmnic0&lt;/b&gt; — Trunk 802.1Q hacia SW-CORE01 (puerto SFP+). &lt;i&gt;Si falla:&lt;/i&gt; El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio&lt;br&gt;&lt;b&gt;vmnic1&lt;/b&gt; — Trunk 802.1Q hacia SW-CORE01 (puerto SFP+). &lt;i&gt;Si falla:&lt;/i&gt; El teaming mueve las VM a la otra NIC de vSwitch0 sin cortar el servicio&lt;br&gt;&lt;b&gt;vmnic2&lt;/b&gt; — NIC dedicada a la red de tránsito hacia el FortiGate. &lt;i&gt;Si falla:&lt;/i&gt; FW01 pierde la salida a Internet y la VPN&lt;br&gt;&lt;b&gt;vmnic3&lt;/b&gt; — Libre (reserva), sin enlace. &lt;i&gt;Si falla:&lt;/i&gt; Sin efecto: no transporta tráfico&lt;br&gt;&lt;b&gt;DS-VM&lt;/b&gt; — Discos de las VM (sin caché) y la copia local de restic. &lt;i&gt;Si falla:&lt;/i&gt; Si fallan los dos SSD o la controladora se pierden las VM y la copia local" celeris_rol="panel" componentes="RACK01, CD-PP01, SW-CORE01, CD-ORG01, ESX01, vmnic0, vmnic1, vmnic2, vmnic3, DS-VM, DS-CACHE1, DS-CACHE2, IPMI01, JMP01, UPS01, CD-PDU01, SW-ACC, BRK01, FGT-EXT">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1260.0" y="368" width="495.0" height="234" as="geometry" />
           </mxCell>
         </object>
-        <object id="DC-1-94" label="&lt;b&gt;…continúa&lt;/b&gt;&lt;br&gt;&lt;b&gt;DS-CACHE1&lt;/b&gt; — Caché de EDGE01 (500 GB como punto de partida [S-04]). &lt;i&gt;Si falla:&lt;/i&gt; EDGE01 pierde su caché: sirve MISS hasta volver a llenarla&lt;br&gt;&lt;b&gt;DS-CACHE2&lt;/b&gt; — Caché de EDGE02 (500 GB como punto de partida [S-04]). &lt;i&gt;Si falla:&lt;/i&gt; EDGE02 pierde su caché: sirve MISS hasta volver a llenarla&lt;br&gt;&lt;b&gt;IPMI01&lt;/b&gt; — Consola remota del servidor sin depender de ESXi. &lt;i&gt;Si falla:&lt;/i&gt; Sin consola remota la recuperación del servidor exige presencia física&lt;br&gt;&lt;b&gt;JMP01&lt;/b&gt; — Único origen administrativo con MFA. &lt;i&gt;Si falla:&lt;/i&gt; No hay administración remota de la plataforma&lt;br&gt;&lt;b&gt;UPS01&lt;/b&gt; — Apagado ordenado del servidor ante un corte. &lt;i&gt;Si falla:&lt;/i&gt; Un corte eléctrico apaga ESX01 sin orden, con riesgo de corrupción de…&lt;br&gt;&lt;b&gt;CD-PDU01&lt;/b&gt; — Distribuye la salida de la UPS a ESX01 y SW-CORE01. &lt;i&gt;Si falla:&lt;/i&gt; ESX01 y SW-CORE01 pierden energía aunque la UPS funcione&lt;br&gt;&lt;b&gt;SW-ACC&lt;/b&gt; — Conecta los PC de laboratorio a la VLAN 30. &lt;i&gt;Si falla:&lt;/i&gt; Un laboratorio entero pierde conectividad&lt;br&gt;&lt;b&gt;BRK01&lt;/b&gt; — Recupera FW01 sin depender del ruteo. &lt;i&gt;Si falla:&lt;/i&gt; Si el puerto no funciona, la recuperación de FW01 requiere acceso físico al…&lt;br&gt;&lt;b&gt;FGT-EXT&lt;/b&gt; — FortiGate existente: IP pública, NAT 1:1 y FortiGuard. &lt;i&gt;Si falla:&lt;/i&gt; Todo el campus sin Internet y FW01 (10.20.0.2) sin salida a la WAN, incluida…" celeris_rol="panel" componentes="RACK01, CD-PP01, SW-CORE01, CD-ORG01, ESX01, vmnic0, vmnic1, vmnic2, vmnic3, DS-VM, DS-CACHE1, DS-CACHE2, IPMI01, JMP01, UPS01, CD-PDU01, SW-ACC, BRK01, FGT-EXT">
+        <object id="DC-1-90" label="&lt;b&gt;…continúa&lt;/b&gt;&lt;br&gt;&lt;b&gt;DS-CACHE1&lt;/b&gt; — Caché de EDGE01 (500 GB como punto de partida [S-04]). &lt;i&gt;Si falla:&lt;/i&gt; EDGE01 pierde su caché: sirve MISS hasta volver a llenarla&lt;br&gt;&lt;b&gt;DS-CACHE2&lt;/b&gt; — Caché de EDGE02 (500 GB como punto de partida [S-04]). &lt;i&gt;Si falla:&lt;/i&gt; EDGE02 pierde su caché: sirve MISS hasta volver a llenarla&lt;br&gt;&lt;b&gt;IPMI01&lt;/b&gt; — Consola remota del servidor sin depender de ESXi. &lt;i&gt;Si falla:&lt;/i&gt; Sin consola remota la recuperación del servidor exige presencia física&lt;br&gt;&lt;b&gt;JMP01&lt;/b&gt; — Único origen administrativo con MFA. &lt;i&gt;Si falla:&lt;/i&gt; No hay administración remota de la plataforma&lt;br&gt;&lt;b&gt;UPS01&lt;/b&gt; — Apagado ordenado del servidor ante un corte. &lt;i&gt;Si falla:&lt;/i&gt; Un corte eléctrico apaga ESX01 sin orden, con riesgo de corrupción de…&lt;br&gt;&lt;b&gt;CD-PDU01&lt;/b&gt; — Distribuye la salida de la UPS a ESX01 y SW-CORE01. &lt;i&gt;Si falla:&lt;/i&gt; ESX01 y SW-CORE01 pierden energía aunque la UPS funcione&lt;br&gt;&lt;b&gt;SW-ACC&lt;/b&gt; — Conecta los PC de laboratorio a la VLAN 30. &lt;i&gt;Si falla:&lt;/i&gt; Un laboratorio entero pierde conectividad&lt;br&gt;&lt;b&gt;BRK01&lt;/b&gt; — Recupera FW01 sin depender del ruteo. &lt;i&gt;Si falla:&lt;/i&gt; Si el puerto no funciona, la recuperación de FW01 requiere acceso físico al…&lt;br&gt;&lt;b&gt;FGT-EXT&lt;/b&gt; — FortiGate existente: IP pública, NAT 1:1 y FortiGuard. &lt;i&gt;Si falla:&lt;/i&gt; Todo el campus sin Internet y FW01 (10.20.0.2) sin salida a la WAN, incluida…" celeris_rol="panel" componentes="RACK01, CD-PP01, SW-CORE01, CD-ORG01, ESX01, vmnic0, vmnic1, vmnic2, vmnic3, DS-VM, DS-CACHE1, DS-CACHE2, IPMI01, JMP01, UPS01, CD-PDU01, SW-ACC, BRK01, FGT-EXT">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="1765.0" y="368" width="495.0" height="246" as="geometry" />
           </mxCell>

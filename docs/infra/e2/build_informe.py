@@ -297,7 +297,7 @@ def t_dim(x, d):
              ["RAM (F2)", f"{d['ram_f2']} GB × 1,1 = {d['ram_esxi']} GB; × 1,2 = {d['ram_crec']} GB", f"{d['ram_crec']} GB", f"{d['ram_host']} GB", f"{d['h_ram']} tras ESXi; {d['m_ram']} tras el crecimiento", "Cumple ≥ 15 % en ambos casos"],
              ["Disco de VM (F2)", f"{d['disco_sin_cache_f2']} GB × 1,3 = {d['disco_req']} GB; + 200 GB de copia local = {d['disco_tot']} GB", f"{d['disco_tot']} GB", f"{d['disco_cap']} GB (DS-VM)", d["h_disco"], "Cumple ≥ 15 %"],
              ["Caché por nodo", "500 GB como punto de partida [S-04]", "500 GB", "1 000 GB (NVMe)", "50,0 %", "Cumple ≥ 15 %"],
-             ["Red hacia un laboratorio", "40 PCs a la vez ≈ 1 Gbps (REQ-NF-02)", "1 Gbps", "2 × 10 GbE", "95 %", "Cumple; se mide con iperf3 en S2"]],
+             ["Red hacia un laboratorio", "40 PCs a la vez ≈ 1 Gbps (REQ-NF-02); enlace SW-CORE01 ↔ SW-ACC de 1 GbE [S-14]", "1 Gbps", "1 GbE hasta SW-ACC (2 × 10 GbE en el host)", "0 % en el acceso", "Sin holgura: CI-87; se mide con iperf3 en S2"]],
             [2.4, 5.2, 2.2, 2.6, 2.6, 2.0], False)
 
 

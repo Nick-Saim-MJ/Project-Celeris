@@ -83,7 +83,8 @@ host:
     - { id: vmnic0, velocidad_gbps: 10, uso: "Trunk 802.1Q hacia SW-CORE01 (puerto SFP+)", vswitch: vSwitch0, destino: SW-CORE01 }
     - { id: vmnic1, velocidad_gbps: 10, uso: "Trunk 802.1Q hacia SW-CORE01 (puerto SFP+)", vswitch: vSwitch0, destino: SW-CORE01 }
     - { id: vmnic2, velocidad_gbps: 1, uso: "NIC dedicada a la red de tránsito hacia el FortiGate", vswitch: vSwitch1, destino: FGT-EXT }
-    - { id: vmnic3, velocidad_gbps: null, uso: "Libre (reserva)", vswitch: null, destino: null, ci: CI-80 }
+    - { id: vmnic3, velocidad_gbps: null, uso: "Libre (reserva), sin enlace", vswitch: null, destino: null }
+  enlace_acceso: { de: SW-CORE01, a: SW-ACC, velocidad_gbps: 1, supuesto: S-14, nota: "Trunk 802.1Q hacia la capa de acceso existente: 1 GbE por SW-ACC [S-14] (CI-80)" }
 
 almacenamiento:
   datastores:
@@ -168,11 +169,11 @@ rack:
     - { u: [12, 12], elemento: "Patch panel 24 puertos", id: CD-PP01 }
     - { u: [11, 11], elemento: "SW-CORE01 (24× 1 GbE + 2–4× SFP+ 10 GbE), con puerto break-glass", componente: SW-CORE01 }
     - { u: [10, 10], elemento: "Organizador de cables", id: CD-ORG01 }
-    - { u: [6, 9], elemento: "ESX01 (2U)", componente: ESX01, alto_u: 2, ci: CI-79 }
+    - { u: [6, 7], elemento: "ESX01 (2U)", componente: ESX01, alto_u: 2, ci: CI-79 }
     - { u: [1, 3], elemento: "UPS online 1,5 kVA + PDU", componente: UPS01, extra: [CD-PDU01] }
-  libres_derivado: [[4, 5]]
+  libres_derivado: [[4, 5], [8, 9]]
   elementos:    # elementos dibujados en DC-1 que el inventario no registra como componente (nombre de diseño; criticidad heredada de lo que sirven)
-    - { id: RACK01, nombre: "RACK01 — Rack de 12U", tipo: "Rack", funcion: "Aloja y alimenta los equipos del centro de datos", sirve_a: [ESX01, SW-CORE01, UPS01], recursos: "12U: U1–3 y U6–12 asignadas; U4–5 libres",
+    - { id: RACK01, nombre: "RACK01 — Rack de 12U", tipo: "Rack", funcion: "Aloja y alimenta los equipos del centro de datos", sirve_a: [ESX01, SW-CORE01, UPS01], recursos: "12U: U1–U3, U6–U7 y U10–U12 asignadas; U4–U5 y U8–U9 libres",
         por_que: "Un solo rack de 12U alcanza para un host de 2U, un switch, la UPS y la distribución; mantiene el cableado corto y el acceso físico controlado.",
         si_falla: "Un incidente físico en el rack (incendio, inundación, robo) detiene todo el servicio; la copia en S3 con Object Lock es lo que sobrevive (D2.9)." }
     - { id: CD-PP01, nombre: "CD-PP01 — Patch panel 24 puertos", tipo: "Cableado", funcion: "Ordena y rotula los enlaces del rack hacia la capa de acceso y el FortiGate", sirve_a: [SW-CORE01], recursos: "24 puertos; U12",
@@ -210,7 +211,8 @@ dimensionamiento:    # D2.8
   ci: CI-78
   red:
     objetivo_gbps: 1
-    razon: "Un laboratorio de 40 PCs que descarga a la vez necesita ≈ 1 Gbps desde la caché (REQ-NF-02, ≥ 900 Mbps agregados); de ahí los 10 GbE del host."
+    enlace_acceso_gbps: 1
+    razon: "Un laboratorio de 40 PCs que descarga a la vez necesita ≈ 1 Gbps desde la caché (REQ-NF-02, ≥ 900 Mbps agregados); de ahí los 10 GbE del host. El enlace de SW-CORE01 a SW-ACC es de 1 GbE [S-14] (CI-80) y limita a ≈ 1 Gbps lo que llega a la capa de acceso: alcanza para un laboratorio a la vez, sin holgura (CI-87)."
     riesgo: "Los HIT atraviesan FW01 (D-17): en S2 se mide con iperf3 LAB → EDGE con y sin IPS; si FW01 limita, se revisa D-17."
   siem: "≈ 8 agentes + Suricata + WAF + firewall → 12 GB y 300 GB para ≈ 90 días (D2.8). Wazuh todo en uno admite hasta 25 agentes con 8 GiB: con ≈ 8 agentes, 12 GB dan holgura (CI-78)."
 
@@ -275,11 +277,14 @@ aws:
     razon: "app-a está vacía en operación normal y EC2-GW está en una subred pública con su propia IP: nada del diseño necesita salir a Internet desde una subred privada. El acceso a S3 va por el Gateway Endpoint."
     temporal: "NAT-DR existe solo durante el simulacro T59 (etiqueta Ttl) para que EC2-DR instale paquetes; rt-private apunta a ella solo entonces."
     alternativas:
-      - { opcion: "NAT Gateway administrado 24×7", precio_hora: 0.045, horas_mes: 730, ci: CI-83, nota: "Precio de lista de referencia [S-12]; se suma el cargo por GB procesado." }
+      - { opcion: "NAT Gateway administrado 24×7", precio_hora: 0.045, horas_mes: 730, nota: "Precio de lista, us-east-1, noviembre de 2026 [S-12]; se suma el cargo por GB procesado." }
       - { opcion: "Instancia NAT t3.micro 24×7", precio_hora: 0.0104, horas_mes: 730, nota: "Más IPv4 pública (0,005 US$/h)" }
   costo_mensual:     # D2.5; fórmulas visibles en la matriz (hoja «AWS y costo»)
     moneda: USD
     supuesto: S-12
+    region_precios: us-east-1
+    fecha_precios: "noviembre de 2026"
+    nota_precios: "Todos los precios son de lista (AWS Pricing Calculator), de us-east-1 y de noviembre de 2026 [S-12], incluidos t3.small y NAT Gateway (CI-83 resuelto)"
     horas_mes: 730
     meta_usd: 75
     referencial_documento_usd: 70
@@ -300,7 +305,7 @@ aws:
     simulacro:      # T59: solo durante la prueba
       horas: 4
       lineas:
-        - { concepto: "EC2-DR t3.small", cantidad: 1, precio_hora: 0.0208, ci: CI-83 }
+        - { concepto: "EC2-DR t3.small", cantidad: 1, precio_hora: 0.0208 }
         - { concepto: "NAT-DR t3.micro", cantidad: 1, precio_hora: 0.0104 }
   gobierno: "MFA en la cuenta, CloudTrail, AWS Budgets al 80 % y etiqueta Ttl en los recursos efímeros; administración por SSM Session Manager o EC2 Instance Connect, sin puerto 22 público (D2.5)."
 

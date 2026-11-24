@@ -273,6 +273,9 @@ def hoja_dim(wb, x, cd, vm):
     sec("5. Red")
     f("red", "Objetivo desde la caché hacia un laboratorio", d["red"]["objetivo_gbps"], "Gbps", d["red"]["razon"], entrada=True)
     f("red_nic", "Enlaces del host hacia SW-CORE01", 20, "Gbps", "2 × 10 GbE en vSwitch0 (vmnic0 y vmnic1): el objetivo cabe con holgura", entrada=True)
+    f("red_acc", "Enlace SW-CORE01 ↔ SW-ACC (1 GbE [S-14])", d["red"]["enlace_acceso_gbps"], "Gbps", "1 GbE por SW-ACC, CI-80", entrada=True)
+    f("red_h", "Holgura del enlace de acceso frente al objetivo", f"=({R('red_acc')}-{R('red')})/{R('red_acc')}", "%", "(enlace − objetivo) ÷ enlace: sin holgura, un solo laboratorio a la vez (CI-87)", fmt="0.0%",
+      estado=f'=IF(B{fila[0]}>={d["holgura_minima"]},"Cumple ≥ 15 %","Sin holgura: CI-87")')
     f("red_riesgo", "Riesgo declarado", "—", "", d["red"]["riesgo"])
     sec("6. EC2-GW frente a su carga (S-33: carga esperada derivada de S-26; se mide en S2)")
     g = cd.ec2_gw()
@@ -300,7 +303,7 @@ def hoja_aws(wb, x, cd):
     ws = wb.create_sheet("AWS y costo")
     c = cd.aws["costo_mensual"]
     titulo(ws, "AWS: recursos, costo mensual 24×7 y costo del laboratorio efímero [S-12]",
-           "Precios de lista de referencia (noviembre de 2026) en us-east-1: confirmar en AWS Pricing Calculator. Datos de entrada con fondo gris; "
+           f"{c['nota_precios']}. Confirmar en AWS Pricing Calculator. Datos de entrada con fondo gris; "
            "totales por fórmula.", 7)
     xc.escribir_encabezado(ws, 4, ["Recurso / concepto", "Cantidad", "Unidad", "Precio unitario (US$)", "Total (US$/mes)", "Supuesto", "Nota"], [52, 12, 12, 18, 16, 12, 60])
     r = 5
@@ -348,7 +351,7 @@ def hoja_aws(wb, x, cd):
     a = r
     for l in c["simulacro"]["lineas"]:
         xc.escribir_fila(ws, r, [l["concepto"], l["cantidad"], c["simulacro"]["horas"], l["precio_hora"], f"=B{r}*C{r}*D{r}", "[S-12]",
-                                 "Precio fuera de D2.5 (CI-83)" if l.get("ci") else ""], centrar={2, 3, 4, 5, 6})
+                                 "Precio de lista, us-east-1, noviembre de 2026 [S-12]" if "t3.small" in l["concepto"] else ""], centrar={2, 3, 4, 5, 6})
         ws.cell(row=r, column=5).number_format = "0.0000"
         r += 1
     ws.cell(row=r, column=1, value="Total del simulacro").font = NEG

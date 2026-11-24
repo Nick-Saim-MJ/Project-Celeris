@@ -203,7 +203,7 @@ class CentroDatos:
             sw = n["vswitch"]
             ex[n["id"]] = {"id": n["id"], "nombre": f"{n['id']} — NIC física de ESX01", "entorno": "On-premise", "tipo": "Red (NIC física)",
                            "funcion": n["uso"],
-                           "recursos": (f"{n['velocidad_gbps']} GbE" if n["velocidad_gbps"] else "Libre, velocidad sin definir (CI-80)") + (f" · {sw}" if sw else ""),
+                           "recursos": (f"{n['velocidad_gbps']} GbE" if n["velocidad_gbps"] else "Libre (reserva), sin enlace") + (f" · {sw}" if sw else ""),
                            "criticidad": ex[sw]["criticidad"] if sw else "Baja", "estado": "diseño",
                            "por_que": ("Enlace de 10 GbE: un laboratorio de 40 PCs necesita ≈ 1 Gbps desde la caché (REQ-NF-02)." if (n["velocidad_gbps"] or 0) >= 10 else
                                        "NIC dedicada a la red de tránsito, separada del trunk de las zonas." if n["vswitch"] else "Reserva para un enlace adicional sin rediseñar el host."),

@@ -926,20 +926,18 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto (Nick)
 
 ### CI-79 — Rack: ESX01 ocupa 2U pero D2.4 le asigna el rango U6–9 (4U)
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-23, decisión del equipo: ESX01 en U6–U7)
 - **Tipo:** vacío
-- **Dónde:** CE03 D2.4 «Rack de 12U» (fila «6–9 | ESX01 (2U)»); `infra/centro_datos.yaml` → `rack.ocupacion`
-- **Qué dice cada fuente:** el rango U6–9 son 4 unidades y el equipo es de 2U; D2.4 no dice cuáles dos U ocupa ni para qué sirven las otras dos. Las U4–5 no figuran en la tabla.
-- **Decisión aplicada:** DC-1 dibuja el rango U6–9 como lo escribe D2.4, rotulado «ESX01 (equipo de 2U)», y las U4–5 como libres. No se asigna uso a las U sobrantes.
-- **Decide:** equipo del proyecto (al instalar el rack, S2)
+- **Dónde:** CE03 D2.4 «Rack de 12U»; `infra/centro_datos.yaml` → `rack.ocupacion`
+- **Decisión aplicada:** ESX01 (2U) ocupa U6–U7. Quedan libres U8–U9 y U4–U5, sin uso asignado. V-93 comprueba que las U libres son las que no ocupa ningún equipo. DC-1 rotula las U reales; el alto de las filas no es a escala.
+- **Decide:** equipo del proyecto
 
-### CI-80 — Enlace SW-CORE01 ↔ SW-ACC y NIC libre de ESX01 sin velocidad ni puerto
-- **Estado:** abierto
+### CI-80 — Enlace SW-CORE01 ↔ SW-ACC sin velocidad ni puerto
+- **Estado:** resuelto (2026-11-23, decisión del equipo: 1 GbE por SW-ACC [S-14]); deja abierto CI-88
 - **Tipo:** vacío
-- **Dónde:** CE03 D2.4 (SW-CORE01 «24× 1 GbE + 2–4× SFP+ 10 GbE»; ESX01 «4 NIC (2× 10 GbE trunk, 1× 1 GbE hacia el FortiGate, 1 libre)»)
-- **Qué dice cada fuente:** no dice con qué puerto ni a qué velocidad se enlaza SW-CORE01 con la capa de acceso existente (SW-ACC), ni la velocidad de la cuarta NIC. D2.8 pide ≈ 1 Gbps desde la caché hacia un laboratorio.
-- **Decisión aplicada:** DC-1 dibuja el enlace a SW-ACC como «trunk 802.1Q, velocidad sin definir (CI-80)» y vmnic3 como libre.
-- **Decide:** equipo del proyecto con la DTI (levantamiento AS-IS, S-14)
+- **Dónde:** CE03 D2.4; `infra/centro_datos.yaml` → `host.enlace_acceso`
+- **Decisión aplicada:** el enlace es un trunk 802.1Q de 1 GbE, la velocidad del SW-ACC existente [S-14]. La cuarta NIC (vmnic3) queda libre y sin enlace; no se le asigna velocidad.
+- **Decide:** equipo del proyecto con la DTI (levantamiento AS-IS)
 
 ### CI-81 — Región de producción: «us-east-1 elegida» (D2.5) o «sa-east-1 candidata» (inventario, S-11)
 - **Estado:** resuelto (2026-11-23, por la regla del proyecto: manda el inventario)
@@ -956,11 +954,10 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto (Nick)
 
 ### CI-83 — Precios de lista fuera de D2.5 (t3.small, NAT Gateway)
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-23, decisión del equipo: precios de lista con fecha y región [S-12])
 - **Tipo:** supuesto nuevo
-- **Dónde:** `infra/centro_datos.yaml` → `aws.costo_mensual.simulacro`, `aws.nat.alternativas`
-- **Qué dice cada fuente:** D2.5 da los precios de la VPN, t3.micro, IPv4, EBS y S3 [S-12], pero no el de t3.small (EC2-DR) ni el del NAT Gateway administrado que se descarta.
-- **Decisión aplicada:** US$ 0,0208/h para t3.small y US$ 0,045/h para el NAT Gateway (lista pública de us-east-1); se marcan como referencia [S-12] y se confirman en AWS Pricing Calculator. No entran en el costo mensual de 24×7.
+- **Dónde:** `infra/centro_datos.yaml` → `aws.costo_mensual` (`region_precios`, `fecha_precios`, `nota_precios`), `aws.nat.alternativas`
+- **Decisión aplicada:** todos los precios son de lista de AWS, de us-east-1 y de noviembre de 2026 [S-12]: US$ 0,0208/h para t3.small y US$ 0,045/h para el NAT Gateway. La matriz y el informe lo rotulan; no entran en el costo mensual de 24×7. Se confirman en AWS Pricing Calculator.
 - **Decide:** Nick (S-12)
 
 ### CI-84 — S-08 en `trazabilidad.yaml` es de la v0.3
@@ -985,3 +982,12 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Qué dice cada fuente:** no hay RTO ni RPO del host. Lo que sí hay: la consola se restaura en ≤ 2 h en una EC2 temporal desde S3 aunque el host no esté (T59).
 - **Decisión aplicada:** el informe no promete un RTO del host; documenta el punto único de falla y sus mitigaciones. No se inventa el plazo de un proveedor.
 - **Decide:** equipo del proyecto (cotización y garantía del servidor, S-08)
+
+### CI-87 — El trunk de 1 GbE hacia SW-ACC no deja holgura frente a D2.8
+- **Estado:** abierto
+- **Tipo:** contradicción (consecuencia de CI-80)
+- **Dónde:** CE03 D2.8 (≈ 1 Gbps desde la caché hacia un laboratorio, REQ-NF-02 ≥ 900 Mbps); `infra/centro_datos.yaml` → `host.enlace_acceso`, `dimensionamiento.red`
+- **Qué dicen las fuentes:** el host tiene 2 × 10 GbE y la caché sirve ≈ 1 Gbps a un laboratorio, pero el enlace SW-CORE01 ↔ SW-ACC (1 GbE por SW-ACC [S-14]) iguala ese objetivo: holgura 0 % y un solo laboratorio a la vez; varios laboratorios comparten 1 Gbps.
+- **Decisión aplicada:** el informe y la matriz lo declaran como cuello de botella («sin holgura») y no lo ocultan; no se cambia la velocidad del SW-ACC, que es de la DTI.
+- **Propuesta:** medir con iperf3 en S2 (LAB → EDGE con y sin IPS) y pedir a la DTI un enlace SFP+ de 10 GbE entre SW-CORE01 y SW-ACC si los laboratorios descargan a la vez.
+- **Decide:** equipo del proyecto con la DTI

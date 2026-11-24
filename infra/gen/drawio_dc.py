@@ -193,31 +193,42 @@ def dc_1(x: Infra, cd: CentroDatos) -> DiagramaDC:
     d = DiagramaDC(x, cd, "DC-1", 2300, 1200)
     d.titulo(w=1180)
     h, r = cd.host, cd.raw["rack"]
-    SU, Y0 = 80, 112                      # alto de una U y borde superior de la U12
-
-    def top(u):                           # borde superior de la unidad u (U12 arriba)
-        return Y0 + (12 - u) * SU
+    # Filas del rack, de arriba (U12) hacia abajo, con el alto en píxeles de cada una. El alto NO es proporcional a las U: el servidor
+    # de 2U se dibuja más alto para mostrar sus NIC y datastores (el rotulado de las U es el real).
+    filas_rack = [("pp", "U12", 80), ("sw", "U11", 80), ("org", "U10", 80), ("libre_alta", "U8–9", 84), ("esx", "U6–7", 340),
+                  ("libre_baja", "U4–5", 84), ("ups", "U1–3", 240)]
+    Y0 = 112
+    ys, y = {}, Y0
+    for clave, etiqueta, alto in filas_rack:
+        ys[clave] = (y, alto)
+        d.caja(2, y + alto // 2 - 9, 40, 18, "text;html=1;align=left;verticalAlign=middle;fontSize=9;fontColor=#595959;", etiqueta)
+        y += alto
+    fin_rack = y
     # marco del rack
     e = cd.extras()["RACK01"]
-    d.caja(20, 80, 770, 12 * SU + 44, "rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#1A1A1A;strokeWidth=3;"
+    d.caja(40, 80, 750, fin_rack - 80 + 20, "rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#1A1A1A;strokeWidth=3;"
            f"verticalAlign=top;align=left;spacingLeft=8;spacingTop=3;fontSize=11;fontColor={TEXTO};",
-           f"<b>RACK01</b> · Rack de {r['unidades']}U · <b>ALTA</b> · {esc(e['recursos'])} · U12 arriba",
+           f"<b>RACK01</b> · Rack de {r['unidades']}U · <b>ALTA</b> · {esc(e['recursos'])} · U12 arriba · el alto de cada fila no es a escala",
            {"celeris_id": "RACK01", "celeris_tipo": "elemento", "tipo": e["tipo"], "entorno": "On-premise", "criticidad": e["criticidad"],
             "funcion": e["funcion"], "recursos": e["recursos"], "por_que": e["por_que"], "si_falla": e["si_falla"]})
     d.nodos["RACK01"] = d.celdas[-1].get("id")
     d.presentes.append("RACK01")
-    for u in range(1, 13):                # numeración de las U
-        d.caja(2, top(u) + 26, 18, 18, "text;html=1;align=center;verticalAlign=middle;fontSize=9;fontColor=#595959;", f"U{u}")
     X, W = 70, 640
-    d.elem("CD-PP01", X, top(12) + 4, W, 72, d.recurso("CD-PP01"), "Ordena los enlaces hacia la capa de acceso", nombre="Patch panel 24 puertos", color="#4D4D4D")
-    sw = d.comp("SW-CORE01", X, top(11) + 4, W, 72, "10.20.10.2 · 24× 1 GbE + 2–4× SFP+ 10 GbE · U11", x.componentes["SW-CORE01"]["aporta_corto"])
-    d.elem("CD-ORG01", X, top(10) + 4, W, 72, d.recurso("CD-ORG01"), "Guía los cables entre el switch y el servidor", nombre="Organizador de cables")
-    # ESX01 (U6–9) con sus NIC, datastores, IPMI01 y JMP01 dentro
-    ex_y = top(9) + 4
-    esx = d.comp("ESX01", X, ex_y, W, 4 * SU - 8, f"10.20.10.10 (vmk0) · {cd.recursos_de('ESX01')} · rango U6–9 (CI-79)",
-                 x.componentes["ESX01"]["aporta_corto"])
-    nic_ids = list(cd.nics)
-    for i, nid in enumerate(nic_ids):
+
+    def yy(c):
+        return ys[c][0] + 4
+
+    def hh(c):
+        return ys[c][1] - 8
+    d.elem("CD-PP01", X, yy("pp"), W, hh("pp"), d.recurso("CD-PP01"), "Ordena los enlaces hacia la capa de acceso", nombre="Patch panel 24 puertos", color="#4D4D4D")
+    d.comp("SW-CORE01", X, yy("sw"), W, hh("sw"), "10.20.10.2 · 24× 1 GbE + 2–4× SFP+ 10 GbE · U11", x.componentes["SW-CORE01"]["aporta_corto"])
+    d.elem("CD-ORG01", X, yy("org"), W, hh("org"), d.recurso("CD-ORG01"), "Guía los cables entre el switch y el servidor", nombre="Organizador de cables")
+    libres = [(a, b) for a, b in r["libres_derivado"]]
+    d.nota_dc(X, yy("libre_alta"), W, hh("libre_alta"), f"<b>U{libres[1][0]}–U{libres[1][1]} libres.</b> ESX01 es un equipo de 2U y ocupa U{r['ocupacion'][3]['u'][0]}–U{r['ocupacion'][3]['u'][1]} (CI-79); "
+              "las U sobrantes quedan sin uso asignado.", "libre", "RACK01", color="#FFFFFF", tam=10)
+    ex_y = yy("esx")
+    d.comp("ESX01", X, ex_y, W, hh("esx"), f"10.20.10.10 (vmk0) · {cd.recursos_de('ESX01')} · U6–U7", x.componentes["ESX01"]["aporta_corto"])
+    for i, nid in enumerate(cd.nics):
         n = cd.nics[nid]
         vel = f"{n['velocidad_gbps']} GbE" if n["velocidad_gbps"] else "libre"
         d.elem(nid, 515, ex_y + 72 + i * 58, 190, 50, f"{vel} · {n['vswitch'] or 'sin vSwitch'}", None, nombre="NIC física")
@@ -231,40 +242,44 @@ def dc_1(x: Infra, cd: CentroDatos) -> DiagramaDC:
     fases = {f: ", ".join(v["componente"] for v in cd.vms if v["fase"] == f) for f in ("F1", "F2")}
     d.nota_dc(X + 6, ex_y + 224, 426, 44, f"<b>VM de ESX01:</b> {esc(fases['F1'])} (F1) y {esc(fases['F2'])} (F2); detalle en DC-2.",
               "vm_lista", "ESX01", tam=9)
-    d.nota_dc(X, top(5) + 4, W, 2 * SU - 8, "<b>U4–U5 libres.</b> D2.4 asigna el rango U6–9 a ESX01, un equipo de 2U; no se define el uso de las U sobrantes (CI-79).",
+    d.nota_dc(X, yy("libre_baja"), W, hh("libre_baja"), f"<b>U{libres[0][0]}–U{libres[0][1]} libres.</b> Entre ESX01 y la UPS; sin uso asignado en D2.4.",
               "libre", "RACK01", color="#FFFFFF", tam=10)
-    ups = d.comp("UPS01", X, top(3) + 8, 340, 120, "10.20.10.40 (tarjeta de red) · " + cd.recursos_de("UPS01"), x.componentes["UPS01"]["aporta_corto"])
-    d.elem("CD-PDU01", X + 370, top(3) + 8, 270, 120, d.recurso("CD-PDU01"), "Reparte la UPS a ESX01 y SW-CORE01", nombre="PDU")
+    uy = yy("ups")
+    d.comp("UPS01", X, uy + 4, 340, 120, "10.20.10.40 (tarjeta de red) · " + cd.recursos_de("UPS01"), x.componentes["UPS01"]["aporta_corto"])
+    d.elem("CD-PDU01", X + 370, uy + 4, 270, 120, d.recurso("CD-PDU01"), "Reparte la UPS a ESX01 y SW-CORE01", nombre="PDU")
     en = cd.raw["energia"]
-    d.nota_dc(X, top(3) + 136, W, 90, f"<b>Energía:</b> consumo ≈ {en['consumo_w']} W; autonomía {en['autonomia_min'][0]}–{en['autonomia_min'][1]} min "
+    d.nota_dc(X, uy + 132, W, 96, f"<b>Energía:</b> consumo ≈ {en['consumo_w']} W; autonomía {en['autonomia_min'][0]}–{en['autonomia_min'][1]} min "
               f"({esc(en['autonomia_nota'].lower())}). <b>NUT:</b> {esc(en['nut']['accion'])}.<br><b>Arranque:</b> FW01 → CTRL01 → EDGE01/02 → SIEM01 → resto (D2.4).",
               "energia", "UPS01", tam=10)
     # columna externa
     XE = 930
-    acc = d.comp("SW-ACC", XE, 98, 300, 100, "Según levantamiento AS-IS [S-14]", x.componentes["SW-ACC"]["aporta_corto"], dashed=True)
-    brk = d.comp("BRK01", XE, 232, 300, 86, "laptop 10.20.10.250 · VLAN 10", x.componentes["BRK01"]["aporta_corto"])
-    fgt = d.comp("FGT-EXT", XE, 560, 300, 112, "WAN 203.0.113.10 · tránsito 10.20.0.1", x.componentes["FGT-EXT"]["aporta_corto"], dashed=True)
-    inet = d.zona("INTERNET", XE + 40, 740, 220, 96, "<br>salida del campus")
+    acc = cd.host["enlace_acceso"]
+    d.comp("SW-ACC", XE, 98, 300, 100, "Según levantamiento AS-IS [S-14]", x.componentes["SW-ACC"]["aporta_corto"], dashed=True)
+    d.comp("BRK01", XE, 232, 300, 86, "laptop 10.20.10.250 · VLAN 10", x.componentes["BRK01"]["aporta_corto"])
+    d.comp("FGT-EXT", XE, 560, 300, 112, "WAN 203.0.113.10 · tránsito 10.20.0.1", x.componentes["FGT-EXT"]["aporta_corto"], dashed=True)
+    d.zona("INTERNET", XE + 40, 740, 220, 96, "<br>salida del campus")
+    sw_top = yy("sw")
+    pp_top = yy("pp")
     # cables
-    d.cable((X + W, top(12) + 40), (XE, 148), [], ENLACE_1G, "trunk 802.1Q a la capa de acceso · velocidad sin definir (CI-80)", "CD-PP01", "SW-ACC")
-    d.cable((X + 560, top(11) + 4), (X + 560, top(12) + 76), [], ENLACE_1G, "", "SW-CORE01", "CD-PP01")
-    d.cable((XE, 275), (X + W, 205), [(880, 275), (880, 205)], ENLACE_1G, "puerto break-glass · VLAN 10 · apagado por defecto", "BRK01", "SW-CORE01")
-    ex = ex_y
-    d.cable((700, ex + 72 + 25), (X + W, 232), [(725, ex + 72 + 25), (725, 232)], ENLACE_10G, "10 GbE · trunk 802.1Q (vSwitch0)", "vmnic0", "SW-CORE01")
-    d.cable((700, ex + 72 + 58 + 25), (X + W, 220), [(742, ex + 72 + 58 + 25), (742, 220)], ENLACE_10G, "", "vmnic1", "SW-CORE01")
-    d.cable((700, ex + 72 + 116 + 25), (XE, 616), [(850, ex + 72 + 116 + 25), (850, 616)], ENLACE_1G, "1 GbE · NIC dedicada · tránsito 10.20.0.0/29 (vSwitch1)", "vmnic2", "FGT-EXT")
-    d.cable((X, ex + 140 + 38), (X, 244), [(54, ex + 140 + 38), (54, 244)], ENLACE_GEST, "", "IPMI01", "SW-CORE01")
-    d.cable((X, top(3) + 8 + 100), (X, 222), [(42, top(3) + 8 + 100), (42, 222)], ENLACE_GEST, "", "UPS01", "SW-CORE01")
-    d.cable((X, top(3) + 8 + 112), (X, 205), [(30, top(3) + 8 + 112), (30, 205)], ENERGIA, "", "UPS01", "SW-CORE01")
-    d.cable((X + 340, top(3) + 68), (X + 370, top(3) + 68), [], ENERGIA, "", "UPS01", "CD-PDU01")
-    d.cable((X + 505, top(3) + 8), (X + 505, ex_y + 4 * SU - 8), [], ENERGIA, "alimentación", "CD-PDU01", "ESX01")
+    d.cable((X + W, pp_top + 40), (XE, 148), [], ENLACE_1G, f"trunk 802.1Q a SW-ACC · {acc['velocidad_gbps']} GbE [{acc['supuesto']}]", "CD-PP01", "SW-ACC")
+    d.cable((X + 560, sw_top), (X + 560, pp_top + hh("pp")), [], ENLACE_1G, "", "SW-CORE01", "CD-PP01")
+    d.cable((XE, 275), (X + W, sw_top + 9), [(880, 275), (880, sw_top + 9)], ENLACE_1G, "puerto break-glass · VLAN 10 · apagado por defecto", "BRK01", "SW-CORE01")
+    n0 = ex_y + 72 + 25
+    d.cable((700, n0), (X + W, sw_top + 36), [(725, n0), (725, sw_top + 36)], ENLACE_10G, "10 GbE · trunk 802.1Q (vSwitch0)", "vmnic0", "SW-CORE01")
+    d.cable((700, n0 + 58), (X + W, sw_top + 24), [(742, n0 + 58), (742, sw_top + 24)], ENLACE_10G, "", "vmnic1", "SW-CORE01")
+    d.cable((700, n0 + 116), (XE, 616), [(850, n0 + 116), (850, 616)], ENLACE_1G, "1 GbE · NIC dedicada · tránsito 10.20.0.0/29 (vSwitch1)", "vmnic2", "FGT-EXT")
+    d.cable((X, ex_y + 140 + 38), (X, sw_top + 48), [(54, ex_y + 140 + 38), (54, sw_top + 48)], ENLACE_GEST, "", "IPMI01", "SW-CORE01")
+    d.cable((X, uy + 4 + 100), (X, sw_top + 26), [(42, uy + 4 + 100), (42, sw_top + 26)], ENLACE_GEST, "", "UPS01", "SW-CORE01")
+    d.cable((X, uy + 4 + 112), (X, sw_top + 9), [(30, uy + 4 + 112), (30, sw_top + 9)], ENERGIA, "", "UPS01", "SW-CORE01")
+    d.cable((X + 340, uy + 64), (X + 370, uy + 64), [], ENERGIA, "", "UPS01", "CD-PDU01")
+    d.cable((X + 505, uy + 4), (X + 505, ex_y + hh("esx")), [], ENERGIA, "alimentación", "CD-PDU01", "ESX01")
     d.cable((XE + 150, 672), (XE + 150, 740), [], ENLACE_1G, "", "FGT-EXT", "INTERNET")
     d.nota_dc(XE, 380, 300, 150, "<b>Cables</b> (las etiquetas llevan la velocidad):<br>vmnic0 y vmnic1 (10 GbE) → SW-CORE01, teaming por puerto virtual de origen.<br>"
-              "vmnic2 (1 GbE) → FortiGate, dedicada. vmnic3 libre.<br>IPMI01 y la tarjeta de la UPS en MGMT (VLAN 10).", "cables", "ESX01", tam=9)
+              "vmnic2 (1 GbE) → FortiGate, dedicada. vmnic3 libre, sin enlace.<br>IPMI01 y la tarjeta de la UPS en MGMT (VLAN 10).", "cables", "ESX01", tam=9)
     d.nota_dc(XE, 860, 300, 70, "Lados del trunk: las 7 VLAN del proyecto con lista explícita y nativa 999 (D1.9).", "trunk", "SW-CORE01", tam=9)
-    d.nota_dc(20, 12 * SU + 100, 770, 44, "Líneas de las tres columnas izquierdas del rack: negro punteado = alimentación; gris fino = gestión (IPMI01 y red de UPS01 hacia SW-CORE01).",
+    d.nota_dc(40, fin_rack + 30, 750, 44, "Líneas de la izquierda del rack: negro punteado = alimentación; gris fino = gestión (IPMI01 y red de UPS01 hacia SW-CORE01).",
               "carriles", "RACK01", tam=9, color="#FFFFFF")
-    return _fin(d, 12 * SU + 180, 1260, [(ENLACE_10G, "10 GbE trunk"), (ENLACE_1G, "1 GbE / trunk de acceso"), (ENLACE_GEST, "gestión (MGMT)"), (ENERGIA, "alimentación eléctrica")])
+    return _fin(d, fin_rack + 100, 1260, [(ENLACE_10G, "10 GbE trunk"), (ENLACE_1G, "1 GbE / trunk de acceso"), (ENLACE_GEST, "gestión (MGMT)"), (ENERGIA, "alimentación eléctrica")])
 
 
 # --------------------------------------------------------------------------------------------------

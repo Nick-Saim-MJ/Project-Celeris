@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.1 · fecha 2026-11-22
 - Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 9 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **0 FALLA**, 4 con advertencias, 75 PASA, 0 pendientes de P2–P5.
+- Resultado: **0 FALLA**, 4 con advertencias, 79 PASA, 0 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -89,6 +89,10 @@
 | V-101 | Todo celeris_id es un ID del contrato y cada figura dibuja todo lo que debe (cobertura) | PASA | 0 errores, 0 advertencias |
 | V-102 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | PASA | — |
 | V-103 | Título, leyenda, panel; criticidad (borde + texto); vCPU, RAM, VLAN y CIDR coinciden con los YAML | PASA | — |
+| V-104 | Matriz DC: archivo y las 6 hojas | PASA | entregables/CE0331/Matriz_Componentes_DC_v1.0.xlsx |
+| V-105 | Matriz DC: 100 % de lo dibujado en DC-0…DC-3 (y viceversa), criticidad y celdas obligatorias | PASA | 56 elementos en la matriz · 56 dibujados |
+| V-106 | Matriz DC: máquinas virtuales 1 a 1 con centro_datos.yaml y totales por fórmula | PASA | 11 VM · 12 fórmulas de total |
+| V-107 | Matriz DC: fórmulas recalculadas sin errores y coherentes con el cálculo en Python | PASA | Microsoft Excel (COM) · 127 fórmulas · 0 errores |
 
 ## Errores
 

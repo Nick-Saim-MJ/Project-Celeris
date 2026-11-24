@@ -4,7 +4,7 @@
 PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
 VERSION ?= v1.0
 
-.PHONY: help entorno lab-gen tofu-gen tofu-check tofu-emulador image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
+.PHONY: diagrams-dc diagrams-dc-check matrices-dc informe-dc help entorno lab-gen tofu-gen tofu-check tofu-emulador image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
 
 help:
 	@echo "make validate        fuente única + artefactos + secretos (infra/validate.py y gitleaks si está instalado)"
@@ -95,6 +95,21 @@ diagrams-check:
 
 informe:
 	$(PYTHON) docs/infra/e1/build_informe.py --pdf
+	$(PYTHON) infra/validate.py
+
+# Entregable 2 (CE0331, centro de datos híbrido): solo diseño. Orden: diagrams-dc → matrices-dc → informe-dc.
+diagrams-dc:
+	$(PYTHON) infra/gen/drawio_dc.py
+	$(PYTHON) infra/gen/exportar_dc.py
+
+diagrams-dc-check:
+	$(PYTHON) infra/gen/drawio_dc_check.py
+
+matrices-dc:
+	$(PYTHON) infra/gen/xlsx_centro_datos.py --verificar
+
+informe-dc:
+	$(PYTHON) docs/infra/e2/build_informe.py --pdf
 	$(PYTHON) infra/validate.py
 
 release-e1: validate

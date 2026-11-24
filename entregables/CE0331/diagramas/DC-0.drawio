@@ -1,0 +1,277 @@
+<mxfile host="celeris-infra-gen" type="device" version="24.7.17">
+  <diagram id="DC-0" name="DC-0">
+    <mxGraphModel dx="0" dy="0" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="830" background="#FFFFFF" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <object id="DC-0-1" label="&lt;b&gt;Figura 1.1 — Topología ejecutiva del centro de datos híbrido&lt;/b&gt;&lt;br&gt;DC-0 · Centro de datos v1.1 · 2026-11-23 · inventario v1.2 · huella de la fuente f548c168 · CE0331 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="DC-0" titulo="Figura 1.1 — Topología ejecutiva del centro de datos híbrido">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;align=left;spacingLeft=10;fontSize=13;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="20" y="10" width="1200" height="44" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-0-2" label="&lt;b&gt;Internet&lt;/b&gt;&lt;br&gt;usuarios y respaldos" celeris_id="INTERNET" celeris_tipo="zona" confianza="Nula" proposito="Internet pública: ISP, orígenes web, ACME, feeds y S3 (bucket celeris-backups)" tooltip="INTERNET: Internet pública: ISP, orígenes web, ACME, feeds y S3 (bucket celeris-backups). Regla: Entrada solo 443 (y 80 → redirección) hacia PORTAL01 por NAT 1:1 en el FortiGate y 443 hacia EC2-GW; señuelos en ventana autorizada">
+          <mxCell style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#4D4D4D;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="40" y="120" width="200" height="90" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-0-3" label="&lt;b&gt;On-premise · Campus Juliaca&lt;/b&gt; · un rack de 12U · ESXi gratuito, un host" celeris_rol="campus">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#1A1A1A;strokeWidth=2;verticalAlign=top;align=left;spacingLeft=8;spacingTop=4;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="280" y="90" width="640" height="520" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-0-4" label="&lt;b&gt;FGT-EXT&lt;/b&gt; · FortiGate existente · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;WAN 203.0.113.10 · tránsito 10.20.0.1&lt;br&gt;&lt;i&gt;FortiGate existente: IP pública, NAT 1:1 y FortiGuard&lt;/i&gt;" celeris_id="FGT-EXT" celeris_tipo="componente" ip="WAN 203.0.113.10 · tránsito 10.20.0.1" zona="PERIMETRO, TRANSITO" criticidad="Alta" estado="existente" por_que="Ya filtra con FortiGuard y tiene la IP pública 203.0.113.10; FW01 cuelga de su red de tránsito 10.20.0.0/29. Reemplazarlo sería sobreingeniería y no lo controla el equipo [S-29]." aporta="Conserva la IP pública 203.0.113.10 [S-15] y hace NAT 1:1 hacia 10.20.0.2 solo para UDP 500/4500 (IPsec con NAT-T) y TCP 80/443 (portal); excluye a EDGE01/02 de su inspección SSL profunda [S-29]; FortiGuard filtra la salida de los nodos; necesita una ruta estática a 10.20.0.0/16 vía 10.20.0.2." si_falla="Todo el campus sin Internet y FW01 (10.20.0.2) sin salida a la WAN, incluida la VPN a AWS (VTI1 y VTI2); no depende del proyecto." flujos="" pruebas="T26, T56" placeholders="1" tooltip="FGT-EXT · Alta&#10;Por qué: Ya filtra con FortiGuard y tiene la IP pública 203.0.113.10; FW01 cuelga de su red de tránsito 10.20.0.0/29. Reemplazarlo sería sobreingeniería y no lo controla el equipo [S-29].&#10;Aporta: Conserva la IP pública 203.0.113.10 [S-15] y hace NAT 1:1 hacia 10.20.0.2 solo para UDP 500/4500 (IPsec con NAT-T) y TCP 80/443 (portal); excluye a EDGE01/02 de su inspección SSL profunda [S-29]; FortiGuard filtra la salida de los nodos; necesita una ruta estática a 10.20.0.0/16 vía 10.20.0.2.&#10;Si falla: Todo el campus sin Internet y FW01 (10.20.0.2) sin salida a la WAN, incluida la VPN a AWS (VTI1 y VTI2); no depende del proyecto.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#999999;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;dashed=1;dashPattern=3 3;" parent="1" vertex="1">
+            <mxGeometry x="300" y="130" width="300" height="90" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-5" value="">
+          <mxGeometry x="305" y="136" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-0-6" label="&lt;b&gt;ESX01&lt;/b&gt; · Servidor ESXi · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;12 núcleos · 96 GB RAM · 4 NIC · formato 2U · 11 VM · 27 vCPU · 60 GB (F2)&lt;br&gt;&lt;i&gt;Hospeda las 10 VM de la fase F1 (23 vCPU)&lt;/i&gt;" celeris_id="ESX01" celeris_tipo="componente" ip="10.20.10.10" zona="MGMT" criticidad="Alta" estado="diseño" por_que="Aloja todas las VM del diseño en un solo servidor 2U de 12 núcleos y 96 GB [S-08]; la licencia gratuita limita cada VM a 8 vCPU." aporta="vSwitch0 (vmnic0 + vmnic1, trunk con PG-MGMT, PG-SERVERS, PG-LAB, PG-DMZ-SVC, PG-DMZ-HONEY, PG-SEC, PG-EDGE y PG-FW-TRUNK) y vSwitch1 (vmnic2, PG-TRANSITO hacia el FortiGate, solo FW01); sin port groups de captura ni vSwitch de almacenamiento (se retiró vmk1, CI-39)." si_falla="Caen todas las VM, incluido FW01. Mitigación: UPS01 con apagado ordenado por NUT, VM reconstruibles desde plantillas e IaC, respaldos 3-2-1-1-0 (D2.9)." flujos="F20" pruebas="T06, T13, T25, T27, T34, T45, T46, T47, T54, T57" placeholders="1" tooltip="ESX01 · Alta&#10;Por qué: Aloja todas las VM del diseño en un solo servidor 2U de 12 núcleos y 96 GB [S-08]; la licencia gratuita limita cada VM a 8 vCPU.&#10;Aporta: vSwitch0 (vmnic0 + vmnic1, trunk con PG-MGMT, PG-SERVERS, PG-LAB, PG-DMZ-SVC, PG-DMZ-HONEY, PG-SEC, PG-EDGE y PG-FW-TRUNK) y vSwitch1 (vmnic2, PG-TRANSITO hacia el FortiGate, solo FW01); sin port groups de captura ni vSwitch de almacenamiento (se retiró vmk1, CI-39).&#10;Si falla: Caen todas las VM, incluido FW01. Mitigación: UPS01 con apagado ordenado por NUT, VM reconstruibles desde plantillas e IaC, respaldos 3-2-1-1-0 (D2.9).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0072B2;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="300" y="260" width="600" height="330" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.virtual_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-7" value="">
+          <mxGeometry x="305" y="266" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-0-8" label="&lt;b&gt;FW01&lt;/b&gt; · Firewall OPNsense · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;4 vCPU · 8 GB · tránsito 10.20.0.2&lt;br&gt;&lt;i&gt;Ruteo entre zonas, deny-all, IPS, VPN, DNS y NTP&lt;/i&gt;" celeris_id="FW01" celeris_tipo="componente" ip="wan 10.20.0.2 · vlan10 10.20.10.1 · vlan20 10.20.20.1 · vlan30 10.20.32.1 · vlan40 10.20.40.1 · vlan41 10.20.41.1 · vlan50 10.20.50.1 · vlan60 10.20.60.1" zona="PERIMETRO, TRANSITO, MGMT, SERVERS, LAB, DMZ-SVC, DMZ-HONEY, SECURITY, EDGE" criticidad="Alta" estado="diseño" por_que="Todo tráfico entre zonas pasa por FW01 (D-17), de modo que cada flujo tiene una regla y un registro. Además termina la VPN IPsec, ejecuta Suricata y CrowdSec, y presta DNS (Unbound con DNSSEC), NTP y DHCP a las zonas (D-28)." aporta="Se conecta al FortiGate FGT-EXT por la red de tránsito 10.20.0.0/29 (WAN 10.20.0.2; FortiGate 10.20.0.1); una subinterfaz VLAN por zona (10, 20, 30, 40, 41, 50, 60) en el trunk PG-FW-TRUNK; VTI1 y VTI2 con BGP y NAT-T (identidad IKE 203.0.113.10); Unbound con DNSSEC y NTP en la interfaz .1 de cada VLAN (F2), NTS y DoT hacia arriba (F25); cliente ACME del certificado del portal, que entrega por SFTP a PORTAL01 (F33); Suricata IPS inline en tránsito y DMZ-SVC e IDS en las interfaces LAB y SERVERS (DET-02); CrowdSec; DHCP con reservas por rango de laboratorio." si_falla="Se pierde el ruteo entre VLAN, la salida a Internet, la VPN y el DNS y NTP de las zonas (punto único de falla, AM-12). Mitigación: BRK01 y restauración desde el XML en Git, RTO 1 h (D2.9); CARP en H3." flujos="F2, F14, F20, F25, F26, F33" pruebas="T01, T02, T03, T05, T06, T07, T08, T09, T10, T11, T15, T16, T17, T19, T20, T21, T24, T25, T26, T27, T28, T29, T30, T32, T33, T34, T35, T36, T40, T42, T43, T45, T46, T47, T49, T50, T51, T54, T55, T56, T57, T58, T60" placeholders="1" tooltip="FW01 · Alta&#10;Por qué: Todo tráfico entre zonas pasa por FW01 (D-17), de modo que cada flujo tiene una regla y un registro. Además termina la VPN IPsec, ejecuta Suricata y CrowdSec, y presta DNS (Unbound con DNSSEC), NTP y DHCP a las zonas (D-28).&#10;Aporta: Se conecta al FortiGate FGT-EXT por la red de tránsito 10.20.0.0/29 (WAN 10.20.0.2; FortiGate 10.20.0.1); una subinterfaz VLAN por zona (10, 20, 30, 40, 41, 50, 60) en el trunk PG-FW-TRUNK; VTI1 y VTI2 con BGP y NAT-T (identidad IKE 203.0.113.10); Unbound con DNSSEC y NTP en la interfaz .1 de cada VLAN (F2), NTS y DoT hacia arriba (F25); cliente ACME del certificado del portal, que entrega por SFTP a PORTAL01 (F33); Suricata IPS inline en tránsito y DMZ-SVC e IDS en las interfaces LAB y SERVERS (DET-02); CrowdSec; DHCP con reservas por rango de laboratorio.&#10;Si falla: Se pierde el ruteo entre VLAN, la salida a Internet, la VPN y el DNS y NTP de las zonas (punto único de falla, AM-12). Mitigación: BRK01 y restauración desde el XML en Git, RTO 1 h (D2.9); CARP en H3.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#999999;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="320" y="330" width="270" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-9" value="">
+          <mxGeometry x="325" y="336" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-0-10" label="&lt;b&gt;EDGE01&lt;/b&gt; · Nodo Celeris 1 · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;4 vCPU · 8 GB · 10.20.60.10&lt;br&gt;&lt;i&gt;Proxy de caché explícito en TCP 3128&lt;/i&gt;" celeris_id="EDGE01" celeris_tipo="componente" ip="10.20.60.10" zona="EDGE" criticidad="Alta" estado="diseño" por_que="Es el proxy de caché que reduce las descargas repetidas por el enlace de 300 Mbps [S-02]; atiende TCP 3128 de LAB (F1) y, sin descifrar, de WIFI-EST (F31)." aporta="Cachea según RFC 9111, descifra solo dominios listados, sale a Internet por TCP 80/443 vía el FortiGate (F8) y recibe configuración firmada de CTRL01 por 8443 (F10); sirve el PAC en TCP 80 (F3) con dos registros A (EDGE01 y EDGE02); para WIFI-EST siempre passthrough (REQ-F-36); administración y métricas en 9128." si_falla="El PAC conmuta a EDGE02 y, si ambos caen, a DIRECT (T09); en el piloto F6 lo permite. Mitigación: dos nodos y DIRECT." flujos="F1, F3, F13, F31" pruebas="T05, T07, T09, T11, T13, T14, T18, T19, T26, T27, T30, T31, T34, T36, T45, T46, T47, T50, T51, T52, T55, T56, T57, T58, T60" placeholders="1" tooltip="EDGE01 · Alta&#10;Por qué: Es el proxy de caché que reduce las descargas repetidas por el enlace de 300 Mbps [S-02]; atiende TCP 3128 de LAB (F1) y, sin descifrar, de WIFI-EST (F31).&#10;Aporta: Cachea según RFC 9111, descifra solo dominios listados, sale a Internet por TCP 80/443 vía el FortiGate (F8) y recibe configuración firmada de CTRL01 por 8443 (F10); sirve el PAC en TCP 80 (F3) con dos registros A (EDGE01 y EDGE02); para WIFI-EST siempre passthrough (REQ-F-36); administración y métricas en 9128.&#10;Si falla: El PAC conmuta a EDGE02 y, si ambos caen, a DIRECT (T09); en el piloto F6 lo permite. Mitigación: dos nodos y DIRECT.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="610" y="330" width="270" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-11" value="">
+          <mxGeometry x="615" y="336" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-0-12" label="&lt;b&gt;CTRL01&lt;/b&gt; · Plano de control Celeris · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;2 vCPU · 8 GB · 10.20.20.10&lt;br&gt;&lt;i&gt;Consola, base local, CA interna y firma de configuración&lt;/i&gt;" celeris_id="CTRL01" celeris_tipo="componente" ip="10.20.20.10" zona="SERVERS" criticidad="Alta" estado="diseño" por_que="El encargado necesita un lugar para decidir qué se cachea y quién accede, y el nodo necesita una configuración firmada que no se pueda alterar. Vive en el campus para que el nodo no dependa de Internet y la llave de firma y los datos no salgan de él (D-25)." aporta="SPA + API (axum) + PostgreSQL local por socket (sin puerto en la red) + CA interna (step-ca). Atiende TCP 8443 con mTLS desde EDGE01/02 (F10), TCP 443 desde ENC01 (F28) y desde EC2-GW con mTLS dentro de IPsec (F30); envía eventos a SIEM01 (F13) y respalda con restic a S3 (F18)." si_falla="El nodo sigue con la última configuración válida y no se pueden hacer cambios. Mitigación: copia local y en S3 (F18), restauración en una EC2 temporal de app-a, RTO 2 h y RPO 15 min (D2.9, T59)." flujos="F10, F13, F18, F28, F30" pruebas="T01, T02, T05, T11, T18, T19, T21, T27, T29, T30, T31, T34, T36, T40, T45, T46, T47, T50, T51, T52, T53, T54, T57, T58, T59" placeholders="1" tooltip="CTRL01 · Alta&#10;Por qué: El encargado necesita un lugar para decidir qué se cachea y quién accede, y el nodo necesita una configuración firmada que no se pueda alterar. Vive en el campus para que el nodo no dependa de Internet y la llave de firma y los datos no salgan de él (D-25).&#10;Aporta: SPA + API (axum) + PostgreSQL local por socket (sin puerto en la red) + CA interna (step-ca). Atiende TCP 8443 con mTLS desde EDGE01/02 (F10), TCP 443 desde ENC01 (F28) y desde EC2-GW con mTLS dentro de IPsec (F30); envía eventos a SIEM01 (F13) y respalda con restic a S3 (F18).&#10;Si falla: El nodo sigue con la última configuración válida y no se pueden hacer cambios. Mitigación: copia local y en S3 (F18), restauración en una EC2 temporal de app-a, RTO 2 h y RPO 15 min (D2.9, T59).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#009E73;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="320" y="450" width="270" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-13" value="">
+          <mxGeometry x="325" y="456" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-0-14" label="&lt;b&gt;SIEM01&lt;/b&gt; · Wazuh · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;4 vCPU · 12 GB · 10.20.50.10&lt;br&gt;&lt;i&gt;Correlación de alertas de todo el diseño&lt;/i&gt;" celeris_id="SIEM01" celeris_tipo="componente" ip="10.20.50.10" zona="SECURITY" criticidad="Alta" estado="diseño" por_que="Correlaciona la telemetría de todo el diseño (agentes, Suricata, WAF, honeypots, Celeris, firewall) y es la evidencia de que cada escenario de ataque produce una alerta de nivel ≥ 10. Queda en el campus porque las alertas incluyen IP del campus." aporta="Recibe agentes en TCP 1514/1515 (F13) y syslog TLS en 6514 (F14); dashboard por HTTPS (F20); descarga reglas y feeds por TCP 443 (F26). ≈ 8 agentes + Suricata + WAF + firewall en 12 GB y 300 GB para ≈ 90 días (D2.8; Wazuh todo en uno admite hasta 25 agentes con 8 GiB, CI-78)." si_falla="Se pierde la correlación y el registro centralizado. Mitigación: snapshots del indexer en el datastore local y semanales en S3, RTO 4 h, RPO 24 h (D2.9)." flujos="F13, F14, F26" pruebas="T05, T11, T13, T14, T15, T18, T19, T28, T29, T30, T31, T32, T33, T34, T43, T45, T47, T53, T54, T58" placeholders="1" tooltip="SIEM01 · Alta&#10;Por qué: Correlaciona la telemetría de todo el diseño (agentes, Suricata, WAF, honeypots, Celeris, firewall) y es la evidencia de que cada escenario de ataque produce una alerta de nivel ≥ 10. Queda en el campus porque las alertas incluyen IP del campus.&#10;Aporta: Recibe agentes en TCP 1514/1515 (F13) y syslog TLS en 6514 (F14); dashboard por HTTPS (F20); descarga reglas y feeds por TCP 443 (F26). ≈ 8 agentes + Suricata + WAF + firewall en 12 GB y 300 GB para ≈ 90 días (D2.8; Wazuh todo en uno admite hasta 25 agentes con 8 GiB, CI-78).&#10;Si falla: Se pierde la correlación y el registro centralizado. Mitigación: snapshots del indexer en el datastore local y semanales en S3, RTO 4 h, RPO 24 h (D2.9).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#56B4E9;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="610" y="450" width="270" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-15" value="">
+          <mxGeometry x="615" y="456" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-0-16" label="&lt;b&gt;AWS&lt;/b&gt; · zona AWS · confianza Baja · us-east-1 · 10.30.0.0/16" celeris_id="AWS" celeris_tipo="zona" cidr="10.30.0.0/16" confianza="Baja" proposito="VPC celeris (10.30.0.0/16): EC2-GW (panel remoto), S3 de respaldos y subred privada vacía para el simulacro de recuperación" tooltip="AWS: VPC celeris (10.30.0.0/16): EC2-GW (panel remoto), S3 de respaldos y subred privada vacía para el simulacro de recuperación. Regla: Alcanzable solo por VPN desde el campus; desde Internet solo EC2-GW:443; Security Groups y NACL de D2.5">
+          <mxCell style="shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_aws_cloud_alt;strokeColor=#232F3E;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=top;align=left;spacingLeft=30;fontSize=11;fontColor=#232F3E;container=0;dashed=0;" parent="1" vertex="1">
+            <mxGeometry x="1040" y="90" width="520" height="520" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-0-17" label="&lt;b&gt;VGW&lt;/b&gt; · Virtual Private Gateway · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;2 túneles IPsec · ASN 64512&lt;br&gt;&lt;i&gt;Extremo AWS de la VPN con BGP&lt;/i&gt;" celeris_id="VGW" celeris_tipo="componente" ip="IP públicas asignadas por AWS (1 por túnel)" zona="AWS" criticidad="Alta" estado="diseño" por_que="Es el extremo AWS de la VPN site-to-site: anuncia 10.30.0.0/16 por BGP (ASN 64512) y aprende 10.20.0.0/16 sin cambios manuales. Transporta F30 y F13; lo exige la rúbrica de conectividad híbrida." aporta="Dos túneles IPsec IKEv2 (activo/pasivo) con IP asignadas por AWS; propaga rutas a rt-public y rt-private." si_falla="Se pierde la conectividad híbrida; el campus sigue funcionando (el DIRECT y los nodos no dependen de AWS). Mitigación: entorno AWS recreable desde OpenTofu, RTO 15 min (D2.9)." flujos="" pruebas="T01, T02, T05, T21, T58" placeholders="1" tooltip="VGW · Alta&#10;Por qué: Es el extremo AWS de la VPN site-to-site: anuncia 10.30.0.0/16 por BGP (ASN 64512) y aprende 10.20.0.0/16 sin cambios manuales. Transporta F30 y F13; lo exige la rúbrica de conectividad híbrida.&#10;Aporta: Dos túneles IPsec IKEv2 (activo/pasivo) con IP asignadas por AWS; propaga rutas a rt-public y rt-private.&#10;Si falla: Se pierde la conectividad híbrida; el campus sigue funcionando (el DIRECT y los nodos no dependen de AWS). Mitigación: entorno AWS recreable desde OpenTofu, RTO 15 min (D2.9).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8C4FFF;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1060" y="130" width="480" height="80" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpn_gateway;fillColor=#8C4FFF;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-18" value="">
+          <mxGeometry x="1065" y="136" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-0-19" label="&lt;b&gt;EC2-GW&lt;/b&gt; · Proxy inverso del panel remoto · &lt;b&gt;MEDIA&lt;/b&gt;&lt;br&gt;t3.micro · 2 vCPU · 1 GiB · 8 GB gp3 · 10.30.0.10&lt;br&gt;&lt;i&gt;Panel remoto sin exponer ningún puerto del campus&lt;/i&gt;" celeris_id="EC2-GW" celeris_tipo="componente" ip="10.30.0.10" zona="AWS" criticidad="Media" estado="diseño" por_que="Permite al encargado usar la consola desde fuera del campus sin publicar ningún puerto del campus: termina TLS, aplica el WAF y reenvía solo la consola a CTRL01:443 por la VPN. No guarda datos ni llaves de firma." aporta="Caddy con certificado público (ACME), TLS 1.3, HSTS, Coraza (OWASP CRS) y límite de intentos; recibe TCP 443 de Internet (F29) y reenvía solo a CTRL01:443 por IPsec con su certificado de cliente (mTLS, F30); su salida está limitada a CTRL01:443, SIEM01:1514/1515 (F13) y TCP 443 a Internet (ACME y actualizaciones). t3.micro con 8 GB gp3 en pub-a." si_falla="Solo se pierde el acceso remoto; la consola local sigue (ENC01). Si se compromete, se destruye y se recrea con OpenTofu en 15 min." flujos="F13, F29, F30" pruebas="T01, T02, T03, T05, T11, T18, T19, T21, T27, T30, T31, T47, T53, T54, T58" placeholders="1" tooltip="EC2-GW · Media&#10;Por qué: Permite al encargado usar la consola desde fuera del campus sin publicar ningún puerto del campus: termina TLS, aplica el WAF y reenvía solo la consola a CTRL01:443 por la VPN. No guarda datos ni llaves de firma.&#10;Aporta: Caddy con certificado público (ACME), TLS 1.3, HSTS, Coraza (OWASP CRS) y límite de intentos; recibe TCP 443 de Internet (F29) y reenvía solo a CTRL01:443 por IPsec con su certificado de cliente (mTLS, F30); su salida está limitada a CTRL01:443, SIEM01:1514/1515 (F13) y TCP 443 a Internet (ACME y actualizaciones). t3.micro con 8 GB gp3 en pub-a.&#10;Si falla: Solo se pierde el acceso remoto; la consola local sigue (ENC01). Si se compromete, se destruye y se recrea con OpenTofu en 15 min.">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=2;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1060" y="250" width="480" height="100" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;fillColor=#ED7100;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-20" value="">
+          <mxGeometry x="1065" y="256" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-0-21" label="&lt;b&gt;S3&lt;/b&gt; · Respaldos con Object Lock · &lt;b&gt;ALTA&lt;/b&gt;&lt;br&gt;≈ 300 GB · versionado · Object Lock 30 d (compliance)&lt;br&gt;&lt;i&gt;Copia fuera del sitio inmutable por 30 días&lt;/i&gt;" celeris_id="S3" celeris_tipo="componente" ip="bucket celeris-backups · Object Lock 30 días" zona="AWS" criticidad="Alta" estado="diseño" por_que="Es la copia fuera del sitio que nadie del campus puede borrar: Object Lock de 30 días en modo compliance sobre respaldos que restic cifra en origen." aporta="Bucket celeris-backups regional con versionado y Object Lock (30 días, modo compliance); recibe TCP 443 de CTRL01 por Internet (F18) y solo acepta la IP pública del campus; credencial aparte con solo s3:PutObject y condición de IP de origen [S-30]; la llave de restic no está en AWS." si_falla="Se pierde la copia externa; queda la copia local en el datastore (D2.9)." flujos="" pruebas="T40, T59" placeholders="1" tooltip="S3 · Alta&#10;Por qué: Es la copia fuera del sitio que nadie del campus puede borrar: Object Lock de 30 días en modo compliance sobre respaldos que restic cifra en origen.&#10;Aporta: Bucket celeris-backups regional con versionado y Object Lock (30 días, modo compliance); recibe TCP 443 de CTRL01 por Internet (F18) y solo acepta la IP pública del campus; credencial aparte con solo s3:PutObject y condición de IP de origen [S-30]; la llave de restic no está en AWS.&#10;Si falla: Se pierde la copia externa; queda la copia local en el datastore (D2.9).">
+          <mxCell style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#232F3E;strokeWidth=3;align=left;verticalAlign=top;spacingLeft=32;spacingTop=2;spacingRight=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1060" y="400" width="480" height="120" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;fillColor=#7AA116;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-22" value="">
+          <mxGeometry x="1065" y="406" width="22" height="22" as="geometry" />
+        </mxCell>
+        <object id="DC-0-23" label="" celeris_id="INTERNET&gt;FGT-EXT" celeris_tipo="enlace" enlace_a="INTERNET" enlace_b="FGT-EXT" etiqueta="">
+          <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="240" y="165" as="sourcePoint" />
+              <mxPoint x="300" y="175" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-0-24" label="tránsito" celeris_id="FGT-EXT&gt;FW01" celeris_tipo="enlace" enlace_a="FGT-EXT" enlace_b="FW01" etiqueta="tránsito">
+          <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="312" y="220" as="sourcePoint" />
+              <mxPoint x="320" y="360" as="targetPoint" />
+              <Array as="points">
+                <mxPoint x="312" y="360" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-0-25" label="" celeris_id="FW01&gt;EDGE01" celeris_tipo="enlace" enlace_a="FW01" enlace_b="EDGE01" etiqueta="">
+          <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="590" y="380" as="sourcePoint" />
+              <mxPoint x="610" y="380" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-0-26" label="VPN IPsec (FIG-5.4 de CE0311)" celeris_id="FW01&gt;VGW" celeris_tipo="enlace" enlace_a="FW01" enlace_b="VGW" etiqueta="VPN IPsec (FIG-5.4 de CE0311)">
+          <mxCell style="html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="900" y="380" as="sourcePoint" />
+              <mxPoint x="1060" y="170" as="targetPoint" />
+              <Array as="points">
+                <mxPoint x="960" y="380" />
+                <mxPoint x="960" y="170" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-0-27" label="" celeris_id="VGW&gt;EC2-GW" celeris_tipo="enlace" enlace_a="VGW" enlace_b="EC2-GW" etiqueta="">
+          <mxCell style="html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="1300" y="210" as="sourcePoint" />
+              <mxPoint x="1300" y="250" as="targetPoint" />
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-0-28" label="respaldo cifrado, TCP 443 (F18)" celeris_id="CTRL01&gt;S3" celeris_tipo="enlace" enlace_a="CTRL01" enlace_b="S3" etiqueta="respaldo cifrado, TCP 443 (F18)">
+          <mxCell style="dashed=1;dashPattern=3 3;html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1">
+            <mxGeometry relative="1" as="geometry">
+              <mxPoint x="590" y="500" as="sourcePoint" />
+              <mxPoint x="1060" y="470" as="targetPoint" />
+              <Array as="points">
+                <mxPoint x="590" y="640" />
+                <mxPoint x="1000" y="640" />
+                <mxPoint x="1000" y="470" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="DC-0-29" label="&lt;b&gt;Reparto campus / nube (D-25).&lt;/b&gt; En el campus: nodos de caché, consola y base, SIEM y firewall; en AWS: solo EC2-GW (sin datos ni llaves) y S3 (respaldos cifrados en origen). La caché no va en AWS (D-19)." celeris_rol="reparto" celeris_ref="ESX01">
+          <mxCell style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#1A1A1A;align=left;verticalAlign=top;spacingLeft=6;spacingRight=4;spacingTop=2;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="280" y="680" width="1280" height="90" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-0-30" label="&lt;b&gt;Leyenda&lt;/b&gt;" celeris_rol="leyenda">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1600" y="70" width="360" height="222" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-31" value="&lt;b&gt;Criticidad&lt;/b&gt; (grosor del borde + etiqueta):">
+          <mxGeometry x="1608" y="96" width="360" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-0-32" value="&lt;b&gt;ALTA&lt;/b&gt; · borde 3 px">
+          <mxGeometry x="1608" y="116" width="104" height="28" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-0-33" value="&lt;b&gt;MEDIA&lt;/b&gt; · borde 2 px">
+          <mxGeometry x="1720" y="116" width="104" height="28" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-0-34" value="&lt;b&gt;BAJA&lt;/b&gt; · borde 1 px">
+          <mxGeometry x="1832" y="116" width="104" height="28" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;dashed=1;dashPattern=2 2;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-0-35" value="interfaz de un equipo en otra zona">
+          <mxGeometry x="1608" y="150" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell style="rounded=1;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=2;dashed=1;dashPattern=6 3;fontSize=10;fontColor=#1A1A1A;" parent="1" vertex="1" id="DC-0-36" value="existente, fuera de alcance">
+          <mxGeometry x="1776" y="150" width="160" height="26" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-37" value="&lt;b&gt;Íconos&lt;/b&gt; (draw.io redes / AWS4):">
+          <mxGeometry x="1608" y="184" width="300" height="16" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.ec2;fillColor=#ED7100;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-38" value="">
+          <mxGeometry x="1608" y="204" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-39" value="Instancia EC2">
+          <mxGeometry x="1632" y="204" width="88" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.s3;fillColor=#7AA116;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-40" value="">
+          <mxGeometry x="1722" y="204" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-41" value="Bucket S3">
+          <mxGeometry x="1746" y="204" width="88" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-42" value="">
+          <mxGeometry x="1836" y="204" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-43" value="Firewall">
+          <mxGeometry x="1860" y="204" width="88" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.networks.firewall;fillColor=#FFFFFF;strokeColor=#4D4D4D;dashed=1;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-44" value="">
+          <mxGeometry x="1608" y="230" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-45" value="Firewall existente (DTI)">
+          <mxGeometry x="1632" y="230" width="88" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.networks.virtual_server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-46" value="">
+          <mxGeometry x="1722" y="230" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-47" value="Hipervisor">
+          <mxGeometry x="1746" y="230" width="88" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.networks.server;fillColor=#CCCCCC;strokeColor=#4D4D4D;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-48" value="">
+          <mxGeometry x="1836" y="230" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-49" value="Servidor / VM">
+          <mxGeometry x="1860" y="230" width="88" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.vpn_gateway;fillColor=#8C4FFF;strokeColor=#FFFFFF;html=1;aspect=fixed;outlineConnect=0;dashed=0;" parent="1" vertex="1" id="DC-0-50" value="">
+          <mxGeometry x="1608" y="256" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-51" value="VGW de AWS">
+          <mxGeometry x="1632" y="256" width="88" height="20" as="geometry" />
+        </mxCell>
+        <object id="DC-0-52" label="&lt;b&gt;Enlaces&lt;/b&gt; (el estilo y el texto de la etiqueta dicen qué es):" celeris_rol="leyenda_enlaces">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;fontSize=11;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1600" y="300" width="360" height="54" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell style="html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=2.5;" parent="1" edge="1" id="DC-0-53" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1608" y="337" as="sourcePoint" />
+            <mxPoint x="1652" y="337" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-54" value="enlace">
+          <mxGeometry x="1658" y="328" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="html=1;endArrow=none;strokeColor=#8C4FFF;strokeWidth=3;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;" parent="1" edge="1" id="DC-0-55" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1722" y="337" as="sourcePoint" />
+            <mxPoint x="1766" y="337" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-56" value="VPN IPsec">
+          <mxGeometry x="1772" y="328" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell style="dashed=1;dashPattern=3 3;html=1;endArrow=none;strokeColor=#7F7F7F;fontSize=10;labelBackgroundColor=#FFFFFF;fontColor=#1A1A1A;strokeWidth=1.5;" parent="1" edge="1" id="DC-0-57" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1836" y="337" as="sourcePoint" />
+            <mxPoint x="1880" y="337" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell style="text;html=1;align=left;verticalAlign=middle;fontSize=10;fontColor=#1A1A1A;whiteSpace=wrap;" parent="1" vertex="1" id="DC-0-58" value="respaldo (cifrado en origen)">
+          <mxGeometry x="1886" y="328" width="60" height="20" as="geometry" />
+        </mxCell>
+        <object id="DC-0-59" label="&lt;b&gt;Qué aporta y qué pasa si falla&lt;/b&gt;&lt;br&gt;&lt;b&gt;FGT-EXT&lt;/b&gt; — FortiGate existente: IP pública, NAT 1:1 y FortiGuard. &lt;i&gt;Si falla:&lt;/i&gt; Todo el campus sin Internet y FW01 (10.20.0.2) sin salida a la WAN, incluida…&lt;br&gt;&lt;b&gt;ESX01&lt;/b&gt; — Hospeda las 10 VM de la fase F1 (23 vCPU). &lt;i&gt;Si falla:&lt;/i&gt; Caen todas las VM, incluido FW01&lt;br&gt;&lt;b&gt;FW01&lt;/b&gt; — Ruteo entre zonas, deny-all, IPS, VPN, DNS y NTP. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde el ruteo entre VLAN, la salida a Internet, la VPN y el DNS y NTP de…&lt;br&gt;&lt;b&gt;EDGE01&lt;/b&gt; — Proxy de caché explícito en TCP 3128. &lt;i&gt;Si falla:&lt;/i&gt; El PAC conmuta a EDGE02 y, si ambos caen, a DIRECT (T09)&lt;br&gt;&lt;b&gt;CTRL01&lt;/b&gt; — Consola, base local, CA interna y firma de configuración. &lt;i&gt;Si falla:&lt;/i&gt; El nodo sigue con la última configuración válida y no se pueden hacer cambios" celeris_rol="panel" componentes="FGT-EXT, ESX01, FW01, EDGE01, CTRL01, SIEM01, VGW, EC2-GW, S3">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1600.0" y="370" width="175.0" height="294" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="DC-0-60" label="&lt;b&gt;…continúa&lt;/b&gt;&lt;br&gt;&lt;b&gt;SIEM01&lt;/b&gt; — Correlación de alertas de todo el diseño. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde la correlación y el registro centralizado&lt;br&gt;&lt;b&gt;VGW&lt;/b&gt; — Extremo AWS de la VPN con BGP. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde la conectividad híbrida&lt;br&gt;&lt;b&gt;EC2-GW&lt;/b&gt; — Panel remoto sin exponer ningún puerto del campus. &lt;i&gt;Si falla:&lt;/i&gt; Solo se pierde el acceso remoto&lt;br&gt;&lt;b&gt;S3&lt;/b&gt; — Copia fuera del sitio inmutable por 30 días. &lt;i&gt;Si falla:&lt;/i&gt; Se pierde la copia externa" celeris_rol="panel" componentes="FGT-EXT, ESX01, FW01, EDGE01, CTRL01, SIEM01, VGW, EC2-GW, S3">
+          <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#4D4D4D;align=left;verticalAlign=top;spacingLeft=8;spacingRight=6;spacingTop=4;fontSize=9;fontColor=#1A1A1A;" parent="1" vertex="1">
+            <mxGeometry x="1785.0" y="370" width="175.0" height="198" as="geometry" />
+          </mxCell>
+        </object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

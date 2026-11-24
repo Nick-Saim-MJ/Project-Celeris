@@ -180,6 +180,8 @@ Los S-16 a S-19 y S-25 ya tienen uso en el repositorio (desfase de reloj, ruta h
 | S-30 | IAM para respaldos | La cuenta permite una credencial de solo escritura en el bucket | Confirmar con el docente | Nick |
 | S-31 | Certificado del portal | El FortiGate permite a FW01 llegar a los endpoints ACME de la CA elegida (TCP 443 y 80); PORTAL01 no sale a la WAN | Reunión con la DTI y prueba de renovación en el Modo H (T49) | Henyelrey |
 | S-32 | Nombre del portal | El FQDN público lo entrega la DTI; hasta entonces el diseño y las pruebas usan el nombre de trabajo `portal.celeris.internal` y el Modo H lo sustituye por el real | La DTI entrega el dominio y FW01 emite el certificado por ACME (T16, T49) | Henyelrey |
+| S-33 | Carga esperada de EC2-GW | 10 sesiones simultáneas del panel (una por laboratorio, derivadas de S-26), 5 solicitudes por segundo, 0,10 vCPU de media y 512 MiB de RAM | Medición con el piloto en S2; si supera la línea base del t3.micro, pasar a t3.small | Nick |
+| S-34 | Plazo de reposición del servidor físico | Sin plazo definido; el que acuerde la DTI (garantía, repuesto o servidor de contingencia) | Confirmar con la DTI antes de S2; es el RTO de la caída de ESX01 | Henyelrey |
 
 > Un supuesto que no se valida se declara como limitación en el informe. Nunca se presenta como dato.
 
@@ -187,7 +189,7 @@ Los S-16 a S-19 y S-25 ya tienen uso en el repositorio (desfase de reloj, ruta h
 
 | Prefijo | Qué identifica | Definido en | Rango vigente |
 | --- | --- | --- | --- |
-| S-xx | Supuesto | 00 M5 | S-01…S-32 |
+| S-xx | Supuesto | 00 M5 | S-01…S-34 |
 | OB-x | Objetivo del proyecto | CE01 B2.1 | OB-1…OB-5 |
 | RE-xx / RP-xx | Riesgo estratégico / de proyecto | CE01 B1.8 / B3.6 | RE-01…RE-12 / RP-01…RP-07 |
 | P1, P2 | Proceso | CE01 B4 | — |

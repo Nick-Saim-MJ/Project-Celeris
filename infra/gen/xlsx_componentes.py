@@ -544,24 +544,58 @@ def _recalcular_libreoffice(exe: str, origen: Path, destino: Path) -> None:
     shutil.move(hecho, destino)
 
 
+def _wsl_con_soffice() -> bool:
+    """En Windows, LibreOffice puede vivir en WSL (el mismo criterio que V-74)."""
+    if sys.platform != "win32" or not shutil.which("wsl"):
+        return False
+    try:
+        r = subprocess.run(["wsl", "-u", "root", "--", "sh", "-c", "command -v soffice"], capture_output=True, timeout=60)
+        return r.returncode == 0 and bool(r.stdout.strip())
+    except (subprocess.SubprocessError, OSError):
+        return False
+
+
+def _ruta_wsl(ruta: Path) -> str:
+    p = ruta.resolve()
+    return f"/mnt/{p.drive[0].lower()}/" + "/".join(p.parts[1:])
+
+
+def _recalcular_wsl(origen: Path, destino: Path) -> None:
+    out = destino.parent / "lo"
+    out.mkdir(exist_ok=True)
+    r = subprocess.run(["wsl", "-u", "root", "--", "env", "HOME=/root", "soffice", "-env:UserInstallation=file:///tmp/lo-perfil-celeris", "--headless",
+                        "--calc", "--convert-to", "xlsx", "--outdir", _ruta_wsl(out), _ruta_wsl(origen)], capture_output=True, text=True, timeout=240)
+    hecho = out / origen.name
+    if r.returncode != 0 or not hecho.exists():
+        raise RuntimeError(r.stderr.strip() or "LibreOffice (WSL) no convirtió el archivo")
+    shutil.move(hecho, destino)
+
+
+def recalcular_copia(origen: Path, destino: Path) -> str:
+    """Recalcula con LibreOffice (nativo o en WSL) y, si no hay, con Excel (COM). Devuelve el nombre del motor."""
+    lo = shutil.which("soffice") or shutil.which("libreoffice")
+    if lo:
+        _recalcular_libreoffice(lo, origen, destino)
+        return "LibreOffice headless"
+    if _wsl_con_soffice():
+        _recalcular_wsl(origen, destino)
+        return "LibreOffice headless (WSL)"
+    if sys.platform == "win32":
+        _recalcular_excel(origen, destino)
+        return "Microsoft Excel (COM)"
+    raise RuntimeError("no hay LibreOffice ni Excel")
+
+
 def verificar(ruta: Path) -> dict:
     sha = hashlib.sha256(ruta.read_bytes()).hexdigest()
     resultado = {"archivo": ruta.relative_to(RAIZ).as_posix(), "sha256": sha, "motor": None, "formulas": 0, "errores": [],
                  "sin_valor": 0, "nota": ""}
-    lo = shutil.which("soffice") or shutil.which("libreoffice")
     with tempfile.TemporaryDirectory() as tmp:
         origen = Path(tmp) / ruta.name
         shutil.copy(ruta, origen)
         destino = Path(tmp) / ("recalc_" + ruta.name)
         try:
-            if lo:
-                _recalcular_libreoffice(lo, origen, destino)
-                resultado["motor"] = "LibreOffice headless"
-            elif sys.platform == "win32":
-                _recalcular_excel(origen, destino)
-                resultado["motor"] = "Microsoft Excel (COM)"
-            else:
-                raise RuntimeError("no hay LibreOffice ni Excel")
+            resultado["motor"] = recalcular_copia(origen, destino)
         except Exception as exc:  # sin motor: se informa, no se simula
             resultado["nota"] = f"No se pudo recalcular: {exc}"
             return resultado

@@ -358,20 +358,20 @@ PORTAL01 sirve un sitio estático firmado, sin base de datos ni login, con certi
 | FW01 | F1 | 4 | 8 | 40 |
 | EDGE01 | F1 | 4 | 8 | 40 + 500 caché |
 | CTRL01 | F1 | 2 | 8 | 100 |
-| SIEM01 | F1 | 4 | 16 | 300 |
+| SIEM01 | F1 | 4 | 12 | 300 |
 | PORTAL01 | F1 | 1 | 2 | 20 |
 | HNY01 | F1 | 1 | 1 | 20 |
 | HNY02 | F1 | 1 | 1 | 10 |
 | JMP01 | F1 | 2 | 4 | 60 |
 | LABCLI01 | F1 | 2 | 4 | 64 |
 | KALI01 | F1 | 2 | 4 | 80 |
-| **Total F1** | | **23** | **56** | **1 234** |
+| **Total F1** | | **23** | **52** | **1 234** |
 | EDGE02 | F2 | 4 | 8 | 40 + 500 caché |
-| **Total F2** | | **27** | **64** | **1 774** |
+| **Total F2** | | **27** | **60** | **1 774** |
 
 **Host:**
 - **CPU:** FW01, EDGE01 y EDGE02 suman 12 vCPU a 2:1, que son 6 núcleos. El resto, 15 vCPU a 4:1, son 3,75 núcleos. En total son ≈ 9,75 núcleos, así que basta un host de **12 núcleos** (≈ 19 % de margen).
-- **RAM:** 64 GB × 1,1 de sobrecarga de ESXi × 1,2 de crecimiento ≈ 84,5 GB, así que hacen falta **96 GB**.
+- **RAM:** 60 GB × 1,1 de sobrecarga de ESXi × 1,2 de crecimiento ≈ 79,2 GB, así que bastan **96 GB** (margen 17,5 %).
 - **Disco:** las VM sin caché suman 774 GB; con un factor de 1,3 son ≈ 1 006 GB, más ≈ 200 GB de copia local de restic. Caben en 2 × 1,92 TB en RAID 1 (≈ 63 % de uso). La caché va en 2 NVMe de 1 TB sin RAID.
 
 El host es más chico que el de la v0.3 (16 núcleos, 128 GB); hay que recalcular S-08.
@@ -418,6 +418,7 @@ AWS cobra cada IP pública de los túneles de la VPN a US$ 0,005 por hora. En el
 | Panel remoto | EC2-GW se recrea con OpenTofu | 15 min | Último commit |
 | Firewall | XML en Git + puerto *break-glass* | 1 h | Último cambio |
 | CA raíz | Offline, dividida en 2 de 3 partes (Shamir) | 1 h | 0 |
+| Caída de ESX01 (host único) | Laboratorios en `DIRECT` por el PAC (navegación sin caché); consola y caché se recuperan al reponer el host restaurando desde S3 (T59) | Plazo de reposición [S-34] + 2 h | Consola 15 min |
 
 ---
 

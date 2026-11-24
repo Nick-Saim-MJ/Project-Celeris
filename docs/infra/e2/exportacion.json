@@ -1,5 +1,10 @@
 {
   "motor": "draw.io Desktop",
-  "escala_png": 3,
+  "escala_png": {
+    "DC-0": 3.0,
+    "DC-1": 3.0,
+    "DC-2": 2.84,
+    "DC-3": 3.0
+  },
   "nota": "Con el respaldo, los stencils de draw.io se dibujan como glifos; el .drawio conserva los íconos de draw.io y es el editable. Con draw.io Desktop: python infra/gen/exportar_dc.py"
 }

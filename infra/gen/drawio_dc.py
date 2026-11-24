@@ -286,7 +286,7 @@ def dc_1(x: Infra, cd: CentroDatos) -> DiagramaDC:
 # DC-2 — Hipervisor
 # --------------------------------------------------------------------------------------------------
 def dc_2(x: Infra, cd: CentroDatos) -> DiagramaDC:
-    d = DiagramaDC(x, cd, "DC-2", 2400, 1500)
+    d = DiagramaDC(x, cd, "DC-2", 2840, 1500)
     d.titulo(w=1560)
     vs0, vs1 = cd.vswitches["vSwitch0"], cd.vswitches["vSwitch1"]
     seg = cd.raw["hipervisor_red"]["seguridad_por_defecto"]

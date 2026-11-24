@@ -1,4 +1,5 @@
-"""Exporta los .drawio de entregables/CE0331/diagramas/ a PNG (escala 3, margen 10) y PDF vectorial, ambos con el XML embebido.
+"""Exporta los .drawio de entregables/CE0331/diagramas/ a PNG (escala 3, margen 10; menor si el PNG pasaría de ~8000 px, límite de draw.io
+Desktop: ver exportar_drawio.escala_png y V-108) y PDF vectorial, ambos con el XML embebido.
 
 Orden de preferencia (igual que CE0311, infra/gen/exportar_drawio.py):
  1. draw.io Desktop, si está (variable DRAWIO, PATH o rutas habituales): es el método de CE0311.
@@ -264,12 +265,14 @@ def main(argv=None) -> int:
         print("error: no hay draw.io Desktop ni Edge/Chrome. No se exportó nada (defina DRAWIO o NAVEGADOR).", file=sys.stderr)
         return 2
     motor = "draw.io Desktop" if exe else f"respaldo propio con {Path(nav).stem} sin interfaz (sin draw.io Desktop)"
+    escalas = {}
     for origen in sorted(Path(a.dir).glob("DC-*.drawio")):
         hechos = ed.exportar(exe, origen) if exe else exportar_respaldo(nav, origen)
+        escalas[origen.stem] = ed.escala_png(origen) if exe else ESCALA
         for h in hechos:
             print(h.relative_to(RAIZ) if h.is_relative_to(RAIZ) else h)
     REGISTRO.parent.mkdir(parents=True, exist_ok=True)
-    REGISTRO.write_text(json.dumps({"motor": motor, "escala_png": ESCALA, "nota": "Con el respaldo, los stencils de draw.io se dibujan como glifos; "
+    REGISTRO.write_text(json.dumps({"motor": motor, "escala_png": escalas, "nota": "Con el respaldo, los stencils de draw.io se dibujan como glifos; "
                                     "el .drawio conserva los íconos de draw.io y es el editable. Con draw.io Desktop: python infra/gen/exportar_dc.py"},
                                    ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"motor: {motor}")

@@ -9,10 +9,12 @@ rutas de instalación habituales de Windows, macOS y Linux. Sin draw.io, termina
 from __future__ import annotations
 
 import argparse
+import math
 import os
 import shutil
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -33,11 +35,44 @@ def drawio() -> str | None:
     return next((c for c in CANDIDATOS if c and Path(c).is_file()), None)
 
 
+# draw.io Desktop recorta el PNG cuando pasa de ~8192 px de ancho o de alto: dibuja solo una parte y deja el resto en blanco
+# (se vio en DC-2: a escala 3 eran 8437 px y quedó con contenido solo en el 51 % superior; a 2,9 sale completo). Por eso la escala
+# se calcula por figura: 3 si cabe y, si no, la mayor que deje ancho y alto bajo ANCHO_MAX_PX y el área bajo PIXELES_MAX.
+ESCALA_PNG = 3.0
+MARGEN_PX = 10
+ANCHO_MAX_PX = 8000
+PIXELES_MAX = int(2 ** 25 * 0.95)
+
+
+def extension(origen: Path) -> tuple[float, float, float, float]:
+    """Caja que ocupa el dibujo (x0, y0, x1, y1): celdas con geometría absoluta y puntos intermedios de los enlaces."""
+    xs, ys = [], []
+    for g in ET.parse(origen).getroot().iter("mxGeometry"):
+        if g.get("width") is not None and g.get("relative") != "1":
+            x, y, w, h = (float(g.get(k, 0)) for k in ("x", "y", "width", "height"))
+            xs += [x, x + w]
+            ys += [y, y + h]
+        for pt in g.iter("mxPoint"):
+            if pt.get("x") is not None and pt.get("y") is not None:
+                xs.append(float(pt.get("x")))
+                ys.append(float(pt.get("y")))
+    if not xs:
+        raise ValueError(f"{origen.name} no tiene celdas con geometría")
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def escala_png(origen: Path) -> float:
+    x0, y0, x1, y1 = extension(origen)
+    ancho, alto = x1 - x0 + 2 * MARGEN_PX, y1 - y0 + 2 * MARGEN_PX
+    s = min(ESCALA_PNG, ANCHO_MAX_PX / ancho, ANCHO_MAX_PX / alto, math.sqrt(PIXELES_MAX / (ancho * alto)))
+    return math.floor(s * 100) / 100
+
+
 def exportar(exe: str, origen: Path) -> list[Path]:
     hechos = []
     base = [exe, "--no-sandbox", "--disable-gpu"] if sys.platform.startswith("linux") else [exe]
     trabajos = [
-        (origen.with_suffix(".png"), ["-x", "-f", "png", "-s", "3", "-b", "10", "-e"]),
+        (origen.with_suffix(".png"), ["-x", "-f", "png", "-s", f"{escala_png(origen):g}", "-b", str(MARGEN_PX), "-e"]),
         (origen.with_suffix(".pdf"), ["-x", "-f", "pdf", "-b", "10", "-e", "--crop"]),
     ]
     for destino, args in trabajos:

@@ -4,7 +4,7 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <object id="DC-3-1" label="&lt;b&gt;Figura 6.1 — Diseño de arquitectura AWS / VPC&lt;/b&gt;&lt;br&gt;DC-3 · Centro de datos v1.1 · 2026-11-23 · inventario v1.2 · huella de la fuente f548c168 · CE0331 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="DC-3" titulo="Figura 6.1 — Diseño de arquitectura AWS / VPC">
+        <object id="DC-3-1" label="&lt;b&gt;Figura 6.1 — Diseño de arquitectura AWS / VPC&lt;/b&gt;&lt;br&gt;DC-3 · Centro de datos v1.2 · 2026-11-24 · inventario v1.3 · huella de la fuente 41349b36 · CE0331 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="DC-3" titulo="Figura 6.1 — Diseño de arquitectura AWS / VPC">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;align=left;spacingLeft=10;fontSize=13;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="20" y="10" width="1560" height="44" as="geometry" />
           </mxCell>

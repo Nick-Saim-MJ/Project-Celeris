@@ -4,7 +4,7 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <object id="FIG-5.3-1" label="&lt;b&gt;Figura 5.3 — Topología de seguridad y zonas propuesta&lt;/b&gt;&lt;br&gt;FIG-5.3 · Inventario v1.2 · 2026-11-23 · commit de la fuente 286cbc6 · CE0311 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="FIG-5.3" titulo="Figura 5.3 — Topología de seguridad y zonas propuesta">
+        <object id="FIG-5.3-1" label="&lt;b&gt;Figura 5.3 — Topología de seguridad y zonas propuesta&lt;/b&gt;&lt;br&gt;FIG-5.3 · Inventario v1.3 · 2026-11-24 · commit de la fuente 286cbc6 · CE0311 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="FIG-5.3" titulo="Figura 5.3 — Topología de seguridad y zonas propuesta">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;align=left;spacingLeft=10;fontSize=13;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="20" y="10" width="1740" height="44" as="geometry" />
           </mxCell>

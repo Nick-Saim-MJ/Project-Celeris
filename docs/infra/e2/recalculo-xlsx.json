@@ -1,6 +1,6 @@
 {
-  "archivo": "entregables/CE0331/Matriz_Componentes_DC_v1.1.xlsx",
-  "sha256": "affaa617b042ec8992f5101dc7ff2f62e830ad93426d285555e6c24faa751ffd",
+  "archivo": "entregables/CE0331/Matriz_Componentes_DC_v1.2.xlsx",
+  "sha256": "a063cdf07240de4f558f97a7f422d6e28c7dc81a60d4cd8a6e73a72848ec3b66",
   "motor": "LibreOffice headless (WSL)",
   "formulas": 130,
   "errores": [],
@@ -72,5 +72,5 @@
     "AWS: Total mensual 24×7": 69.582,
     "AWS: Total por hora": 0.0908
   },
-  "huella_fuente": "f548c168"
+  "huella_fuente": "41349b36"
 }

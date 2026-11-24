@@ -1,6 +1,6 @@
 {
-  "archivo": "entregables/CE0311/Matriz_Componentes_Red_v1.2.xlsx",
-  "sha256": "3bd13a54e57cfed2bab5743a1915bdad4e699eff9ddda39c9d676dfad6bd4fee",
+  "archivo": "entregables/CE0311/Matriz_Componentes_Red_v1.3.xlsx",
+  "sha256": "c6b61d6a2192f19ece724a6149bf11a9b6d0cf372e2580602087ebff31d49f27",
   "motor": "LibreOffice headless (WSL)",
   "formulas": 172,
   "errores": [],

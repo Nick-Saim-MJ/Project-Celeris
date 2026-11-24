@@ -4,7 +4,7 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <object id="DC-1-1" label="&lt;b&gt;Figura 5.1 — Topología física propuesta del centro de datos on-premise&lt;/b&gt;&lt;br&gt;DC-1 · Centro de datos v1.1 · 2026-11-23 · inventario v1.2 · huella de la fuente f548c168 · CE0331 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="DC-1" titulo="Figura 5.1 — Topología física propuesta del centro de datos on-premise">
+        <object id="DC-1-1" label="&lt;b&gt;Figura 5.1 — Topología física propuesta del centro de datos on-premise&lt;/b&gt;&lt;br&gt;DC-1 · Centro de datos v1.2 · 2026-11-24 · inventario v1.3 · huella de la fuente 41349b36 · CE0331 Celeris Edge · generado desde infra/*.yaml" celeris_rol="titulo" figura="DC-1" titulo="Figura 5.1 — Topología física propuesta del centro de datos on-premise">
           <mxCell style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1A1A1A;strokeWidth=1;align=left;spacingLeft=10;fontSize=13;fontColor=#1A1A1A;" parent="1" vertex="1">
             <mxGeometry x="20" y="10" width="1180" height="44" as="geometry" />
           </mxCell>

@@ -20,97 +20,97 @@
     {
       "texto": "Figura 1.1 — Topología ejecutiva del centro de datos híbrido",
       "nivel": 10,
-      "pagina": 4
+      "pagina": 5
     },
     {
       "texto": "2. Descripción de la organización y necesidades de infraestructura",
       "nivel": 1,
-      "pagina": 4
+      "pagina": 6
     },
     {
       "texto": "3. Alcance del diseño de centro de datos híbrido",
       "nivel": 1,
-      "pagina": 6
+      "pagina": 7
     },
     {
       "texto": "3.1 Declaración de alcance",
       "nivel": 2,
-      "pagina": 6
+      "pagina": 7
     },
     {
       "texto": "3.2 Límites",
       "nivel": 2,
-      "pagina": 6
+      "pagina": 7
     },
     {
       "texto": "3.3 Exclusiones",
       "nivel": 2,
-      "pagina": 6
+      "pagina": 7
     },
     {
       "texto": "4. Objetivos del diseño de centro de datos",
       "nivel": 1,
-      "pagina": 7
+      "pagina": 8
     },
     {
       "texto": "5. Arquitectura on-premise — diseño (VMware ESXi)",
       "nivel": 1,
-      "pagina": 7
+      "pagina": 8
     },
     {
       "texto": "5.1 Topología física propuesta",
       "nivel": 2,
-      "pagina": 7
+      "pagina": 8
     },
     {
       "texto": "Figura 5.1 — Topología física propuesta del centro de datos on-premise",
       "nivel": 10,
-      "pagina": 9
+      "pagina": 10
     },
     {
       "texto": "5.2 Diseño del hipervisor",
       "nivel": 2,
-      "pagina": 10
+      "pagina": 11
     },
     {
       "texto": "Figura 5.2 — Diseño interno del hipervisor VMware ESXi",
       "nivel": 10,
-      "pagina": 12
+      "pagina": 13
     },
     {
       "texto": "6. Arquitectura AWS — diseño",
       "nivel": 1,
-      "pagina": 13
+      "pagina": 14
     },
     {
       "texto": "6.1 Selección de región y justificación",
       "nivel": 2,
-      "pagina": 13
+      "pagina": 14
     },
     {
       "texto": "6.2 Diseño de VPC",
       "nivel": 2,
-      "pagina": 13
+      "pagina": 14
     },
     {
       "texto": "Figura 6.1 — Diseño de arquitectura AWS / VPC",
       "nivel": 10,
-      "pagina": 15
+      "pagina": 16
     },
     {
       "texto": "6.3 Servicios EC2 planeados",
       "nivel": 2,
-      "pagina": 16
+      "pagina": 17
     },
     {
       "texto": "6.4 Security Groups y NACL planeados",
       "nivel": 2,
-      "pagina": 17
+      "pagina": 18
     },
     {
       "texto": "7. Mecanismo de integración híbrida",
       "nivel": 1,
-      "pagina": 17
+      "pagina": 18
     },
     {
       "texto": "Figura 7.1 — Integración híbrida: VPN IPsec entre FW01 y el VGW (FIG-5.4 del Entregable 1, sin cambios)",
@@ -155,7 +155,7 @@
     {
       "texto": "Contradicciones y vacíos (CI) del Entregable 2",
       "nivel": 2,
-      "pagina": 28
+      "pagina": 29
     },
     {
       "texto": "Anexo B. Rúbrica de CE0331 y dónde se evidencia",
@@ -168,10 +168,10 @@
       "pagina": 31
     }
   ],
-  "docx": "entregables/CE0331/Informe_Centro_Datos_v1.1.docx",
-  "pdf": "entregables/CE0331/Informe_Centro_Datos_v1.1.pdf",
-  "commit_fuente": "f548c168",
-  "huella_fuente": "f548c168",
+  "docx": "entregables/CE0331/Informe_Centro_Datos_v1.2.docx",
+  "pdf": "entregables/CE0331/Informe_Centro_Datos_v1.2.pdf",
+  "commit_fuente": "41349b36",
+  "huella_fuente": "41349b36",
   "figuras": [
     "DC-0",
     "DC-1",
@@ -180,6 +180,6 @@
     "FIG-5.4"
   ],
   "completar": [],
-  "version": "1.1",
-  "fig54_sha256": "5d8907c4a9fae41906e2e681c35b7cdb02040dee99c96f092486ecb8b92ab83a"
+  "version": "1.2",
+  "fig54_sha256": "175a961136094645e370c42c9ae7a03b4c8b4fa32be376c16e1179329167d821"
 }

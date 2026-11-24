@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.2 · fecha 2026-11-23
 - Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 9 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **5 FALLA**, 1 con advertencias, 82 PASA, 0 pendientes de P2–P5.
+- Resultado: **0 FALLA**, 1 con advertencias, 87 PASA, 0 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -85,35 +85,24 @@
 | V-92 | Dimensionamiento: sumas = tablas D2.4; núcleos, RAM y disco recalculados; holgura ≥ 15 % y la caché cabe | PASA | F2: 27 vCPU → 9.75 núcleos de 12 (holgura 18.8%) · RAM 79.2 de 96 GB (holgura 31.2%; tras crecimiento 17.5%) · disco 1206 de 1920 GB (holgura 37.2%) |
 | V-93 | Hipervisor: NIC → vSwitch → port group → VLAN de la zona; teaming; seguridad; rack de 12U y energía | PASA | 2 vSwitch · 9 port groups · 4 NIC · rack: U libres [4, 5, 8, 9] · UPS 480 W |
 | V-94 | AWS y continuidad: CIDR, instancias, NAT temporal, costo ≤ US$ 75, RTO/RPO coherentes con la criticidad y 3-2-1-1-0 | PASA | costo 69.58 US$/mes · lab 0.0908 US$/h · 9 servicios con RTO y RPO |
-| V-95 | Informe DC: DOCX y PDF existen, abren y son de la fuente actual | FALLA | entregables/CE0331/Informe_Centro_Datos_v1.0.docx; PDF 29 páginas; motor Microsoft Word (COM) |
+| V-95 | Informe DC: DOCX y PDF existen, abren y son de la fuente actual | PASA | entregables/CE0331/Informe_Centro_Datos_v1.1.docx; PDF 31 páginas; motor Microsoft Word (COM) |
 | V-96 | Informe DC: 12 secciones de la plantilla, en orden y con contenido | PASA | 21 títulos de sección · 3 anexos |
 | V-97 | Informe DC: sin texto guía, sin IDs retirados como vigentes, toda IP del inventario | PASA | 37 textos guía comprobados · 16 IP/redes distintas citadas |
-| V-98 | Informe DC: figuras DC-0…DC-3 y FIG-5.4 (sin cambios) con leyenda y «Qué observar» | FALLA | 8 imágenes · 5 leyendas |
-| V-99 | Informe DC: cifras = cálculo de la fuente y evidencia por cada criterio de la rúbrica | FALLA | 7 criterios con evidencia comprobada · 0 pendientes |
+| V-98 | Informe DC: figuras DC-0…DC-3 y FIG-5.4 (sin cambios) con leyenda y «Qué observar» | PASA | 8 imágenes · 5 leyendas |
+| V-99 | Informe DC: cifras = cálculo de la fuente y evidencia por cada criterio de la rúbrica | PASA | 7 criterios con evidencia comprobada · 0 pendientes |
 | V-100 | Diagramas DC-0…DC-3: .drawio, .png y .pdf presentes, con XML embebido y al día | PASA | — |
 | V-101 | Todo celeris_id es un ID del contrato y cada figura dibuja todo lo que debe (cobertura) | PASA | 0 errores, 0 advertencias |
 | V-102 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | PASA | — |
 | V-103 | Título, leyenda, panel; criticidad (borde + texto); vCPU, RAM, VLAN y CIDR coinciden con los YAML | PASA | — |
-| V-104 | Matriz DC: archivo y las 6 hojas | PASA | entregables/CE0331/Matriz_Componentes_DC_v1.0.xlsx |
+| V-104 | Matriz DC: archivo y las 6 hojas | PASA | entregables/CE0331/Matriz_Componentes_DC_v1.1.xlsx |
 | V-105 | Matriz DC: 100 % de lo dibujado en DC-0…DC-3 (y viceversa), criticidad y celdas obligatorias | PASA | 56 elementos en la matriz · 56 dibujados |
-| V-106 | Matriz DC: máquinas virtuales 1 a 1 con centro_datos.yaml y totales por fórmula | FALLA | 11 VM · 12 fórmulas de total |
-| V-107 | Matriz DC: fórmulas recalculadas sin errores y coherentes con el cálculo en Python | FALLA | LibreOffice headless (WSL) · 127 fórmulas · 0 errores |
+| V-106 | Matriz DC: máquinas virtuales 1 a 1 con centro_datos.yaml y totales por fórmula | PASA | 11 VM · 12 fórmulas de total |
+| V-107 | Matriz DC: fórmulas recalculadas sin errores y coherentes con el cálculo en Python | PASA | LibreOffice headless (WSL) · 130 fórmulas · 0 errores |
 
 ## Errores
 
-- **V-95** — centro_datos.yaml o inventory.yaml cambiaron después de generar el informe (la huella no coincide). *Cómo corregir:* make informe-dc (python docs/infra/e2/build_informe.py --pdf)
-- **V-98** — FIG-5.4.png cambió después de generar el informe. *Cómo corregir:* make informe-dc (python docs/infra/e2/build_informe.py --pdf)
-- **V-99** — La cifra «79,2» (ram_crec) no figura en las secciones 1 o 9. *Cómo corregir:* make informe-dc (python docs/infra/e2/build_informe.py --pdf)
-- **V-99** — La cifra «31,3 %» (h_ram) no figura en las secciones 1 o 9. *Cómo corregir:* make informe-dc (python docs/infra/e2/build_informe.py --pdf)
-- **V-99** — La cifra «17,5 %» (m_ram) no figura en las secciones 1 o 9. *Cómo corregir:* make informe-dc (python docs/infra/e2/build_informe.py --pdf)
-- **V-99** — La cifra «60» (ram_f2) no figura en las secciones 1 o 9. *Cómo corregir:* make informe-dc (python docs/infra/e2/build_informe.py --pdf)
-- **V-99** — La tabla de continuidad tiene 8 servicios y el YAML 9. *Cómo corregir:* make informe-dc (python docs/infra/e2/build_informe.py --pdf)
-- **V-99** — Criterio 5 (dimensionamiento frente al host y a EC2-GW): la sección 9 no cita 79,2. *Cómo corregir:* Complete el texto o la tabla
-- **V-99** — El control de versiones no cita la huella de la fuente. *Cómo corregir:* make informe-dc (python docs/infra/e2/build_informe.py --pdf)
-- **V-106** — SIEM01: la fila no coincide con centro_datos.yaml. *Cómo corregir:* python infra/gen/xlsx_centro_datos.py --verificar
-- **V-107** — «RAM requerida con crecimiento»: Excel/LibreOffice 84.48 ≠ Python 79.2. *Cómo corregir:* python infra/gen/xlsx_centro_datos.py --verificar
-- **V-107** — «Holgura de RAM tras la sobrecarga de ESXi»: Excel/LibreOffice 0.266666666666667 ≠ Python 0.3125. *Cómo corregir:* python infra/gen/xlsx_centro_datos.py --verificar
-- **V-107** — «Margen de RAM tras reservar el crecimiento»: Excel/LibreOffice 0.12 ≠ Python 0.17499999999999996. *Cómo corregir:* python infra/gen/xlsx_centro_datos.py --verificar
+Ninguno.
+
 
 ## Advertencias (contradicciones y vacíos registrados)
 
@@ -130,7 +119,7 @@
 - **V-94** — EC2-GW frente a S-33: margen de CPU 50% y de RAM 50%; se mide en S2
 - **V-94** — CT-09: RTO pendiente del supuesto S-34 (por confirmar con la DTI)
 - **V-94** — Criticidad derivada de los servicios: {'CT-01': 'Alta', 'CT-02': 'Media', 'CT-03': 'Alta', 'CT-04': 'Media', 'CT-05': 'Alta', 'CT-06': 'Alta', 'CT-07': 'Alta', 'CT-08': 'Alta', 'CT-09': 'Alta'}
-- **V-101** — Huella de la fuente al generar: c1b5d1ba
+- **V-101** — Huella de la fuente al generar: f548c168
 
 ## Cobertura
 

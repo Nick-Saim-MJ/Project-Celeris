@@ -17,4 +17,4 @@
 
 {{tabla:ci}}
 
-Los abiertos que más pesan son CI-78 (margen de RAM tras el crecimiento) y CI-82 (carga de EC2-GW sin medir); ninguno cambia una IP, un puerto ni una regla.
+Los dos abiertos son CI-87 (el trunk de 1 GbE hacia SW-ACC no deja holgura frente a ≈ 1 Gbps por laboratorio) y CI-88 (`DIRECT` con ESX01 caído depende de FW01, que corre en ESX01). Además, el supuesto S-34 (plazo de reposición del servidor) espera valor de la DTI, y la latencia a AWS [S-11] y la carga de EC2-GW [S-33] se miden en S2. Ninguno cambia una IP, un puerto ni una regla.

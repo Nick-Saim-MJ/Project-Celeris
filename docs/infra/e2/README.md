@@ -12,7 +12,7 @@ Solo diseño: no toca `deploy/opentofu/`, `lab/` ni `src/`, no crea recursos en 
 Orden de regeneración: `make diagrams-dc`, `make diagrams-dc-check`, `make matrices-dc`, `make informe-dc` y `make validate`. Sin GNU make, los mismos comandos con `python`.
 
 - La integración híbrida no se redibuja: el informe usa `entregables/CE0311/diagramas/FIG-5.4.png` tal cual (V-98 comprueba que no cambió).
-- `exportar_dc.py` usa draw.io Desktop si está instalado; si no, un respaldo con Edge o Chrome sin interfaz que dibuja los stencils como glifos (ver `exportacion.json`). El `.drawio` conserva los íconos de draw.io.
+- `exportar_dc.py` usa draw.io Desktop (variable `DRAWIO` con la ruta del ejecutable); si no está, un respaldo con Edge o Chrome sin interfaz que dibuja los stencils como glifos (ver `exportacion.json`).
 - El PDF del informe lo exporta Word (COM) o LibreOffice; la matriz se recalcula con LibreOffice o, si no está, con Excel (COM).
 - Contradicciones y vacíos: CI-77…CI-88 en `docs/infra/e1/CAMBIOS-INVENTARIO.md`.
 - `autoevaluacion-informe.md`: nivel estimado por criterio y qué falta para el nivel 4.

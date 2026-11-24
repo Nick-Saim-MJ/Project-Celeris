@@ -232,7 +232,7 @@ def t_rutas_aws(x, d):
     return e1.t_rutas_aws(x, d)
 
 
-def t_instancias_ec2(x, d):
+def t_instancias_aws(x, d):
     x, cd = fuentes()
     filas = []
     for i in cd.aws["instancias"]:

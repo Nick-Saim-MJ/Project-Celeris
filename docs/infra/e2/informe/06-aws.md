@@ -34,7 +34,7 @@ Se usa una sola zona de disponibilidad (a). La alta disponibilidad entre zonas s
 
 EC2-GW es la única instancia permanente. EC2-DR y NAT-DR son temporales y se crean solo durante el simulacro.
 
-{{tabla:instancias_ec2}}
+{{tabla:instancias_aws}}
 
 **Por qué un t3.micro para EC2-GW.** El tipo se elige frente a la carga: EC2-GW solo termina TLS, aplica el WAF (Coraza con OWASP CRS) y reenvía a CTRL01:443; no guarda datos ni llaves. Un t3.micro tiene 2 vCPU, 1 GiB y una línea base de CPU de 10 % por vCPU, es decir {{dato:gw_base}} vCPU sostenidos, y gana {{dato:gw_cred_g}} créditos de CPU por hora. Con la carga de diseño de la tabla siguiente el margen es de {{dato:gw_margen_cpu}} en CPU y {{dato:gw_margen_ram}} en RAM, y el saldo de créditos crece. Un t3.small duplicaría la RAM y el precio sin que la carga lo pida; se sube de tipo si el piloto mide los créditos agotándose.
 

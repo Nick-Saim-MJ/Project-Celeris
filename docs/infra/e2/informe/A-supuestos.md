@@ -14,4 +14,4 @@ Se registran en `docs/infra/e1/CAMBIOS-INVENTARIO.md`. El YAML no se «arregla»
 
 {{tabla:ci}}
 
-El valor de S-08 que figura en `trazabilidad.yaml` (servidor de la v0.3) está desactualizado frente al Marco común; este informe usa las especificaciones del Marco común y no cita el precio (CI-84).
+S-08 se corrigió a la v0.4 en `trazabilidad.yaml` (CI-84, resuelto) y el informe de CE0311 se regeneró como v1.2; por eso ambos entregables comparten el mismo inventario v{{dato:inv_version}}.

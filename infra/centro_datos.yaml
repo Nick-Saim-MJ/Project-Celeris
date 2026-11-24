@@ -7,7 +7,7 @@
 # Todo supuesto lleva [S-xx]. Lo que falta y no se pudo resolver lleva `ci: CI-nn` (registrado en CAMBIOS-INVENTARIO.md).
 
 meta:
-  version: "1.0"
+  version: "1.1"
   fecha: "2026-11-23"
   entregable: "CE0331 — Análisis y Diseño de Centro de Datos Híbrido (S1, E2)"
   inventario: infra/inventory.yaml

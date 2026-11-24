@@ -131,7 +131,7 @@ def run(infra):
     for g in guias:
         if any(t.strip() == g for _, t in cuerpo):
             h.append(E(f"Texto guía de la plantilla presente: «{g[:70]}…»", GENERAR))
-    for patron in ("[ Espacio para diagrama", "____", "192.168.", "Plantilla y guía de estructura"):
+    for patron in ("[ Espacio para diagrama", "____", "192.168.", "Plantilla y guía de estructura", "{{"):
         if patron in texto_total:
             h.append(E(f"Marcador de plantilla presente: {patron}", GENERAR))
     retirados = [*infra.componentes_retirados, *infra.flujos_retirados, *infra.pruebas_retiradas, *infra.zonas_retiradas]

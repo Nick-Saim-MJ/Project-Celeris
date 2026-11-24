@@ -1315,7 +1315,7 @@ def ejecutar_ganchos(x: Infra) -> list[Resultado]:
     Si run devuelve None, el gancho aún no está implementado y se informa «PENDIENTE de P#»."""
     salida = []
     d = x.raiz / "infra" / "checks"
-    for ruta in sorted(d.glob("v[5-9]0_*.py")):
+    for ruta in sorted(d.glob("v[0-9]*_*.py"), key=lambda r: int(r.stem.split("_")[0][1:])):
         spec = importlib.util.spec_from_file_location(f"checks_{ruta.stem}", ruta)
         mod = importlib.util.module_from_spec(spec)
         sys.modules[spec.name] = mod

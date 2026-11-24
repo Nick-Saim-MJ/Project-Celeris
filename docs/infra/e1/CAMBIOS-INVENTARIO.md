@@ -905,3 +905,87 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decisión aplicada:** S-18 conserva su ID (para que las referencias históricas no cambien de sentido) y se marca `estado: retirado` con `retirado_motivo`. El anexo D del informe lista solo los supuestos vigentes y nombra los retirados en una nota.
 - **Decide:** equipo del proyecto
 
+
+## Entradas del Entregable 2 — centro de datos híbrido (CE0331, desde CI-77)
+
+`infra/centro_datos.yaml` transcribe CE03 D2.3–D2.9 y Arquitectura §10–§11. Lo que falta o se contradice se registra aquí; el YAML cita el CI en el campo `ci`.
+
+### CI-77 — Consumo eléctrico de ESX01: 400 W (D2.4) o 480 W (inventario)
+- **Estado:** resuelto (2026-11-23, por la regla del proyecto: manda el inventario)
+- **Tipo:** contradicción
+- **Dónde:** CE03 D2.4 «Energía» (≈ 400 W); `infra/inventory.yaml` → UPS01.`por_que` («autonomía de 15–20 min a ≈ 480 W»)
+- **Decisión aplicada:** se usa 480 W en `centro_datos.yaml` → `energia.consumo_w`; V-93 comprueba que coincide con el inventario. La autonomía de 15–20 min sigue «a confirmar con el fabricante».
+- **Decide:** equipo del proyecto (confirmar con la ficha del servidor y de la UPS)
+
+### CI-78 — Holgura de RAM: ≥ 15 % (D2.3) frente a 12,0 % tras el crecimiento (D2.8)
+- **Estado:** abierto
+- **Tipo:** contradicción
+- **Dónde:** CE03 D2.3 («100 % cubierto con ≥ 15 % de holgura»); D2.8 y Arquitectura §10.1 (64 GB × 1,1 × 1,2 ≈ 84,5 GB sobre 96 GB); S-08
+- **Qué dice cada fuente:** el host de 96 GB deja libres 96 − 84,48 = 11,52 GB, es decir 12,0 % del host, si además de la sobrecarga de ESXi se reserva el 20 % de crecimiento. Medida sobre lo asignado más la sobrecarga de ESXi (70,4 GB) la holgura es 26,7 %.
+- **Decisión aplicada:** `dimensionamiento.holgura_definicion` define la holgura de RAM como la que queda tras la sobrecarga de ESXi (26,7 % ≥ 15 %) y V-92 emite una advertencia con el margen tras el crecimiento (12,0 %). No se inventa un host mayor.
+- **Propuesta:** (a) comprar 128 GB de RAM (el host de la v0.3 los tenía): margen 34 %; (b) aceptar 12 % porque el crecimiento del 20 % es una reserva y no un requisito; (c) reducir SIEM01 a 12 GB.
+- **Decide:** equipo del proyecto (Nick)
+- **Efecto al resolver:** si (a), cambiar S-08 y `host.ram_gb`; si (b), cerrar la advertencia de V-92.
+
+### CI-79 — Rack: ESX01 ocupa 2U pero D2.4 le asigna el rango U6–9 (4U)
+- **Estado:** abierto
+- **Tipo:** vacío
+- **Dónde:** CE03 D2.4 «Rack de 12U» (fila «6–9 | ESX01 (2U)»); `infra/centro_datos.yaml` → `rack.ocupacion`
+- **Qué dice cada fuente:** el rango U6–9 son 4 unidades y el equipo es de 2U; D2.4 no dice cuáles dos U ocupa ni para qué sirven las otras dos. Las U4–5 no figuran en la tabla.
+- **Decisión aplicada:** DC-1 dibuja el rango U6–9 como lo escribe D2.4, rotulado «ESX01 (equipo de 2U)», y las U4–5 como libres. No se asigna uso a las U sobrantes.
+- **Decide:** equipo del proyecto (al instalar el rack, S2)
+
+### CI-80 — Enlace SW-CORE01 ↔ SW-ACC y NIC libre de ESX01 sin velocidad ni puerto
+- **Estado:** abierto
+- **Tipo:** vacío
+- **Dónde:** CE03 D2.4 (SW-CORE01 «24× 1 GbE + 2–4× SFP+ 10 GbE»; ESX01 «4 NIC (2× 10 GbE trunk, 1× 1 GbE hacia el FortiGate, 1 libre)»)
+- **Qué dice cada fuente:** no dice con qué puerto ni a qué velocidad se enlaza SW-CORE01 con la capa de acceso existente (SW-ACC), ni la velocidad de la cuarta NIC. D2.8 pide ≈ 1 Gbps desde la caché hacia un laboratorio.
+- **Decisión aplicada:** DC-1 dibuja el enlace a SW-ACC como «trunk 802.1Q, velocidad sin definir (CI-80)» y vmnic3 como libre.
+- **Decide:** equipo del proyecto con la DTI (levantamiento AS-IS, S-14)
+
+### CI-81 — Región de producción: «us-east-1 elegida» (D2.5) o «sa-east-1 candidata» (inventario, S-11)
+- **Estado:** resuelto (2026-11-23, por la regla del proyecto: manda el inventario)
+- **Tipo:** contradicción
+- **Dónde:** CE03 D2.5 («us-east-1 … Elegida (laboratorio y producción)»); `infra/inventory.yaml` → `aws.region` (laboratorio us-east-1, producción_candidata sa-east-1); S-11
+- **Decisión aplicada:** el informe presenta us-east-1 como región del laboratorio y del costo de referencia [S-12], y sa-east-1 como candidata de producción a confirmar con `mtr` desde Juliaca [S-11]. La región es una variable (`var.region`).
+- **Decide:** equipo del proyecto (Nick) al medir la latencia
+
+### CI-82 — Carga de EC2-GW sin cifras
+- **Estado:** abierto
+- **Tipo:** vacío (supuesto nuevo, sin ID S-xx)
+- **Dónde:** CE03 D2.8 («EC2-GW solo atiende sesiones del panel (pocos usuarios); t3.micro sobra; se vigilan los créditos de CPU»); `infra/centro_datos.yaml` → `aws.instancias[EC2-GW].carga_diseno`
+- **Qué dice cada fuente:** ninguna da sesiones simultáneas, solicitudes por segundo, CPU ni RAM. Sin cifras no hay margen calculable frente a un t3.micro (2 vCPU, 1 GiB, línea base 10 % por vCPU, 12 créditos por hora).
+- **Decisión aplicada (propuesta, sin medir):** 10 sesiones simultáneas (una por laboratorio, S-26), 5 solicitudes por segundo, 0,10 vCPU de media y 512 MiB de RAM. Con ellas el margen es 50 % en CPU y 50 % en RAM. V-94 lo señala como advertencia mientras el CI esté abierto.
+- **Decide:** equipo del proyecto; medir con el piloto en S2 y convertir en un S-xx si se confirma
+- **Efecto al resolver:** si la medición supera la línea base, pasar a t3.small.
+
+### CI-83 — Precios de lista fuera de D2.5 (t3.small, NAT Gateway)
+- **Estado:** abierto
+- **Tipo:** supuesto nuevo
+- **Dónde:** `infra/centro_datos.yaml` → `aws.costo_mensual.simulacro`, `aws.nat.alternativas`
+- **Qué dice cada fuente:** D2.5 da los precios de la VPN, t3.micro, IPv4, EBS y S3 [S-12], pero no el de t3.small (EC2-DR) ni el del NAT Gateway administrado que se descarta.
+- **Decisión aplicada:** US$ 0,0208/h para t3.small y US$ 0,045/h para el NAT Gateway (lista pública de us-east-1); se marcan como referencia [S-12] y se confirman en AWS Pricing Calculator. No entran en el costo mensual de 24×7.
+- **Decide:** Nick (S-12)
+
+### CI-84 — S-08 en `trazabilidad.yaml` es de la v0.3
+- **Estado:** abierto
+- **Tipo:** contradicción
+- **Dónde:** `infra/trazabilidad.yaml` → `supuestos.S-08` («Servidor físico disponible o a adquirir», US$ 4 500); Marco común S-08 («12 núcleos, 96 GB, 2 × 1,92 TB + 2 × 1 TB NVMe», US$ 3 800); Arquitectura §10.1 («hay que recalcular S-08»)
+- **Decisión aplicada:** el informe del Entregable 2 cita las especificaciones de S-08 del Marco común y no cita el precio. No se edita `trazabilidad.yaml` porque su huella decide si el informe de CE0311 está al día (V-80, V-89).
+- **Decide:** equipo del proyecto; corregir S-08 junto con la próxima regeneración del informe de CE0311
+
+### CI-85 — `inventory.yaml` no referencia a `centro_datos.yaml`
+- **Estado:** resuelto (2026-11-23)
+- **Tipo:** decisión de transcripción
+- **Dónde:** encargo del Entregable 2 («referenciado desde inventory.yaml»); `huella_fuente()` de `docs/infra/e1/build_informe.py`
+- **Qué dice cada fuente:** el informe de CE0311, cerrado en main, guarda la huella SHA-256 de `inventory.yaml`, `pruebas.yaml` y `trazabilidad.yaml`; V-80 y V-89 fallan si cambian. Escribir una referencia en `inventory.yaml` obligaría a regenerar y volver a entregar CE0311.
+- **Decisión aplicada:** la referencia va en sentido contrario: `centro_datos.yaml` → `meta.inventario` y todo ID se valida contra el inventario (V-90, V-91). El inventario no se toca.
+- **Decide:** equipo del proyecto
+
+### CI-86 — Plazo de reposición del servidor físico
+- **Estado:** abierto
+- **Tipo:** vacío
+- **Dónde:** CE03 D2.9 (no hay fila para ESX01); D2.2 excluye la alta disponibilidad entre hosts
+- **Qué dice cada fuente:** no hay RTO ni RPO del host. Lo que sí hay: la consola se restaura en ≤ 2 h en una EC2 temporal desde S3 aunque el host no esté (T59).
+- **Decisión aplicada:** el informe no promete un RTO del host; documenta el punto único de falla y sus mitigaciones. No se inventa el plazo de un proveedor.
+- **Decide:** equipo del proyecto (cotización y garantía del servidor, S-08)

@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.1 · fecha 2026-11-22
 - Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 9 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **0 FALLA**, 3 con advertencias, 67 PASA, 0 pendientes de P2–P5.
+- Resultado: **0 FALLA**, 4 con advertencias, 71 PASA, 0 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -50,7 +50,7 @@
 | V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA | — |
 | V-44 | Un ID retirado no se reutiliza ni aparece en flujos, pruebas, componentes, zonas, rúbrica o textos vigentes | PASA | — |
 | V-45 | Ningún flujo permite descifrado con origen WIFI-EST (REQ-F-36, REQ-RN-11) | PASA | — |
-| V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA con advertencias | Detalle y matriz componente × figura en docs/infra/e1/cobertura-figuras.md |
+| V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA | Detalle y matriz componente × figura en docs/infra/e1/cobertura-figuras.md |
 | V-51 | Cobertura componente × figura igual al campo `figuras` del inventario | PASA | — |
 | V-52 | Todo celeris_id es un ID del contrato | PASA | — |
 | V-53 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | PASA | — |
@@ -80,6 +80,11 @@
 | V-87 | Informe: evidencia citada para cada criterio de la rúbrica | PASA | criterios con toda su evidencia: R1, R2, R3, R4, R5, R6, R7, R8 |
 | V-88 | Informe: marcas [COMPLETAR] pendientes | PASA | 0 pendientes |
 | V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.1 · commit 9620c3d |
+| V-90 | centro_datos.yaml: esquema, referencias (componentes, zonas, S-xx, CI-nn) e IDs retirados | PASA | 11 VM · 9 port groups · 30 elementos propios · 8 servicios |
+| V-91 | VM: 1 a 1 con el inventario, mismos recursos, port group y zona; ninguna > 8 vCPU | PASA | 11 VM en el YAML · 11 en el inventario · máx. 4 vCPU |
+| V-92 | Dimensionamiento: sumas = tablas D2.4; núcleos, RAM y disco recalculados; holgura ≥ 15 % y la caché cabe | PASA con advertencias | F2: 27 vCPU → 9.75 núcleos de 12 (holgura 18.8%) · RAM 84.5 de 96 GB (holgura 26.7%; tras crecimiento 12.0%) · disco 1206 de 1920 GB (holgura 37.2%) |
+| V-93 | Hipervisor: NIC → vSwitch → port group → VLAN de la zona; teaming; seguridad; rack de 12U y energía | PASA | 2 vSwitch · 9 port groups · 4 NIC · rack: U libres [4, 5] · UPS 480 W |
+| V-94 | AWS y continuidad: CIDR, instancias, NAT temporal, costo ≤ US$ 75, RTO/RPO coherentes con la criticidad y 3-2-1-1-0 | PASA con advertencias | costo 69.58 US$/mes · lab 0.0908 US$/h · 8 servicios con RTO y RPO |
 
 ## Errores
 
@@ -90,29 +95,18 @@ Ninguno.
 
 - **V-42** — 2026-11-23-L: la prueba crítica T23 (Fuga IPv6) está en NO_APLICA, no en PASA
 - **V-42** — 2026-11-23-L: la prueba crítica T58 (EC2-GW solo alcanza CTRL01:443 y SIEM01) está en PARCIAL, no en PASA
-- **V-50** — FIG-1.1.png es anterior a FIG-1.1.drawio
-- **V-50** — FIG-1.1.pdf es anterior a FIG-1.1.drawio
-- **V-50** — FIG-5.1.png es anterior a FIG-5.1.drawio
-- **V-50** — FIG-5.1.pdf es anterior a FIG-5.1.drawio
-- **V-50** — FIG-5.2.png es anterior a FIG-5.2.drawio
-- **V-50** — FIG-5.2.pdf es anterior a FIG-5.2.drawio
-- **V-50** — FIG-5.3.png es anterior a FIG-5.3.drawio
-- **V-50** — FIG-5.3.pdf es anterior a FIG-5.3.drawio
-- **V-50** — FIG-5.4.png es anterior a FIG-5.4.drawio
-- **V-50** — FIG-5.4.pdf es anterior a FIG-5.4.drawio
-- **V-50** — FIG-5.5a.png es anterior a FIG-5.5a.drawio
-- **V-50** — FIG-5.5a.pdf es anterior a FIG-5.5a.drawio
-- **V-50** — FIG-5.5b.png es anterior a FIG-5.5b.drawio
-- **V-50** — FIG-5.5b.pdf es anterior a FIG-5.5b.drawio
 - **V-65** — El último recálculo es de otra versión del archivo
+- **V-92** — Margen de RAM tras reservar el 20 % de crecimiento: 12.0% < 15% (11.5 GB libres de 96 GB). Abierto en CI-78
+- **V-94** — La carga de diseño de EC2-GW son valores propuestos y sin medir (CI-82 abierto)
 
 ## Información
 
 - **V-27** — 28 de 60 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 0 elementos pendientes en los YAML; 70 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-01', 'CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-06', 'CI-07', 'CI-08', 'CI-09', 'CI-10', 'CI-11', 'CI-12', 'CI-13', 'CI-14', 'CI-15', 'CI-16', 'CI-17', 'CI-18', 'CI-19', 'CI-20', 'CI-21', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-27', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-49', 'CI-50', 'CI-51', 'CI-52', 'CI-53', 'CI-54', 'CI-55', 'CI-56', 'CI-57', 'CI-58', 'CI-59', 'CI-60', 'CI-61', 'CI-62', 'CI-63', 'CI-70', 'CI-71', 'CI-72', 'CI-73', 'CI-74', 'CI-75', 'CI-76']
+- **V-29** — 0 elementos pendientes en los YAML; 80 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-01', 'CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-06', 'CI-07', 'CI-08', 'CI-09', 'CI-10', 'CI-11', 'CI-12', 'CI-13', 'CI-14', 'CI-15', 'CI-16', 'CI-17', 'CI-18', 'CI-19', 'CI-20', 'CI-21', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-27', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-49', 'CI-50', 'CI-51', 'CI-52', 'CI-53', 'CI-54', 'CI-55', 'CI-56', 'CI-57', 'CI-58', 'CI-59', 'CI-60', 'CI-61', 'CI-62', 'CI-63', 'CI-70', 'CI-71', 'CI-72', 'CI-73', 'CI-74', 'CI-75', 'CI-76', 'CI-77', 'CI-78', 'CI-79', 'CI-80', 'CI-81', 'CI-82', 'CI-83', 'CI-84', 'CI-85', 'CI-86']
 - **V-42** — Resultados de 2026-11-23-L (commit descono): {'PASA': 34, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 32 de 60 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 605 fórmulas recalculadas con LibreOffice sin errores
+- **V-94** — Criticidad derivada de los servicios: {'CT-01': 'Alta', 'CT-02': 'Media', 'CT-03': 'Alta', 'CT-04': 'Media', 'CT-05': 'Alta', 'CT-06': 'Alta', 'CT-07': 'Alta', 'CT-08': 'Alta'}
 
 ## Cobertura
 

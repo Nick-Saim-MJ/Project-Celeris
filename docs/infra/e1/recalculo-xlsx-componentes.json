@@ -1,7 +1,7 @@
 {
-  "archivo": "entregables/CE0311/Matriz_Componentes_Red_v1.1.xlsx",
-  "sha256": "e45132e6cb7dcc0382e1de0ca980b0715b6e3b19a315c471f66f3f3f2fc04fee",
-  "motor": "Microsoft Excel (COM)",
+  "archivo": "entregables/CE0311/Matriz_Componentes_Red_v1.2.xlsx",
+  "sha256": "3bd13a54e57cfed2bab5743a1915bdad4e699eff9ddda39c9d676dfad6bd4fee",
+  "motor": "LibreOffice headless (WSL)",
   "formulas": 172,
   "errores": [],
   "sin_valor": 0,

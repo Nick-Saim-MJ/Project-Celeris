@@ -259,13 +259,13 @@ aws:
       creditos_por_hora: 12
       linea_base_por_vcpu: 0.10
       horas_mes: 730
-      carga_diseno:           # CI-82: D2.8 solo dice «pocos usuarios»; valores PROPUESTOS, a medir en S2
-        ci: CI-82
+      carga_diseno:           # S-33 (cierra CI-82): D2.8 solo decía «pocos usuarios»; el valor se mide en S2
+        supuesto: S-33
         sesiones_simultaneas: 10
         solicitudes_por_s: 5
         cpu_medio_vcpu: 0.10
         ram_mib: 512
-        nota: "Una sesión por laboratorio (S-26: 10 laboratorios) como cota superior de encargados conectados a la vez. Cifras de CPU y RAM de TLS + Coraza CRS estimadas, no medidas."
+        nota: "S-33: una sesión por laboratorio (S-26: 10 laboratorios) como cota superior de encargados conectados a la vez; CPU y RAM de TLS + Coraza CRS estimados, se miden en S2."
       por_que: "Solo termina TLS, aplica el WAF y reenvía; no guarda datos ni llaves de firma. Una t3.micro tiene 2 vCPU y 1 GiB; la carga de diseño usa la mitad de su línea base de CPU y de su RAM."
       alternativa_descartada: { tipo: t3.small, por_que: "Duplica la RAM (2 GiB) y el precio por hora sin que la carga lo pida; se sube de tipo si el piloto mide créditos agotándose." }
     - { componente: EC2-DR,  tipo: t3.small, vcpu: 2, ram_gib: 2, temporal: true, por_que: "Restaura la consola (PostgreSQL + API) desde S3 durante el simulacro T59; 2 GiB bastan para la restauración y se destruye al terminar." }

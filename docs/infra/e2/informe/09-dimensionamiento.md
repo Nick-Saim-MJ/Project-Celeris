@@ -16,6 +16,6 @@ El dimensionamiento compara lo que piden las {{dato:n_vm}} VM de la fase F2 (la 
 
 **Margen de crecimiento.** El crecimiento previsto es EDGE02 (ya incluido en F2) y hasta 16 laboratorios en el mismo /22. Con la RAM y el disco actuales caben unos {{dato:ram_libre}} GB de RAM y unos {{dato:disco_libre}} GB de disco más antes de agotar el host; el cuello de botella sería la RAM.
 
-**EC2-GW frente a su carga.** La instancia se dimensiona frente a una carga de diseño propuesta (CI-82), no medida:
+**EC2-GW frente a su carga.** La instancia se dimensiona frente a la carga esperada del supuesto S-33 (derivada de S-26: una sesión por laboratorio), que se mide en S2:
 
 {{tabla:gw}}

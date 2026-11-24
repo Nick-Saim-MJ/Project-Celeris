@@ -300,8 +300,14 @@ def run(infra):
     if eg["margen_cpu"] < 0 or eg["margen_ram"] < 0:
         h.append(E("EC2-GW no soporta su carga de diseño", "Suba el tipo de instancia"))
     if eg["margen_cpu"] < cd.raw["dimensionamiento"]["holgura_minima"] or eg["margen_ram"] < cd.raw["dimensionamiento"]["holgura_minima"]:
-        h.append(W("Margen de EC2-GW < 15 %", "Revise la carga de diseño (CI-82)"))
-    h.append(W("La carga de diseño de EC2-GW son valores propuestos y sin medir (CI-82 abierto)", "Medir en S2 con el piloto"))
+        h.append(E("Margen de EC2-GW < 15 %", "Suba el tipo de instancia o revise S-33"))
+    carga = eg["carga_diseno"]
+    if carga.get("supuesto") not in infra.supuestos:
+        h.append(E("La carga de EC2-GW debe citar un supuesto S-xx vigente", "S-33"))
+    n_lab = len(infra.inv["rangos_lab"]["laboratorios"])
+    if carga["sesiones_simultaneas"] != n_lab:
+        h.append(E(f"S-33 deriva las sesiones de S-26: {carga['sesiones_simultaneas']} ≠ {n_lab} laboratorios", "Una sesión por laboratorio"))
+    h.append(I(f"EC2-GW frente a {carga['supuesto']}: margen de CPU {eg['margen_cpu']:.0%} y de RAM {eg['margen_ram']:.0%}; se mide en S2"))
     # continuidad
     lim = cd.continuidad["limites_por_criticidad"]
     for s in cd.servicios.values():

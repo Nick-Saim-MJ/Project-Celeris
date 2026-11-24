@@ -40,7 +40,7 @@ EC2-GW es la única instancia permanente. EC2-DR y NAT-DR son temporales y se cr
 
 {{tabla:gw}}
 
-> La carga de diseño (10 sesiones, 5 solicitudes por segundo, 0,10 vCPU y 512 MiB) es una propuesta sin medir: D2.8 solo dice «pocos usuarios» (CI-82, abierto). Se mide en S2 con el piloto.
+> La carga de diseño es el supuesto S-33, derivado de S-26 (una sesión por laboratorio): 10 sesiones, 5 solicitudes por segundo, 0,10 vCPU y 512 MiB. D2.8 solo decía «pocos usuarios» (CI-82, resuelto con S-33). Se mide con el piloto en S2 y, si la media supera la línea base del t3.micro, se pasa a t3.small.
 
 **Costo mensual 24×7.** Con precios de lista de noviembre de 2026 en us-east-1 [S-12], la AWS del diseño cuesta ≈ US$ {{dato:costo_total}} al mes (meta de D2.3: ≤ US$ {{dato:costo_meta}}). La mayor parte es la VPN (US$ 36,50) y las tres IPv4 públicas, entre ellas las dos de los túneles, que AWS cobra por hora. El laboratorio efímero (Modo A) cuesta US$ {{dato:costo_lab_h}} por hora, bajo la meta de US$ 0,10. Los precios se confirman en AWS Pricing Calculator.
 

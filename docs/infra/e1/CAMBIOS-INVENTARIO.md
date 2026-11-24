@@ -949,13 +949,11 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto (Nick) al medir la latencia
 
 ### CI-82 — Carga de EC2-GW sin cifras
-- **Estado:** abierto
-- **Tipo:** vacío (supuesto nuevo, sin ID S-xx)
-- **Dónde:** CE03 D2.8 («EC2-GW solo atiende sesiones del panel (pocos usuarios); t3.micro sobra; se vigilan los créditos de CPU»); `infra/centro_datos.yaml` → `aws.instancias[EC2-GW].carga_diseno`
-- **Qué dice cada fuente:** ninguna da sesiones simultáneas, solicitudes por segundo, CPU ni RAM. Sin cifras no hay margen calculable frente a un t3.micro (2 vCPU, 1 GiB, línea base 10 % por vCPU, 12 créditos por hora).
-- **Decisión aplicada (propuesta, sin medir):** 10 sesiones simultáneas (una por laboratorio, S-26), 5 solicitudes por segundo, 0,10 vCPU de media y 512 MiB de RAM. Con ellas el margen es 50 % en CPU y 50 % en RAM. V-94 lo señala como advertencia mientras el CI esté abierto.
-- **Decide:** equipo del proyecto; medir con el piloto en S2 y convertir en un S-xx si se confirma
-- **Efecto al resolver:** si la medición supera la línea base, pasar a t3.small.
+- **Estado:** resuelto (2026-11-23, decisión del equipo: supuesto S-33)
+- **Tipo:** vacío (supuesto nuevo)
+- **Dónde:** CE03 D2.8 («EC2-GW solo atiende sesiones del panel (pocos usuarios)»); `infra/trazabilidad.yaml` → `supuestos.S-33`; `infra/centro_datos.yaml` → `aws.instancias[EC2-GW].carga_diseno`
+- **Decisión aplicada:** S-33 fija la carga esperada derivada de S-26 (10 laboratorios, una sesión por laboratorio): 10 sesiones simultáneas, 5 solicitudes por segundo, 0,10 vCPU de media y 512 MiB. Frente a un t3.micro (línea base de 0,20 vCPU, 1 GiB) el margen es 50 % en CPU y 50 % en RAM. V-94 comprueba que las sesiones son las del número de laboratorios. Se mide con el piloto en S2; si la media supera la línea base se pasa a t3.small.
+- **Decide:** equipo del proyecto (Nick)
 
 ### CI-83 — Precios de lista fuera de D2.5 (t3.small, NAT Gateway)
 - **Estado:** abierto

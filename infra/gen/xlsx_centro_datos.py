@@ -74,7 +74,7 @@ def hoja_portada(wb, x, cd):
                   "AWS y costo (cantidad × precio [S-12]) · Continuidad (RTO/RPO, redundancia y 3-2-1-1-0)"),
         ("Figuras", "DC-0 Topología ejecutiva · DC-1 Topología física · DC-2 Hipervisor · DC-3 AWS / VPC. La integración híbrida es FIG-5.4 de CE0311, sin cambios."),
         ("Cómo leer las fórmulas", "Las celdas con fondo gris claro son datos de entrada (del YAML); las demás son fórmulas. Cambiar un dato de entrada recalcula todo."),
-        ("Pendientes", "CI abiertos que afectan esta matriz: CI-78 (margen de RAM tras el crecimiento), CI-82 (carga de EC2-GW, propuesta sin medir), CI-83 (precios fuera de D2.5), CI-79 y CI-80 (rack y enlaces)."),
+        ("Pendientes", "CI abiertos que afectan esta matriz: ver la sección 11 del informe (CI-86 y CI-87)."),
         ("Regla de seguridad", "Sin claves, tokens ni secretos. IP públicas solo de documentación (RFC 5737)."),
     ]
     for i, (k, v) in enumerate(filas, start=3):
@@ -274,7 +274,7 @@ def hoja_dim(wb, x, cd, vm):
     f("red", "Objetivo desde la caché hacia un laboratorio", d["red"]["objetivo_gbps"], "Gbps", d["red"]["razon"], entrada=True)
     f("red_nic", "Enlaces del host hacia SW-CORE01", 20, "Gbps", "2 × 10 GbE en vSwitch0 (vmnic0 y vmnic1): el objetivo cabe con holgura", entrada=True)
     f("red_riesgo", "Riesgo declarado", "—", "", d["red"]["riesgo"])
-    sec("6. EC2-GW frente a su carga (CI-82: carga propuesta, sin medir)")
+    sec("6. EC2-GW frente a su carga (S-33: carga esperada derivada de S-26; se mide en S2)")
     g = cd.ec2_gw()
     f("g_vcpu", f"vCPU de {g['tipo']}", g["vcpu"], "vCPU", "Tipo de instancia de EC2-GW", entrada=True)
     f("g_base", "Línea base de CPU por vCPU", g["linea_base_por_vcpu"], "%", "t3.micro: 10 % por vCPU", entrada=True, fmt="0%")
@@ -289,7 +289,7 @@ def hoja_dim(wb, x, cd, vm):
     f("g_cred_g", "Créditos de CPU ganados por hora", g["creditos_por_hora"], "créditos/h", "t3.micro gana 12 créditos por hora", entrada=True)
     f("g_cred_c", "Créditos consumidos por hora con la carga de diseño", f"={R('g_cpu')}*60", "créditos/h", "0,10 vCPU × 60 min", fmt="0.0")
     f("g_cred_m", "Saldo de créditos por hora", f"={R('g_cred_g')}-{R('g_cred_c')}", "créditos/h", "Positivo: el saldo de créditos crece", fmt="0.0")
-    f("g_sesiones", "Sesiones simultáneas de diseño", g["carga_diseno"]["sesiones_simultaneas"], "sesiones", "Una por laboratorio [S-26] como cota superior", entrada=True)
+    f("g_sesiones", "Sesiones simultáneas de diseño", g["carga_diseno"]["sesiones_simultaneas"], "sesiones", "Una por laboratorio (S-26), supuesto S-33", entrada=True)
     f("g_rps", "Solicitudes por segundo de diseño", g["carga_diseno"]["solicitudes_por_s"], "req/s", "Cota superior estimada", entrada=True)
     xc.configurar_hoja(ws, 4, 5, fila[0] - 1, congelar="B5", filtro=False)
     ws.sheet_view.zoomScale = 100

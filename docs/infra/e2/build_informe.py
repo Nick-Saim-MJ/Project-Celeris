@@ -308,7 +308,7 @@ def t_gw(x, d):
     filas = [["CPU", f"{g['vcpu']} vCPU; línea base {pct(g['linea_base_por_vcpu'], 0)} por vCPU = {d['gw_base']} vCPU sostenidos", f"{coma(c['cpu_medio_vcpu'], 2)} vCPU de media", d["gw_margen_cpu"]],
              ["RAM", f"{g['ram_gib']} GiB = 1 024 MiB", f"{c['ram_mib']} MiB", d["gw_margen_ram"]],
              ["Créditos de CPU", f"Gana {g['creditos_por_hora']} créditos por hora", f"Consume {d['gw_cred_c']} por hora", f"Saldo +{g['creditos_por_hora'] - int(d['gw_cred_c'])} por hora"],
-             ["Sesiones y solicitudes", "—", f"{c['sesiones_simultaneas']} sesiones, {c['solicitudes_por_s']} solicitudes por segundo", "Propuesta, sin medir (CI-82)"]]
+             ["Sesiones y solicitudes", "—", f"{c['sesiones_simultaneas']} sesiones, {c['solicitudes_por_s']} solicitudes por segundo", "Supuesto S-33; se mide en S2"]]
     return (["Recurso", "Capacidad de t3.micro", "Carga de diseño", "Margen"], filas, [3.0, 6.0, 5.0, 3.0], False)
 
 
@@ -348,7 +348,7 @@ def t_decisiones(x, d):
 
 def t_supuestos(x, d):
     x, cd = fuentes()
-    usados = ["S-04", "S-08", "S-11", "S-12", "S-13", "S-14", "S-26", "S-29", "S-30"]
+    usados = ["S-04", "S-08", "S-11", "S-12", "S-13", "S-14", "S-26", "S-29", "S-30", "S-33"]
     filas = [[s, x.supuestos[s]["supuesto"], re.sub(r"\s+", " ", str(x.supuestos[s]["valor"])), x.supuestos[s]["validacion"]] for s in usados]
     return (["ID", "Supuesto", "Valor", "Cómo se valida"], filas, [1.3, 4.2, 7.0, 4.5], False)
 

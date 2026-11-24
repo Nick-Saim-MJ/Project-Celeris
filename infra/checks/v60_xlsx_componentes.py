@@ -1,7 +1,7 @@
 """Gancho V-60+ — XLSX de componentes: 100 % del inventario, IP, zona, criticidad, por qué, aporta y si falla.
 
 Lee entregables/CE0311/Matriz_Componentes_Red_v<versión>.xlsx (lo genera infra/gen/xlsx_componentes.py con `make matrices`):
-    V-60  El archivo existe, abre y tiene las 6 hojas.
+    V-60  El archivo existe, abre y tiene las 7 hojas; «Retirados en v0.4» lista 1 a 1 los componentes retirados.
     V-61  Hoja Matriz: una fila por componente, 1 a 1 con el inventario (ID, nombre, IP planeada, zona, criticidad, estado).
     V-62  Todo componente dibujado en los .drawio (cobertura-figuras.json de P3) está en la matriz, con sus figuras.
     V-63  Ninguna celda obligatoria vacía.
@@ -24,7 +24,7 @@ for _p in (str(_INFRA), str(_INFRA / "gen")):
     if _p not in sys.path:
         sys.path.insert(0, _p)
 
-HOJAS = ["Portada", "Matriz", "Plan de direccionamiento", "Cobertura", "Resumen", "Trazabilidad R6"]
+HOJAS = ["Portada", "Matriz", "Plan de direccionamiento", "Cobertura", "Resumen", "Trazabilidad R6", "Retirados en v0.4"]
 GENERAR = "make matrices (python infra/gen/xlsx_componentes.py --verificar)"
 
 
@@ -53,6 +53,12 @@ def run(infra):
     faltan = [h for h in HOJAS if h not in wb.sheetnames]
     if faltan:
         h60.append(E(f"Faltan hojas: {', '.join(faltan)}", GENERAR))
+    if gx.HOJA_RETIRADOS in wb.sheetnames:
+        wr = wb[gx.HOJA_RETIRADOS]
+        en_hoja = {r[0] for r in wr.iter_rows(min_row=2, max_col=1, values_only=True)
+                   if r[0] and r[0] in infra.componentes_retirados}
+        for cid in sorted(set(infra.componentes_retirados) - en_hoja):
+            h60.append(E(f"{cid} está retirado y falta en la hoja «{gx.HOJA_RETIRADOS}»", GENERAR))
     resultado("V-60", "Matriz de componentes: archivo y hojas", h60, rel)
     if "Matriz" not in wb.sheetnames:
         return res

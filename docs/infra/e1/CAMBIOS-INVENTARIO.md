@@ -97,6 +97,8 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-70 | vacío | FGT-EXT sin FIG-5.3 ni FIG-5.4; WIFI-EST sin FIG-5.3 (H1) | resuelto (2026-11-23) |
 | CI-71 | contradicción | `muestra` de FIG-5.5a/b con los flujos de la v0.2 (H1) | resuelto (2026-11-23) |
 | CI-72 | contradicción | Confianza de la zona AWS: «Media» en el YAML, «Baja, expuesta» en D1.9 (H1) | abierto |
+| CI-73 | vacío | «Por qué existe» de HNY01, SIEM01 y VGW más pobre que la Arquitectura v0.4 §4 (H2) | resuelto (2026-11-23) |
+| CI-74 | vacío | Los componentes retirados no tienen motivo ni reemplazo en el YAML; la §5 no da motivo para las subredes AWS-PUB-B, AWS-APP-B, AWS-DATA-A y AWS-DATA-B (H2) | abierto (parcial) |
 
 ## Entradas
 
@@ -864,3 +866,21 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto (Nick y Henyelrey)
 - **Efecto al resolver:** cambiar `confianza` de la zona AWS, quitar `cambio: CI-72` y regenerar FIG-5.3 (`make diagrams-check`).
 
+## Entradas de la matriz de componentes v1.1 (H2, rango CI-70…CI-89)
+
+### CI-73 — «Por qué existe» de HNY01, SIEM01 y VGW más pobre que la Arquitectura §4
+- **Estado:** resuelto (2026-11-23)
+- **Tipo:** vacío
+- **Dónde:** `infra/inventory.yaml` → `por_que` de HNY01, SIEM01 y VGW (marcados con `cambio: CI-73`); `docs/celeris/Celeris-Arquitectura-v0.4.md` §4.1 y §4.2
+- **Qué dice cada fuente:** la §4 da una razón de existir que el YAML no recogía. HNY01: «lo exige la rúbrica (criterio 5 en S1, criterio 4 en S2). Cuesta 1 vCPU». SIEM01: las alertas incluyen IP del campus, «por eso queda en el campus». VGW: «transporta F30 y F13; lo exige la rúbrica de conectividad híbrida».
+- **Decisión aplicada:** se agrega esa razón al `por_que` de cada uno, sin quitar lo que ya tenía. Los demás componentes vigentes concuerdan con la §4 (el YAML es igual o más detallado). La matriz se regenera; no se edita a mano.
+- **Decide:** equipo del proyecto
+
+### CI-74 — Motivo y reemplazo de los componentes retirados
+- **Estado:** abierto (parcial)
+- **Tipo:** vacío
+- **Dónde:** `infra/inventory.yaml` → componentes con `estado: retirado`; campos nuevos `retirado_motivo` y `retirado_cubre` (opcionales en `infra/schema/inventory.schema.json`); Arquitectura v0.4 §5
+- **Qué dice cada fuente:** el YAML solo guardaba `retirado_por` (CI-35, CI-36 o CI-39). La hoja «Retirados en v0.4» de la matriz pide el motivo. La §5 da el motivo y lo que cubre la función de DB01, OBS01, SVC01, WAF01, WEB01, IDS01, PROBE01, NAS01, EC2-SHIELD, EC2-CTRLR y NAT01. Para las subredes AWS-PUB-B, AWS-APP-B, AWS-DATA-A y AWS-DATA-B la §5 no da motivo; la §10.2 solo deja pub-a, app-a y la reserva 10.30.128.0/17.
+- **Decisión aplicada:** `retirado_motivo` y `retirado_cubre` con el texto de la §5 en los 11 componentes que la §5 nombra. Las 4 subredes quedan sin motivo; la matriz lo muestra como «la §5 no da motivo (CI-74)».
+- **Pendiente:** que el equipo escriba el motivo de las 4 subredes (por ejemplo, si se debe a que la v0.4 usa una sola AZ). No se completa aquí para no inventarlo.
+- **Decide:** equipo del proyecto (Nick y Henyelrey)

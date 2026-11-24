@@ -1,8 +1,8 @@
 {
-  "archivo": "entregables/CE0311/Matriz_Componentes_Red_v1.0.xlsx",
-  "sha256": "5b894934e6c3810150c07b11119fa8973caf5b8a3c7c758b21f19aa7c304de34",
+  "archivo": "entregables/CE0311/Matriz_Componentes_Red_v1.1.xlsx",
+  "sha256": "e45132e6cb7dcc0382e1de0ca980b0715b6e3b19a315c471f66f3f3f2fc04fee",
   "motor": "Microsoft Excel (COM)",
-  "formulas": 195,
+  "formulas": 172,
   "errores": [],
   "sin_valor": 0,
   "nota": ""

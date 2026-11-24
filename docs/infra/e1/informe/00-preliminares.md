@@ -4,7 +4,7 @@
 
 Este informe se genera con `make informe` desde la fuente única del repositorio (`infra/inventory.yaml`, `infra/pruebas.yaml` e `infra/trazabilidad.yaml`). Las tablas de direccionamiento, componentes, flujos, pruebas, amenazas, detecciones y supuestos no se escriben a mano: si un dato cambia en el inventario, el informe, los diagramas y las matrices XLSX cambian juntos. El commit indicado arriba identifica la versión exacta de esos datos.
 
-Las contradicciones y vacíos encontrados en los documentos base se registran como CI-nn en `docs/infra/e1/CAMBIOS-INVENTARIO.md`. Quedan abiertos CI-72 (nivel de confianza de la zona AWS) y CI-74 (motivo del retiro de cuatro subredes de AWS); ninguno cambia una IP, un puerto ni una regla de este diseño.
+Las contradicciones y vacíos encontrados en los documentos base se registran como CI-nn en `docs/infra/e1/CAMBIOS-INVENTARIO.md`. CI-72 (nivel de confianza de la zona AWS, ahora «Baja, expuesta») y CI-74 (motivo del retiro de cuatro subredes de AWS, D-28) están resueltos; ninguno cambia una IP, un puerto ni una regla de este diseño.
 
 # Glosario
 

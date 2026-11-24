@@ -226,7 +226,7 @@
   "docx": "entregables/CE0311/Informe_Diseno_Red_v1.1.docx",
   "pdf": "entregables/CE0311/Informe_Diseno_Red_v1.1.pdf",
   "commit_fuente": "bb7172a",
-  "huella_fuente": "b529fb07ac874d2a",
+  "huella_fuente": "020ffdd01a8745a1",
   "figuras": [
     "FIG-1.1",
     "FIG-5.1",
@@ -236,8 +236,5 @@
     "FIG-5.5a",
     "FIG-5.5b"
   ],
-  "completar": [
-    "[COMPLETAR: docente/curso]",
-    "[COMPLETAR: nombres completos de los autores]"
-  ]
+  "completar": []
 }

@@ -40,7 +40,7 @@ La Figura 5.3 ordena las zonas por nivel de confianza y muestra, sobre la misma 
 
 {{tabla:zonas_confianza}}
 
-La zona AWS figura con confianza «Media» porque así está en el inventario; el documento de diseño la califica como «Baja, expuesta», igual que DMZ-SVC, porque EC2-GW recibe tráfico de Internet (F29). La diferencia está registrada como CI-72 y no cambia ninguna regla: EC2-GW solo puede llegar a CTRL01:443 con mTLS y a SIEM01:1514/1515, tanto por su Security Group como por FW01 (T58).
+La zona AWS figura con confianza «Baja, expuesta», igual que DMZ-SVC, porque EC2-GW recibe tráfico de Internet (F29). Que EC2-GW no guarde datos no vuelve más confiable a su zona: solo reduce el impacto si la comprometen. La decisión está registrada como CI-72 y no cambia ninguna regla: EC2-GW solo puede llegar a CTRL01:443 con mTLS y a SIEM01:1514/1515, tanto por su Security Group como por FW01 (T58).
 
 {{figura:FIG-5.3|Qué observar: las zonas de mayor a menor confianza; los controles de cada capa de defensa; que PORTAL01 no tiene salida a Internet y recibe su certificado de FW01 por F33; y en qué componente se mitiga cada amenaza AM-xx.}}
 

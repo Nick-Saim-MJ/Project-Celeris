@@ -27,8 +27,7 @@ figuras y pruebas citadas. Hoy pasa en R1–R8. Eso prueba que la evidencia exis
 
 ## Pendientes del equipo antes de entregar
 
-1. Docente/curso y nombres completos de los autores en la portada (V-88). Se completan en `build_informe.py` → `portada()`
-   o, mejor, como dato en `infra/inventory.yaml` → `meta` si el equipo lo aprueba.
-2. Decidir CI-72 (confianza de AWS) y CI-74 (motivo de las 4 subredes retiradas).
+1. ~~Nombres completos y docente en la portada~~ Resuelto: `build_informe.py` toma los nombres del campo `equipo` del Marco común y pone el área «Infraestructura Tecnológica»; no hay docente (son tres jurados).
+2. ~~CI-72 y CI-74~~ Resueltos el 2026-11-23: la zona AWS pasa a «Baja, expuesta» y el motivo de las 4 subredes es D-28.
 3. Abrir el DOCX en Word y revisar la tabla de contenidos: el generador la actualiza con Word por COM; con LibreOffice
    habría que pulsar F9.

@@ -1249,7 +1249,8 @@ def fig_1_1(x: Infra) -> Diagrama:
     d.flecha(n["FW01"], n["VGW"], VIOLETA + "fontSize=10;", "VPN IPsec<br>2 túneles<br>lleva " + " y ".join(vpn["flujos_sobre_vpn"]),
              {"celeris_id": vpn["id"], "celeris_tipo": "tunel", "flujos": ", ".join(vpn["flujos_sobre_vpn"])})
     d.flecha(n["VGW"], n["AWS-VPC"], VIOLETA + "strokeWidth=2;")
-    d.nota(20, 560, 960, 30, "La VPN sale por FGT-EXT (NAT-T, UDP 4500). FW01 → consola: ruteo entre zonas. ESX01 hospeda las VM (línea punteada).",
+    d.nota(20, 560, 960, 44, "La VPN sale por FGT-EXT (NAT-T, UDP 4500). FW01 → consola: ruteo entre zonas. ESX01 hospeda las VM (línea punteada). "
+           "Vista simplificada: F8 también cruza FW01 (EDGE → FW01 → FGT-EXT); la regla «F8 EDGE > INTERNET miss tcp/80,443» está en FW01.",
            {"celeris_rol": "nota"}, color="#FFFFFF", borde="#FFFFFF", tam=10)
     alto_p = d.panel(20, 640, 940, list(d.presentes), max_si_falla=90)
     alto_l = d.leyenda(980, 640, w=680)

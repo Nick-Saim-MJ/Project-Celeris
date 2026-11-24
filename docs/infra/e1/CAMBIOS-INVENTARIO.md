@@ -96,9 +96,9 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-63 | decisión de transcripción | Capas de defensa en profundidad (D1.9) en la fuente única (resuelve la parte 1 de CI-30) | resuelto (2026-11-23) |
 | CI-70 | vacío | FGT-EXT sin FIG-5.3 ni FIG-5.4; WIFI-EST sin FIG-5.3 (H1) | resuelto (2026-11-23) |
 | CI-71 | contradicción | `muestra` de FIG-5.5a/b con los flujos de la v0.2 (H1) | resuelto (2026-11-23) |
-| CI-72 | contradicción | Confianza de la zona AWS: «Media» en el YAML, «Baja, expuesta» en D1.9 (H1) | abierto |
+| CI-72 | contradicción | Confianza de la zona AWS: «Media» en el YAML, «Baja, expuesta» en D1.9 (H1) | resuelto (2026-11-23) |
 | CI-73 | vacío | «Por qué existe» de HNY01, SIEM01 y VGW más pobre que la Arquitectura v0.4 §4 (H2) | resuelto (2026-11-23) |
-| CI-74 | vacío | Los componentes retirados no tienen motivo ni reemplazo en el YAML; la §5 no da motivo para las subredes AWS-PUB-B, AWS-APP-B, AWS-DATA-A y AWS-DATA-B (H2) | abierto (parcial) |
+| CI-74 | vacío | Los componentes retirados no tienen motivo ni reemplazo en el YAML; la §5 no da motivo para las subredes AWS-PUB-B, AWS-APP-B, AWS-DATA-A y AWS-DATA-B (H2) | resuelto (2026-11-23) |
 | CI-75 | vacío | Los OD-xx no citan la necesidad ni el objetivo del proyecto (OB-x) que atienden; el anexo C del informe lo necesita (H3) | resuelto (2026-11-23) |
 | CI-76 | contradicción | El supuesto S-18 (usuario SFTP de NAS01, prueba T39) describe piezas retiradas en v0.4 y aparecía como vigente en el anexo D | resuelto (2026-11-23) |
 
@@ -860,13 +860,13 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto
 
 ### CI-72 — Confianza de la zona AWS: «Media» en el YAML, «Baja, expuesta» en D1.9
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-23)
 - **Tipo:** contradicción
 - **Dónde:** `infra/inventory.yaml` → zona AWS (`confianza`, marcada con `cambio: CI-72`); D1.9 «Zonas y su nivel de confianza» («AWS (EC2-GW) — Baja, expuesta»)
 - **Qué dice cada fuente:** el YAML da a la zona AWS la confianza «Media». La tabla de D1.9 v0.4 da «Baja, expuesta» a AWS (EC2-GW), igual que a DMZ-SVC, porque EC2-GW recibe F29 desde Internet.
 - **Propuesta:** «Baja» con `confianza_nota: expuesta` (como DMZ-SVC), porque EC2-GW es lo único del diseño expuesto a Internet además del portal. Mientras tanto, la FIG-5.3 dibuja el valor del YAML (Media) y ordena las zonas con él.
 - **Decide:** equipo del proyecto (Nick y Henyelrey)
-- **Efecto al resolver:** cambiar `confianza` de la zona AWS, quitar `cambio: CI-72` y regenerar FIG-5.3 (`make diagrams-check`).
+- **Decisión aplicada:** `confianza: Baja` y `confianza_nota: expuesta` en la zona AWS; se quitó `cambio: CI-72`. Que EC2-GW no guarde datos no vuelve más confiable a su zona: solo reduce el impacto si la comprometen. FIG-5.3 y el informe se regeneraron con el valor nuevo; ninguna regla cambia.
 
 ## Entradas de la matriz de componentes v1.1 (H2, rango CI-70…CI-89)
 
@@ -879,12 +879,12 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto
 
 ### CI-74 — Motivo y reemplazo de los componentes retirados
-- **Estado:** abierto (parcial)
+- **Estado:** resuelto (2026-11-23)
 - **Tipo:** vacío
 - **Dónde:** `infra/inventory.yaml` → componentes con `estado: retirado`; campos nuevos `retirado_motivo` y `retirado_cubre` (opcionales en `infra/schema/inventory.schema.json`); Arquitectura v0.4 §5
 - **Qué dice cada fuente:** el YAML solo guardaba `retirado_por` (CI-35, CI-36 o CI-39). La hoja «Retirados en v0.4» de la matriz pide el motivo. La §5 da el motivo y lo que cubre la función de DB01, OBS01, SVC01, WAF01, WEB01, IDS01, PROBE01, NAS01, EC2-SHIELD, EC2-CTRLR y NAT01. Para las subredes AWS-PUB-B, AWS-APP-B, AWS-DATA-A y AWS-DATA-B la §5 no da motivo; la §10.2 solo deja pub-a, app-a y la reserva 10.30.128.0/17.
 - **Decisión aplicada:** `retirado_motivo` y `retirado_cubre` con el texto de la §5 en los 11 componentes que la §5 nombra. Las 4 subredes quedan sin motivo; la matriz lo muestra como «la §5 no da motivo (CI-74)».
-- **Pendiente:** que el equipo escriba el motivo de las 4 subredes (por ejemplo, si se debe a que la v0.4 usa una sola AZ). No se completa aquí para no inventarlo.
+- **Decisión del equipo (2026-11-23):** el motivo de AWS-PUB-B, AWS-APP-B, AWS-DATA-A y AWS-DATA-B es D-28: ya no hay réplica ni componentes multi-AZ (se retiraron EC2-CTRLR y EC2-SHIELD), así que no tienen nada que alojar. Se agregó `retirado_motivo` y `retirado_cubre` a las cuatro subredes. Nota: el texto de D-28 en CE03 habla de los servicios de apoyo; el retiro de EC2-CTRLR y EC2-SHIELD figura como CI-36.
 - **Decide:** equipo del proyecto (Nick y Henyelrey)
 
 ## Entradas del informe CE0311 (H3, rango CI-70…CI-89)

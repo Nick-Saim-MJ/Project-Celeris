@@ -222,8 +222,8 @@ zonas:
     vlan: null
     cidr: 10.30.0.0/16
     gateway: null
-    confianza: Media
-    cambio: CI-72
+    confianza: Baja
+    confianza_nota: "expuesta"
     proposito: "VPC celeris (10.30.0.0/16): EC2-GW (panel remoto), S3 de respaldos y subred privada vacía para el simulacro de recuperación"
     regla_diseno: "Alcanzable solo por VPN desde el campus; desde Internet solo EC2-GW:443; Security Groups y NACL de D2.5"
     admin: "Equipo del proyecto (cuenta AWS [S-13])"
@@ -1287,6 +1287,8 @@ componentes:
     criticidad: Baja
     estado: retirado
     retirado_por: CI-36
+    retirado_motivo: "No hay réplica ni componentes multi-AZ desde que se retiraron EC2-CTRLR y EC2-SHIELD (D-28): la subred no tiene nada que alojar"
+    retirado_cubre: "pub-a, que aloja EC2-GW (sin NAT redundante)"
     por_que: "Reserva para crecer a NAT redundante en la segunda zona de disponibilidad."
     aporta_corto: "Reserva para NAT redundante"
     aporta: "Sin recursos en esta fase."
@@ -1436,6 +1438,8 @@ componentes:
     criticidad: Media
     estado: retirado
     retirado_por: CI-36
+    retirado_motivo: "No hay réplica ni componentes multi-AZ desde que se retiraron EC2-CTRLR y EC2-SHIELD (D-28): la subred no tiene nada que alojar"
+    retirado_cubre: "app-a (simulacro de recuperación)"
     por_que: "Aloja EC2-CTRLR sin exposición directa a Internet."
     aporta_corto: "Aloja la réplica del plano de control"
     aporta: "Mismas rutas que app-a (rt-private)."
@@ -1462,6 +1466,8 @@ componentes:
     criticidad: Baja
     estado: retirado
     retirado_por: CI-36
+    retirado_motivo: "No hay réplica ni componentes multi-AZ desde que se retiraron EC2-CTRLR y EC2-SHIELD (D-28): la subred no tiene nada que alojar"
+    retirado_cubre: "S3 celeris-backups (sin base de datos en AWS)"
     por_que: "Reserva para una base de datos gestionada si el plano de control crece."
     aporta_corto: "Reserva para base de datos gestionada"
     aporta: "Sin recursos en esta fase."
@@ -1488,6 +1494,8 @@ componentes:
     criticidad: Baja
     estado: retirado
     retirado_por: CI-36
+    retirado_motivo: "No hay réplica ni componentes multi-AZ desde que se retiraron EC2-CTRLR y EC2-SHIELD (D-28): la subred no tiene nada que alojar"
+    retirado_cubre: "S3 celeris-backups (sin base de datos en AWS)"
     por_que: "Reserva en la segunda zona de disponibilidad para crecer a alta disponibilidad."
     aporta_corto: "Reserva para alta disponibilidad de datos"
     aporta: "Sin recursos en esta fase."

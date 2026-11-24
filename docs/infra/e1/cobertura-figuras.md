@@ -8,7 +8,7 @@ Un componente cuenta como presente si tiene caja propia con `celeris_id`. Los qu
 
 | ID | Chequeo | Estado | Hallazgos |
 |---|---|---|---|
-| V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA | 0 |
+| V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | ADVERTENCIA | 14 |
 | V-51 | Cobertura componente × figura igual al campo `figuras` del inventario | PASA | 0 |
 | V-52 | Todo celeris_id es un ID del contrato | PASA | 0 |
 | V-53 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | PASA | 0 |
@@ -16,7 +16,20 @@ Un componente cuenta como presente si tiene caja propia con `celeris_id`. Los qu
 | V-55 | Título, leyenda y panel «Qué aporta y qué pasa si falla» en cada figura | PASA | 0 |
 | V-56 | Criticidad (borde + texto) y color de zona según CLAUDE.md | PASA | 0 |
 
-Sin hallazgos.
+- **V-50** [advertencia] FIG-1.1.png es anterior a FIG-1.1.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-1.1.pdf es anterior a FIG-1.1.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.1.png es anterior a FIG-5.1.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.1.pdf es anterior a FIG-5.1.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.2.png es anterior a FIG-5.2.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.2.pdf es anterior a FIG-5.2.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.3.png es anterior a FIG-5.3.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.3.pdf es anterior a FIG-5.3.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.4.png es anterior a FIG-5.4.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.4.pdf es anterior a FIG-5.4.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.5a.png es anterior a FIG-5.5a.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.5a.pdf es anterior a FIG-5.5a.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.5b.png es anterior a FIG-5.5b.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
+- **V-50** [advertencia] FIG-5.5b.pdf es anterior a FIG-5.5b.drawio — Vuelva a exportar: python infra/gen/exportar_drawio.py
 
 ## Por figura
 

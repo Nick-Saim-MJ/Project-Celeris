@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.1 · fecha 2026-11-22
 - Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 9 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **0 FALLA**, 2 con advertencias, 68 PASA, 0 pendientes de P2–P5.
+- Resultado: **0 FALLA**, 3 con advertencias, 67 PASA, 0 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -50,7 +50,7 @@
 | V-43 | Los artefactos generados versionados (tfvars de OpenTofu, topología de containerlab) están al día con el inventario | PASA | — |
 | V-44 | Un ID retirado no se reutiliza ni aparece en flujos, pruebas, componentes, zonas, rúbrica o textos vigentes | PASA | — |
 | V-45 | Ningún flujo permite descifrado con origen WIFI-EST (REQ-F-36, REQ-RN-11) | PASA | — |
-| V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA | Detalle y matriz componente × figura en docs/infra/e1/cobertura-figuras.md |
+| V-50 | Figuras .drawio, .png y .pdf presentes, con XML embebido y al día | PASA con advertencias | Detalle y matriz componente × figura en docs/infra/e1/cobertura-figuras.md |
 | V-51 | Cobertura componente × figura igual al campo `figuras` del inventario | PASA | — |
 | V-52 | Todo celeris_id es un ID del contrato | PASA | — |
 | V-53 | IP y CIDR rotulados existen en el inventario (y son del componente que los rotula) | PASA | — |
@@ -62,7 +62,7 @@
 | V-62 | Componentes dibujados en los .drawio = 100 % en la matriz | PASA | — |
 | V-63 | Ninguna celda obligatoria vacía en la hoja Matriz | PASA | — |
 | V-64 | Ningún «Por qué existe» repetido | PASA | — |
-| V-65 | Las fórmulas recalculan sin errores | PASA | Microsoft Excel (COM) · 172 fórmulas · 0 errores |
+| V-65 | Las fórmulas recalculan sin errores | PASA con advertencias | Microsoft Excel (COM) · 172 fórmulas · 0 errores |
 | V-66 | «Por qué», «Qué aporta» y «Si falla» citan algo verificable | PASA | — |
 | V-70 | XLSX de pruebas: hojas y una fila por prueba del YAML, con sus datos | PASA | — |
 | V-71 | XLSX de pruebas: cada prueba cita flujos, componentes, OD, AM, DET y criterios de rúbrica existentes | PASA | — |
@@ -70,7 +70,7 @@
 | V-73 | Ensayo L: ninguna FALLA sin causa y acción; NO_APLICA, PARCIAL y sin ensayo nunca como PASA | PASA | — |
 | V-74 | XLSX de pruebas: fórmulas sin errores tras recalcular con LibreOffice y coherentes con la biblioteca | PASA | 0 errores, 0 advertencias |
 | V-75 | XLSX de pruebas: el archivo versionado está al día con pruebas.yaml, el inventario y el último ensayo | PASA | — |
-| V-80 | Informe: DOCX y PDF existen, abren y son de la fuente actual | PASA | entregables/CE0311/Informe_Diseno_Red_v1.1.docx; PDF 46 páginas; motor Microsoft Word (COM) |
+| V-80 | Informe: DOCX y PDF existen, abren y son de la fuente actual | PASA | entregables/CE0311/Informe_Diseno_Red_v1.1.docx; PDF ? páginas; motor Microsoft Word (COM) |
 | V-81 | Informe: 11 secciones de la plantilla, en orden y con contenido | PASA | 26 títulos de sección |
 | V-82 | Informe: sin texto guía ni marcadores de la plantilla | PASA | 48 textos guía comprobados |
 | V-83 | Informe: ningún ID retirado en v0.4 presentado como vigente | PASA | 35 IDs retirados buscados |
@@ -78,7 +78,7 @@
 | V-85 | Informe: 7 figuras con leyenda y «qué observar» | PASA | 7 imágenes |
 | V-86 | Informe: cifras repetidas coherentes con la fuente | PASA | 7 VLAN · 31 componentes · T05 27,2 s · T09 8,7 s |
 | V-87 | Informe: evidencia citada para cada criterio de la rúbrica | PASA | criterios con toda su evidencia: R1, R2, R3, R4, R5, R6, R7, R8 |
-| V-88 | Informe: marcas [COMPLETAR] pendientes | PASA con advertencias | 2 pendientes |
+| V-88 | Informe: marcas [COMPLETAR] pendientes | PASA | 0 pendientes |
 | V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.1 · commit bb7172a |
 
 ## Errores
@@ -90,8 +90,21 @@ Ninguno.
 
 - **V-42** — 2026-11-23-L: la prueba crítica T23 (Fuga IPv6) está en NO_APLICA, no en PASA
 - **V-42** — 2026-11-23-L: la prueba crítica T58 (EC2-GW solo alcanza CTRL01:443 y SIEM01) está en PARCIAL, no en PASA
-- **V-88** — Pendiente: [COMPLETAR: docente/curso]
-- **V-88** — Pendiente: [COMPLETAR: nombres completos de los autores]
+- **V-50** — FIG-1.1.png es anterior a FIG-1.1.drawio
+- **V-50** — FIG-1.1.pdf es anterior a FIG-1.1.drawio
+- **V-50** — FIG-5.1.png es anterior a FIG-5.1.drawio
+- **V-50** — FIG-5.1.pdf es anterior a FIG-5.1.drawio
+- **V-50** — FIG-5.2.png es anterior a FIG-5.2.drawio
+- **V-50** — FIG-5.2.pdf es anterior a FIG-5.2.drawio
+- **V-50** — FIG-5.3.png es anterior a FIG-5.3.drawio
+- **V-50** — FIG-5.3.pdf es anterior a FIG-5.3.drawio
+- **V-50** — FIG-5.4.png es anterior a FIG-5.4.drawio
+- **V-50** — FIG-5.4.pdf es anterior a FIG-5.4.drawio
+- **V-50** — FIG-5.5a.png es anterior a FIG-5.5a.drawio
+- **V-50** — FIG-5.5a.pdf es anterior a FIG-5.5a.drawio
+- **V-50** — FIG-5.5b.png es anterior a FIG-5.5b.drawio
+- **V-50** — FIG-5.5b.pdf es anterior a FIG-5.5b.drawio
+- **V-65** — El último recálculo es de otra versión del archivo
 
 ## Información
 

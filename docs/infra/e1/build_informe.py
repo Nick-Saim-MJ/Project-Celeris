@@ -57,6 +57,17 @@ COLOR_CABECERA = "1F3864"
 TAM_TEXTO = 10.5
 TAM_TABLA = 8.5
 COMPLETAR = "[COMPLETAR"
+MARCO_COMUN = RAIZ / "docs" / "celeris" / "Celeris-00-Marco-Comun.md"
+AREA = "Infraestructura Tecnológica"
+
+
+def equipo() -> str:
+    """Nombres completos de los autores: el campo `equipo` del encabezado del Marco común (no los nombres de usuario de git)."""
+    m = re.search(r"^equipo:\s*\[(.*?)\]\s*$", MARCO_COMUN.read_text(encoding="utf-8"), re.M)
+    nombres = re.findall(r'"([^"]+)"', m.group(1)) if m else []
+    if not nombres:
+        raise SystemExit(f"no hay `equipo` en el encabezado de {MARCO_COMUN}")
+    return " y ".join(nombres)
 
 
 FUENTES = ("infra/inventory.yaml", "infra/pruebas.yaml", "infra/trazabilidad.yaml")
@@ -164,7 +175,7 @@ def t_control_versiones(x, d):
         fecha = meta["fecha"]
     return (["Versión", "Fecha", "Fuente (inventario · commit)", "Autores", "Cambios"],
             [[meta["inventario_version"], fecha, f"inventario v{meta['inventario_version']} · commit {commit}",
-              gx.autores(), "Primera edición con la arquitectura v0.4: figuras regeneradas (H1), matriz de componentes v"
+              equipo(), "Primera edición con la arquitectura v0.4: figuras regeneradas (H1), matriz de componentes v"
               f"{meta['inventario_version']} (H2) e informe completo (H3)."]],
             [1.6, 2.2, 4.0, 3.4, 5.8], False)
 
@@ -892,11 +903,9 @@ class Constructor:
             if t.startswith("Plantilla y guía"):
                 poner(p, "Informe de análisis y diseño de red — Celeris Edge")
             elif t.startswith("Preparado por"):
-                poner(p, f"Preparado por: {gx.autores()} [COMPLETAR: nombres completos de los autores]")
-                self.completar.append("[COMPLETAR: nombres completos de los autores]")
+                poner(p, f"Preparado por: {equipo()}")
             elif t.startswith("Docente / curso"):
-                poner(p, "Docente / curso: [COMPLETAR: docente/curso]")
-                self.completar.append("[COMPLETAR: docente/curso]")
+                poner(p, f"Área: {AREA}")
             elif t.startswith("Análisis y Diseño de Red"):
                 pass
             elif re.fullmatch(r"20\d\d", t.strip()):
@@ -1020,7 +1029,7 @@ class Constructor:
         self._quitar_separadores_antes_de_salto()
         self._cabecera()
         self.doc.core_properties.title = "Informe de análisis y diseño de red — Celeris Edge (CE0311)"
-        self.doc.core_properties.author = gx.autores()
+        self.doc.core_properties.author = equipo()
         self.doc.core_properties.comments = f"Generado por docs/infra/e1/build_informe.py desde commit {commit_fuente()}"
         return self.doc
 

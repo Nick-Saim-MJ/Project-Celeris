@@ -961,11 +961,11 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** Nick (S-12)
 
 ### CI-84 — S-08 en `trazabilidad.yaml` es de la v0.3
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-23, decisión del equipo: corregir a la v0.4 y regenerar CE0311 como v1.2)
 - **Tipo:** contradicción
-- **Dónde:** `infra/trazabilidad.yaml` → `supuestos.S-08` («Servidor físico disponible o a adquirir», US$ 4 500); Marco común S-08 («12 núcleos, 96 GB, 2 × 1,92 TB + 2 × 1 TB NVMe», US$ 3 800); Arquitectura §10.1 («hay que recalcular S-08»)
-- **Decisión aplicada:** el informe del Entregable 2 cita las especificaciones de S-08 del Marco común y no cita el precio. No se edita `trazabilidad.yaml` porque su huella decide si el informe de CE0311 está al día (V-80, V-89).
-- **Decide:** equipo del proyecto; corregir S-08 junto con la próxima regeneración del informe de CE0311
+- **Dónde:** `infra/trazabilidad.yaml` → `supuestos.S-08` (decía «Servidor físico disponible o a adquirir», US$ 4 500); Marco común S-08 (12 núcleos, 96 GB, 2 × 1,92 TB + 2 × 1 TB NVMe, US$ 3 800); Arquitectura §10.1 («hay que recalcular S-08»)
+- **Decisión aplicada:** S-08 queda como en el Marco común y la v0.4: «Servidor físico (12 núcleos, 96 GB, 2 × 1,92 TB + 2 × 1 TB NVMe)», US$ 3 800 si se compra, validación «Cotización». Como cambia la huella de la fuente, el informe, las figuras y las matrices de CE0311 se regeneraron como v1.2 (`meta.inventario_version`); las v1.1 pasaron a `entregables/CE0311/historial/`.
+- **Decide:** equipo del proyecto
 
 ### CI-85 — `inventory.yaml` no referencia a `centro_datos.yaml`
 - **Estado:** resuelto (2026-11-23)

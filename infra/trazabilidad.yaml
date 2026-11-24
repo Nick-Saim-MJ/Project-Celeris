@@ -456,9 +456,9 @@ supuestos:
     validacion: Entrevista a técnicos
     responsable: Henyelrey
   S-08:
-    supuesto: Servidor físico disponible o a adquirir
-    valor: US$ 4 500 si se compra
-    validacion: Inventario / cotización
+    supuesto: Servidor físico (12 núcleos, 96 GB, 2 × 1,92 TB + 2 × 1 TB NVMe)
+    valor: US$ 3 800 si se compra
+    validacion: Cotización
     responsable: Nick
   S-09:
     supuesto: Tarifa eléctrica

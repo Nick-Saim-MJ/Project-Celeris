@@ -223,6 +223,7 @@ zonas:
     cidr: 10.30.0.0/16
     gateway: null
     confianza: Media
+    cambio: CI-72
     proposito: "VPC celeris (10.30.0.0/16): EC2-GW (panel remoto), S3 de respaldos y subred privada vacía para el simulacro de recuperación"
     regla_diseno: "Alcanzable solo por VPN desde el campus; desde Internet solo EC2-GW:443; Security Groups y NACL de D2.5"
     admin: "Equipo del proyecto (cuenta AWS [S-13])"
@@ -386,7 +387,7 @@ componentes:
     adr: [D-26]
     req: []
     objetivos: []
-    figuras: [FIG-1.1, FIG-5.1, FIG-5.2]
+    figuras: [FIG-1.1, FIG-5.1, FIG-5.2, FIG-5.3, FIG-5.4]
     supuestos: [S-15, S-29]
     flujos_justificacion: "Equipo existente fuera de alcance: transporta F8, F18, F21, F24 y F29 («vía FortiGate») sin ser origen ni destino de ninguna regla del proyecto"
     emulacion_lab: { nodo: fgt-sim, equivalencia: funcional, nota: "nftables con NAT 1:1 y NAT-T, sin FortiGuard (D5.3)" }
@@ -614,6 +615,8 @@ componentes:
     criticidad: Alta
     estado: retirado
     retirado_por: CI-35
+    retirado_motivo: "Una base pequeña no justifica otra VM; PostgreSQL se usa por socket local, sin red"
+    retirado_cubre: "CTRL01"
     vm: { fase: F1, vcpu: 2, ram_gb: 8, disco_gb: 100, so: "Debian 13", port_group: "PG-SERVERS" }
     por_que: "Guarda el estado del plano de control; su réplica nativa a AWS (F16) da continuidad ante la pérdida del servidor del campus."
     aporta_corto: "Base primaria del plano de control"
@@ -638,6 +641,8 @@ componentes:
     criticidad: Media
     estado: retirado
     retirado_por: CI-39
+    retirado_motivo: "La consola recibe los KPI del nodo por F10; las alertas van a Wazuh; las métricas de AWS, a CloudWatch"
+    retirado_cubre: "CTRL01, SIEM01, CloudWatch"
     vm: { fase: F1, vcpu: 2, ram_gb: 8, disco_gb: 200, so: "Debian 13", port_group: "PG-SERVERS" }
     por_que: "Recibe las trazas y métricas OTLP de los nodos (F11) y hace el scraping de Prometheus (F12); da la medición que sustenta la meta de adopción del proxy."
     aporta_corto: "Métricas y trazas de los nodos"
@@ -662,6 +667,8 @@ componentes:
     criticidad: Alta
     estado: retirado
     retirado_por: CI-39
+    retirado_motivo: "Si FW01 cae no hay ruteo, así que un DNS «secundario» no daba redundancia real"
+    retirado_cubre: "DNS y NTP en FW01; el PAC lo sirve el nodo (pac.rs)"
     vm: { fase: F1, vcpu: 1, ram_gb: 2, disco_gb: 20, so: "Debian 13", port_group: "PG-SERVERS" }
     por_que: "Sin DNS ni PAC no funcionan ni el proxy ni DIRECT; por eso hay un segundo resolvedor (FW01) y una copia del PAC en EDGE01."
     aporta_corto: "DNS primario con DNSSEC, PAC y hora con NTS"
@@ -756,6 +763,8 @@ componentes:
     criticidad: Alta
     estado: retirado
     retirado_por: CI-39
+    retirado_motivo: "El sitio es estático: el WAF y los archivos caben en una VM con sistema de archivos de solo lectura"
+    retirado_cubre: "PORTAL01"
     vm: { fase: F1, vcpu: 1, ram_gb: 1, disco_gb: 20, so: "Debian 13", port_group: "PG-DMZ-SVC" }
     por_que: "Es el único punto expuesto a Internet (DNAT 443 desde 203.0.113.10); filtra ataques web con OWASP CRS antes de que lleguen a WEB01 y entrega el aviso antes de que el usuario use el proxy (D-15, REQ-RN-05)."
     aporta_corto: "WAF con OWASP CRS delante del portal"
@@ -780,6 +789,8 @@ componentes:
     criticidad: Alta
     estado: retirado
     retirado_por: CI-39
+    retirado_motivo: "El sitio es estático: el WAF y los archivos caben en una VM con sistema de archivos de solo lectura"
+    retirado_cubre: "PORTAL01"
     vm: { fase: F1, vcpu: 1, ram_gb: 1, disco_gb: 20, so: "Debian 13", port_group: "PG-DMZ-SVC" }
     por_que: "Sirve el aviso de transparencia como sitio estático firmado (REQ-F-30), sin base de datos ni login: lo que no existe no se puede explotar."
     aporta_corto: "Portal estático firmado, sin base de datos"
@@ -804,7 +815,8 @@ componentes:
     criticidad: Media
     estado: diseño
     vm: { fase: F1, vcpu: 1, ram_gb: 1, disco_gb: 20, so: "Debian 13", port_group: "PG-DMZ-HONEY" }
-    por_que: "Un honeypot está hecho para ser comprometido: vive en su propia VLAN 41 (D-16) y solo envía eventos al SIEM."
+    por_que: "Lo exige la rúbrica (criterio 5 en S1, criterio 4 en S2) y cuesta 1 vCPU. Un honeypot está hecho para ser comprometido: vive en su propia VLAN 41 (D-16) y solo envía eventos al SIEM."
+    cambio: CI-73
     aporta_corto: "Señuelo SSH/Telnet que alerta en el SIEM"
     aporta: "Cowrie y OpenCanary reciben TCP 22→2222 y 23 por DNAT (F24, solo con aprobación escrita de la DTI y en ventana definida); envía eventos a SIEM01 (F13)."
     si_falla: "Se pierde la detección de fuerza bruta por señuelo SSH/Telnet (F24, DET-04); DMZ-SVC y el resto de la red no se afectan porque HNY01 (10.20.41.20) vive en DMZ-HONEY."
@@ -827,7 +839,8 @@ componentes:
     criticidad: Alta
     estado: diseño
     vm: { fase: F1, vcpu: 4, ram_gb: 16, disco_gb: 300, so: "Ubuntu 24.04", port_group: "PG-SEC" }
-    por_que: "Correlaciona la telemetría de todo el diseño (agentes, Suricata, WAF, honeypots, Celeris, firewall) y es la evidencia de que cada escenario de ataque produce una alerta de nivel ≥ 10."
+    por_que: "Correlaciona la telemetría de todo el diseño (agentes, Suricata, WAF, honeypots, Celeris, firewall) y es la evidencia de que cada escenario de ataque produce una alerta de nivel ≥ 10. Queda en el campus porque las alertas incluyen IP del campus."
+    cambio: CI-73
     aporta_corto: "Correlación de alertas de todo el diseño"
     aporta: "Recibe agentes en TCP 1514/1515 (F13) y syslog TLS en 6514 (F14); dashboard por HTTPS (F20); descarga reglas y feeds por TCP 443 (F26). ≈ 8 agentes + Suricata + WAF + firewall en 16 GB y 300 GB para ≈ 90 días (D2.8)."
     si_falla: "Se pierde la correlación y el registro centralizado. Mitigación: snapshots del indexer en el datastore local y semanales en S3, RTO 4 h, RPO 24 h (D2.9)."
@@ -854,6 +867,8 @@ componentes:
     criticidad: Media
     estado: retirado
     retirado_por: CI-39
+    retirado_motivo: "Suricata ya corre inline en FW01 (WAN, DMZ y LAN); los puntos ciegos intra-VLAN los cubre HNY02"
+    retirado_cubre: "FW01, HNY02"
     vm: { fase: F1, vcpu: 4, ram_gb: 8, disco_gb: 80, so: "Debian 13", port_group: "SEC + CAP-10/20/31/50" }
     por_que: "El tráfico entre VM de distinta VLAN no sale al switch físico, así que recibe copias por port groups de captura en las VLAN 10, 20, 31 y 50 (no en 30 ni 60, que cargan el tráfico masivo de la caché)."
     aporta_corto: "Detección de movimiento lateral en 4 VLAN"
@@ -901,6 +916,8 @@ componentes:
     criticidad: Baja
     estado: retirado
     retirado_por: CI-39
+    retirado_motivo: "Sonda sintética: útil pero no necesaria para el problema"
+    retirado_cubre: "T09 mide el cambio a DIRECT"
     vm: { fase: F1, vcpu: 1, ram_gb: 1, disco_gb: 10, so: "Debian 13", port_group: "PG-LAB" }
     por_que: "Mide la disponibilidad que ve el usuario (REQ-NF-03 ≥ 99,5 %) desde el mismo segmento de LAB, cada minuto."
     aporta_corto: "Mide la disponibilidad desde la VLAN de usuario"
@@ -1025,7 +1042,7 @@ componentes:
     adr: [D-27]
     req: [REQ-F-36, REQ-RN-11]
     objetivos: [OD-06, OD-08]
-    figuras: [FIG-1.1, FIG-5.1, FIG-5.2, FIG-5.5a]
+    figuras: [FIG-1.1, FIG-5.1, FIG-5.2, FIG-5.3, FIG-5.5a]
     supuestos: [S-28]
     emulacion_lab: { nodo: byod01, equivalencia: funcional, nota: "Bridge wifi-sim 172.16.0.0/16 + byod01, sin APs (D5.3)" }
     cambio: CI-38
@@ -1042,6 +1059,8 @@ componentes:
     criticidad: Media
     estado: retirado
     retirado_por: CI-39
+    retirado_motivo: "Un solo host con datastore local no necesita NFS; el respaldo va a S3"
+    retirado_cubre: "Copia local en el datastore + S3"
     por_que: "Concentra el datastore NFS de ESX01 (VLAN 70, sin ruteo) y el destino de respaldos 3-2-1-1-0 (VLAN 71, enrutada con lista de permitidos); además actúa como servidor NUT."
     aporta_corto: "NFS aislado y destino de respaldos restic"
     aporta: "2× 4 TB RAID 1; NFS 4.1 en TCP 2049 solo desde ESX01 vmk1 (F19); SFTP en TCP 22 desde DB01, CTRL01, SVC01 y OBS01 (F17); copia a S3 (F18)."
@@ -1109,7 +1128,8 @@ componentes:
     funcion: "Extremo VPN"
     criticidad: Alta
     estado: diseño
-    por_que: "Es el extremo AWS de la VPN site-to-site: anuncia 10.30.0.0/16 por BGP (ASN 64512) y aprende 10.20.0.0/16 sin cambios manuales."
+    por_que: "Es el extremo AWS de la VPN site-to-site: anuncia 10.30.0.0/16 por BGP (ASN 64512) y aprende 10.20.0.0/16 sin cambios manuales. Transporta F30 y F13; lo exige la rúbrica de conectividad híbrida."
+    cambio: CI-73
     aporta_corto: "Extremo AWS de la VPN con BGP"
     aporta: "Dos túneles IPsec IKEv2 (activo/pasivo) con IP asignadas por AWS; propaga rutas a rt-public y rt-private."
     si_falla: "Se pierde la conectividad híbrida; el campus sigue funcionando (el DIRECT y los nodos no dependen de AWS). Mitigación: entorno AWS recreable desde OpenTofu, RTO 15 min (D2.9)."
@@ -1135,6 +1155,8 @@ componentes:
     criticidad: Media
     estado: retirado
     retirado_por: CI-36
+    retirado_motivo: "Un segundo nivel de caché en AWS no ahorra enlace del campus: los MISS igual cruzan el enlace"
+    retirado_cubre: "—"
     por_que: "Atiende solo los MISS de los nodos del campus (≈ 70 % del tráfico cacheable si el BHR local es 30 % [S-04]), en ráfagas, para no repetir la descarga por el enlace del campus."
     aporta_corto: "Caché de segundo nivel en AWS"
     aporta: "t3.medium + 200 GB gp3 en producción (t3.small en laboratorio); TCP 8443 con mTLS dentro de IPsec desde EDGE (F9); métricas en 9128 desde OBS01 (F12); sg-shield."
@@ -1160,6 +1182,8 @@ componentes:
     criticidad: Media
     estado: retirado
     retirado_por: CI-36
+    retirado_motivo: "La continuidad por respaldo en S3 basta para un RTO de 2 h"
+    retirado_cubre: "S3 + restauración (T59)"
     por_que: "Mantiene una réplica en espera de PostgreSQL y la API del plano de control para continuidad si el servidor del campus se pierde."
     aporta_corto: "Réplica en espera del plano de control"
     aporta: "t3.small + 60 GB gp3 (t3.micro en laboratorio); se conecta al primario DB01 por TCP 5432 con TLS verify-full dentro de IPsec (F16); sg-ctrlr."
@@ -1185,6 +1209,8 @@ componentes:
     criticidad: Media
     estado: retirado
     retirado_por: CI-36
+    retirado_motivo: "EC2-GW está en la subred pública; nada privado corre 24×7"
+    retirado_cubre: "NAT temporal en el simulacro (NAT-DR)"
     por_que: "Da salida a Internet a las subredes privadas por una instancia t3.micro en lugar de un NAT Gateway, que cobra por hora y por GB; es un punto único de falla aceptado en esta fase."
     aporta_corto: "Salida a Internet de las subredes privadas"
     aporta: "Ruta 0.0.0.0/0 de rt-private hacia su ENI; ancho de banda base ≈ 64 Mbps (suficiente para un prefetch nocturno ≤ 50 GB); sg-nat acepta todo desde 10.30.10.0/23."

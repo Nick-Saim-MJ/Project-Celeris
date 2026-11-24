@@ -1,7 +1,10 @@
 """Genera la Matriz de componentes de red del Entregable CE0311 (P4) desde la fuente única infra/*.yaml.
 
 Salida: entregables/CE0311/Matriz_Componentes_Red_v<inventario_version>.xlsx con las hojas
-    Portada · Matriz · Plan de direccionamiento · Cobertura · Resumen · Trazabilidad R6
+    Portada · Matriz · Plan de direccionamiento · Cobertura · Resumen · Trazabilidad R6 · Retirados en v0.4
+
+- La hoja Matriz trae solo lo vigente (Infra.componentes); lo retirado va a «Retirados en v0.4» con el CI que lo retiró y el
+  motivo y el reemplazo de la Arquitectura v0.4 §5 (`retirado_motivo`, `retirado_cubre`, CI-74).
 
 - Todo dato sale de `Infra` (celeris_infra). La columna «Figuras donde aparece» y la hoja Cobertura salen del informe que
   escribe infra/gen/drawio_check.py (docs/infra/e1/cobertura-figuras.json: lo que está DIBUJADO en los .drawio).
@@ -39,7 +42,9 @@ COBERTURA_JSON = RAIZ / "docs" / "infra" / "e1" / "cobertura-figuras.json"
 RECALCULO_JSON = RAIZ / "docs" / "infra" / "e1" / "recalculo-xlsx-componentes.json"
 ERRORES_EXCEL = ("#REF!", "#VALUE!", "#NAME?", "#DIV/0!", "#N/A", "#NUM!", "#NULL!")
 
-ESTADO = {"diseño": "Diseño", "existente": "Existente", "fuera_de_alcance": "Fuera de alcance"}
+# Estado en la matriz (H2): vigente, temporal (solo durante el simulacro T59) o existente / fuera de alcance.
+ESTADO = {"diseño": "Vigente", "temporal": "Temporal", "existente": "Existente", "fuera_de_alcance": "Fuera de alcance"}
+HOJA_RETIRADOS = "Retirados en v0.4"
 CRITICIDADES = ["Alta", "Media", "Baja"]
 # Relleno por criticidad (Okabe-Ito aclarado). El texto «Alta/Media/Baja» siempre está en la celda: el color nunca va solo.
 RELLENO_CRIT = {"Alta": "F7C9A8", "Media": "FBE3B0", "Baja": "E6E6E6"}
@@ -184,6 +189,14 @@ def formato_criticidad(ws, rango: str, primera: str):
                                                         fill=relleno_cf(color), font=Font(bold=crit == "Alta")))
 
 
+def conteo_estados(x: Infra) -> str:
+    n = {}
+    for c in x.componentes.values():
+        e = ESTADO.get(c["estado"], c["estado"])
+        n[e] = n.get(e, 0) + 1
+    return ", ".join(f"{k} {v}" for k, v in sorted(n.items(), key=lambda kv: -kv[1]))
+
+
 def hoja_portada(wb, x: Infra, fuente_fig: str, nombre: str):
     ws = wb.active
     ws.title = "Portada"
@@ -199,7 +212,9 @@ def hoja_portada(wb, x: Infra, fuente_fig: str, nombre: str):
         ("Fuente de los datos", "infra/inventory.yaml, infra/pruebas.yaml, infra/trazabilidad.yaml; generado por "
                                 "infra/gen/xlsx_componentes.py (no editar a mano: make matrices lo regenera)"),
         ("Figuras", f"Columna «Figuras donde aparece» y hoja Cobertura: {fuente_fig}"),
-        ("Cómo leer la matriz", "Una fila por componente del inventario (37). Las cinco primeras columnas son las de la plantilla "
+        ("Cómo leer la matriz", f"Una fila por componente no retirado del inventario ({len(x.componentes)}: {conteo_estados(x)}); los "
+                                f"{len(x.componentes_retirados)} retirados en la v0.4 están en la hoja «{HOJA_RETIRADOS}». "
+                                "Las cinco primeras columnas son las de la plantilla "
                                 "del informe (Componente, IP planeada, Zona, Función, Criticidad). Las siguientes explican por qué "
                                 "existe, qué aporta y qué pasa si falla, y lo enlazan con flujos F-nn, pruebas T-xx, amenazas AM-xx, "
                                 "objetivos OD-xx, decisiones D-xx, requisitos REQ-…, figuras FIG-x.x y supuestos S-xx. "
@@ -207,7 +222,8 @@ def hoja_portada(wb, x: Infra, fuente_fig: str, nombre: str):
         ("Criticidad", "Alta: su caída corta un servicio del diseño o su recuperación (borde 3 px y etiqueta ALTA en los diagramas). "
                        "Media: degrada el servicio o la detección (2 px, MEDIA). Baja: sin impacto en el servicio (1 px, BAJA). "
                        "En esta matriz la celda lleva siempre el texto; el color es solo apoyo."),
-        ("Estado", "Diseño: componente nuevo de este diseño. Existente: ya está en el campus y se integra. "
+        ("Estado", "Vigente: componente de este diseño. Temporal: solo existe durante el simulacro de recuperación (T59) y se "
+                   "destruye al terminar; no se dibuja en las topologías de operación. Existente: ya está en el campus y se integra. "
                    "Fuera de alcance: existe y se documenta AS-IS, su rediseño no es parte del entregable [S-14]."),
         ("Observación abierta", "CI-nn: contradicción o vacío del documento maestro registrado en docs/infra/e1/CAMBIOS-INVENTARIO.md."),
         ("Supuestos", "Todo supuesto se marca [S-xx]; ninguno se presenta como dato. IP públicas solo de documentación (RFC 5737)."),
@@ -260,7 +276,7 @@ def hoja_matriz(wb, x: Infra, cob: dict[str, list[str]]):
                         errorTitle="Criticidad", error="Use Alta, Media o Baja (inventory.yaml)")
     dv.add(f"{letra_crit}2:{letra_crit}{ultima}")
     de = DataValidation(type="list", formula1='"' + ",".join(ESTADO.values()) + '"', allow_blank=False, showErrorMessage=True,
-                        errorTitle="Estado", error="Use Diseño, Existente o Fuera de alcance")
+                        errorTitle="Estado", error="Use " + ", ".join(ESTADO.values()))
     de.add(f"{letra_est}2:{letra_est}{ultima}")
     ws.add_data_validation(dv)
     ws.add_data_validation(de)
@@ -347,10 +363,13 @@ def hoja_cobertura(wb, x: Infra, cob: dict[str, list[str]], fuente_fig: str):
     celda(ws, r + 1, 2, fuente_fig)
     ws.merge_cells(start_row=r + 1, start_column=2, end_row=r + 1, end_column=2 + n)
     celda(ws, r + 2, 1, "Lectura", negrita=True)
+    temporales = [c["id"] for c in x.componentes.values() if c["estado"] == "temporal"]
     celda(ws, r + 2, 2, "«¿≥ 1 flujo?» = No es esperado para redes AWS y equipos sin tráfico propio: la columna Flujos de la "
-                        "hoja Matriz da la justificación del inventario. Un componente con «¿En ≥ 1 figura?» = No incumple R6.")
+                        "hoja Matriz da la justificación del inventario. Un componente vigente con «¿En ≥ 1 figura?» = No incumple R6. "
+                        + (f"Excepción: {', '.join(temporales)} (estado Temporal) solo existen durante el simulacro T59 y el "
+                           "inventario no los asigna a ninguna figura." if temporales else ""))
     ws.merge_cells(start_row=r + 2, start_column=2, end_row=r + 2, end_column=2 + n + 5)
-    ws.row_dimensions[r + 2].height = 32
+    ws.row_dimensions[r + 2].height = 48
     rango_si = f"{c_en}2:{c_p}{ultima}"
     ws.conditional_formatting.add(rango_si, CellIsRule(operator="equal", formula=['"No"'],
                                                        fill=relleno_cf("FBE3B0"), font=Font(bold=True)))
@@ -377,7 +396,8 @@ def hoja_resumen(wb, x: Infra, ultima_matriz: int):
     for j, crit in enumerate(CRITICIDADES, start=2):
         celda(ws, fz, j, f'=COUNTIFS({rc},"{crit}")', negrita=True)
     celda(ws, fz, 5, f"=SUM(B{fz}:D{fz})", negrita=True)
-    celda(ws, fz + 1, 1, "Nota: un componente con interfaces en varias zonas (FW01, ESX01, NAS01, IDS01, SW-ACC) cuenta en cada "
+    multi = [c["id"] for c in x.componentes.values() if len(c["zonas"]) > 1]
+    celda(ws, fz + 1, 1, f"Nota: un componente con interfaces en varias zonas ({', '.join(multi) or 'ninguno'}) cuenta en cada "
                          "una; la fila «Por criticidad» cuenta cada componente una vez.")
     ws.merge_cells(start_row=fz + 1, start_column=1, end_row=fz + 1, end_column=5)
     ws.row_dimensions[fz + 1].height = 45
@@ -457,6 +477,29 @@ def hoja_r6(wb, x: Infra, t_cob: int, p_cob: int, ultima_matriz: int):
     imprimir(ws)
 
 
+def hoja_retirados(wb, x: Infra):
+    ws = wb.create_sheet(HOJA_RETIRADOS)
+    cabecera(ws, ["ID", "Componente", "Retirado por (CI-nn)", "Motivo (Arquitectura v0.4 §5)", "Qué cubre ahora su función",
+                  "Criticidad que tenía"], [13, 40, 14, 70, 40, 12])
+    f = 1
+    for f, c in enumerate(x.componentes_retirados.values(), start=2):
+        vals = [c["id"], c["nombre"], c["retirado_por"],
+                c.get("retirado_motivo") or f"— (la §5 no da motivo; retirado por {c['retirado_por']}; ver CI-74)",
+                c.get("retirado_cubre") or "—", c.get("criticidad") or "—"]
+        for j, v in enumerate(vals, start=1):
+            celda(ws, f, j, v, negrita=j == 1)
+    nota = f + 2
+    celda(ws, nota, 1, "Regla", negrita=True)
+    celda(ws, nota, 2, "Un ID retirado conserva su entrada en infra/inventory.yaml con `estado: retirado` y nunca se reutiliza "
+                       "(V-44); no aparece en la hoja Matriz ni en ninguna figura (V-52). Detalle de cada CI en "
+                       "docs/infra/e1/CAMBIOS-INVENTARIO.md.")
+    ws.merge_cells(start_row=nota, start_column=2, end_row=nota, end_column=6)
+    ws.row_dimensions[nota].height = 32
+    ws.freeze_panes = "B2"
+    ws.auto_filter.ref = f"A1:F{max(f, 2)}"
+    imprimir(ws)
+
+
 # --------------------------------------------------------------------------------------------------
 def generar(x: Infra, salida: Path = SALIDA) -> Path:
     salida.mkdir(parents=True, exist_ok=True)
@@ -469,6 +512,7 @@ def generar(x: Infra, salida: Path = SALIDA) -> Path:
     t, p = hoja_cobertura(wb, x, cob, fuente_fig)
     hoja_resumen(wb, x, ultima)
     hoja_r6(wb, x, t, p, ultima)
+    hoja_retirados(wb, x)
     wb.calculation.fullCalcOnLoad = True
     wb.properties.title = "Matriz de componentes de red — CE0311"
     wb.properties.creator = "infra/gen/xlsx_componentes.py"

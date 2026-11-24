@@ -1,0 +1,4 @@
+# Dependencias de desarrollo y CI (make deps-dev): las del runtime más las de las pruebas.
+# Terceros importados por infra/ y tests/: yaml, jsonschema, openpyxl (requirements.txt) y pytest (make test-gen).
+-r requirements.txt
+pytest>=8.0

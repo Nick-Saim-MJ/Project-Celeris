@@ -54,6 +54,13 @@
           "responsable": {
             "type": "string",
             "minLength": 1
+          },
+          "objetivo_proyecto": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^OB-\\d$"
+            }
           }
         }
       }
@@ -358,11 +365,28 @@
               "items": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["id", "elemento", "pruebas"],
+                "required": [
+                  "id",
+                  "elemento",
+                  "pruebas"
+                ],
                 "properties": {
-                  "id": {"type": "string", "pattern": "^R[1-8]-\\d{2}$"},
-                  "elemento": {"type": "string", "minLength": 1},
-                  "pruebas": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^T(0[1-9]|[1-9][0-9])$"}}
+                  "id": {
+                    "type": "string",
+                    "pattern": "^R[1-8]-\\d{2}$"
+                  },
+                  "elemento": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "pruebas": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "string",
+                      "pattern": "^T(0[1-9]|[1-9][0-9])$"
+                    }
+                  }
                 }
               }
             },
@@ -453,12 +477,25 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["capa", "controles", "detalle"],
+        "required": [
+          "capa",
+          "controles",
+          "detalle"
+        ],
         "additionalProperties": false,
         "properties": {
-          "capa": { "type": "string", "minLength": 1 },
-          "controles": { "type": "string", "minLength": 1 },
-          "detalle": { "type": "string", "minLength": 1 }
+          "capa": {
+            "type": "string",
+            "minLength": 1
+          },
+          "controles": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detalle": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
@@ -516,6 +553,37 @@
       "additionalProperties": {
         "type": "string",
         "minLength": 1
+      }
+    },
+    "objetivos_proyecto": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "necesidad",
+          "indicador",
+          "meta"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^OB-\\d$"
+          },
+          "necesidad": {
+            "type": "string",
+            "minLength": 1
+          },
+          "indicador": {
+            "type": "string",
+            "minLength": 1
+          },
+          "meta": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
     }
   }

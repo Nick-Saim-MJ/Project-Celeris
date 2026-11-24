@@ -99,6 +99,8 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 | CI-72 | contradicción | Confianza de la zona AWS: «Media» en el YAML, «Baja, expuesta» en D1.9 (H1) | abierto |
 | CI-73 | vacío | «Por qué existe» de HNY01, SIEM01 y VGW más pobre que la Arquitectura v0.4 §4 (H2) | resuelto (2026-11-23) |
 | CI-74 | vacío | Los componentes retirados no tienen motivo ni reemplazo en el YAML; la §5 no da motivo para las subredes AWS-PUB-B, AWS-APP-B, AWS-DATA-A y AWS-DATA-B (H2) | abierto (parcial) |
+| CI-75 | vacío | Los OD-xx no citan la necesidad ni el objetivo del proyecto (OB-x) que atienden; el anexo C del informe lo necesita (H3) | resuelto (2026-11-23) |
+| CI-76 | contradicción | El supuesto S-18 (usuario SFTP de NAS01, prueba T39) describe piezas retiradas en v0.4 y aparecía como vigente en el anexo D | resuelto (2026-11-23) |
 
 ## Entradas
 
@@ -884,3 +886,22 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decisión aplicada:** `retirado_motivo` y `retirado_cubre` con el texto de la §5 en los 11 componentes que la §5 nombra. Las 4 subredes quedan sin motivo; la matriz lo muestra como «la §5 no da motivo (CI-74)».
 - **Pendiente:** que el equipo escriba el motivo de las 4 subredes (por ejemplo, si se debe a que la v0.4 usa una sola AZ). No se completa aquí para no inventarlo.
 - **Decide:** equipo del proyecto (Nick y Henyelrey)
+
+## Entradas del informe CE0311 (H3, rango CI-70…CI-89)
+
+### CI-75 — Objetivos del proyecto (OB-x) en la trazabilidad
+- **Estado:** resuelto (2026-11-23)
+- **Tipo:** vacío
+- **Dónde:** `infra/trazabilidad.yaml` → lista nueva `objetivos_proyecto` y campo `objetivo_proyecto` en cada OD-xx (opcionales en `infra/schema/trazabilidad.schema.json`); CE03 D1.6 (columna «Objetivo del proyecto»); 00 Marco común M2.3
+- **Qué dice cada fuente:** D1.6 asigna a cada OD-xx uno o más objetivos del proyecto (OB-1…OB-5) y M2.3 da la necesidad, el indicador y la meta de cada OB. El YAML no tenía ni lo uno ni lo otro, y el anexo C del informe (necesidad → OD → D-xx → componente → F → T) no se podía generar desde la fuente única.
+- **Decisión aplicada:** se copian las cinco filas de M2.3 en `objetivos_proyecto` y la asignación de D1.6 en `objetivo_proyecto`. OD-05 queda con lista vacía, como en D1.6 («—»).
+- **Decide:** equipo del proyecto
+
+### CI-76 — Supuesto S-18 sobre piezas retiradas
+- **Estado:** resuelto (2026-11-23)
+- **Tipo:** contradicción
+- **Dónde:** `infra/trazabilidad.yaml` → `supuestos.S-18`; `infra/inventory.yaml` → NAS01 (`estado: retirado`); `infra/pruebas.yaml` → T39 (retirada)
+- **Qué dice cada fuente:** S-18 fija el usuario SFTP y la carpeta restic de NAS01 para la prueba T39. La arquitectura v0.4 (§5) retira NAS01 («el respaldo va a S3») y T39 ya no es vigente, pero S-18 seguía sin marca y la validación V-83 del informe lo detectó como ID retirado citado como vigente.
+- **Decisión aplicada:** S-18 conserva su ID (para que las referencias históricas no cambien de sentido) y se marca `estado: retirado` con `retirado_motivo`. El anexo D del informe lista solo los supuestos vigentes y nombra los retirados en una nota.
+- **Decide:** equipo del proyecto
+

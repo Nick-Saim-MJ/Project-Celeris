@@ -1,0 +1,243 @@
+{
+  "motor": "Microsoft Word (COM)",
+  "paginas": 46,
+  "marcas": [
+    {
+      "texto": "Control de versiones",
+      "nivel": 1,
+      "pagina": 2
+    },
+    {
+      "texto": "Glosario",
+      "nivel": 1,
+      "pagina": 2
+    },
+    {
+      "texto": "1. Resumen ejecutivo del diseño de red",
+      "nivel": 1,
+      "pagina": 5
+    },
+    {
+      "texto": "Figura 1.1 — Topología ejecutiva simplificada del diseño de red",
+      "nivel": 10,
+      "pagina": 5
+    },
+    {
+      "texto": "2. Descripción de la organización y necesidades de red",
+      "nivel": 1,
+      "pagina": 6
+    },
+    {
+      "texto": "2.1 Descripción general",
+      "nivel": 2,
+      "pagina": 6
+    },
+    {
+      "texto": "2.2 Servicios y procesos críticos dependientes de la red",
+      "nivel": 2,
+      "pagina": 7
+    },
+    {
+      "texto": "2.3 Partes interesadas relevantes a la red",
+      "nivel": 2,
+      "pagina": 7
+    },
+    {
+      "texto": "3. Alcance del diseño de red",
+      "nivel": 1,
+      "pagina": 8
+    },
+    {
+      "texto": "3.1 Declaración de alcance",
+      "nivel": 2,
+      "pagina": 8
+    },
+    {
+      "texto": "3.2 Límites",
+      "nivel": 2,
+      "pagina": 8
+    },
+    {
+      "texto": "3.3 Exclusiones",
+      "nivel": 2,
+      "pagina": 8
+    },
+    {
+      "texto": "4. Objetivos del diseño de red",
+      "nivel": 1,
+      "pagina": 9
+    },
+    {
+      "texto": "5. Topologías de red (diseño)",
+      "nivel": 1,
+      "pagina": 10
+    },
+    {
+      "texto": "5.1 Topología general de infraestructura de red",
+      "nivel": 2,
+      "pagina": 10
+    },
+    {
+      "texto": "Figura 5.1 — Topología general de red propuesta",
+      "nivel": 10,
+      "pagina": 11
+    },
+    {
+      "texto": "5.2 Topología lógica de red — VLAN y subredes",
+      "nivel": 2,
+      "pagina": 12
+    },
+    {
+      "texto": "Figura 5.2 — Topología lógica de red propuesta",
+      "nivel": 10,
+      "pagina": 14
+    },
+    {
+      "texto": "5.3 Diseño de seguridad perimetral y zonas",
+      "nivel": 2,
+      "pagina": 15
+    },
+    {
+      "texto": "Figura 5.3 — Topología de seguridad y zonas propuesta",
+      "nivel": 10,
+      "pagina": 16
+    },
+    {
+      "texto": "5.4 Diseño de conectividad VPN híbrida",
+      "nivel": 2,
+      "pagina": 17
+    },
+    {
+      "texto": "Figura 5.4 — Topología VPN híbrida propuesta",
+      "nivel": 10,
+      "pagina": 19
+    },
+    {
+      "texto": "5.5 Diagrama de flujo de información planeado",
+      "nivel": 2,
+      "pagina": 20
+    },
+    {
+      "texto": "Figura 5.5a — Flujos de información planeados: usuarios, portal y servicios hacia Internet",
+      "nivel": 10,
+      "pagina": 22
+    },
+    {
+      "texto": "Figura 5.5b — Flujos de información planeados: plano de control, observabilidad, seguridad y respaldo",
+      "nivel": 10,
+      "pagina": 23
+    },
+    {
+      "texto": "5.6 Matriz de componentes de red",
+      "nivel": 2,
+      "pagina": 24
+    },
+    {
+      "texto": "6. Diseño de conectividad híbrida",
+      "nivel": 1,
+      "pagina": 25
+    },
+    {
+      "texto": "7. Diseño de seguridad perimetral",
+      "nivel": 1,
+      "pagina": 26
+    },
+    {
+      "texto": "7.1 Firewall",
+      "nivel": 2,
+      "pagina": 26
+    },
+    {
+      "texto": "7.2 DMZ",
+      "nivel": 2,
+      "pagina": 27
+    },
+    {
+      "texto": "7.3 Segmentación planeada",
+      "nivel": 2,
+      "pagina": 28
+    },
+    {
+      "texto": "8. Diseño de detección — IDS/IPS y honeypot",
+      "nivel": 1,
+      "pagina": 30
+    },
+    {
+      "texto": "9. Consideraciones de escalabilidad y disponibilidad",
+      "nivel": 1,
+      "pagina": 31
+    },
+    {
+      "texto": "10. Conclusiones del diseño y siguientes pasos",
+      "nivel": 1,
+      "pagina": 32
+    },
+    {
+      "texto": "11. Referencias",
+      "nivel": 1,
+      "pagina": 33
+    },
+    {
+      "texto": "Anexo A. Matriz de comunicación zona × zona",
+      "nivel": 1,
+      "pagina": 35
+    },
+    {
+      "texto": "Anexo B. Modelo de amenazas STRIDE (AM-01…AM-18)",
+      "nivel": 1,
+      "pagina": 37
+    },
+    {
+      "texto": "Anexo C. Trazabilidad necesidad → objetivo → decisión → componente → flujo → prueba",
+      "nivel": 1,
+      "pagina": 39
+    },
+    {
+      "texto": "Anexo D. Registro de supuestos",
+      "nivel": 1,
+      "pagina": 41
+    },
+    {
+      "texto": "Anexo E. Validación emulada (Modo L y AWS Emulator)",
+      "nivel": 1,
+      "pagina": 43
+    },
+    {
+      "texto": "Modo L: laboratorio emulado local",
+      "nivel": 2,
+      "pagina": 43
+    },
+    {
+      "texto": "AWS Emulator: plano de control",
+      "nivel": 2,
+      "pagina": 45
+    },
+    {
+      "texto": "Por qué esto no es implementación",
+      "nivel": 2,
+      "pagina": 45
+    },
+    {
+      "texto": "Anexo F. Por qué la consola no está en la nube (D-24, D-25)",
+      "nivel": 1,
+      "pagina": 46
+    }
+  ],
+  "docx": "entregables/CE0311/Informe_Diseno_Red_v1.1.docx",
+  "pdf": "entregables/CE0311/Informe_Diseno_Red_v1.1.pdf",
+  "commit_fuente": "bb7172a",
+  "huella_fuente": "b529fb07ac874d2a",
+  "figuras": [
+    "FIG-1.1",
+    "FIG-5.1",
+    "FIG-5.2",
+    "FIG-5.3",
+    "FIG-5.4",
+    "FIG-5.5a",
+    "FIG-5.5b"
+  ],
+  "completar": [
+    "[COMPLETAR: docente/curso]",
+    "[COMPLETAR: nombres completos de los autores]"
+  ]
+}

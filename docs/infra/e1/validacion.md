@@ -4,7 +4,7 @@
 
 - Inventario: versión 1.1 · fecha 2026-11-22
 - Contenido cargado (v0.4): **13 zonas vigentes** (3 retiradas), **31 componentes vigentes** (15 retirados; 2 temporales), **24 flujos vigentes** (23 activos, F4 reservado) y 9 retirados, **52 pruebas vigentes** y 8 retiradas, 12 objetivos OD, 18 amenazas AM, 11 detecciones DET, 7 figuras, 8 criterios de rúbrica.
-- Resultado: **0 FALLA**, 1 con advertencias, 59 PASA, 1 pendientes de P2–P5.
+- Resultado: **0 FALLA**, 2 con advertencias, 68 PASA, 0 pendientes de P2–P5.
 
 ## Chequeos
 
@@ -70,7 +70,16 @@
 | V-73 | Ensayo L: ninguna FALLA sin causa y acción; NO_APLICA, PARCIAL y sin ensayo nunca como PASA | PASA | — |
 | V-74 | XLSX de pruebas: fórmulas sin errores tras recalcular con LibreOffice y coherentes con la biblioteca | PASA | 0 errores, 0 advertencias |
 | V-75 | XLSX de pruebas: el archivo versionado está al día con pruebas.yaml, el inventario y el último ensayo | PASA | — |
-| V-80 | Informe DOCX: 11 secciones, tablas generadas del inventario, figuras y leyendas | PENDIENTE | pendiente de P5 |
+| V-80 | Informe: DOCX y PDF existen, abren y son de la fuente actual | PASA | entregables/CE0311/Informe_Diseno_Red_v1.1.docx; PDF 46 páginas; motor Microsoft Word (COM) |
+| V-81 | Informe: 11 secciones de la plantilla, en orden y con contenido | PASA | 26 títulos de sección |
+| V-82 | Informe: sin texto guía ni marcadores de la plantilla | PASA | 48 textos guía comprobados |
+| V-83 | Informe: ningún ID retirado en v0.4 presentado como vigente | PASA | 35 IDs retirados buscados |
+| V-84 | Informe: toda IP o red citada coincide con el inventario | PASA | 60 IP/redes distintas citadas |
+| V-85 | Informe: 7 figuras con leyenda y «qué observar» | PASA | 7 imágenes |
+| V-86 | Informe: cifras repetidas coherentes con la fuente | PASA | 7 VLAN · 31 componentes · T05 27,2 s · T09 8,7 s |
+| V-87 | Informe: evidencia citada para cada criterio de la rúbrica | PASA | criterios con toda su evidencia: R1, R2, R3, R4, R5, R6, R7, R8 |
+| V-88 | Informe: marcas [COMPLETAR] pendientes | PASA con advertencias | 2 pendientes |
+| V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.1 · commit bb7172a |
 
 ## Errores
 
@@ -81,11 +90,13 @@ Ninguno.
 
 - **V-42** — 2026-11-23-L: la prueba crítica T23 (Fuga IPv6) está en NO_APLICA, no en PASA
 - **V-42** — 2026-11-23-L: la prueba crítica T58 (EC2-GW solo alcanza CTRL01:443 y SIEM01) está en PARCIAL, no en PASA
+- **V-88** — Pendiente: [COMPLETAR: docente/curso]
+- **V-88** — Pendiente: [COMPLETAR: nombres completos de los autores]
 
 ## Información
 
 - **V-27** — 28 de 60 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 0 elementos pendientes en los YAML; 68 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-01', 'CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-06', 'CI-07', 'CI-08', 'CI-09', 'CI-10', 'CI-11', 'CI-12', 'CI-13', 'CI-14', 'CI-15', 'CI-16', 'CI-17', 'CI-18', 'CI-19', 'CI-20', 'CI-21', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-27', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-49', 'CI-50', 'CI-51', 'CI-52', 'CI-53', 'CI-54', 'CI-55', 'CI-56', 'CI-57', 'CI-58', 'CI-59', 'CI-60', 'CI-61', 'CI-62', 'CI-63', 'CI-70', 'CI-71', 'CI-72', 'CI-73', 'CI-74']
+- **V-29** — 0 elementos pendientes en los YAML; 70 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-01', 'CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-06', 'CI-07', 'CI-08', 'CI-09', 'CI-10', 'CI-11', 'CI-12', 'CI-13', 'CI-14', 'CI-15', 'CI-16', 'CI-17', 'CI-18', 'CI-19', 'CI-20', 'CI-21', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-27', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-49', 'CI-50', 'CI-51', 'CI-52', 'CI-53', 'CI-54', 'CI-55', 'CI-56', 'CI-57', 'CI-58', 'CI-59', 'CI-60', 'CI-61', 'CI-62', 'CI-63', 'CI-70', 'CI-71', 'CI-72', 'CI-73', 'CI-74', 'CI-75', 'CI-76']
 - **V-42** — Resultados de 2026-11-23-L (commit descono): {'PASA': 34, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 32 de 60 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 605 fórmulas recalculadas con LibreOffice sin errores
@@ -105,6 +116,4 @@ Ninguno.
 
 ## Pendientes de P2–P5 (ganchos)
 
-| Gancho | Qué validará | Estado |
-| --- | --- | --- |
-| V-80+ | Informe DOCX: 11 secciones, tablas generadas del inventario, figuras y leyendas | pendiente de P5 |
+Todos los ganchos están implementados.

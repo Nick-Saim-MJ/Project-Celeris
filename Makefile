@@ -21,7 +21,7 @@ help:
 	@echo "make test-lab         ejecuta las pruebas T-nn del Modo L (Etapa 4)"
 	@echo "make matrices        genera las dos matrices XLSX (componentes y pruebas)"
 	@echo "make diagrams-check  genera, exporta y valida los diagramas draw.io (V-50…V-56)"
-	@echo "make informe         genera DOCX y PDF (pendiente de P5)"
+	@echo "make informe         genera el informe DOCX y PDF desde la plantilla y valida V-80+ (Word o LibreOffice)"
 	@echo "make release-e1      copia la versión final a entregables/CE0311/vX.Y/ (pendiente de P5)"
 
 entorno:
@@ -94,7 +94,8 @@ diagrams-check:
 	$(PYTHON) infra/gen/drawio_check.py
 
 informe:
-	@echo "pendiente de P5: informe DOCX y PDF desde la plantilla de 11 secciones" >&2; exit 1
+	$(PYTHON) docs/infra/e1/build_informe.py --pdf
+	$(PYTHON) infra/validate.py
 
 release-e1: validate
 	@echo "pendiente de P5: copia a entregables/CE0311/$(VERSION)/ tras make informe y make matrices" >&2; exit 1

@@ -1,0 +1,61 @@
+# Registro de figuras del E1 (lo escribe gestion/e1/figuras/generar.py; no editar a mano).
+fig-organigrama:
+  archivo: organigrama.png
+  titulo: Organigrama del campus y áreas que toca Celeris
+  fuente: Elaboración propia a partir de la guía CE01 v0.4 B1.2; dependencias por confirmar con la DTI
+  horizontal: true
+fig-cadena-valor:
+  archivo: cadena-valor.png
+  titulo: Cadena de valor de la universidad y dependencia de los laboratorios
+  fuente: Elaboración propia, adaptado de Porter [1]
+  horizontal: true
+fig-mendelow:
+  archivo: mendelow.png
+  titulo: Matriz poder × interés de los stakeholders
+  fuente: 'Elaboración propia, adaptado de Mendelow [3]; niveles: valoración del equipo'
+  horizontal: false
+fig-mapa-estrategico:
+  archivo: mapa-estrategico.png
+  titulo: Mapa estratégico de Celeris Edge en cuatro perspectivas
+  fuente: Elaboración propia, adaptado de Kaplan y Norton [4]; objetivos OB-x de infra/trazabilidad.yaml
+  horizontal: true
+fig-radar-cobit:
+  archivo: radar-cobit.png
+  titulo: Nivel de capacidad COBIT 2019 objetivo y actual
+  fuente: Elaboración propia con la escala de capacidad de COBIT 2019 [5]; gestion/e1/datos/madurez.yaml
+  horizontal: false
+fig-brechas:
+  archivo: brechas.png
+  titulo: Brechas cuantificadas entre la situación actual y la meta
+  fuente: Elaboración propia; supuestos S-02, S-26 y S-27, metas OB-x de infra/trazabilidad.yaml
+  horizontal: true
+fig-impacto-frecuencia:
+  archivo: impacto-frecuencia.png
+  titulo: 'Problemas operativos asociados a TI: impacto × frecuencia'
+  fuente: Elaboración propia; valoración del equipo, a confirmar con datos de la DTI
+  horizontal: false
+fig-ishikawa:
+  archivo: ishikawa.png
+  titulo: Diagrama de Ishikawa del problema de las descargas repetidas
+  fuente: Elaboración propia a partir de 00 M2.2 y la guía CE01 v0.4 B1.5
+  horizontal: true
+fig-arbol:
+  archivo: arbol-problemas.png
+  titulo: 'Árbol de problemas: causas, problema central y efectos'
+  fuente: Elaboración propia a partir de 00 M2.1 y M2.2
+  horizontal: true
+fig-motivacion:
+  archivo: motivacion-archi.png
+  titulo: 'Vista de motivación ArchiMate 3.2: de la estrategia al componente'
+  fuente: Elaboración propia en Archi 5.12 [6]; gestion/e1/archimate/celeris-motivacion.xml
+  horizontal: true
+fig-roadmap:
+  archivo: roadmap.png
+  titulo: Roadmap de tecnología de Celeris Edge en tres horizontes
+  fuente: Elaboración propia a partir de la guía CE01 v0.4 B1.7 y 00 M9
+  horizontal: true
+fig-mapa-calor:
+  archivo: mapa-calor.png
+  titulo: Mapa de calor de los riesgos estratégicos RE-01…RE-12
+  fuente: Elaboración propia; P e I de gestion/ce01.yaml (guía CE01 v0.4 B1.8)
+  horizontal: false

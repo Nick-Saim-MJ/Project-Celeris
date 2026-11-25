@@ -10,7 +10,7 @@
 
 meta:
   version: "0.1"
-  fecha: "2026-11-24"
+  fecha: "2026-11-25"
   equipo: "docs/celeris/Celeris-00-Marco-Comun.md#equipo"       # lo resuelve el cargador (no se copia)
   guia: "docs/celeris/Celeris-CE01-Gestion-TI.md v0.4"
   versiones_informe: { E1: "0.1", E2: "0.1", E3: "0.1", E4: "0.1" }
@@ -128,20 +128,20 @@ alternativas:
     - { id: A5, nombre: "Caché web del FortiGate existente (si el modelo la tiene)",      puntajes: [3, 3, 4, 1, 4, 1] }
 
 riesgos_estrategicos:
-  fuente: "Guía CE01 v0.4 B1.8 (escala 1–5; puntaje = P × I)"
+  fuente: "Guía CE01 v0.4 B1.8 (escala 1–5; puntaje = P × I); dueño propuesto por el equipo según el reparto de 00 M9 (CI-101)"
   lista:
-    - { id: RE-01, riesgo: "El proyecto depende de dos personas", p: 4, i: 5, respuesta: "Documentación como código, runbooks, transferencia a la DTI", disparador: "Un integrante ausente 2 semanas" }
-    - { id: RE-02, riesgo: "Rechazo por privacidad de la CA", p: 3, i: 5, respuesta: "Solo PCs institucionales, portal previo al uso, CA limitada", disparador: "Quejas formales" }
-    - { id: RE-03, riesgo: "Más tráfico cifrado reduce lo cacheable", p: 4, i: 3, respuesta: "Proxy explícito, medir BHR mensual, priorizar fuentes HTTP", disparador: "BHR < 15 % tres meses" }
-    - { id: RE-04, riesgo: "Compromiso de la llave de la CA", p: 2, i: 5, respuesta: "Raíz offline, intermedia por nodo, Name Constraints", disparador: "Alerta de integridad" }
-    - { id: RE-05, riesgo: "La DTI no aprueba el despliegue", p: 3, i: 4, respuesta: "Piloto en un laboratorio, demostración previa en laboratorio emulado", disparador: "Respuesta negativa" }
-    - { id: RE-06, riesgo: "Los encargados no adoptan la consola", p: 3, i: 4, respuesta: "Validación del prototipo con encargados (CE02 C2.2), capacitación corta", disparador: "Menos de 1 uso semanal" }
-    - { id: RE-07, riesgo: "Costos AWS fuera de presupuesto", p: 2, i: 3, respuesta: "AWS Budgets, entorno de laboratorio efímero", disparador: "Gasto > 80 % del mes" }
-    - { id: RE-08, riesgo: "Software con certificate pinning falla", p: 4, i: 2, respuesta: "Nunca descifrar por defecto; lista de compatibilidad", disparador: "Ticket de soporte" }
-    - { id: RE-09, riesgo: "No hay servidor físico disponible", p: 3, i: 4, respuesta: "Laboratorio emulado y AWS efímero para las pruebas de S2", disparador: "Sin respuesta de la DTI" }
-    - { id: RE-10, riesgo: "Cambio de licenciamiento del hipervisor", p: 3, i: 3, respuesta: "Diseño agnóstico; Proxmox como equivalente", disparador: "Aviso del fabricante" }
-    - { id: RE-11, riesgo: "La DTI no habilita en el FortiGate el NAT 1:1 (VPN, portal) o la exclusión de inspección SSL del nodo [S-29]", p: 3, i: 4, respuesta: "Pedido mínimo y documentado; alternativa: VPN de acceso remoto en OPNsense y portal solo interno; demostrar en Modo A", disparador: "Respuesta negativa de la DTI" }
-    - { id: RE-12, riesgo: "Compromiso del acceso remoto al panel (EC2-GW)", p: 2, i: 5, respuesta: "Segundo factor, acciones críticas solo desde el campus, EC2-GW sin datos y recreable, WAF y límite de intentos", disparador: "Alerta de fuerza bruta o de WAF" }
+    - { id: RE-01, riesgo: "El proyecto depende de dos personas", p: 4, i: 5, respuesta: "Documentación como código, runbooks, transferencia a la DTI", disparador: "Un integrante ausente 2 semanas", dueno: Ambos }
+    - { id: RE-02, riesgo: "Rechazo por privacidad de la CA", p: 3, i: 5, respuesta: "Solo PCs institucionales, portal previo al uso, CA limitada", disparador: "Quejas formales", dueno: Nick }
+    - { id: RE-03, riesgo: "Más tráfico cifrado reduce lo cacheable", p: 4, i: 3, respuesta: "Proxy explícito, medir BHR mensual, priorizar fuentes HTTP", disparador: "BHR < 15 % tres meses", dueno: Henyelrey }
+    - { id: RE-04, riesgo: "Compromiso de la llave de la CA", p: 2, i: 5, respuesta: "Raíz offline, intermedia por nodo, Name Constraints", disparador: "Alerta de integridad", dueno: Nick }
+    - { id: RE-05, riesgo: "La DTI no aprueba el despliegue", p: 3, i: 4, respuesta: "Piloto en un laboratorio, demostración previa en laboratorio emulado", disparador: "Respuesta negativa", dueno: Henyelrey }
+    - { id: RE-06, riesgo: "Los encargados no adoptan la consola", p: 3, i: 4, respuesta: "Validación del prototipo con encargados (CE02 C2.2), capacitación corta", disparador: "Menos de 1 uso semanal", dueno: Nick }
+    - { id: RE-07, riesgo: "Costos AWS fuera de presupuesto", p: 2, i: 3, respuesta: "AWS Budgets, entorno de laboratorio efímero", disparador: "Gasto > 80 % del mes", dueno: Nick }
+    - { id: RE-08, riesgo: "Software con certificate pinning falla", p: 4, i: 2, respuesta: "Nunca descifrar por defecto; lista de compatibilidad", disparador: "Ticket de soporte", dueno: Nick }
+    - { id: RE-09, riesgo: "No hay servidor físico disponible", p: 3, i: 4, respuesta: "Laboratorio emulado y AWS efímero para las pruebas de S2", disparador: "Sin respuesta de la DTI", dueno: Nick }
+    - { id: RE-10, riesgo: "Cambio de licenciamiento del hipervisor", p: 3, i: 3, respuesta: "Diseño agnóstico; Proxmox como equivalente", disparador: "Aviso del fabricante", dueno: Nick }
+    - { id: RE-11, riesgo: "La DTI no habilita en el FortiGate el NAT 1:1 (VPN, portal) o la exclusión de inspección SSL del nodo [S-29]", p: 3, i: 4, respuesta: "Pedido mínimo y documentado; alternativa: VPN de acceso remoto en OPNsense y portal solo interno; demostrar en Modo A", disparador: "Respuesta negativa de la DTI", dueno: Henyelrey }
+    - { id: RE-12, riesgo: "Compromiso del acceso remoto al panel (EC2-GW)", p: 2, i: 5, respuesta: "Segundo factor, acciones críticas solo desde el campus, EC2-GW sin datos y recreable, WAF y límite de intentos", disparador: "Alerta de fuerza bruta o de WAF", dueno: Nick }
 
 riesgos_proyecto:
   fuente: "Guía CE01 v0.4 B3.6 (escala 1–5)"

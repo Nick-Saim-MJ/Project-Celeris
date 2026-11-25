@@ -1,0 +1,51 @@
+# gestion/e1/datos/madurez.yaml — Madurez COBIT 2019 (escala de capacidad 0–5) de los procesos de TI que toca Celeris.
+#
+# `actual` NO se inventa: queda en null hasta la entrevista a la DTI y a los encargados con el instrumento
+# gestion/e1/instrumentos/entrevista-cobit.md. Cuando se llene (con la evidencia vista), `make figuras-ce01` redibuja el
+# radar y el gráfico de brechas, y el informe pasa de «pendiente de entrevista» a la brecha medida.
+#
+# `objetivo`: nivel que el proyecto necesita al cierre del piloto (guía CE01 v0.4 B1.4). Nivel 2 = proceso gestionado
+# (se hace y se planifica); nivel 3 = proceso definido (documentado, con responsables y medido).
+
+fuente: "Guía CE01 v0.4 B1.4 (objetivos y preguntas guía); ISACA, COBIT 2019 [5] (escala de capacidad 0–5)"
+estado_entrevista: pendiente          # pendiente | realizada (con fecha y entrevistados)
+fecha_entrevista: null
+entrevistados: []                     # roles, no nombres (p. ej. «Jefe de Infraestructura DTI», «Encargado lab. 3»)
+
+objetivos:
+  - id: APO02
+    nombre: "Estrategia gestionada"
+    pregunta: "¿Hay un plan de TI que considere los laboratorios?"
+    objetivo: 3
+    actual: null
+    evidencia_esperada: "Plan estratégico de TI vigente con una línea para los laboratorios de cómputo"
+  - id: APO12
+    nombre: "Riesgo gestionado"
+    pregunta: "¿Existe un registro de riesgos de TI?"
+    objetivo: 2
+    actual: null
+    evidencia_esperada: "Registro de riesgos de TI con dueño, probabilidad, impacto y fecha de revisión"
+  - id: BAI03
+    nombre: "Identificación y construcción de soluciones gestionadas"
+    pregunta: "¿Las soluciones se diseñan con requisitos y pruebas?"
+    objetivo: 3
+    actual: null
+    evidencia_esperada: "Requisitos y plan de pruebas de una solución reciente de la DTI"
+  - id: DSS01
+    nombre: "Operaciones gestionadas"
+    pregunta: "¿Se monitorea la capacidad del enlace? ¿Se programan las descargas?"
+    objetivo: 3
+    actual: null
+    evidencia_esperada: "Gráfico de uso del enlace por hora (FortiGate o ISP) y calendario de actualizaciones de laboratorios"
+  - id: DSS05
+    nombre: "Servicios de seguridad gestionados"
+    pregunta: "¿Hay detección y respuesta a incidentes en la red de laboratorios?"
+    objetivo: 3
+    actual: null
+    evidencia_esperada: "Registro de incidentes de la red de laboratorios y procedimiento de respuesta"
+  - id: MEA01
+    nombre: "Monitoreo del desempeño y la conformidad gestionado"
+    pregunta: "¿Se miden indicadores de servicio de los laboratorios?"
+    objetivo: 3
+    actual: null
+    evidencia_esperada: "Reporte periódico con indicadores de los laboratorios (disponibilidad, tiempos de preparación, uso del enlace)"

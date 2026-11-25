@@ -1,0 +1,33 @@
+{
+  "fuente": "gestion/e1/calculos.py",
+  "datos": {
+    "pcs_lab": "40",
+    "labs": "10",
+    "pcs": "400",
+    "gb_pc": "3 GB",
+    "enlace": "300 Mbps",
+    "usd_mbps": "US$ 8",
+    "ciclos": "2",
+    "gb_ciclo_lab": "120 GB",
+    "gb_repetidos_lab": "117 GB",
+    "gb_ciclo_total": "1 200 GB",
+    "gb_repetidos_ciclo": "1 170 GB",
+    "gb_repetidos_anio": "2 340 GB",
+    "tb_repetidos_anio": "2,3 TB",
+    "fraccion_repetida": "97,5 %",
+    "horas_lab": "0,89 h",
+    "min_lab": "53 min",
+    "min_lab_meta": "16 min",
+    "meta_ob1": "25 %",
+    "meta_ob2": "70 %",
+    "meta_ob4": "100 %",
+    "horas_tecnicas_anio": "200 h",
+    "usd_enlace_anio": "US$ 8 640",
+    "usd_horas_anio": "US$ 1 000",
+    "usd_no_actuar": "US$ 28 920",
+    "re_altos": "2",
+    "re_medios": "9",
+    "re_bajos": "1",
+    "re_max": "20"
+  }
+}

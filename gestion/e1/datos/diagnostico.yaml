@@ -1,0 +1,337 @@
+# gestion/e1/datos/diagnostico.yaml — Contenido cualitativo del Entregable 1 (CE01): una sola fuente para las tablas del
+# informe (gestion/e1/tablas.py), las figuras (gestion/e1/figuras/generar.py) y el XLSX de matrices.
+#
+# Regla de evidencia: cada fila lleva `fuente`. Valores posibles:
+#   - un supuesto [S-xx] de infra/trazabilidad.yaml, una sección del Marco común (00 Mx) o de la guía CE01 (B1.x);
+#   - «[levantar con la DTI]» o «[confirmar con el plan estratégico]» cuando el dato es institucional y no se tiene;
+#   - «Valoración del equipo» cuando es juicio del equipo (intensidad, impacto, frecuencia): se valida en la entrevista.
+# Las cifras no se escriben aquí: las tablas las leen de ce01_datos.py o de infra/*.yaml.
+
+pendiente: "[levantar con la DTI]"
+pendiente_pe: "[confirmar con el plan estratégico]"
+
+# ------------------------------------------------------------------------------------------------ 1.1 Contexto
+porter:
+  fuente: "Porter [2], adaptado a una universidad privada del altiplano; intensidad = valoración del equipo"
+  fuerzas:
+    - fuerza: "Poder de negociación de los proveedores de conectividad"
+      intensidad: Alta
+      hecho: "Un solo enlace de 300 Mbps con IP fija [S-02, S-15]; cada Mbps adicional cuesta US$ 8 por mes [S-03] y la oferta del altiplano es menor que la de la costa (guía CE01 B1.2)"
+      fuente: "[S-02], [S-03], [S-15]; número de ISP con fibra en Juliaca [levantar con la DTI]"
+    - fuerza: "Amenaza de sustitutos"
+      intensidad: Alta
+      hecho: "Ampliar el enlace, un servidor de actualizaciones del fabricante, LanCache o la caché web del FortiGate resuelven parte del problema sin un proyecto nuevo"
+      fuente: "Alternativas A0–A5 de gestion/ce01.yaml (se evalúan en el E2)"
+    - fuerza: "Poder de negociación de los estudiantes"
+      intensidad: Media
+      hecho: "Hasta 400 personas usan los laboratorios a la vez [S-36] y además traen su equipo al Wi-Fi; esperan velocidad y que su equipo no se inspeccione"
+      fuente: "[S-36]; 00 M3.3"
+    - fuerza: "Rivalidad entre universidades de la región"
+      intensidad: Media
+      hecho: "La calidad visible de los laboratorios (que el software esté listo al empezar la clase) es un atributo de la oferta académica en ingeniería"
+      fuente: "Universidades que compiten en Juliaca y Puno y su oferta de laboratorios [levantar con la DTI y Admisión]"
+    - fuerza: "Amenaza de nuevos entrantes"
+      intensidad: Baja
+      hecho: "Abrir una universidad con laboratorios exige licenciamiento e inversión en infraestructura; los programas a distancia compiten sin laboratorios presenciales"
+      fuente: "Valoración del equipo [levantar con Admisión]"
+
+conectividad:
+  fuente: "[S-02], [S-03], [S-15]; guía CE01 v0.4 B1.2. Ninguna cifra de la costa se inventa"
+  filas:
+    - aspecto: "Ancho de banda contratado"
+      altiplano: "300 Mbps simétricos [S-02]"
+      costa: "No aplica (el campus Juliaca no contrata en la costa)"
+    - aspecto: "Costo de 1 Mbps adicional"
+      altiplano: "US$ 8 por Mbps-mes [S-03]"
+      costa: "Cotización de referencia de un ISP de Lima [levantar con la DTI]"
+    - aspecto: "IP pública fija"
+      altiplano: "1 IP estática en el firewall perimetral [S-15]"
+      costa: "—"
+    - aspecto: "Proveedores con fibra disponibles"
+      altiplano: "[levantar con la DTI]"
+      costa: "[levantar con la DTI]"
+    - aspecto: "Plazo para ampliar el enlace"
+      altiplano: "[levantar con la DTI] (contrato vigente)"
+      costa: "—"
+
+organigrama:
+  fuente: "Guía CE01 v0.4 B1.2; dependencia exacta [levantar con la DTI]"
+  unidades:
+    - { id: dir,  nombre: "Dirección del campus Juliaca", padre: null, toca: false }
+    - { id: fac,  nombre: "Facultades", padre: dir, toca: false }
+    - { id: ep,   nombre: "EP Ingeniería de Sistemas (equipo del proyecto)", padre: fac, toca: true, rol: "Diseña y valida" }
+    - { id: dti,  nombre: "Dirección de Tecnologías de Información (DTI)", padre: dir, toca: true, rol: "Aprueba y opera" }
+    - { id: inf,  nombre: "Infraestructura", padre: dti, toca: true, rol: "FortiGate, enlace, servidores" }
+    - { id: sop,  nombre: "Soporte", padre: dti, toca: true, rol: "PCs e imágenes de laboratorio" }
+    - { id: sis,  nombre: "Sistemas", padre: dti, toca: false }
+    - { id: enc,  nombre: "Encargados de laboratorio (10)", padre: sop, toca: true, rol: "Usuarios de la consola", dudoso: true }
+    - { id: odp,  nombre: "Oficial de datos personales", padre: dir, toca: true, rol: "Ley 29733", dudoso: true }
+  nota: "Los encargados dependen de Soporte o de la facultad, y el oficial de datos personales puede estar en otra unidad: [levantar con la DTI]"
+
+cadena_valor:
+  fuente: "Porter [1], adaptado; dependencia: guía CE01 v0.4 B1.2"
+  actividades:
+    - { tipo: Primaria, actividad: "Enseñanza en laboratorios", dependencia: Alta, por_que: "Software de cada curso, actualizaciones y plataforma virtual se descargan en las PCs del laboratorio", problema: "La clase empieza tarde si la descarga no terminó" }
+    - { tipo: Primaria, actividad: "Investigación", dependencia: Media, por_que: "Datasets, bibliotecas y modelos que se descargan en los laboratorios", problema: "Descargas largas compiten con las clases" }
+    - { tipo: Primaria, actividad: "Admisión y extensión", dependencia: Baja, por_que: "Usa sistemas web, no los laboratorios", problema: "Sufre la saturación del enlace, no la causa" }
+    - { tipo: Apoyo, actividad: "Infraestructura de TI y soporte", dependencia: Alta, por_que: "Prepara y mantiene los laboratorios, PC por PC", problema: "Horas técnicas en cada ciclo de actualización" }
+    - { tipo: Apoyo, actividad: "Gestión administrativa y financiera", dependencia: Baja, por_que: "Paga el enlace", problema: "Costo de ampliar el enlace cada año" }
+
+stakeholders:
+  fuente: "Guía CE01 v0.4 B1.2 (poder × interés de Mendelow [3]); niveles = valoración del equipo"
+  lista:
+    - { nombre: "Encargados de laboratorio", poder: Medio, interes: Alto, estrategia: "Gestionar de cerca", espera: "Laboratorios listos a tiempo, sin depender de otros" }
+    - { nombre: "DTI", poder: Alto, interes: Alto, estrategia: "Gestionar de cerca", espera: "Menos saturación del enlace, control y seguridad" }
+    - { nombre: "Docentes", poder: Medio, interes: Alto, estrategia: "Mantener informados", espera: "Clases sin esperas por descargas" }
+    - { nombre: "Estudiantes (PC y BYOD)", poder: Bajo, interes: Alto, estrategia: "Mantener informados", espera: "Velocidad y privacidad; en BYOD, que su equipo no se inspeccione" }
+    - { nombre: "Dirección del campus", poder: Alto, interes: Medio, estrategia: "Mantener satisfecha", espera: "Ahorro e imagen" }
+    - { nombre: "Oficial de datos personales", poder: Medio, interes: Medio, estrategia: "Consultar", espera: "Cumplimiento de la Ley 29733" }
+    - { nombre: "ISP", poder: Medio, interes: Bajo, estrategia: "Monitorear", espera: "Contrato dentro de términos" }
+    - { nombre: "AWS", poder: Bajo, interes: Bajo, estrategia: "Monitorear", espera: "Uso dentro de los términos de la cuenta" }
+    - { nombre: "Jurado EPE", poder: Alto, interes: Alto, estrategia: "Gestionar de cerca", espera: "Evidencia, coherencia, dominio técnico" }
+
+# ------------------------------------------------------------------------------------------------ 1.2 Estratégico
+identidad:
+  fuente: "Plan estratégico institucional de la UPeU vigente [confirmar con el plan estratégico]"
+  mision: "[confirmar con el plan estratégico: texto oficial de la misión]"
+  vision: "[confirmar con el plan estratégico: texto oficial de la visión]"
+  objetivos:
+    - { id: OE-a, texto: "Fortalecer la infraestructura tecnológica para la enseñanza (ejemplo de la guía B1.3)", estado: "[confirmar con el plan estratégico]", ob: [OB-1, OB-2] }
+    - { id: OE-b, texto: "Calidad académica: laboratorios listos para cada clase", estado: "[confirmar con el plan estratégico]", ob: [OB-2, OB-3] }
+    - { id: OE-c, texto: "Gestión eficiente de los recursos", estado: "[confirmar con el plan estratégico]", ob: [OB-1, OB-3] }
+    - { id: OE-d, texto: "Seguridad de la información y cumplimiento", estado: "[confirmar con el plan estratégico]", ob: [OB-4, OB-5] }
+  nota: "OE-a…OE-d son rótulos de trabajo, no IDs del contrato M6: se reemplazan por los códigos oficiales del plan estratégico cuando la DTI lo entregue"
+
+mapa_estrategico:
+  fuente: "Kaplan y Norton [4], adaptado; objetivos OB-x de infra/trazabilidad.yaml"
+  perspectivas:
+    - nombre: "Institucional (resultado)"
+      objetivos:
+        - { id: m1, texto: "Diferir la ampliación del enlace", ob: OB-1 }
+        - { id: m2, texto: "Imagen de laboratorios confiables", ob: OB-2 }
+    - nombre: "Usuarios (estudiantes y docentes)"
+      objetivos:
+        - { id: m3, texto: "Clases sin esperas por descargas", ob: OB-2 }
+        - { id: m4, texto: "Saber qué se descifra y qué no", ob: OB-4 }
+    - nombre: "Procesos internos"
+      objetivos:
+        - { id: m5, texto: "Descargar una vez, servir muchas", ob: OB-1 }
+        - { id: m6, texto: "Preparar el laboratorio con precarga", ob: OB-2 }
+        - { id: m7, texto: "El encargado decide qué se cachea y quién accede", ob: OB-3 }
+        - { id: m8, texto: "Detectar el abuso del servicio", ob: OB-5 }
+    - nombre: "Aprendizaje y crecimiento"
+      objetivos:
+        - { id: m9, texto: "Medir el desperdicio por laboratorio", ob: OB-1 }
+        - { id: m10, texto: "DTI y encargados operan sin el equipo autor", ob: OB-3 }
+  enlaces: [[m9, m5], [m10, m7], [m10, m6], [m5, m1], [m5, m3], [m6, m3], [m7, m6], [m8, m4], [m3, m2], [m4, m2]]
+
+foda:
+  fuente: "Guía CE01 v0.4 B1.3 (a validar con la DTI y los encargados)"
+  F:
+    - { id: F1, texto: "PCs de laboratorio administradas centralmente (imagen y políticas)", fuente: "[levantar con la DTI]" }
+    - { id: F2, texto: "Encargados que conocen qué software pide cada curso", fuente: "00 M3.3" }
+    - { id: F3, texto: "Línea académica de infraestructura y seguridad en la EP", fuente: "Plan de estudios de la EP" }
+  O:
+    - { id: O1, texto: "Herramientas libres maduras (OPNsense, Suricata, Wazuh)", fuente: "Arquitectura v0.4" }
+    - { id: O2, texto: "ESXi gratuito de nuevo desde abril de 2025", fuente: "Broadcom [12]" }
+    - { id: O3, texto: "Créditos de AWS para estudiantes y emuladores locales gratuitos", fuente: "[S-13]" }
+    - { id: O4, texto: "El FortiGate existente se reutiliza: el proyecto se apoya en él en lugar de reemplazarlo", fuente: "D-26; [S-29]" }
+  D:
+    - { id: D1, texto: "Enlace limitado y caro", fuente: "[S-02], [S-03]" }
+    - { id: D2, texto: "Descargas repetidas en cada PC (40 por laboratorio)", fuente: "[S-26], [S-27]" }
+    - { id: D3, texto: "Preparación manual, PC por PC", fuente: "[S-07]; [levantar con la DTI]" }
+    - { id: D4, texto: "Sin medición del desperdicio de ancho de banda", fuente: "00 M2.3 (línea base «A medir»)" }
+  A:
+    - { id: A1, texto: "Más tráfico cifrado (HTTPS, QUIC, ECH) reduce lo que se puede cachear", fuente: "RFC 9849; RFC 9000" }
+    - { id: A2, texto: "Cambios de licenciamiento de proveedores (hipervisor)", fuente: "RE-10" }
+    - { id: A3, texto: "Exigencias del reglamento de datos personales", fuente: "D.S. 016-2024-JUS" }
+    - { id: A4, texto: "Uso de IA y búsqueda de respuestas en exámenes por la red del campus (fuera de S1)", fuente: "00 M2.4" }
+
+tows:
+  fuente: "Elaboración propia a partir del FODA; decisiones D-xx de infra/trazabilidad.yaml"
+  estrategias:
+    - { tipo: FO, id: FO-1, cruza: "F1, O2, O4", estrategia: "Instalar la caché detrás del FortiGate existente sobre ESXi gratuito y repartir el PAC con las políticas centrales de las PCs", apunta_a: "D-26, D-05" }
+    - { tipo: FO, id: FO-2, cruza: "F2, O1", estrategia: "Que el encargado arme el catálogo de contenido del curso; la DTI solo aprueba lo que se descifra", apunta_a: "D-20" }
+    - { tipo: FO, id: FO-3, cruza: "F3, O3", estrategia: "Probar todo en un laboratorio emulado y en AWS efímero antes de tocar el campus", apunta_a: "D-18" }
+    - { tipo: FA, id: FA-1, cruza: "F1, A1", estrategia: "Proxy explícito por URL fija del PAC y bloqueo de QUIC en las PCs institucionales para conservar lo cacheable", apunta_a: "D-05, D-06" }
+    - { tipo: FA, id: FA-2, cruza: "F1, A3", estrategia: "Descifrar solo en PCs institucionales con aviso previo; el BYOD nunca se descifra", apunta_a: "D-27, D-15, D-04" }
+    - { tipo: FA, id: FA-3, cruza: "F3, A2", estrategia: "Diseño independiente del hipervisor: la misma imagen corre en ESXi, en Proxmox o en el laboratorio emulado", apunta_a: "D-18 (RE-10)" }
+    - { tipo: DO, id: DO-1, cruza: "D2, O4", estrategia: "Usar primero lo que ya existe: la caché web del FortiGate (si el modelo la tiene) y un servidor de actualizaciones del fabricante para Windows. Celeris cubre lo que ellos no: instaladores de cursos, paquetes y fuentes HTTPS aprobadas", apunta_a: "Alternativas A3 y A5 (E2)" }
+    - { tipo: DO, id: DO-2, cruza: "D3, O1", estrategia: "Precargar el contenido de la clase en el nodo fuera del horario de clase", apunta_a: "D-21" }
+    - { tipo: DO, id: DO-3, cruza: "D4, O1", estrategia: "Medir el ahorro por laboratorio con métricas del nodo, nunca por persona", apunta_a: "D-22" }
+    - { tipo: DA, id: DA-1, cruza: "D1, A1", estrategia: "Revisar el BHR cada mes y ampliar el enlace solo si la caché deja de rendir", apunta_a: "RE-03; alternativa A0 (E2)" }
+    - { tipo: DA, id: DA-2, cruza: "D1, A4", estrategia: "Segmentar: el Wi-Fi y los laboratorios no alcanzan los servidores del proyecto; base del futuro modo examen", apunta_a: "D-16, D-17" }
+
+pestel:
+  fuente: "Normas y hechos citados por fila"
+  factores:
+    - { factor: Político, hecho: "Las decisiones sobre el FortiGate, el Wi-Fi y la capa de acceso son de la DTI; el proyecto solo pide cambios mínimos", fuente: "00 M3.2; [S-14], [S-28], [S-29]", efecto: "Toda integración pasa por un pedido documentado (RE-11)" }
+    - { factor: Económico, hecho: "Costo por Mbps del altiplano mayor que en la costa", fuente: "[S-03]", efecto: "Base del beneficio económico (BN-1 del E2)" }
+    - { factor: Social, hecho: "Estudiantes con equipo propio en el Wi-Fi esperan privacidad", fuente: "00 M3.1; [S-28]", efecto: "BYOD sin descifrado y proxy opcional (D-27)" }
+    - { factor: Tecnológico, hecho: "ECH (RFC 9849) y HTTP/3 sobre QUIC (RFC 9000, RFC 9114) ocultan o saltan lo que una caché clásica ve", fuente: "RFC 9849 [9]; RFC 9114 [10]", efecto: "Proxy explícito y bloqueo de UDP/443 en laboratorios (D-05, D-06)" }
+    - { factor: Tecnológico, hecho: "ESXi vuelve a tener edición gratuita desde abril de 2025", fuente: "Broadcom [12]", efecto: "El host no paga licencia de hipervisor (O2)" }
+    - { factor: Ecológico, hecho: "Menos tráfico repetido es menos energía de red; el rack del proyecto agrega consumo propio", fuente: "infra/centro_datos.yaml (energía); [S-09]", efecto: "Indicador complementario; el consumo entra al OPEX del E2" }
+    - { factor: Legal, hecho: "Reglamento de la Ley 29733 (D.S. 016-2024-JUS), vigente desde marzo de 2025", fuente: "Ley 29733 [7]; D.S. 016-2024-JUS [8]", efecto: "Aviso previo, minimización y evaluación de impacto antes del piloto (OB-4)" }
+
+fce:
+  fuente: "Guía CE01 v0.4 B1.3; metas de infra/trazabilidad.yaml → objetivos_proyecto (CI-101)"
+  lista:
+    - { id: FCE-1, factor: "Apoyo de la DTI", kpi: "Pedidos mínimos al FortiGate atendidos (NAT 1:1 y exclusión de inspección SSL)", meta: "Todos antes del piloto [S-29]", medicion: "Acta de reunión con la DTI", riesgo: RE-11 }
+    - { id: FCE-2, factor: "Los encargados usan la consola", kpi: "Usos semanales de la consola por encargado", meta: "Al menos uno por semana (disparador de RE-06)", medicion: "Auditoría de la consola (CTRL01)", riesgo: RE-06 }
+    - { id: FCE-3, factor: "La caché rinde", kpi: "BHR mensual por laboratorio", meta_ob: OB-1, medicion: "Métricas del nodo (REQ-F-13, REQ-F-25)", riesgo: RE-03 }
+    - { id: FCE-4, factor: "Cero incidentes de privacidad", kpi: "PCs con aviso entregado antes de instalar la CA", meta_ob: OB-4, medicion: "Portal de transparencia y registro de instalación de la CA", riesgo: RE-02 }
+    - { id: FCE-5, factor: "Operación por personal distinto del equipo autor", kpi: "Runbooks ejecutados por la DTI sin ayuda del equipo", meta: "Ensayo completo en S2", medicion: "Ensayo cronometrado con la DTI", riesgo: RE-01 }
+
+# ------------------------------------------------------------------------------------------------ 1.3 Diagnóstico TI
+inventario:
+  fuente: "00 M3; infra/trazabilidad.yaml (supuestos); lo no levantado se marca [levantar con la DTI]"
+  sistemas:
+    - { sistema: "FortiGate con FortiGuard (perímetro)", dueno: DTI, version: "Modelo y versión [levantar con la DTI]", soporte: "Licencias FortiGuard [levantar con la DTI]", internet: Alta, criticidad: Alta, estado: "Rol confirmado en el diseño [S-29]; falta saber si tiene disco y caché web" }
+    - { sistema: "Enlace a Internet del campus", dueno: "DTI (contrato con el ISP)", version: "300 Mbps simétricos [S-02], 1 IP fija [S-15]", soporte: "Contrato con el ISP", internet: "—", criticidad: Alta, estado: "Supuesto; validar con el contrato" }
+    - { sistema: "Capa de acceso y DHCP", dueno: DTI, version: "Switches con 802.1Q [S-14]; modelos [levantar con la DTI]", soporte: "[levantar con la DTI]", internet: Baja, criticidad: Alta, estado: "Supuesto [S-14]" }
+    - { sistema: "Wi-Fi de estudiantes (BYOD)", dueno: DTI, version: "Red provisional 172.16.0.0/16 [S-28]", soporte: "[levantar con la DTI]", internet: Alta, criticidad: Media, estado: "Supuesto [S-28]" }
+    - { sistema: "PCs de laboratorio", dueno: "DTI Soporte / encargados", version: "400 PCs en 10 laboratorios de 40 [S-01, S-26]; sistema operativo [levantar con la DTI]", soporte: "[levantar con la DTI]", internet: Alta, criticidad: Alta, estado: "Supuesto [S-01, S-26]" }
+    - { sistema: "Imágenes y despliegue de laboratorios", dueno: "DTI Soporte", version: "Herramienta de imagen y de políticas (directorio, GPO) [levantar con la DTI]", soporte: "[levantar con la DTI]", internet: Media, criticidad: Alta, estado: "[levantar con la DTI]" }
+    - { sistema: "Servicio de actualizaciones (WSUS o similar)", dueno: DTI, version: "¿Existe? [levantar con la DTI]", soporte: "[levantar con la DTI]", internet: Alta, criticidad: Media, estado: "[levantar con la DTI]: si existe, cubre las actualizaciones de Windows (alternativa A3)" }
+    - { sistema: "Plataforma virtual de aprendizaje", dueno: "DTI Sistemas", version: "Producto y versión [levantar con la DTI]", soporte: "[levantar con la DTI]", internet: Alta, criticidad: Alta, estado: "[levantar con la DTI]" }
+    - { sistema: "Mesa de ayuda", dueno: "DTI Soporte", version: "Herramienta [levantar con la DTI]", soporte: "[levantar con la DTI]", internet: Media, criticidad: Media, estado: "[levantar con la DTI]: fuente de tickets para PO-2 y PO-3" }
+
+brechas:
+  fuente: "Elaboración propia; requisitos REQ-x de infra/trazabilidad.yaml; componentes de infra/inventory.yaml"
+  lista:
+    - { id: BR-1, cobit: DSS01, actual: "Cada PC descarga lo mismo: 40 copias por laboratorio y ciclo [S-26, S-27]", deseado: "Una copia por objeto, servida a todo el laboratorio", accion: "Caché con coalescencia y verificación por hash", componente: "EDGE01, EDGE02 (REQ-F-03, REQ-F-05, REQ-F-06)", ob: OB-1 }
+    - { id: BR-2, cobit: DSS01, actual: "Las descargas ocurren en horario de clase", deseado: "Contenido de la clase listo antes de empezar", accion: "Precarga programada en ventana horaria con límite", componente: "EDGE01, CTRL01 (REQ-F-22, REQ-F-34, REQ-RN-10)", ob: OB-2 }
+    - { id: BR-3, cobit: APO02, actual: "El encargado pide a la DTI cada cambio (días)", deseado: "El encargado habilita una fuente o un laboratorio en minutos", accion: "Consola del encargado con roles por laboratorio", componente: "CTRL01, ENC01 (REQ-F-31, REQ-F-32, REQ-F-33)", ob: OB-3 }
+    - { id: BR-4, cobit: MEA01, actual: "No se mide el desperdicio ni el BHR (línea base «A medir», 00 M2.3)", deseado: "Ahorro mensual por laboratorio y por fuente", accion: "Métricas del nodo y reporte en la consola", componente: "EDGE01, CTRL01 (REQ-F-13, REQ-F-25)", ob: OB-1 }
+    - { id: BR-5, cobit: DSS05, actual: "Detección en la red de laboratorios [levantar con la DTI]", deseado: "Escenarios de abuso del proxy detectados", accion: "Eventos de seguridad al SIEM y señuelos", componente: "SIEM01, HNY01, HNY02 (REQ-F-14, REQ-F-15)", ob: OB-5 }
+    - { id: BR-6, cobit: DSS05, actual: "No hay aviso previo a los usuarios porque nada se descifra hoy", deseado: "Aviso entregado antes de instalar la CA en cada PC", accion: "Portal de transparencia generado de la configuración real", componente: "PORTAL01 (REQ-F-12, REQ-F-30)", ob: OB-4 }
+    - { id: BR-7, cobit: APO12, actual: "Registro de riesgos de TI [levantar con la DTI]", deseado: "Riesgos del servicio con dueño y disparador", accion: "Matriz RE-01…RE-12 de este informe y RP-xx del E3", componente: "Gestión del proyecto (E1 §1.7, E3)", ob: "OB-1…OB-5" }
+  ya_resuelto:
+    - { que: "Filtrar sitios por categoría (redes sociales, malware)", quien: "FortiGate con FortiGuard [S-29]", decision: "Se mantiene; Celeris no lo duplica" }
+    - { que: "Actualizaciones de Windows desde un servidor interno", quien: "WSUS o similar, si existe [levantar con la DTI]", decision: "Si existe, se mantiene y Celeris no cachea esas actualizaciones; si no, es la alternativa A3 del E2" }
+    - { que: "Caché web en el perímetro", quien: "FortiGate, solo si el modelo tiene disco y la función [levantar con la DTI]", decision: "Alternativa A5 del E2: se evalúa antes de recomendar Celeris" }
+
+problemas:
+  fuente: "Guía CE01 v0.4 B1.4; impacto y frecuencia 1–5 = valoración del equipo, a confirmar con datos (registro del enlace y tickets)"
+  lista:
+    - { id: PO-1, problema: "Saturación del enlace en horas de clase", impacto: 5, frecuencia: 4, evidencia: "Gráfico de uso del enlace por hora (FortiGate)" }
+    - { id: PO-2, problema: "Descargas que no terminan en una sesión", impacto: 4, frecuencia: 3, evidencia: "Tickets de la mesa de ayuda; entrevista a docentes" }
+    - { id: PO-3, problema: "Preparar un laboratorio toma horas", impacto: 4, frecuencia: 3, evidencia: "Cronometraje de un ciclo (E4)" }
+    - { id: PO-4, problema: "El encargado depende de la DTI para cualquier cambio", impacto: 3, frecuencia: 4, evidencia: "Solicitudes a la DTI por laboratorio y su tiempo de atención" }
+    - { id: PO-5, problema: "Nadie mide cuánto ancho de banda se desperdicia", impacto: 3, frecuencia: 5, evidencia: "Ausencia de indicador (00 M2.3, línea base «A medir»)" }
+
+# ------------------------------------------------------------------------------------------------ 1.4 Problema
+w5h2:
+  fuente: "00 M2.1; cifras de gestion/e1/calculos.py"
+  filas:
+    - { pregunta: "¿Qué?", respuesta: "Cada PC descarga por separado los mismos archivos grandes (actualizaciones, instaladores de cursos, paquetes) y el enlace se satura" }
+    - { pregunta: "¿Por qué?", respuesta: "No hay una copia compartida en el campus: casi todo viaja por HTTPS y el FortiGate filtra, pero no reutiliza" }
+    - { pregunta: "¿Dónde?", respuesta: "En los 10 laboratorios de cómputo del Campus Juliaca [S-26]; el resto del campus sufre la saturación" }
+    - { pregunta: "¿Cuándo?", respuesta: "En cada ciclo de actualización masiva y al preparar una clase, en horario de clase" }
+    - { pregunta: "¿Quién?", respuesta: "Lo sufren docentes y estudiantes; lo atiende el encargado, que depende de la DTI" }
+    - { pregunta: "¿Cómo?", respuesta: "Un laboratorio entero descarga a la vez; nadie decide qué conviene reutilizar ni mide cuánto se desperdicia" }
+    - { pregunta: "¿Cuánto?", respuesta: "calc" }
+
+ishikawa:
+  fuente: "Guía CE01 v0.4 B1.5 y 00 M2.2 (6M adaptado)"
+  efecto: "Laboratorios que descargan lo mismo 40 veces: enlace saturado y clases que empiezan tarde"
+  categorias:
+    - { nombre: "Método", causas: ["Cada PC descarga sola, PC por PC", "Descargas en horario de clase", "Sin ventana de precarga"] }
+    - { nombre: "Personas", causas: ["El encargado no tiene herramienta ni atribución", "Todo cambio se pide a la DTI"] }
+    - { nombre: "Tecnología", causas: ["Casi todo es HTTPS: la caché clásica no sirve", "El FortiGate filtra, pero no reutiliza", "QUIC y ECH ocultan el tráfico"] }
+    - { nombre: "Recursos", causas: ["Enlace limitado [S-02]", "Ampliar es un costo recurrente [S-03]"] }
+    - { nombre: "Medición", causas: ["No se mide el desperdicio ni el BHR", "Sin indicadores por laboratorio"] }
+    - { nombre: "Entorno", causas: ["Menor oferta de conectividad en el altiplano", "Tráfico cifrado en aumento"] }
+
+arbol:
+  fuente: "00 M2.1 y M2.2; efectos de la cadena de valor (§1.1)"
+  problema: "Los laboratorios descargan lo mismo en cada PC y saturan el enlace del campus"
+  causas: ["La misma descarga se repite en 40 PCs", "Las descargas ocurren en horario de clase", "Casi todo es HTTPS: la caché clásica no sirve", "Nadie tiene el rol ni la herramienta para decidir qué se reutiliza"]
+  efectos: ["Clases que empiezan tarde", "El resto del campus pierde ancho de banda", "Presión para ampliar el enlace cada año", "Horas técnicas en cada ciclo", "Nadie sabe cuánto se desperdicia"]
+
+cinco_porques:
+  fuente: "Elaboración propia a partir de 00 M2.2"
+  causa: "La misma descarga se repite en 40 PCs por laboratorio"
+  pasos:
+    - { porque: "¿Por qué se satura el enlace en clase?", respuesta: "Porque un laboratorio entero descarga los mismos archivos al mismo tiempo." }
+    - { porque: "¿Por qué cada PC descarga lo mismo?", respuesta: "Porque cada PC va directo al origen: en el campus no hay una copia compartida." }
+    - { porque: "¿Por qué no hay una copia compartida?", respuesta: "Porque el contenido viaja por HTTPS, una caché clásica no lo puede guardar y el FortiGate solo filtra." }
+    - { porque: "¿Por qué no se descifra lo que conviene reutilizar?", respuesta: "Porque nadie tiene el rol ni la herramienta para decidir qué fuente es segura de reutilizar, con aviso a los usuarios." }
+    - { porque: "¿Por qué no existe ese rol?", respuesta: "Porque la gestión de los laboratorios no mide el desperdicio: sin dato no hay decisión (brecha MEA01)." }
+  raiz: "Falta una capacidad de gestión (medir y decidir qué se reutiliza) y el mecanismo técnico controlado que la ejecute."
+
+# ------------------------------------------------------------------------------------------------ 1.5 Alineamiento
+alineamiento:
+  fuente: "Guía CE01 v0.4 B1.6; 00 M7; objetivos OB-x de infra/trazabilidad.yaml"
+  filas:
+    - { oe: OE-a, capacidad: "Uso eficiente del enlace", brecha: "D1, D2; BR-1, BR-4", componente: "Nodos de caché + coalescencia + precarga (EDGE01, EDGE02)", kpi: "BHR; GB evitados por mes", ob: OB-1, m7: "Descargar una vez y servir muchas" }
+    - { oe: OE-b, capacidad: "Laboratorios listos a tiempo", brecha: "D3; BR-2", componente: "Precarga programada desde la consola (CTRL01 → EDGE01)", kpi: "Tiempo de descarga para dejar listo un laboratorio", ob: OB-2, m7: "Contenido listo antes de la clase" }
+    - { oe: OE-c, capacidad: "Autonomía de los encargados", brecha: "D3, D4; BR-3", componente: "Consola del encargado (CTRL01, ENC01)", kpi: "Tiempo para habilitar una fuente o un laboratorio", ob: OB-3, m7: "Que el encargado decida qué se cachea y quién accede" }
+    - { oe: OE-d, capacidad: "Transparencia y control", brecha: "A3; BR-6", componente: "Portal de transparencia (PORTAL01)", kpi: "PCs con aviso antes de instalar la CA", ob: OB-4, m7: "Que el usuario sepa qué se descifra" }
+    - { oe: OE-d, capacidad: "Seguridad del servicio", brecha: "A4; BR-5", componente: "FW01, SIEM01, HNY01, HNY02", kpi: "Escenarios de abuso detectados", ob: OB-5, m7: "Detectar ataques (DMZ, honeypot, intra-laboratorio)" }
+
+archimate:
+  fuente: "Guía CE01 v0.4 B1.6; requisitos de infra/trazabilidad.yaml (CE02); componentes de infra/inventory.yaml (CE03)"
+  drivers:
+    - { id: dr1, nombre: "Costo y saturación del enlace" }
+    - { id: dr2, nombre: "Calidad de la enseñanza en laboratorios" }
+    - { id: dr3, nombre: "Ley 29733 y su reglamento" }
+  assessments:
+    - { id: as1, nombre: "La misma descarga se repite en 40 PCs", driver: dr1 }
+    - { id: as2, nombre: "El contenido HTTPS no se reutiliza", driver: dr1 }
+    - { id: as3, nombre: "El encargado no puede decidir ni medir", driver: dr2 }
+    - { id: as4, nombre: "Descifrar exige aviso previo", driver: dr3 }
+  goals:
+    - { id: OE-a, assessments: [as1, as2] }
+    - { id: OE-b, assessments: [as3] }
+    - { id: OE-c, assessments: [as3] }
+    - { id: OE-d, assessments: [as4] }
+  outcomes:                       # OB-x de infra/trazabilidad.yaml; goal que realizan
+    OB-1: [OE-a, OE-c]
+    OB-2: [OE-b]
+    OB-3: [OE-c]
+    OB-4: [OE-d]
+    OB-5: [OE-d]
+  requisitos:                     # REQ → OB que realiza → componentes que lo realizan
+    - { id: REQ-F-03, corto: "Cachear lo compartible (RFC 9111)", ob: OB-1, componentes: [EDGE01] }
+    - { id: REQ-F-05, corto: "Coalescer peticiones al mismo objeto", ob: OB-1, componentes: [EDGE01] }
+    - { id: REQ-F-25, corto: "Reportar el ahorro por laboratorio", ob: OB-1, componentes: [CTRL01] }
+    - { id: REQ-F-34, corto: "Programar una precarga", ob: OB-2, componentes: [CTRL01, EDGE01] }
+    - { id: REQ-F-31, corto: "Gestionar el catálogo de contenido", ob: OB-3, componentes: [CTRL01] }
+    - { id: REQ-F-32, corto: "Gestionar el acceso por laboratorio", ob: OB-3, componentes: [CTRL01] }
+    - { id: REQ-F-12, corto: "Publicar la página de transparencia", ob: OB-4, componentes: [PORTAL01] }
+    - { id: REQ-F-14, corto: "Enviar eventos de seguridad al SIEM", ob: OB-5, componentes: [EDGE01, SIEM01] }
+  componentes:
+    - { id: EDGE01, nombre: "Nodo de caché (EDGE01/EDGE02)" }
+    - { id: CTRL01, nombre: "Consola del encargado (CTRL01)" }
+    - { id: PORTAL01, nombre: "Portal de transparencia (PORTAL01)" }
+    - { id: SIEM01, nombre: "Detección (SIEM01)" }
+
+# ------------------------------------------------------------------------------------------------ 1.6 Roadmap
+roadmap:
+  fuente: "Guía CE01 v0.4 B1.7; cronograma de 00 M9"
+  horizontes:
+    - id: H1
+      nombre: "H1 Diseño y prueba (S1)"
+      tareas:
+        - { nombre: "Diagnóstico, business case y diseños S1", inicio: "2026-11-17", dias: 90 }
+        - { nombre: "Laboratorio emulado + prototipo de la consola", inicio: "2026-11-25", dias: 75 }
+    - id: H2
+      nombre: "H2 Implementación y piloto (S2)"
+      tareas:
+        - { nombre: "Consola del encargado + precarga", inicio: "2027-03-01", dias: 90 }
+        - { nombre: "Piloto en 1 laboratorio con métricas", inicio: "2027-04-15", dias: 60 }
+        - { nombre: "Ampliación a los 10 laboratorios", inicio: "2027-06-15", dias: 60 }
+    - id: H3
+      nombre: "H3 Evolución"
+      tareas:
+        - { nombre: "Modo examen por laboratorio (docente)", inicio: "2027-09-01", dias: 120 }
+        - { nombre: "Más laboratorios u otra sede", inicio: "2028-01-01", dias: 120 }
+  hitos:
+    - { nombre: "Fin de H1 y sustentación S1", fecha: "2027-02-15", horizonte: H1, nota: "fin de la primera tarea de H1 (inicio + 90 días); la fecha de sustentación la fija el EPE [confirmar con el calendario del EPE]" }
+    - { nombre: "Aprobación de la DTI para el piloto", fecha: "2027-04-15", horizonte: H2, nota: "condición: pedidos de S-29 (RE-05, RE-11)" }
+    - { nombre: "Decisión de ampliar a 10 laboratorios", fecha: "2027-06-15", horizonte: H2, nota: "condición: BHR del piloto ≥ meta de OB-1" }
+  dependencias:
+    - "H2 empieza solo con el E1–E4 aprobados y la DTI de acuerdo con el piloto (RE-05)."
+    - "La ampliación depende del BHR medido en el piloto (FCE-3)."
+    - "El modo examen (H3) reutiliza la segmentación y la configuración firmada de H2 (00 M2.4)."

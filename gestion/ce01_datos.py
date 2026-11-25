@@ -175,6 +175,17 @@ def flujo_neto_anual() -> float:
     return round(beneficios()["total"] - costos()["opex_total"], 2)
 
 
+def van() -> float:
+    """VAN del caso base: −I0 + flujo neto constante descontado al COK [S-10] en el horizonte (P2 lo amplía)."""
+    n, k = cargar()["economia"]["horizonte_anios"], s("S-10.cok")
+    return round(-costos()["capex_total"] + sum(flujo_neto_anual() / (1 + k) ** t for t in range(1, n + 1)), 2)
+
+
+def payback_meses() -> float:
+    """Meses para recuperar I0 con el flujo neto mensual constante del caso base."""
+    return costos()["capex_total"] / (flujo_neto_anual() / 12)
+
+
 # ==================================================================================================
 # Formato (español del Perú: miles con espacio, decimales con coma)
 # ==================================================================================================
@@ -206,6 +217,8 @@ def datos() -> dict[str, str]:
         "flujo_neto_anual": usd(flujo_neto_anual()),
         "horizonte_anios": f"{cargar()['economia']['horizonte_anios']} años",
         "cok": pct(s("S-10.cok")),
+        "van": usd(van()),
+        "payback_meses": f"{num(payback_meses(), 1)} meses",
     }
     for x in c["capex"] + c["opex"] + b["lista"]:
         d[x["id"].lower().replace("-", "_")] = usd(x["usd"])

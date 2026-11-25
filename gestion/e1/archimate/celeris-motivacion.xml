@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.opengroup.org/xsd/archimate/3.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengroup.org/xsd/archimate/3.0/ http://www.opengroup.org/xsd/archimate/3.1/archimate3_Diagram.xsd" identifier="id-celeris-e1">
+  <name xml:lang="es">Celeris Edge — Motivación (CE01 E1, CE0112)</name>
+  <documentation xml:lang="es">Generado por gestion/e1/archimate/generar.py desde gestion/e1/datos/diagnostico.yaml e infra/trazabilidad.yaml. No editar a mano.</documentation>
+  <elements>
+    <element identifier="id-dr1" xsi:type="Driver"><name xml:lang="es">Costo y saturación del enlace</name></element>
+    <element identifier="id-dr2" xsi:type="Driver"><name xml:lang="es">Calidad de la enseñanza en laboratorios</name></element>
+    <element identifier="id-dr3" xsi:type="Driver"><name xml:lang="es">Ley 29733 y su reglamento</name></element>
+    <element identifier="id-as1" xsi:type="Assessment"><name xml:lang="es">La misma descarga se repite en 40 PCs</name></element>
+    <element identifier="id-as2" xsi:type="Assessment"><name xml:lang="es">El contenido HTTPS no se reutiliza</name></element>
+    <element identifier="id-as3" xsi:type="Assessment"><name xml:lang="es">El encargado no puede decidir ni medir</name></element>
+    <element identifier="id-as4" xsi:type="Assessment"><name xml:lang="es">Descifrar exige aviso previo</name></element>
+    <element identifier="id-OE-a" xsi:type="Goal"><name xml:lang="es">OE-a Fortalecer la infraestructura tecnológica para la enseñanza</name></element>
+    <element identifier="id-OE-b" xsi:type="Goal"><name xml:lang="es">OE-b Calidad académica: laboratorios listos para cada clase</name></element>
+    <element identifier="id-OE-c" xsi:type="Goal"><name xml:lang="es">OE-c Gestión eficiente de los recursos</name></element>
+    <element identifier="id-OE-d" xsi:type="Goal"><name xml:lang="es">OE-d Seguridad de la información y cumplimiento</name></element>
+    <element identifier="id-OB-1" xsi:type="Outcome"><name xml:lang="es">OB-1 Ahorro de Internet: BHR ≥ 25 %</name></element>
+    <element identifier="id-OB-2" xsi:type="Outcome"><name xml:lang="es">OB-2 Ahorro de tiempo: −70 %</name></element>
+    <element identifier="id-OB-3" xsi:type="Outcome"><name xml:lang="es">OB-3 Autonomía del encargado: ≤ 5 min</name></element>
+    <element identifier="id-OB-4" xsi:type="Outcome"><name xml:lang="es">OB-4 Transparencia: 100 %</name></element>
+    <element identifier="id-OB-5" xsi:type="Outcome"><name xml:lang="es">OB-5 Seguridad del servicio: ≥ 90 % en S2</name></element>
+    <element identifier="id-REQ-F-03" xsi:type="Requirement"><name xml:lang="es">REQ-F-03 Cachear lo compartible (RFC 9111)</name></element>
+    <element identifier="id-REQ-F-05" xsi:type="Requirement"><name xml:lang="es">REQ-F-05 Coalescer peticiones al mismo objeto</name></element>
+    <element identifier="id-REQ-F-25" xsi:type="Requirement"><name xml:lang="es">REQ-F-25 Reportar el ahorro por laboratorio</name></element>
+    <element identifier="id-REQ-F-34" xsi:type="Requirement"><name xml:lang="es">REQ-F-34 Programar una precarga</name></element>
+    <element identifier="id-REQ-F-31" xsi:type="Requirement"><name xml:lang="es">REQ-F-31 Gestionar el catálogo de contenido</name></element>
+    <element identifier="id-REQ-F-32" xsi:type="Requirement"><name xml:lang="es">REQ-F-32 Gestionar el acceso por laboratorio</name></element>
+    <element identifier="id-REQ-F-12" xsi:type="Requirement"><name xml:lang="es">REQ-F-12 Publicar la página de transparencia</name></element>
+    <element identifier="id-REQ-F-14" xsi:type="Requirement"><name xml:lang="es">REQ-F-14 Enviar eventos de seguridad al SIEM</name></element>
+    <element identifier="id-EDGE01" xsi:type="ApplicationComponent"><name xml:lang="es">Nodo de caché (EDGE01/EDGE02)</name></element>
+    <element identifier="id-CTRL01" xsi:type="ApplicationComponent"><name xml:lang="es">Consola del encargado (CTRL01)</name></element>
+    <element identifier="id-PORTAL01" xsi:type="ApplicationComponent"><name xml:lang="es">Portal de transparencia (PORTAL01)</name></element>
+    <element identifier="id-SIEM01" xsi:type="ApplicationComponent"><name xml:lang="es">Detección (SIEM01)</name></element>
+  </elements>
+  <relationships>
+    <relationship identifier="id-r-as1-dr1" source="id-as1" target="id-dr1" xsi:type="Association"/>
+    <relationship identifier="id-r-as2-dr1" source="id-as2" target="id-dr1" xsi:type="Association"/>
+    <relationship identifier="id-r-as3-dr2" source="id-as3" target="id-dr2" xsi:type="Association"/>
+    <relationship identifier="id-r-as4-dr3" source="id-as4" target="id-dr3" xsi:type="Association"/>
+    <relationship identifier="id-r-as1-OE-a" source="id-as1" target="id-OE-a" xsi:type="Influence"/>
+    <relationship identifier="id-r-as2-OE-a" source="id-as2" target="id-OE-a" xsi:type="Influence"/>
+    <relationship identifier="id-r-as3-OE-b" source="id-as3" target="id-OE-b" xsi:type="Influence"/>
+    <relationship identifier="id-r-as3-OE-c" source="id-as3" target="id-OE-c" xsi:type="Influence"/>
+    <relationship identifier="id-r-as4-OE-d" source="id-as4" target="id-OE-d" xsi:type="Influence"/>
+    <relationship identifier="id-r-OB-1-OE-a" source="id-OB-1" target="id-OE-a" xsi:type="Realization"/>
+    <relationship identifier="id-r-OB-1-OE-c" source="id-OB-1" target="id-OE-c" xsi:type="Realization"/>
+    <relationship identifier="id-r-OB-2-OE-b" source="id-OB-2" target="id-OE-b" xsi:type="Realization"/>
+    <relationship identifier="id-r-OB-3-OE-c" source="id-OB-3" target="id-OE-c" xsi:type="Realization"/>
+    <relationship identifier="id-r-OB-4-OE-d" source="id-OB-4" target="id-OE-d" xsi:type="Realization"/>
+    <relationship identifier="id-r-OB-5-OE-d" source="id-OB-5" target="id-OE-d" xsi:type="Realization"/>
+    <relationship identifier="id-r-REQ-F-03-OB-1" source="id-REQ-F-03" target="id-OB-1" xsi:type="Realization"/>
+    <relationship identifier="id-r-EDGE01-REQ-F-03" source="id-EDGE01" target="id-REQ-F-03" xsi:type="Realization"/>
+    <relationship identifier="id-r-REQ-F-05-OB-1" source="id-REQ-F-05" target="id-OB-1" xsi:type="Realization"/>
+    <relationship identifier="id-r-EDGE01-REQ-F-05" source="id-EDGE01" target="id-REQ-F-05" xsi:type="Realization"/>
+    <relationship identifier="id-r-REQ-F-25-OB-1" source="id-REQ-F-25" target="id-OB-1" xsi:type="Realization"/>
+    <relationship identifier="id-r-CTRL01-REQ-F-25" source="id-CTRL01" target="id-REQ-F-25" xsi:type="Realization"/>
+    <relationship identifier="id-r-REQ-F-34-OB-2" source="id-REQ-F-34" target="id-OB-2" xsi:type="Realization"/>
+    <relationship identifier="id-r-CTRL01-REQ-F-34" source="id-CTRL01" target="id-REQ-F-34" xsi:type="Realization"/>
+    <relationship identifier="id-r-EDGE01-REQ-F-34" source="id-EDGE01" target="id-REQ-F-34" xsi:type="Realization"/>
+    <relationship identifier="id-r-REQ-F-31-OB-3" source="id-REQ-F-31" target="id-OB-3" xsi:type="Realization"/>
+    <relationship identifier="id-r-CTRL01-REQ-F-31" source="id-CTRL01" target="id-REQ-F-31" xsi:type="Realization"/>
+    <relationship identifier="id-r-REQ-F-32-OB-3" source="id-REQ-F-32" target="id-OB-3" xsi:type="Realization"/>
+    <relationship identifier="id-r-CTRL01-REQ-F-32" source="id-CTRL01" target="id-REQ-F-32" xsi:type="Realization"/>
+    <relationship identifier="id-r-REQ-F-12-OB-4" source="id-REQ-F-12" target="id-OB-4" xsi:type="Realization"/>
+    <relationship identifier="id-r-PORTAL01-REQ-F-12" source="id-PORTAL01" target="id-REQ-F-12" xsi:type="Realization"/>
+    <relationship identifier="id-r-REQ-F-14-OB-5" source="id-REQ-F-14" target="id-OB-5" xsi:type="Realization"/>
+    <relationship identifier="id-r-EDGE01-REQ-F-14" source="id-EDGE01" target="id-REQ-F-14" xsi:type="Realization"/>
+    <relationship identifier="id-r-SIEM01-REQ-F-14" source="id-SIEM01" target="id-REQ-F-14" xsi:type="Realization"/>
+  </relationships>
+  <views>
+    <diagrams>
+      <view identifier="id-vista-motivacion" xsi:type="Diagram">
+        <name xml:lang="es">Motivación de Celeris Edge</name>
+        <node identifier="id-t0" xsi:type="Label" x="20" y="10" w="200" h="30"><label xml:lang="es">Drivers</label><style><fillColor r="255" g="255" b="255" a="0"/><lineColor r="255" g="255" b="255" a="0"/><font name="Calibri" size="13" style="bold"><color r="0" g="56" b="101"/></font></style></node>
+        <node identifier="id-t1" xsi:type="Label" x="260" y="10" w="200" h="30"><label xml:lang="es">Assessments</label><style><fillColor r="255" g="255" b="255" a="0"/><lineColor r="255" g="255" b="255" a="0"/><font name="Calibri" size="13" style="bold"><color r="0" g="56" b="101"/></font></style></node>
+        <node identifier="id-t2" xsi:type="Label" x="500" y="10" w="200" h="30"><label xml:lang="es">Goals (OE)</label><style><fillColor r="255" g="255" b="255" a="0"/><lineColor r="255" g="255" b="255" a="0"/><font name="Calibri" size="13" style="bold"><color r="0" g="56" b="101"/></font></style></node>
+        <node identifier="id-t3" xsi:type="Label" x="740" y="10" w="200" h="30"><label xml:lang="es">Outcomes (OB)</label><style><fillColor r="255" g="255" b="255" a="0"/><lineColor r="255" g="255" b="255" a="0"/><font name="Calibri" size="13" style="bold"><color r="0" g="56" b="101"/></font></style></node>
+        <node identifier="id-t4" xsi:type="Label" x="980" y="10" w="200" h="30"><label xml:lang="es">Requirements (CE02)</label><style><fillColor r="255" g="255" b="255" a="0"/><lineColor r="255" g="255" b="255" a="0"/><font name="Calibri" size="13" style="bold"><color r="0" g="56" b="101"/></font></style></node>
+        <node identifier="id-t5" xsi:type="Label" x="1220" y="10" w="200" h="30"><label xml:lang="es">Componentes (CE03)</label><style><fillColor r="255" g="255" b="255" a="0"/><lineColor r="255" g="255" b="255" a="0"/><font name="Calibri" size="13" style="bold"><color r="0" g="56" b="101"/></font></style></node>
+        <node identifier="id-nota" xsi:type="Label" x="20" y="782" w="1400" h="28"><label xml:lang="es">OE-a…OE-d: rótulos de trabajo de los objetivos estratégicos institucionales [confirmar con el plan estratégico]. OB-x: infra/trazabilidad.yaml. REQ-x: SRS de CE02. Componentes: infra/inventory.yaml.</label><style><fillColor r="255" g="255" b="255" a="0"/><lineColor r="255" g="255" b="255" a="0"/><font name="Calibri" size="10" style="italic"><color r="127" g="127" b="127"/></font></style></node>
+        <node identifier="n-id-dr1" elementRef="id-dr1" xsi:type="Element" x="20" y="281" w="200" h="80"><style><fillColor r="220" g="229" b="239"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-dr2" elementRef="id-dr2" xsi:type="Element" x="20" y="371" w="200" h="80"><style><fillColor r="220" g="229" b="239"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-dr3" elementRef="id-dr3" xsi:type="Element" x="20" y="461" w="200" h="80"><style><fillColor r="220" g="229" b="239"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-as1" elementRef="id-as1" xsi:type="Element" x="260" y="236" w="200" h="80"><style><fillColor r="220" g="229" b="239"/><lineColor r="47" g="93" b="138"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-as2" elementRef="id-as2" xsi:type="Element" x="260" y="326" w="200" h="80"><style><fillColor r="220" g="229" b="239"/><lineColor r="47" g="93" b="138"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-as3" elementRef="id-as3" xsi:type="Element" x="260" y="416" w="200" h="80"><style><fillColor r="220" g="229" b="239"/><lineColor r="47" g="93" b="138"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-as4" elementRef="id-as4" xsi:type="Element" x="260" y="506" w="200" h="80"><style><fillColor r="220" g="229" b="239"/><lineColor r="47" g="93" b="138"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-OE-a" elementRef="id-OE-a" xsi:type="Element" x="500" y="236" w="200" h="80"><style><fillColor r="252" g="217" b="138"/><lineColor r="248" g="168" b="0"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-OE-b" elementRef="id-OE-b" xsi:type="Element" x="500" y="326" w="200" h="80"><style><fillColor r="252" g="217" b="138"/><lineColor r="248" g="168" b="0"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-OE-c" elementRef="id-OE-c" xsi:type="Element" x="500" y="416" w="200" h="80"><style><fillColor r="252" g="217" b="138"/><lineColor r="248" g="168" b="0"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-OE-d" elementRef="id-OE-d" xsi:type="Element" x="500" y="506" w="200" h="80"><style><fillColor r="252" g="217" b="138"/><lineColor r="248" g="168" b="0"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-OB-1" elementRef="id-OB-1" xsi:type="Element" x="740" y="191" w="200" h="80"><style><fillColor r="252" g="217" b="138"/><lineColor r="248" g="168" b="0"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-OB-2" elementRef="id-OB-2" xsi:type="Element" x="740" y="281" w="200" h="80"><style><fillColor r="252" g="217" b="138"/><lineColor r="248" g="168" b="0"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-OB-3" elementRef="id-OB-3" xsi:type="Element" x="740" y="371" w="200" h="80"><style><fillColor r="252" g="217" b="138"/><lineColor r="248" g="168" b="0"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-OB-4" elementRef="id-OB-4" xsi:type="Element" x="740" y="461" w="200" h="80"><style><fillColor r="252" g="217" b="138"/><lineColor r="248" g="168" b="0"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-OB-5" elementRef="id-OB-5" xsi:type="Element" x="740" y="551" w="200" h="80"><style><fillColor r="252" g="217" b="138"/><lineColor r="248" g="168" b="0"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-REQ-F-03" elementRef="id-REQ-F-03" xsi:type="Element" x="980" y="56" w="200" h="80"><style><fillColor r="143" g="169" b="196"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-REQ-F-05" elementRef="id-REQ-F-05" xsi:type="Element" x="980" y="146" w="200" h="80"><style><fillColor r="143" g="169" b="196"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-REQ-F-25" elementRef="id-REQ-F-25" xsi:type="Element" x="980" y="236" w="200" h="80"><style><fillColor r="143" g="169" b="196"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-REQ-F-34" elementRef="id-REQ-F-34" xsi:type="Element" x="980" y="326" w="200" h="80"><style><fillColor r="143" g="169" b="196"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-REQ-F-31" elementRef="id-REQ-F-31" xsi:type="Element" x="980" y="416" w="200" h="80"><style><fillColor r="143" g="169" b="196"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-REQ-F-32" elementRef="id-REQ-F-32" xsi:type="Element" x="980" y="506" w="200" h="80"><style><fillColor r="143" g="169" b="196"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-REQ-F-12" elementRef="id-REQ-F-12" xsi:type="Element" x="980" y="596" w="200" h="80"><style><fillColor r="143" g="169" b="196"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-REQ-F-14" elementRef="id-REQ-F-14" xsi:type="Element" x="980" y="686" w="200" h="80"><style><fillColor r="143" g="169" b="196"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-EDGE01" elementRef="id-EDGE01" xsi:type="Element" x="1220" y="236" w="200" h="80"><style><fillColor r="255" g="255" b="255"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-CTRL01" elementRef="id-CTRL01" xsi:type="Element" x="1220" y="326" w="200" h="80"><style><fillColor r="255" g="255" b="255"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-PORTAL01" elementRef="id-PORTAL01" xsi:type="Element" x="1220" y="416" w="200" h="80"><style><fillColor r="255" g="255" b="255"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <node identifier="n-id-SIEM01" elementRef="id-SIEM01" xsi:type="Element" x="1220" y="506" w="200" h="80"><style><fillColor r="255" g="255" b="255"/><lineColor r="0" g="56" b="101"/><font name="Calibri" size="11"><color r="38" g="38" b="38"/></font></style></node>
+        <connection identifier="c-id-r-as1-dr1" relationshipRef="id-r-as1-dr1" xsi:type="Relationship" source="n-id-as1" target="n-id-dr1"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-as2-dr1" relationshipRef="id-r-as2-dr1" xsi:type="Relationship" source="n-id-as2" target="n-id-dr1"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-as3-dr2" relationshipRef="id-r-as3-dr2" xsi:type="Relationship" source="n-id-as3" target="n-id-dr2"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-as4-dr3" relationshipRef="id-r-as4-dr3" xsi:type="Relationship" source="n-id-as4" target="n-id-dr3"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-as1-OE-a" relationshipRef="id-r-as1-OE-a" xsi:type="Relationship" source="n-id-as1" target="n-id-OE-a"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-as2-OE-a" relationshipRef="id-r-as2-OE-a" xsi:type="Relationship" source="n-id-as2" target="n-id-OE-a"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-as3-OE-b" relationshipRef="id-r-as3-OE-b" xsi:type="Relationship" source="n-id-as3" target="n-id-OE-b"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-as3-OE-c" relationshipRef="id-r-as3-OE-c" xsi:type="Relationship" source="n-id-as3" target="n-id-OE-c"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-as4-OE-d" relationshipRef="id-r-as4-OE-d" xsi:type="Relationship" source="n-id-as4" target="n-id-OE-d"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-OB-1-OE-a" relationshipRef="id-r-OB-1-OE-a" xsi:type="Relationship" source="n-id-OB-1" target="n-id-OE-a"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-OB-1-OE-c" relationshipRef="id-r-OB-1-OE-c" xsi:type="Relationship" source="n-id-OB-1" target="n-id-OE-c"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-OB-2-OE-b" relationshipRef="id-r-OB-2-OE-b" xsi:type="Relationship" source="n-id-OB-2" target="n-id-OE-b"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-OB-3-OE-c" relationshipRef="id-r-OB-3-OE-c" xsi:type="Relationship" source="n-id-OB-3" target="n-id-OE-c"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-OB-4-OE-d" relationshipRef="id-r-OB-4-OE-d" xsi:type="Relationship" source="n-id-OB-4" target="n-id-OE-d"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-OB-5-OE-d" relationshipRef="id-r-OB-5-OE-d" xsi:type="Relationship" source="n-id-OB-5" target="n-id-OE-d"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-REQ-F-03-OB-1" relationshipRef="id-r-REQ-F-03-OB-1" xsi:type="Relationship" source="n-id-REQ-F-03" target="n-id-OB-1"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-EDGE01-REQ-F-03" relationshipRef="id-r-EDGE01-REQ-F-03" xsi:type="Relationship" source="n-id-EDGE01" target="n-id-REQ-F-03"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-REQ-F-05-OB-1" relationshipRef="id-r-REQ-F-05-OB-1" xsi:type="Relationship" source="n-id-REQ-F-05" target="n-id-OB-1"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-EDGE01-REQ-F-05" relationshipRef="id-r-EDGE01-REQ-F-05" xsi:type="Relationship" source="n-id-EDGE01" target="n-id-REQ-F-05"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-REQ-F-25-OB-1" relationshipRef="id-r-REQ-F-25-OB-1" xsi:type="Relationship" source="n-id-REQ-F-25" target="n-id-OB-1"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-CTRL01-REQ-F-25" relationshipRef="id-r-CTRL01-REQ-F-25" xsi:type="Relationship" source="n-id-CTRL01" target="n-id-REQ-F-25"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-REQ-F-34-OB-2" relationshipRef="id-r-REQ-F-34-OB-2" xsi:type="Relationship" source="n-id-REQ-F-34" target="n-id-OB-2"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-CTRL01-REQ-F-34" relationshipRef="id-r-CTRL01-REQ-F-34" xsi:type="Relationship" source="n-id-CTRL01" target="n-id-REQ-F-34"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-EDGE01-REQ-F-34" relationshipRef="id-r-EDGE01-REQ-F-34" xsi:type="Relationship" source="n-id-EDGE01" target="n-id-REQ-F-34"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-REQ-F-31-OB-3" relationshipRef="id-r-REQ-F-31-OB-3" xsi:type="Relationship" source="n-id-REQ-F-31" target="n-id-OB-3"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-CTRL01-REQ-F-31" relationshipRef="id-r-CTRL01-REQ-F-31" xsi:type="Relationship" source="n-id-CTRL01" target="n-id-REQ-F-31"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-REQ-F-32-OB-3" relationshipRef="id-r-REQ-F-32-OB-3" xsi:type="Relationship" source="n-id-REQ-F-32" target="n-id-OB-3"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-CTRL01-REQ-F-32" relationshipRef="id-r-CTRL01-REQ-F-32" xsi:type="Relationship" source="n-id-CTRL01" target="n-id-REQ-F-32"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-REQ-F-12-OB-4" relationshipRef="id-r-REQ-F-12-OB-4" xsi:type="Relationship" source="n-id-REQ-F-12" target="n-id-OB-4"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-PORTAL01-REQ-F-12" relationshipRef="id-r-PORTAL01-REQ-F-12" xsi:type="Relationship" source="n-id-PORTAL01" target="n-id-REQ-F-12"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-REQ-F-14-OB-5" relationshipRef="id-r-REQ-F-14-OB-5" xsi:type="Relationship" source="n-id-REQ-F-14" target="n-id-OB-5"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-EDGE01-REQ-F-14" relationshipRef="id-r-EDGE01-REQ-F-14" xsi:type="Relationship" source="n-id-EDGE01" target="n-id-REQ-F-14"><style><lineColor r="127" g="127" b="127"/></style></connection>
+        <connection identifier="c-id-r-SIEM01-REQ-F-14" relationshipRef="id-r-SIEM01-REQ-F-14" xsi:type="Relationship" source="n-id-SIEM01" target="n-id-REQ-F-14"><style><lineColor r="127" g="127" b="127"/></style></connection>
+      </view>
+    </diagrams>
+  </views>
+</model>

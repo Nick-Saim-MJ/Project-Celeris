@@ -1124,3 +1124,18 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - Ninguna figura sin un párrafo previo que la introduzca (y la cite) y un párrafo posterior que interprete sus resultados clave; ninguna tabla sin título ni cita. El generador falla si no se cumple.
   - Figuras: PNG de 200 dpi, Calibri (Arial si no está), ancho útil 25,7 cm y alto máximo 13,4 cm en sección horizontal (CI-90), 17 cm en vertical.
 - **Decide:** equipo del proyecto
+
+### CI-101 — Diagnóstico E1 de CE01: meta de BHR del FCE, dueños de RE-xx e identificadores locales
+- **Estado:** resuelto (2026-11-25, P1)
+- **Tipo:** contradicción | vacío
+- **Dónde:** guía CE01 v0.4 B1.3 (factores críticos de éxito) y B1.8 (riesgos estratégicos); `gestion/ce01.yaml` → `riesgos_estrategicos`; `gestion/e1/`
+- **Qué dice cada fuente:**
+  - La guía pone «BHR ≥ 20 %» como factor crítico de éxito, pero el objetivo OB-1 de `infra/trazabilidad.yaml` fija «BHR ≥ 25 % [S-04]».
+  - El prompt P1 pide la matriz de riesgos estratégicos con dueño, pero B1.8 no asigna dueño a RE-01…RE-12.
+  - El E1 necesita rotular los problemas operativos y los factores críticos de éxito, y el contrato de IDs (00 M6) no tiene prefijo para ellos.
+- **Decisión aplicada:**
+  - El FCE de BHR usa la meta de OB-1 (manda el repositorio); el informe la lee de `infra/trazabilidad.yaml`, no la escribe.
+  - Cada RE-xx tiene `dueno` en `gestion/ce01.yaml`, asignado según el reparto de M9 (CE01 y red: Henyelrey; CE02, centro de datos, laboratorio y AWS: Nick; RE-01: ambos). Es una propuesta del equipo que se confirma en P3 junto con la RACI.
+  - Tiempo de descarga de un laboratorio (OB-2): 00 M2.3 da «≈ 1,8 h (ilustrativo)» sin derivarlo. El E1 lo calcula con los supuestos (40 PCs × 3 GB [S-26, S-27] con todo el enlace de 300 Mbps [S-02]) y lo presenta como cota inferior (≈ 0,89 h); el 1,8 h equivale a usar la mitad del enlace. La línea base real se mide en el E4.
+  - Prefijos locales del E1, sin uso fuera de CE01: PO-1…PO-5 (problemas operativos asociados a TI), FCE-1…FCE-5 (factores críticos de éxito), BR-1…BR-7 (brechas) y OE-a…OE-d (rótulos de trabajo de los objetivos estratégicos institucionales, hasta tener los códigos oficiales del plan estratégico). No son IDs del contrato M6 y no se reutilizan con otro significado.
+- **Decide:** equipo del proyecto

@@ -1,0 +1,246 @@
+{
+  "motor": "Microsoft Word (COM)",
+  "paginas": 33,
+  "marcas": [
+    {
+      "texto": "Resumen ejecutivo",
+      "nivel": 1,
+      "pagina": 2
+    },
+    {
+      "texto": "1.1 Contexto organizacional",
+      "nivel": 1,
+      "pagina": 4
+    },
+    {
+      "texto": "1.1.1 Descripción del sector y entorno competitivo",
+      "nivel": 2,
+      "pagina": 4
+    },
+    {
+      "texto": "1.1.2 Estructura organizacional",
+      "nivel": 2,
+      "pagina": 5
+    },
+    {
+      "texto": "Figura 1.1. Organigrama del campus y áreas que toca Celeris",
+      "nivel": 10,
+      "pagina": 5
+    },
+    {
+      "texto": "1.1.3 Cadena de valor",
+      "nivel": 2,
+      "pagina": 6
+    },
+    {
+      "texto": "Figura 1.2. Cadena de valor de la universidad y dependencia de los laboratorios",
+      "nivel": 10,
+      "pagina": 6
+    },
+    {
+      "texto": "1.1.4 Mapa de stakeholders",
+      "nivel": 2,
+      "pagina": 7
+    },
+    {
+      "texto": "Figura 1.3. Matriz poder × interés de los stakeholders",
+      "nivel": 10,
+      "pagina": 7
+    },
+    {
+      "texto": "1.2 Análisis estratégico",
+      "nivel": 1,
+      "pagina": 9
+    },
+    {
+      "texto": "1.2.1 Misión, visión y objetivos estratégicos",
+      "nivel": 2,
+      "pagina": 9
+    },
+    {
+      "texto": "Figura 1.4. Mapa estratégico de Celeris Edge en cuatro perspectivas",
+      "nivel": 10,
+      "pagina": 10
+    },
+    {
+      "texto": "1.2.2 Análisis FODA",
+      "nivel": 2,
+      "pagina": 11
+    },
+    {
+      "texto": "1.2.3 Análisis PESTEL",
+      "nivel": 2,
+      "pagina": 11
+    },
+    {
+      "texto": "1.2.4 Identificación de factores críticos de éxito",
+      "nivel": 2,
+      "pagina": 12
+    },
+    {
+      "texto": "1.3 Diagnóstico digital / TI",
+      "nivel": 1,
+      "pagina": 13
+    },
+    {
+      "texto": "1.3.1 Inventario de sistemas de información existentes",
+      "nivel": 2,
+      "pagina": 13
+    },
+    {
+      "texto": "1.3.2 Nivel de madurez digital (COBIT 2019)",
+      "nivel": 2,
+      "pagina": 13
+    },
+    {
+      "texto": "Figura 1.5. Nivel de capacidad COBIT 2019 objetivo y actual",
+      "nivel": 10,
+      "pagina": 14
+    },
+    {
+      "texto": "1.3.3 Brechas tecnológicas",
+      "nivel": 2,
+      "pagina": 15
+    },
+    {
+      "texto": "Figura 1.6. Brechas cuantificadas entre la situación actual y la meta",
+      "nivel": 10,
+      "pagina": 16
+    },
+    {
+      "texto": "1.3.4 Problemas operativos asociados a TI",
+      "nivel": 2,
+      "pagina": 17
+    },
+    {
+      "texto": "Figura 1.7. Problemas operativos asociados a TI: impacto × frecuencia",
+      "nivel": 10,
+      "pagina": 18
+    },
+    {
+      "texto": "1.4 Identificación del problema",
+      "nivel": 1,
+      "pagina": 19
+    },
+    {
+      "texto": "1.4.1 Definición estructurada del problema",
+      "nivel": 2,
+      "pagina": 19
+    },
+    {
+      "texto": "1.4.2 Causas raíz",
+      "nivel": 2,
+      "pagina": 20
+    },
+    {
+      "texto": "Figura 1.8. Diagrama de Ishikawa del problema de las descargas repetidas",
+      "nivel": 10,
+      "pagina": 20
+    },
+    {
+      "texto": "Figura 1.9. Árbol de problemas: causas, problema central y efectos",
+      "nivel": 10,
+      "pagina": 21
+    },
+    {
+      "texto": "1.4.3 Impacto estratégico",
+      "nivel": 2,
+      "pagina": 22
+    },
+    {
+      "texto": "1.4.4 Justificación de intervención",
+      "nivel": 2,
+      "pagina": 22
+    },
+    {
+      "texto": "1.5 Alineamiento estratégico",
+      "nivel": 1,
+      "pagina": 24
+    },
+    {
+      "texto": "Figura 1.10. Vista de motivación ArchiMate 3.2: de la estrategia al componente",
+      "nivel": 10,
+      "pagina": 25
+    },
+    {
+      "texto": "1.6 Roadmap de tecnología",
+      "nivel": 1,
+      "pagina": 26
+    },
+    {
+      "texto": "Figura 1.11. Roadmap de tecnología de Celeris Edge en tres horizontes",
+      "nivel": 10,
+      "pagina": 26
+    },
+    {
+      "texto": "1.7 Matriz de riesgos estratégicos",
+      "nivel": 1,
+      "pagina": 28
+    },
+    {
+      "texto": "Figura 1.12. Mapa de calor de los riesgos estratégicos RE-01…RE-12",
+      "nivel": 10,
+      "pagina": 29
+    },
+    {
+      "texto": "1.8 Conclusiones",
+      "nivel": 1,
+      "pagina": 30
+    },
+    {
+      "texto": "1.8.1 Conclusiones del diagnóstico",
+      "nivel": 2,
+      "pagina": 30
+    },
+    {
+      "texto": "1.8.2 Preguntas previsibles de la sustentación",
+      "nivel": 2,
+      "pagina": 30
+    },
+    {
+      "texto": "Referencias",
+      "nivel": 1,
+      "pagina": 31
+    },
+    {
+      "texto": "Anexos",
+      "nivel": 1,
+      "pagina": 32
+    },
+    {
+      "texto": "Anexo A. Supuestos citados en el informe",
+      "nivel": 2,
+      "pagina": 32
+    },
+    {
+      "texto": "Anexo B. Autoevaluación contra la rúbrica",
+      "nivel": 2,
+      "pagina": 33
+    },
+    {
+      "texto": "Figura 1.4; Tabla 1.7; Tabla 1.19; Figura 1.10; Figura 1.11\r\u0007",
+      "nivel": 10,
+      "pagina": 33
+    }
+  ],
+  "docx": "Informe_CE01_E1_v0.1.docx",
+  "pdf": "Informe_CE01_E1_v0.1.pdf",
+  "commit_fuente": "4a52e3d",
+  "figuras": [
+    "fig-organigrama",
+    "fig-cadena-valor",
+    "fig-mendelow",
+    "fig-mapa-estrategico",
+    "fig-radar-cobit",
+    "fig-brechas",
+    "fig-impacto-frecuencia",
+    "fig-ishikawa",
+    "fig-arbol",
+    "fig-motivacion",
+    "fig-roadmap",
+    "fig-mapa-calor"
+  ],
+  "completar": [
+    "[COMPLETAR: semestre académico]"
+  ]
+}

@@ -134,6 +134,8 @@ figuras-ce01:
 	$(PYTHON) gestion/figuras_ce01.py
 
 informe-ce01-e1:
+	$(PYTHON) gestion/e1/calculos.py
+	$(PYTHON) gestion/e1/xlsx_matrices.py
 	$(PYTHON) gestion/build_informe_ce01.py --entregable E1 --pdf
 	$(PYTHON) gestion/validate_ce01.py
 

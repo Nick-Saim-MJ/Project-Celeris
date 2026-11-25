@@ -354,6 +354,12 @@ class InformeCE01(base.Informe):
         return (k + 1 < len(bl) and bl[k][0] == "p" and bl[k + 1][0] == "figura"
                 and bool(self.f.figuras.get(bl[k + 1][1].strip(), {}).get("horizontal")))
 
+    def _titulo_horizontal(self, bl, k) -> bool:
+        """¿bl[k] es un título seguido (directo o tras un párrafo de entrada) de una figura horizontal?"""
+        if k >= len(bl) or bl[k][0] not in ("h1", "h2", "h3", "h4"):
+            return False
+        return self._horizontal(bl, k + 1) or (k + 1 < len(bl) and bl[k + 1][0] == "p" and self._horizontal(bl, k + 2))
+
     def render(self, bl, salto_h1=True):
         bl = self._unir_listas_cortas(bl)
         k = 0
@@ -361,11 +367,16 @@ class InformeCE01(base.Informe):
             b = bl[k]
             t = b[0]
             sig = bl[k + 1] if k + 1 < len(bl) else None
+            entrada_h = t == "p" and self._horizontal(bl, k + 1)  # párrafo de entrada entre el título y la figura
+            if self.horizontal and not (self._horizontal(bl, k) or self._titulo_horizontal(bl, k) or entrada_h):
+                self.seccion(False)
             # Un título seguido de una figura horizontal abre la sección horizontal antes del título: así no queda
             # solo en una página vertical (el salto de sección ya abre página).
-            if t in ("h1", "h2", "h3", "h4") and self._horizontal(bl, k + 1):
+            if self._titulo_horizontal(bl, k):
+                nivel = min(int(t[1]), 3)
+                ya_h = self.horizontal  # sin cambio de sección no hay salto implícito: el h1 lo pide
                 self.seccion(True)
-                self.titulo(b[1], min(int(t[1]), 3), salto=False)
+                self.titulo(b[1], nivel, salto=ya_h and salto_h1 and nivel == 1)
                 k += 1
                 continue
             # figura horizontal (CI-90): el párrafo que la introduce, la figura y su interpretación van en la sección
@@ -376,8 +387,9 @@ class InformeCE01(base.Informe):
                 if k + 2 < len(bl) and bl[k + 2][0] == "p":
                     self.parrafo(bl[k + 2][1])
                     k += 1
-                self.seccion(False)
                 k += 2
+                # La vuelta a vertical se difiere al siguiente bloque (aunque esté en otro archivo): si abre otra
+                # figura horizontal, la sección sigue horizontal y no queda una página vertical en blanco.
                 continue
             if t in ("h1", "h2", "h3", "h4"):
                 nivel = min(int(t[1]), 3)
@@ -405,8 +417,15 @@ class InformeCE01(base.Informe):
             k += 1
 
     # ------------------------------------------------------------------ anexos generados
+    def _salto_anexo(self) -> bool:
+        """Cada anexo abre página, salvo el primero, que sigue al título «Anexos»."""
+        if getattr(self, "_anexo_abierto", False):
+            self._anexo_abierto = False
+            return False
+        return True
+
     def anexo_supuestos(self, letra: str):
-        self.titulo(f"Anexo {letra}. Supuestos citados en el informe", 2, salto=True)
+        self.titulo(f"Anexo {letra}. Supuestos citados en el informe", 2, salto=self._salto_anexo())
         ids = sorted(self.supuestos_citados)
         self.parrafo(f"La {self.num['supuestos-citados']} reúne los supuestos que cita el informe. Ninguno se presenta "
                      "como dato: cada uno indica cómo se valida (Marco común M5).")
@@ -421,7 +440,7 @@ class InformeCE01(base.Informe):
         self._fuente("infra/trazabilidad.yaml")
 
     def anexo_autoevaluacion(self, letra: str):
-        self.titulo(f"Anexo {letra}. Autoevaluación contra la rúbrica", 2, salto=True)
+        self.titulo(f"Anexo {letra}. Autoevaluación contra la rúbrica", 2, salto=self._salto_anexo())
         self.parrafo(f"La {self.num['autoevaluacion']} contrasta cada criterio de la rúbrica oficial con su descriptor "
                      "de nivel Excelente y con el lugar del informe donde está la evidencia.")
         cont = self.f.contenido["entregables"][self.f.ent]["rubrica"]
@@ -449,7 +468,9 @@ class InformeCE01(base.Informe):
         self.indice()
         for _, bl in cuerpo:
             self.render(bl)
+        self.seccion(False)
         self.titulo("Anexos", 1, salto=True)
+        self._anexo_abierto = not f.anexos  # el primer anexo va en la página del título «Anexos»
         letras = iter("ABCDEFGHIJ")
         for _, bl in f.anexos:
             self.render(bl, salto_h1=False)

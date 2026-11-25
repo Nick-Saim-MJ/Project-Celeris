@@ -1075,3 +1075,52 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - Se regeneró CE0311 v1.4 (47 páginas), porque su huella depende del YAML (V-80).
   - No cambia ningún ID, IP, flujo ni prueba.
 - **Decide:** equipo del proyecto
+
+### CI-97 — Costos y derivaciones del business case de CE01 sin supuesto registrado
+- **Estado:** resuelto (2026-11-24)
+- **Tipo:** supuesto nuevo
+- **Dónde:** `docs/celeris/Celeris-CE01-Gestion-TI.md` v0.4 B2.3–B2.4; `infra/trazabilidad.yaml` → `supuestos`; `gestion/ce01.yaml`
+- **Qué pasaba:** la guía CE01 suma a la inversión inicial un switch núcleo L2 con 10 GbE (US$ 600), una UPS de 1,5 kVA (US$ 700) y cableado (US$ 200) sin supuesto que los respalde; usa «100 Mbps de ampliación diferidos» sin derivarlos y «mantenimiento = 10 % del hardware» sin decir de qué base.
+- **Decisión aplicada:**
+  - S-37 switch (US$ 600), S-38 UPS (US$ 700) y S-39 cableado (US$ 200), cada uno a validar con cotización.
+  - S-40 «Mbps diferidos» queda como fórmula sin cifra propia: BHR [S-04] × enlace [S-02]. Con los valores actuales da 90 Mbps, no 100; el número lo calcula `gestion/ce01_datos.py`.
+  - S-41 mantenimiento = 10 % de la inversión inicial en hardware (S-08 + S-37 + S-38 + S-39), no solo del servidor.
+  - `gestion/ce01.yaml` no copia los valores de los supuestos: declara una «lectura numérica» por supuesto (valor y el texto exacto donde aparece) y `gestion/ce01_datos.py` falla si ese texto ya no está en `infra/trazabilidad.yaml`. Así, si un supuesto cambia, CE01 no sigue usando la cifra vieja.
+  - La huella de CE0311 incluye `infra/trazabilidad.yaml` (V-80): se regeneró el informe CE0311 v1.4 y su anexo de supuestos lista S-37…S-41.
+- **Decide:** equipo del proyecto
+
+### CI-98 — Cifras desactualizadas de la guía CE01 v0.4 frente al repositorio
+- **Estado:** resuelto (2026-11-24); la corrección va en los informes de CE01, no en la guía
+- **Tipo:** contradicción
+- **Dónde:** `docs/celeris/Celeris-CE01-Gestion-TI.md` v0.4 B2.4–B2.5; `infra/centro_datos.yaml` → `energia.consumo_w` y `aws.costo_mensual.lineas`
+- **Qué dice cada fuente:**
+  - Energía: la guía usa 400 W (US$ 526/año); el repositorio, 480 W (CI-77), que dan ≈ US$ 631/año con S-09.
+  - AWS: la guía usa «≈ US$ 70/mes» (US$ 840/año); la suma de las líneas C1–C7 da US$ 69,58/mes (US$ 834,98/año).
+  - Mbps diferidos: la guía usa 100; la derivación de S-40 da 90 (30 % × 300 Mbps).
+  - RAM: el documento de prompts de CE01 atribuía a la guía «56 GB de RAM en F1»; la guía v0.4 no cita esa cifra (solo el host de 96 GB), así que no hay discrepancia. F1 suma 52 GB en `centro_datos.yaml` (CI-78).
+- **Decisión aplicada:** manda el repositorio. Los informes de CE01 leen consumo, AWS y supuestos a través de `gestion/ce01_datos.py` y nunca de la guía; el E2 incluye una nota de conciliación con la guía (VAN, flujo y payback de la guía quedan como referencia histórica). La guía no se edita a mano.
+- **Decide:** equipo del proyecto
+
+### CI-99 — Texto literal del EPE para CE01 S1 ausente del repositorio
+- **Estado:** resuelto (2026-11-25)
+- **Tipo:** vacío
+- **Dónde:** `docs/fuentes/CE01/E1-E4-contenido-y-rubrica.md`; `docs/fuentes/CE01/contenido-minimo.yaml`
+- **Qué pasaba:** P0 se ejecutó sin el bloque «B. ÁREA DE GESTIÓN DE TECNOLOGÍAS DE INFORMACIÓN» de `transcripcion.md`; el contenido mínimo quedó preliminar, con los títulos de la guía CE01 v0.4, y el generador no podía armar informes.
+- **Decisión aplicada:**
+  - El bloque B se copió literal (líneas 488–805 de `transcripcion.md`, hasta antes de «Entregable 5»), comprobado línea a línea contra la fuente; el encabezado del archivo guarda la huella SHA-256 de la fuente.
+  - `contenido-minimo.yaml` se regeneró desde ese texto: E1 4 títulos y 16 ítems, E2 5 y 14, E3 6 y 17, E4 3 y 11; la rúbrica con sus cuatro descriptores (4, 4, 7 y 4 criterios). `cotejado: true`.
+  - Varios títulos de la guía no eran los del EPE: «Justificación» → «Justificación del Proyecto», «Beneficios» → «Evaluación de Beneficios», «Costos» → «Estimación de Costos», «Alcance/Cronograma/Costos/Riesgos» → «Gestión del …», «AS-IS/TO-BE» → «Proceso Actual (AS-IS)» / «Proceso Propuesto (TO-BE)». En la rúbrica, el último criterio de todos los entregables es «Sustentación y defensa técnica».
+  - El generador exige ahora, además de cada título, cada ítem del contenido mínimo como subtítulo (lo que va entre paréntesis, como «(opcional según complejidad)» o «(si aplica)», no se exige). `validate-ce01` comprueba que títulos, ítems y descriptores estén tal cual en el texto literal.
+  - El EPE no fija plantilla, extensión ni formato para GTI (a diferencia de CE02 y CE03): la estructura es el contenido mínimo. No hay plantilla DOCX oficial de CE01: se usa la portada UPeU del proyecto. Evidencias según el índice del EPE: E1 CE0111–CE0115, E2 CE0113, E3 CE0121–CE0125, E4 CE0131–CE0135.
+- **Decide:** Henyelrey
+
+### CI-100 — Identidad visual y numeración de figuras y tablas de CE01
+- **Estado:** resuelto (2026-11-24, pedido del equipo antes de P0)
+- **Tipo:** decisión de diseño
+- **Dónde:** `gestion/ce01.yaml` → `estilo`; `gestion/estilo_ce01.py`; `gestion/build_informe_ce01.py`
+- **Decisión aplicada:**
+  - Una sola paleta para todas las figuras de CE01 (BPMN, EDT, draw.io, gráficos de Python y XLSX): los colores institucionales de la UPeU, muestreados del logotipo de la portada (`docs/infra/e1/portada-upeu.docx`): azul #003865 y ámbar #F8A800, con tintes del azul, un tinte del ámbar y grises neutros. No hay manual de marca en el repositorio; si la universidad entrega uno, se ajusta solo `gestion/ce01.yaml`. CE03 sigue con Okabe-Ito (CLAUDE.md). El color nunca va solo: cada barra, celda o carril lleva su texto. Única excepción semántica: los mapas de calor de riesgo usan rojo, ámbar y verde con el nivel escrito (ALTO/MEDIO/BAJO).
+  - Tablas y figuras se numeran por entregable al estilo IEEE: «Tabla 1.3. …» encima de la tabla y «Figura 1.1. …» debajo de la figura, con la fuente debajo («Fuente: elaboración propia…»). El texto las cita con `{{ref:id}}`.
+  - Ninguna figura sin un párrafo previo que la introduzca (y la cite) y un párrafo posterior que interprete sus resultados clave; ninguna tabla sin título ni cita. El generador falla si no se cumple.
+  - Figuras: PNG de 200 dpi, Calibri (Arial si no está), ancho útil 25,7 cm y alto máximo 13,4 cm en sección horizontal (CI-90), 17 cm en vertical.
+- **Decide:** equipo del proyecto

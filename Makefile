@@ -4,7 +4,7 @@
 PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
 VERSION ?= v1.0
 
-.PHONY: diagrams-dc diagrams-dc-check matrices-dc informe-dc informe-ce02 help entorno lab-gen tofu-gen tofu-check tofu-emulador image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
+.PHONY: diagrams-dc diagrams-dc-check matrices-dc informe-dc informe-ce02 informe-ce01-e1 informe-ce01-e2 informe-ce01-e3 informe-ce01-e4 figuras-ce01 validate-ce01 help entorno lab-gen tofu-gen tofu-check tofu-emulador image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
 
 help:
 	@echo "make validate        fuente única + artefactos + secretos (infra/validate.py y gitleaks si está instalado)"
@@ -23,6 +23,9 @@ help:
 	@echo "make diagrams-check  genera, exporta y valida los diagramas draw.io (V-50…V-56)"
 	@echo "make informe         genera el informe DOCX y PDF desde la plantilla y valida V-80+ (Word o LibreOffice)"
 	@echo "make informe-ce02    genera el Entregable 1 de CE02 (SRS, prototipo, C4 + ADR, UML) en DOCX y PDF (Word)"
+	@echo "make figuras-ce01    regenera las figuras de CE01 (gestion/eN/figuras/generar.py, paleta UPeU de gestion/estilo_ce01.py)"
+	@echo "make informe-ce01-e1 informe DOCX y PDF de CE01 E1 (también -e2, -e3, -e4; gestion/build_informe_ce01.py, Word)"
+	@echo "make validate-ce01   fuente única de CE01, contenido mínimo y chequeos a)–f) de los informes + pruebas tests/ce01"
 	@echo "make release-e1      copia la versión final a entregables/CE0311/vX.Y/ (pendiente de P5)"
 
 entorno:
@@ -53,7 +56,7 @@ gen:
 test-gen:
 	$(PYTHON) -m pytest tests/gen tests/network -q
 
-validate:
+validate: validate-ce01
 	$(PYTHON) infra/validate.py
 	@if command -v gitleaks >/dev/null 2>&1; then gitleaks detect --source . --no-banner --redact; \
 	else echo "gitleaks no está instalado: lo ejecuta el CI (.github/workflows/e1.yml). V-30 ya revisó infra/ y docs/infra/."; fi
@@ -120,3 +123,29 @@ informe-ce02:
 
 release-e1: validate
 	@echo "pendiente de P5: copia a entregables/CE0311/$(VERSION)/ tras make informe y make matrices" >&2; exit 1
+
+# CE01 Gestión de TI (S1, E1–E4): fuente única gestion/ce01.yaml, generador común gestion/build_informe_ce01.py.
+# validate-ce01 no escribe nada: fuente única, contenido mínimo (docs/fuentes/CE01) y chequeos a)–f) de cada informe.
+validate-ce01:
+	$(PYTHON) gestion/validate_ce01.py
+	$(PYTHON) -m pytest tests/ce01 -q
+
+figuras-ce01:
+	$(PYTHON) gestion/figuras_ce01.py
+
+informe-ce01-e1:
+	$(PYTHON) gestion/build_informe_ce01.py --entregable E1 --pdf
+	$(PYTHON) gestion/validate_ce01.py
+
+informe-ce01-e2:
+	$(PYTHON) gestion/build_informe_ce01.py --entregable E2 --pdf
+	$(PYTHON) gestion/validate_ce01.py
+
+informe-ce01-e3:
+	$(PYTHON) gestion/build_informe_ce01.py --entregable E3 --pdf
+	$(PYTHON) gestion/validate_ce01.py
+
+informe-ce01-e4:
+	$(PYTHON) gestion/build_informe_ce01.py --entregable E4 --pdf
+	$(PYTHON) gestion/validate_ce01.py
+

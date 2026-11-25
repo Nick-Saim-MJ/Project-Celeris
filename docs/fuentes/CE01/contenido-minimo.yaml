@@ -1,0 +1,265 @@
+# docs/fuentes/CE01/contenido-minimo.yaml — Contenido mínimo y rúbrica de CE01 S1 (E1–E4), legible por máquina.
+#
+# GENERADO desde el texto literal del EPE (docs/fuentes/CE01/E1-E4-contenido-y-rubrica.md, CI-99): títulos, ítems
+# («incluye») y descriptores de la rúbrica copiados tal cual. No editar a mano: si cambia el texto literal, se regenera.
+#
+# Uso:
+#   - gestion/build_informe_ce01.py exige que cada `titulo` sea un título del informe y que cada ítem de `incluye` sea
+#     un subtítulo que empiece con ese texto (lo que va entre paréntesis, p. ej. «(opcional según complejidad)», no
+#     se exige); y arma el anexo de autoevaluación con `excelente`.
+#   - gestion/validate_ce01.py comprueba que todo esté, tal cual, en el texto literal.
+#
+# Evidencias: según el índice del EPE (E2 = CE0113). El E2 también aporta a CE0124 (análisis económico), que el EPE
+# agrupa en CE012 y se evalúa con el E3.
+
+meta:
+  fuente_literal: docs/fuentes/CE01/E1-E4-contenido-y-rubrica.md
+  cotejado: true
+  cambio: CI-99
+  formato: 'El EPE no fija plantilla, extensión ni formato para GTI: la estructura es el contenido mínimo, título por título.
+    Las demás áreas del EPE piden referencias IEEE: CE01 usa IEEE (CI-100).'
+
+entregables:
+  E1:
+    nombre: Diagnóstico Organizacional y Alineamiento Estratégico
+    evidencias:
+    - CE0111
+    - CE0112
+    - CE0113
+    - CE0114
+    - CE0115
+    contenido_minimo:
+    - id: '1.1'
+      titulo: Contexto Organizacional
+      incluye:
+      - Descripción del sector y entorno competitivo
+      - Estructura organizacional
+      - Cadena de valor
+      - Mapa de stakeholders
+    - id: '1.2'
+      titulo: Análisis Estratégico
+      incluye:
+      - Misión, visión y objetivos estratégicos
+      - Análisis FODA
+      - Análisis PESTEL (opcional según complejidad)
+      - Identificación de factores críticos de éxito
+    - id: '1.3'
+      titulo: Diagnóstico Digital / TI
+      incluye:
+      - Inventario de sistemas de información existentes
+      - Nivel de madurez digital
+      - Brechas tecnológicas
+      - Problemas operativos asociados a TI
+    - id: '1.4'
+      titulo: Identificación del Problema
+      incluye:
+      - Definición estructurada del problema
+      - Causas raíz
+      - Impacto estratégico
+      - Justificación de intervención
+    rubrica:
+    - criterio: Análisis del contexto organizacional
+      excelente: Analiza profundamente el entorno con evidencia y sustento estratégico.
+      bueno: Analiza el contexto con identificación clara de problemas.
+      regular: Describe la organización de forma general.
+      deficiente: Descripción superficial sin análisis estructurado.
+    - criterio: Identificación de brechas estratégicas
+      excelente: Identifica brechas críticas con análisis fundamentado y evidencia objetiva.
+      bueno: Identifica brechas coherentes con objetivos organizacionales.
+      regular: Identifica brechas generales sin sustento.
+      deficiente: No identifica brechas relevantes.
+    - criterio: Alineamiento estratégico del proyecto
+      excelente: Evidencia alineamiento claro y coherente entre estrategia, problema y propuesta TI.
+      bueno: Justifica el proyecto en función de objetivos organizacionales.
+      regular: Relación débil o implícita.
+      deficiente: No demuestra relación entre estrategia y proyecto.
+    - criterio: Sustentación y defensa técnica
+      excelente: Explica y defiende con dominio las decisiones tomadas.
+      bueno: Explica con solvencia.
+      regular: Explica con dificultad.
+      deficiente: No sustenta.
+  E2:
+    nombre: Business Case del Proyecto
+    evidencias:
+    - CE0113
+    contenido_minimo:
+    - id: '2.1'
+      titulo: Justificación del Proyecto
+      incluye:
+      - Problema que se resuelve
+      - Objetivos del proyecto (SMART)
+      - Beneficios esperados
+    - id: '2.2'
+      titulo: Análisis de Alternativas
+      incluye:
+      - Alternativas tecnológicas consideradas
+      - Criterios de evaluación
+      - Matriz comparativa
+    - id: '2.3'
+      titulo: Evaluación de Beneficios
+      incluye:
+      - Beneficios cuantificables
+      - Beneficios cualitativos
+      - Indicadores de valor
+    - id: '2.4'
+      titulo: Estimación de Costos
+      incluye:
+      - Inversión inicial
+      - Costos operativos
+      - Costos de mantenimiento
+    - id: '2.5'
+      titulo: Riesgos Iniciales
+      incluye:
+      - Identificación de riesgos estratégicos
+      - Evaluación preliminar de impacto
+    rubrica:
+    - criterio: Análisis de alternativas
+      excelente: Analiza alternativas con matriz comparativa rigurosa y justificación sólida.
+      bueno: Compara alternativas con criterios definidos.
+      regular: Presenta alternativas sin comparación estructurada.
+      deficiente: No evalúa alternativas.
+    - criterio: Evaluación económica
+      excelente: Presenta análisis financiero estructurado con indicadores cuantificados.
+      bueno: Estima costos y beneficios razonablemente.
+      regular: Presenta costos generales sin sustento.
+      deficiente: No presenta estimación financiera.
+    - criterio: Identificación de riesgos
+      excelente: Analiza riesgos estratégicos con impacto y estrategias de mitigación.
+      bueno: Identifica riesgos con evaluación básica.
+      regular: Enumera riesgos sin análisis.
+      deficiente: No identifica riesgos relevantes.
+    - criterio: Sustentación y defensa técnica
+      excelente: Explica y defiende con dominio las decisiones tomadas.
+      bueno: Explica con solvencia.
+      regular: Explica con dificultad.
+      deficiente: No sustenta.
+  E3:
+    nombre: Plan de Gestión del Proyecto (PMBOK / Agile)
+    evidencias:
+    - CE0121
+    - CE0122
+    - CE0123
+    - CE0124
+    - CE0125
+    contenido_minimo:
+    - id: '3.1'
+      titulo: Acta de Constitución
+      incluye:
+      - Sponsor
+      - Objetivos
+      - Alcance preliminar
+      - Restricciones y supuestos
+    - id: '3.2'
+      titulo: Gestión del Alcance
+      incluye:
+      - EDT / WBS
+      - Diccionario de entregables
+    - id: '3.3'
+      titulo: Gestión del Cronograma
+      incluye:
+      - Lista de actividades
+      - Diagrama de Gantt
+      - Hitos principales
+    - id: '3.4'
+      titulo: Gestión de Costos
+      incluye:
+      - Presupuesto detallado
+      - Línea base de costos
+    - id: '3.5'
+      titulo: Gestión de Riesgos
+      incluye:
+      - Identificación
+      - Análisis cualitativo
+      - Plan de respuesta
+    - id: '3.6'
+      titulo: Gestión Ágil (si aplica)
+      incluye:
+      - Product backlog
+      - Sprint planning
+      - Incrementos
+    rubrica:
+    - criterio: Acta de Constitución
+      excelente: Formula acta completa con objetivos SMART, justificación estratégica, stakeholders identificados y criterios de éxito definidos.
+      bueno: Define objetivos, alcance preliminar y stakeholders de forma clara.
+      regular: Presenta acta con información general y poco precisa.
+      deficiente: No define formalmente el proyecto ni sus objetivos.
+    - criterio: Gestión del Alcance
+      excelente: Define alcance detallado con EDT estructurada, diccionario de trabajo y control de cambios establecido.
+      bueno: Presenta EDT/WBS coherente con entregables definidos.
+      regular: Define alcance general sin desglose estructurado.
+      deficiente: No delimita entregables ni estructura de trabajo.
+    - criterio: Gestión del Cronograma
+      excelente: Presenta cronograma detallado, secuenciado, con dependencias, hitos críticos y coherencia total con el alcance.
+      bueno: Presenta cronograma estructurado con actividades y hitos definidos.
+      regular: Presenta cronograma básico sin coherencia total con el alcance.
+      deficiente: No presenta planificación temporal clara.
+    - criterio: Gestión de Costos
+      excelente: Desarrolla presupuesto detallado con línea base de costos, estimaciones justificadas y control presupuestal definido.
+      bueno: Presenta presupuesto coherente alineado al alcance y cronograma.
+      regular: Presenta estimación general sin estructura presupuestal clara.
+      deficiente: No estima costos o lo hace de manera informal.
+    - criterio: Gestión de Riesgos
+      excelente: Desarrolla matriz completa con evaluación cualitativa, priorización y plan formal de respuesta y seguimiento.
+      bueno: Presenta matriz de riesgos con análisis básico de probabilidad e impacto.
+      regular: Enumera riesgos sin análisis estructurado.
+      deficiente: No identifica riesgos relevantes.
+    - criterio: Gestión Ágil (si aplica)
+      excelente: Integra marco ágil coherente (backlog priorizado, sprints definidos, criterios de aceptación y métricas de seguimiento).
+      bueno: Define backlog, iteraciones y entregables incrementales.
+      regular: Menciona prácticas ágiles sin estructura clara.
+      deficiente: No aplica prácticas ágiles cuando corresponden.
+    - criterio: Sustentación y defensa técnica
+      excelente: Explica y defiende con dominio las decisiones tomadas.
+      bueno: Explica con solvencia.
+      regular: Explica con dificultad.
+      deficiente: No sustenta.
+  E4:
+    nombre: Modelado de Procesos AS-IS / TO-BE
+    evidencias:
+    - CE0131
+    - CE0132
+    - CE0133
+    - CE0134
+    - CE0135
+    contenido_minimo:
+    - id: '4.1'
+      titulo: Proceso Actual (AS-IS)
+      incluye:
+      - Descripción narrativa del proceso
+      - Indicadores actuales
+      - Diagrama BPMN
+      - Problemas detectados
+    - id: '4.2'
+      titulo: Proceso Propuesto (TO-BE)
+      incluye:
+      - Rediseño del flujo
+      - Automatizaciones propuestas
+      - Nuevos indicadores
+      - Mejora estimada en eficiencia
+    - id: '4.3'
+      titulo: Análisis Comparativo
+      incluye:
+      - Reducción de tiempos
+      - Reducción de costos
+      - Mejora en calidad
+    rubrica:
+    - criterio: Modelado AS-IS
+      excelente: Modelado detallado con identificación clara de ineficiencias.
+      bueno: Modelado correcto del proceso actual.
+      regular: Representación básica sin análisis crítico.
+      deficiente: Incorrecto o incompleto.
+    - criterio: Propuesta TO-BE
+      excelente: Rediseño innovador con mejora cuantificada en eficiencia y calidad.
+      bueno: Rediseño coherente apoyado en TIC.
+      regular: Propone mejoras generales.
+      deficiente: No responde al problema.
+    - criterio: Análisis comparativo
+      excelente: Cuantifica mejoras en tiempo, costo y calidad.
+      bueno: Evidencia mejoras esperadas.
+      regular: Comparación descriptiva básica.
+      deficiente: No presenta comparación.
+    - criterio: Sustentación y defensa técnica
+      excelente: Explica y defiende con dominio las decisiones tomadas.
+      bueno: Explica con solvencia.
+      regular: Explica con dificultad.
+      deficiente: No sustenta.

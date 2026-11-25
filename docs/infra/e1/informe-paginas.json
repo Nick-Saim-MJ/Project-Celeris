@@ -1,6 +1,6 @@
 {
   "motor": "Microsoft Word (COM)",
-  "paginas": 47,
+  "paginas": 48,
   "marcas": [
     {
       "texto": "Control de versiones",
@@ -200,33 +200,33 @@
     {
       "texto": "Anexo E. Validación emulada (Modo L y AWS Emulator)",
       "nivel": 1,
-      "pagina": 44
+      "pagina": 45
     },
     {
       "texto": "Modo L: laboratorio emulado local",
       "nivel": 2,
-      "pagina": 44
+      "pagina": 45
     },
     {
       "texto": "AWS Emulator: plano de control",
       "nivel": 2,
-      "pagina": 46
+      "pagina": 47
     },
     {
       "texto": "Por qué esto no es implementación",
       "nivel": 2,
-      "pagina": 46
+      "pagina": 47
     },
     {
       "texto": "Anexo F. Por qué la consola no está en la nube (D-24, D-25)",
       "nivel": 1,
-      "pagina": 47
+      "pagina": 48
     }
   ],
   "docx": "entregables/CE0311/Informe_Diseno_Red_v1.4.docx",
   "pdf": "entregables/CE0311/Informe_Diseno_Red_v1.4.pdf",
-  "commit_fuente": "aa3b8e5",
-  "huella_fuente": "59f4c60b9d4ff1ad",
+  "commit_fuente": "5d8e77f",
+  "huella_fuente": "bfd70d2eef4c4c48",
   "figuras": [
     "FIG-1.1",
     "FIG-5.1",

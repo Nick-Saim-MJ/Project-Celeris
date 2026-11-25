@@ -13,7 +13,7 @@
 - No inventes IP, puertos, nombres ni cantidades. Si falta algo, DETENTE y regístralo en
   docs/infra/e1/CAMBIOS-INVENTARIO.md con el siguiente CI libre.
 - IDs vigentes: F1–F33 (F4 reservado; F9, F11, F12, F15, F16, F17, F19, F22, F23 retirados), T01–T60
-  (T12, T22, T37, T38, T39, T41, T44, T48 retirados), OD-01–OD-12, AM-01–AM-18, DET-01–DET-11, S-01–S-36,
+  (T12, T22, T37, T38, T39, T41, T44, T48 retirados), OD-01–OD-12, AM-01–AM-18, DET-01–DET-11, S-01–S-41 (S-37–S-41: costos de CE01, CI-97),
   D-01–D-29, REQ-F-01–F-37. Un ID retirado NUNCA se reutiliza.
 - Componentes vigentes (v0.4): FGT-EXT, FW01, SW-CORE01, SW-ACC, BRK01, ESX01, IPMI01, UPS01, JMP01, CTRL01,
   EDGE01, EDGE02, PORTAL01, HNY01, SIEM01, ENC01, LABCLI01, KALI01, HNY02, PCs LAB-01…LAB-10, WIFI-EST,
@@ -38,3 +38,10 @@ Flujos: cifrado = continua; sin cifrar con riesgo aceptado = discontinua; bloque
 ## Comandos
 make validate · make lab-up / lab-down / test-lab · make tofu-check · make matrices · make diagrams-check ·
 make informe (CE0311) · make informe-dc (CE0331) · make release-s1
+
+## CE01 Gestión de TI (gestion/)
+- Fuente única: gestion/ce01.yaml; todo número pasa por gestion/ce01_datos.py (nunca a mano en el texto: {{dato:}}).
+- Paleta institucional UPeU (gestion/estilo_ce01.py, CI-100) para TODAS las figuras de CE01; Okabe-Ito sigue siendo de CE03.
+- Figuras y tablas numeradas «Figura 1.1.» / «Tabla 1.1.» (IEEE, por entregable); toda figura con párrafo previo que la
+  cite ({{ref:id}}) y párrafo posterior que la interprete. El generador falla si no.
+- make validate-ce01 · make figuras-ce01 · make informe-ce01-e1…e4 (en esta PC: mingw32-make PYTHON=python …)

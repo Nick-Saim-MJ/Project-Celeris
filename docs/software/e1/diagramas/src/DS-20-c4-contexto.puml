@@ -1,0 +1,39 @@
+@startuml DS-20-c4-contexto
+!include <C4/C4_Context>
+!include _estilo.iuml
+title DS-20 · C4 nivel 1 — Contexto de Celeris Edge (CE02 C3.1, arquitectura v0.4)
+caption Personas y sistemas externos alrededor de Celeris Edge. Los rótulos de las flechas nombran el flujo de infra/inventory.yaml. Línea discontinua = uso opcional.
+LAYOUT_TOP_DOWN()
+AddRelTag("opcional", $lineStyle = DashedLine())
+
+Person(usr, "Usuario de laboratorio", "Estudiante o docente en una PC institucional (LAB-01…LAB-10). Sin cuenta.")
+Person(byod, "Usuario BYOD", "Equipo propio en el Wi-Fi de estudiantes (WIFI-EST). Sin cuenta.")
+Person(enc, "Encargado de laboratorio", "Decide qué se cachea, quién accede y cuándo se precarga (rol encargado).")
+Person(adm, "Administrador DTI", "Aprueba lo que se descifra, rota la CA, gestiona usuarios (rol admin, solo desde el campus).")
+Person(doc, "Docente", "Pide que un software esté listo para su clase (rol docente).")
+Person(aud, "Auditor", "Lee el aviso, los reportes y la auditoría (rol auditor).")
+
+System(cel, "Celeris Edge", "Caché compartida de los laboratorios: nodos EDGE01/EDGE02, consola en CTRL01 y portal en PORTAL01.")
+
+System_Ext(org, "Orígenes en Internet", "Servidores de actualizaciones, instaladores y paquetes.")
+System_Ext(fgt, "FortiGate de la DTI (FGT-EXT)", "Perímetro existente: FortiGuard filtra la salida de los nodos.")
+System_Ext(gw, "EC2-GW (AWS)", "Proxy inverso sin datos: única entrada pública a la consola.")
+System_Ext(s3, "S3 celeris-backups (AWS)", "Respaldos cifrados con Object Lock.")
+System_Ext(siem, "SIEM01 (Wazuh)", "Recibe los eventos de seguridad.")
+
+Rel(usr, cel, "Descarga vía PAC y proxy; lee el aviso", "F3, F1, F5")
+Rel_D(byod, cel, "Proxy opcional, nunca descifrado", "F31, F32", $tags = "opcional")
+Rel(enc, cel, "Usa la consola desde ENC01", "F28")
+Rel(adm, cel, "Aprueba y administra desde JMP01 o ENC01", "F20, F28")
+Rel(doc, cel, "Registra solicitudes", "F28 o F29 → F30")
+Rel(aud, cel, "Revisa reportes y auditoría", "F28 o F29 → F30")
+Rel(enc, gw, "Consola desde fuera del campus (TLS + TOTP)", "F29")
+Rel(gw, cel, "Reenvía con certificado de cliente, por IPsec", "F30")
+Rel(cel, fgt, "Solo MISS y precargas", "F8")
+Rel(fgt, org, "Salida filtrada")
+Rel(cel, s3, "Respaldo cifrado en origen", "F18")
+Rel(cel, siem, "Eventos de seguridad", "F13")
+
+SHOW_LEGEND()
+$pie("DS-20", "REQ-F-01, F-12, F-26, F-33, F-36, F-37, NF-07", "CU-01…CU-11", "P-01…P-11")
+@enduml

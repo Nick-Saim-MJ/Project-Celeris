@@ -1,7 +1,7 @@
 @startuml DS-14-casos-de-uso
 !include _estilo.iuml
 title DS-14 · Casos de uso de Celeris Edge (CE02 C1.6, arquitectura v0.4)
-caption «R1» lo cubre el nodo actual · «R2» requiere la consola o el portal (S2). CU-08 aún no tiene pantalla (hueco H-01).
+caption «R1» lo cubre el nodo actual · «R2» requiere la consola o el portal (S2). CU-08 se hace desde P-03 (acción «Purgar», v0.3; H-01 resuelto en el SRS).
 left to right direction
 skinparam usecase {
   BackgroundColor #FFFFFF
@@ -13,7 +13,7 @@ skinparam actorStyle awesome
 
 actor "Usuario\n(PC institucional\nde laboratorio)" as U
 actor "Usuario BYOD\n(WIFI-EST)" as UB
-actor "Docente" as DOC
+actor "Docente\n(rol docente)" as DOC
 actor "Encargado de\nlaboratorio" as ENC
 actor "Administrador DTI" as ADM
 actor "Auditor" as AUD
@@ -43,6 +43,8 @@ ENC --> uc04
 ENC --> uc05
 ENC --> uc06
 ENC --> uc08
+uc08 ..> LOGIN : <<include>>
+uc09 ..> LOGIN : <<include>>
 ENC --> uc11
 ADM --> uc07
 ADM --> uc10
@@ -68,8 +70,9 @@ note right of uc11
   JMP01 o ENC01 (REQ-F-37).
 end note
 note right of uc09
-  Cómo entra el docente a registrarla
-  aún no está definido (hueco H-03).
+  El docente tiene rol propio «docente»:
+  entra por P-01 y solo ve sus solicitudes
+  (H-03, resuelto en el SRS §1.7.3).
 end note
 
 $pie("DS-14", "REQ-F-01…F-05, F-12, F-19, F-24, F-25, F-30…F-37, RN-05, RN-07", "CU-01…CU-11", "P-01…P-11")

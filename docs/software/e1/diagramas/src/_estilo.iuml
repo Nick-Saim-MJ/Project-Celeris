@@ -93,3 +93,19 @@ skinparam database {
   BackgroundColor #FFFFFF
   BorderColor $INK
 }
+
+' Casos de uso (DS-14 y un diagrama por caso de uso, DS-23…DS-33).
+skinparam usecase {
+  BackgroundColor #FFFFFF
+  BorderColor $INK
+  BackgroundColor<<R2>> $R2FILL
+  BorderColor<<R2>> $ACCENT
+}
+skinparam actorStyle awesome
+skinparam RectangleBorderColor $INK2
+skinparam RectangleBackgroundColor #FFFFFF
+
+' Pie corto para los diagramas por caso de uso (DS-23…DS-44), que van de a dos por fila en el informe.
+!procedure $pie_cu($id, $req, $pant)
+footer $id · $req · Pantallas: $pant
+!endprocedure

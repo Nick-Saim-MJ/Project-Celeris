@@ -1,0 +1,38 @@
+@startuml DS-39-cu06-clases
+!include _estilo.iuml
+title DS-39 · CU-06 Ver el ahorro y la actividad: clases
+package "Interfaz" {
+  class "P-02 Ahorro" as P02 <<R2>>
+  class "P-11 Actividad en vivo" as P11 <<R2>>
+}
+package "Control" {
+  class ReportsService <<R2>> {
+    + recibir_kpi(nodo, KpiIntervalo)
+    + ahorro(lab, desde, hasta): Reporte
+    + en_vivo(labs): VistaEnVivo
+  }
+  class Stats <<R1>> {
+    observe(outcome, elapsed)
+  }
+}
+package "Entidad" {
+  class KpiIntervalo <<R2>> {
+    hit, revalidated, miss, bypass
+    bytes_cache, bytes_origen
+  }
+  class KpiDiario <<R2>> {
+    GB evitados, BHR
+    minutos ahorrados
+  }
+  class Laboratorio <<R2>>
+}
+P02 --> ReportsService
+P11 --> ReportsService
+Stats ..> ReportsService : cada 30 s por F10\n(agente del nodo, R2)
+ReportsService ..> KpiIntervalo
+ReportsService ..> KpiDiario
+KpiIntervalo "*" --> "1" Laboratorio
+KpiDiario "*" --> "1" Laboratorio
+
+$pie_cu("DS-39", "REQ-F-13, F-25, NF-07, NF-13", "P-02, P-11")
+@enduml

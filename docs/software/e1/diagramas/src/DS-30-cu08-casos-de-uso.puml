@@ -1,0 +1,22 @@
+@startuml DS-30-cu08-casos-de-uso
+!include _estilo.iuml
+title DS-30 · CU-08 Purgar un contenido
+left to right direction
+actor "Encargado de\nlaboratorio" as ENC
+actor "Nodo EDGE01 / EDGE02" as NODO
+rectangle "Consola (CTRL01)" {
+  usecase "CU-08 Purgar\nun contenido" as UC <<R2>>
+  usecase "Iniciar sesión con\nsegundo factor\n(REQ-F-33)" as LOGIN <<R2>>
+  usecase "Elegir la fuente, una URL\no un prefijo (P-03)" as SEL <<R2>>
+  usecase "Registrar el cambio\nen la auditoría\n(REQ-F-24)" as AUDIT <<R2>>
+  usecase "Publicar la configuración\nfirmada (REQ-F-17)" as PUB <<R2>>
+}
+ENC --> UC
+UC ..> LOGIN : <<include>>
+UC ..> SEL : <<include>>
+UC ..> AUDIT : <<include>>
+UC ..> PUB : <<include>>
+PUB --> NODO : la orden llega en la\nsiguiente versión (F10)
+
+$pie_cu("DS-30", "REQ-F-19, F-24", "P-03")
+@enduml

@@ -1,0 +1,29 @@
+@startuml DS-29-cu07-casos-de-uso
+!include _estilo.iuml
+title DS-29 · CU-07 Aprobar una fuente que requiere descifrado
+left to right direction
+actor "Administrador DTI\n(desde JMP01 o ENC01)" as ADM
+rectangle "Consola (CTRL01)" {
+  usecase "CU-07 Aprobar una fuente\nque requiere descifrado" as UC <<R2>>
+  usecase "Iniciar sesión con\nsegundo factor\n(REQ-F-33)" as LOGIN <<R2>>
+  usecase "Exigir origen campus\n(REQ-F-37)" as ORG <<R2>>
+  usecase "Comprobar que la CA\ncubre el dominio (REQ-RN-04)" as CA <<R2>>
+  usecase "Registrar el cambio\nen la auditoría\n(REQ-F-24)" as AUDIT <<R2>>
+  usecase "Publicar la configuración\ny el aviso (REQ-F-30)" as PUB <<R2>>
+  usecase "Rechazar la fuente" as REC <<R2>>
+}
+ADM --> UC
+UC ..> LOGIN : <<include>>
+UC ..> ORG : <<include>>
+UC ..> CA : <<include>>
+UC ..> AUDIT : <<include>>
+UC ..> PUB : <<include>>
+REC .> UC : <<extend>>
+note bottom of UC
+  Si la sesión llegó por EC2-GW, la API
+  responde 403 y el intento queda en la
+  auditoría con su origen.
+end note
+
+$pie_cu("DS-29", "REQ-F-24, F-30, F-31, F-37, RN-04, RN-07", "P-07")
+@enduml

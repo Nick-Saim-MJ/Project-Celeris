@@ -1,0 +1,25 @@
+@startuml DS-32-cu10-casos-de-uso
+!include _estilo.iuml
+title DS-32 · CU-10 Revisar la auditoría de cambios
+left to right direction
+actor "Auditor" as AU
+actor "Administrador DTI" as ADM
+rectangle "Consola (CTRL01)" {
+  usecase "CU-10 Revisar la\nauditoría de cambios" as UC <<R2>>
+  usecase "Iniciar sesión con\nsegundo factor\n(REQ-F-33)" as LOGIN <<R2>>
+  usecase "Ver quién cambió qué,\ncuándo, antes y después" as CAM <<R2>>
+  usecase "Ver los intentos rechazados\ny su origen (campus/remoto)" as REC <<R2>>
+}
+AU --> UC
+ADM --> UC
+UC ..> LOGIN : <<include>>
+UC ..> CAM : <<include>>
+REC .> UC : <<extend>>
+note bottom of UC
+  Registro de solo inserción:
+  nadie puede editar ni borrar
+  una entrada (REQ-F-24).
+end note
+
+$pie_cu("DS-32", "REQ-F-24, F-37", "P-08")
+@enduml

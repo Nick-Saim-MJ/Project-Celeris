@@ -1,6 +1,6 @@
 @startuml DS-09-estados-entrada-cache
 !include _estilo.iuml
-title DS-09 · Estados de una entrada de caché (C4.4, según store.rs y handler.rs)
+title DS-09 · Estados de una entrada de caché (C4.7, según store.rs y handler.rs)
 caption «R1»: todos los estados existen en el código (no hay un campo «estado»: se deducen de Meta, Flights y del índice de disco).
 
 [*] --> Ausente

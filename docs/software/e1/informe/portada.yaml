@@ -1,0 +1,9 @@
+# Datos de la portada del Entregable 1 de CE02 (plantilla: docs/fuentes/CE02/E1-plantilla-y-rubrica.md).
+# Los autores salen del campo `equipo` de docs/celeris/Celeris-00-Marco-Comun.md; la fecha, de la cabecera de CE02.
+titulo: "Celeris Edge: caché de descargas para los laboratorios de cómputo del Campus Juliaca"
+entregable: "Entregable 1 · Requerimientos y Diseño del Sistema"
+curso: "Ingeniería de Software (CE021)"
+area: "Ingeniería de Software"
+normas: "ISO/IEC/IEEE 29148 · ISO/IEC 25010 · C4 · UML 2.5 · MADR"
+semestre: "[COMPLETAR: semestre académico]"
+lugar: "Juliaca"

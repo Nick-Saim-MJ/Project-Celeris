@@ -1,0 +1,27 @@
+@startuml DS-23-cu01-casos-de-uso
+!include _estilo.iuml
+title DS-23 · CU-01 Descargar a través de la caché
+left to right direction
+actor "Usuario de\nlaboratorio" as U
+actor "Usuario BYOD\n(WIFI-EST)" as UB
+actor "Sitio de origen\n(Internet)" as ORI
+rectangle "Nodo de caché (celeris-node)" {
+  usecase "CU-01 Descargar a\ntravés de la caché" as UC <<R1>>
+  usecase "Verificar laboratorio\ny horario (REQ-F-10)" as ACC <<R1>>
+  usecase "Decidir si se descifra:\nred de origen y SNI\n(REQ-F-02, F-36)" as TLS <<R1>>
+  usecase "Servir la copia\nguardada (HIT)" as HIT <<R1>>
+  usecase "Descargar una sola vez\ny compartir (MISS,\nREQ-F-05)" as MISS <<R1>>
+  usecase "Revalidar con 304\n(REQ-F-04)" as REV <<R1>>
+}
+U --> UC
+UB --> UC : sin descifrado
+UC ..> ACC : <<include>>
+UC ..> TLS : <<include>>
+HIT .> UC : <<extend>>
+MISS .> UC : <<extend>>
+REV .> UC : <<extend>>
+MISS --> ORI
+REV --> ORI
+
+$pie_cu("DS-23", "REQ-F-01…F-05, F-10, F-36", "— (transparente)")
+@enduml

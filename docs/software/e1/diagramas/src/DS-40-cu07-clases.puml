@@ -1,0 +1,43 @@
+@startuml DS-40-cu07-clases
+!include _estilo.iuml
+title DS-40 · CU-07 Aprobar una fuente: clases
+package "Interfaz" {
+  class "P-07 Aprobaciones" as P07 <<R2>>
+}
+package "Control (consola)" {
+  class OrigenMiddleware <<R2>> {
+    + origen(req): campus | remoto
+  }
+  class Rbac <<R2>> {
+    + exigir_campus(sesion, accion_critica)
+  }
+  class CatalogService <<R2>> {
+    + aprobar(sesion, fuente)
+    + rechazar(sesion, fuente)
+  }
+  class AuditLog <<R2>> {
+    + registrar(sesion, accion, objeto, antes, despues)
+  }
+}
+package "Entidad" {
+  class Sesion <<R2>> {
+    origen: campus | remoto
+    equipo
+  }
+  class Fuente <<R2>> {
+    modo, estado
+  }
+  class Aprobacion <<R2>> {
+    decision, por
+    origen: campus
+  }
+}
+P07 --> CatalogService
+OrigenMiddleware ..> Sesion : marca
+CatalogService --> Rbac : exigir_campus
+CatalogService --> AuditLog
+Rbac ..> Sesion
+Fuente "1" -- "0..1" Aprobacion
+
+$pie_cu("DS-40", "REQ-F-24, F-31, F-37, RN-07", "P-07")
+@enduml

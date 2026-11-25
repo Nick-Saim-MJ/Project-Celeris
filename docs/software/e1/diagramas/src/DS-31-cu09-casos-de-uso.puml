@@ -1,0 +1,27 @@
+@startuml DS-31-cu09-casos-de-uso
+!include _estilo.iuml
+title DS-31 · CU-09 Registrar una solicitud de preparación
+left to right direction
+actor "Docente\n(rol docente)" as DOC
+actor "Encargado de\nlaboratorio" as ENC
+rectangle "Consola (CTRL01)" {
+  usecase "CU-09 Registrar una\nsolicitud de preparación" as UC <<R2>>
+  usecase "Iniciar sesión con\nsegundo factor\n(REQ-F-33)" as LOGIN <<R2>>
+  usecase "Indicar laboratorio, fecha\nde la clase y software" as DAT <<R2>>
+  usecase "Ver el estado de\nsus solicitudes" as EST <<R2>>
+  usecase "CU-05 Programar\nuna precarga" as ucCinco <<R2>>
+}
+DOC --> UC
+UC ..> LOGIN : <<include>>
+UC ..> DAT : <<include>>
+EST .> UC : <<extend>>
+ENC --> ucCinco
+ucCinco ..> UC : convierte la\nsolicitud
+note bottom of UC
+  El docente solo ve sus solicitudes
+  (REQ-F-33). Estados: nueva,
+  en preparación, lista.
+end note
+
+$pie_cu("DS-31", "REQ-F-33, F-35", "P-06")
+@enduml

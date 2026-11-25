@@ -1,0 +1,41 @@
+@startuml DS-43-cu10-clases
+!include _estilo.iuml
+title DS-43 · CU-10 Revisar la auditoría: clases
+package "Interfaz" {
+  class "P-08 Auditoría" as P08 <<R2>>
+}
+package "Control (consola)" {
+  class ApiRouter <<R2>> {
+    + GET /v1/auditoria
+  }
+  class Rbac <<R2>> {
+    + puede(sesion, laboratorio): bool
+  }
+  class AuditLog <<R2>> {
+    solo inserción
+  }
+  class Repositorio <<R2>>
+}
+package "Entidad" {
+  class Cambio <<R2>> {
+    accion, objeto
+    antes, despues
+    origen + equipo
+  }
+  class Sesion <<R2>> {
+    origen: campus | remoto
+  }
+  class Usuario <<R2>> {
+    rol: auditor | admin
+  }
+}
+P08 --> ApiRouter
+ApiRouter --> Rbac
+ApiRouter --> Repositorio : consulta
+AuditLog --> Repositorio : inserta
+Repositorio ..> Cambio
+Sesion "1" --> "*" Cambio : genera
+Usuario "1" -- "*" Sesion
+
+$pie_cu("DS-43", "REQ-F-24, F-37", "P-08")
+@enduml

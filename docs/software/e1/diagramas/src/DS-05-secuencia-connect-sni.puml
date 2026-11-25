@@ -1,13 +1,13 @@
 @startuml DS-05-secuencia-connect-sni
 !include _estilo.iuml
-title DS-05 · Secuencia: CONNECT y decisión de descifrado por SNI (REQ-F-02, implementado; BYOD y catálogo en R2)
-caption «R1»: handler.rs (guard_connect, should_intercept_connect, should_intercept_tls, tls_decision) y config.rs (should_intercept).
+title DS-05 · Secuencia: CONNECT y decisión de descifrado por SNI y red de origen (REQ-F-02 y REQ-F-36 implementados; catálogo en R2)
+caption «R1»: handler.rs (guard_connect, should_intercept_connect, should_intercept_tls, tls_decision) y signed.rs (Policy.should_intercept(host, cliente)).
 
 actor "Cliente\n(LAB o WIFI-EST)" as C
 box "celeris-node · EDGE01 10.20.60.10" #FFFFFF
   participant "Hudsucker\n(D-02)" as HS <<R1>>
   participant "CacheHandler" as H <<R1>>
-  participant "Config\n(política)" as P <<R1>>
+  participant "Policy\n(signed.rs)" as P <<R1>>
   participant "DestinationPolicy\n(access.rs)" as D <<R1>>
   participant "Detector +\nSecurityLog" as DET <<R1>>
 end box
@@ -30,14 +30,14 @@ alt resuelve a una IP interna (SSRF)
   H --> C : 403 (REQ-F-11)
 end
 HS -> H : should_intercept_connect(cdn.example)
-alt la IP de origen está en una red BYOD (WIFI-EST, F31) «R2»
-  H --> HS : false → túnel sin descifrar, sea cual sea la fuente
-  note right of H : REQ-F-36 / REQ-RN-11: hoy never_intercept es por dominio;\nen R2 la configuración firmada trae la lista de redes BYOD.
-end
-H -> P : should_intercept(host)
-note right of P : R1: intercept_domains / never_intercept de config.toml.\nR2: solo descifra una fuente descifrar_y_cachear activa;\n«nunca» gana siempre (REQ-RN-03)
+H -> P : should_intercept(host, ip del cliente)
+note right of P : R1: byod_networks, intercept_domains y never_intercept\nde la configuración firmada (signed.rs).\nR2: la consola compila esas listas desde el catálogo;\n«nunca» gana siempre (REQ-RN-03)
 
-alt dominio no listado o en never_intercept
+alt la IP de origen está en byod_networks (WIFI-EST, F31)
+  P --> H : false
+  H --> HS : false → túnel sin descifrar, sea cual sea el dominio
+  note right of H : REQ-F-36 hecho. REQ-RN-11 parcial: una configuración\nfirmada que vacíe byod_networks se acepta (SRS 1.13.1).
+else dominio no listado o en never_intercept
   P --> H : false
   H --> HS : false → túnel a la IP ya validada
   HS <-> O : TLS de extremo a extremo (sin descifrar)
@@ -46,7 +46,7 @@ else dominio en intercept_domains
   P --> H : true; connect_host = cdn.example
   C -> HS : ClientHello (SNI)
   HS -> H : should_intercept_tls(hello)
-  H -> H : tls_decision(cfg, sni, connect_host)
+  H -> H : tls_decision(policy, ip, sni, connect_host)
   alt SNI ≠ CONNECT (canonical_host)
     H -> DET : host_mismatch(ip, "El SNI no coincide…")
     H --> HS : false → no se descifra
@@ -54,7 +54,7 @@ else dominio en intercept_domains
   else SNI = CONNECT y SNI en la lista
     H --> HS : true
     HS -> HS : certificado de hoja firmado por la CA\ncon Name Constraints (REQ-F-18 parcial)
-    HS --> C : TLS 1.2+ (X25519MLKEM768 preferido, REQ-NF-06)
+    HS --> C : TLS 1.2 o 1.3 (valores seguros de rustls, REQ-NF-06)
     note over C, H : Siguen las peticiones HTTP descifradas (DS-04, DS-06)
   end
 end

@@ -15,8 +15,9 @@ El problema, el alcance, los actores y los supuestos están en **00 Marco común
 **Cambios de la v0.4 que afectan a CE02:**
 - La consola completa (SPA + API + PostgreSQL) vive en CTRL01, en el campus. En AWS solo hay un proxy inverso sin datos (EC2-GW) y respaldos (D-24, D-25).
 - Nuevos REQ-F-36 (el Wi-Fi de estudiantes nunca se descifra), REQ-F-37 (acciones críticas solo desde el campus), REQ-RN-11 y CU-11.
-- El estado del código se actualizó según las ramas del repositorio: REQ-F-26, F-28 y NF-14 ya están implementados en `e1/matriz-pruebas`.
+- El estado del código se actualizó según `main` (24/11/2026): REQ-F-26, F-28, F-36, la cabecera `Cache-Status` de NF-11 y NF-14 en el puerto del nodo están hechos; REQ-F-17 está parcial (configuración firmada por archivo, sin descarga por F10). El SRS de la Sección 1 está en `docs/software/e1/srs/`.
 - El prototipo pasó a las pantallas de C2.1 (prototipo v0.2 en `docs/software/e1/prototipo/`).
+- 24/11/2026: SRS de la Sección 1 en `docs/software/e1/srs/` (ISO/IEC/IEEE 29148). Resuelve H-01 a H-03 y H-10 a H-11 (C4.8 y C4.9 se reemplazan por sus tablas) y cierra CI-96: los textos de requisitos de `infra/trazabilidad.yaml` quedan iguales a C1.
 - 24/11/2026: se agrega P-11 «Actividad en vivo» como desviación registrada de C2.1, pendiente de que el revisor la acepte (ver nota bajo la tabla). Solo usa los agregados por laboratorio que ya viajan por F10; no agrega requisitos, flujos ni componentes.
 
 **Formato del entregable (rúbrica oficial):** Word/PDF de 20–30 páginas: portada, resumen ejecutivo de 1 página, Sección 1 Requerimientos, Sección 2 Prototipo navegable, Sección 3 Diseño arquitectónico (C4 + ADR), Sección 4 Diseño detallado (UML), anexos (acta de validación, matriz de trazabilidad, diagramas complementarios, evidencia de sustentación).
@@ -64,7 +65,7 @@ flowchart LR
 | Usuario de laboratorio | Humano | Descargar rápido; saber qué se descifra | Sin cuenta (usa el proxy y el portal) |
 | Usuario BYOD | Humano | Usar el proxy de forma opcional desde el Wi-Fi, sin que su equipo se inspeccione | Sin cuenta |
 | Auditor | Humano | Verificar aviso, reportes y cambios | `auditor` (solo lectura) |
-| Docente | Humano | Pedir que un software o material esté listo para su clase; a futuro, activar el modo examen (R3) | Registra solicitudes (S, R2) |
+| Docente | Humano | Pedir que un software o material esté listo para su clase; a futuro, activar el modo examen (R3) | `docente`: solo crea y ve sus solicitudes (S, R2; H-03 resuelto en el SRS) |
 | EC2-GW | Sistema (proxy inverso en AWS) | Reenviar a la API las sesiones remotas, autenticándose con su certificado de cliente | Origen `remoto` (REQ-F-37) |
 | Origen | Sistema externo | Servir el contenido | — |
 | SIEM (Wazuh) | Sistema externo | Recibir eventos de seguridad | — |
@@ -92,12 +93,12 @@ Prioridad MoSCoW. **Ver.**: R1 = prueba de concepto S1; R2 = implementación S2;
 | REQ-F-13 | Exponer métricas Prometheus por laboratorio | M | R2 | Parcial (métricas globales) |
 | REQ-F-14 | Enviar eventos de seguridad al SIEM | S | R2 | Parcial (JSONL propio) |
 | REQ-F-15 | Detectar uso inusual del proxy por IP | S | R1 | Hecho |
-| REQ-F-17 | Aplicar la configuración que publica la consola, solo si su firma es válida, y volver a la anterior si falla | M | R2 | Pendiente |
+| REQ-F-17 | Aplicar la configuración que publica la consola, solo si su firma es válida, y volver a la anterior si falla | M | R2 | Parcial (`signed.rs`: verifica ed25519 y versión, y conserva la anterior; falta descargarla de la consola por F10) |
 | REQ-F-18 | Usar una CA intermedia por nodo, limitada por Name Constraints | S | R2 | Parcial (CA única limitada) |
 | REQ-F-22 | Ejecutar precargas en la ventana horaria indicada por la consola, con límite de ancho de banda | M | R2 | Pendiente |
-| REQ-F-26 | Generar y servir el PAC con los nodos activos y `DIRECT` de respaldo | M | R1 | **Hecho en la rama** `e1/matriz-pruebas` (`src/pac.rs`); falta fusionar en `main` |
-| REQ-F-28 | Eliminar `X-Forwarded-For`, `Via` y `Forwarded` antes de enviar al origen | M | R2 | **Hecho en la rama** `e1/matriz-pruebas` (prueba T26 PASA en Modo L) |
-| REQ-F-36 | Tratar como `nunca` (passthrough) todo el tráfico que llega desde las redes de origen marcadas como BYOD (WIFI-EST), aunque el dominio esté en una fuente `descifrar_y_cachear` | M | R2 | Pendiente (hoy `never_intercept` es por dominio, no por red de origen) |
+| REQ-F-26 | Generar y servir el PAC con los nodos activos y `DIRECT` de respaldo | M | R1 | Hecho (`src/pac.rs`) |
+| REQ-F-28 | Eliminar `X-Forwarded-For`, `Via` y `Forwarded` antes de enviar al origen | M | R2 | Hecho (`policy.rs`; T26 PASA en Modo L, emulado) |
+| REQ-F-36 | Tratar como `nunca` (passthrough) todo el tráfico que llega desde las redes de origen marcadas como BYOD (WIFI-EST), aunque el dominio esté en una fuente `descifrar_y_cachear` | M | R2 | Hecho en el nodo (`byod_networks` en `signed.rs`); falta que la consola publique la lista |
 
 **Consola del encargado (plano de control)**
 
@@ -129,9 +130,10 @@ Prioridad MoSCoW. **Ver.**: R1 = prueba de concepto S1; R2 = implementación S2;
 | REQ-NF-08 | *Safety* | Ante un error de política, el nodo no descifra (passthrough) | Inyección de fallos |
 | REQ-NF-09 | Mantenibilidad | Cobertura ≥ 70 % en política, caché y TLS; `clippy` sin advertencias | CI |
 | REQ-NF-10 | Portabilidad | Linux x86_64 y aarch64; imagen OCI multi-arquitectura | CI |
+| REQ-NF-11 | Compatibilidad | HTTP/1.1 y HTTP/2 con clientes; cabecera `Cache-Status` (RFC 9211); eventos OCSF 1.x | Prueba de cabeceras (hecho: `Cache-Status`); OCSF pendiente (REQ-F-14) |
 | REQ-NF-12 | Capacidad de interacción | La consola obtiene SUS ≥ 75 con encargados reales; las tareas CU-03 a CU-06 se completan sin ayuda en ≤ 5 min | Prueba de usabilidad |
 | REQ-NF-13 | Observabilidad | Cada decisión (HIT, MISS, bypass, rechazo) produce una métrica etiquetada por laboratorio | Revisión de métricas |
-| REQ-NF-14 | Seguridad | La API de la consola (F28, F30) y el puerto de administración del nodo solo aceptan TLS; F30 exige además certificado de cliente | Captura de tráfico (CE03 T27); hecho para el puerto 9128 en la rama |
+| REQ-NF-14 | Seguridad | La API de la consola (F28, F30) y el puerto de administración del nodo solo aceptan TLS; F30 exige además certificado de cliente | Captura de tráfico (CE03 T27); hecho para el puerto 9128 del nodo |
 | REQ-NF-15 | Seguridad | Imagen OCI sin usuario root, firmada y con SBOM | `cosign verify` |
 | REQ-NF-16 | Fiabilidad | Un cambio en la consola llega a los nodos en ≤ 60 s | Prueba de integración |
 
@@ -243,7 +245,7 @@ Característica: Catálogo de contenido del encargado
 | P-03 | Catálogo de contenido: fuentes, dominios, modo, estado; simulador "¿se cachearía?" | Encargado | F-31, F-20, RN-07, RN-09 |
 | P-04 | Laboratorios: habilitar, rango, horario | Encargado | F-32, RN-06 |
 | P-05 | Precargas: crear, ventana, avance, resultado | Encargado | F-34, F-22, RN-10 |
-| P-06 | Solicitudes de docentes | Encargado | F-35 |
+| P-06 | Solicitudes de docentes | Encargado, docente (solo las suyas) | F-35 |
 | P-07 | Aprobaciones pendientes (fuentes a descifrar) y certificados (huella, vencimiento) | Admin | RN-07, F-18 |
 | P-08 | Auditoría de cambios | Auditor, admin | F-24 |
 | P-09 | Portal público: aviso de transparencia | Usuario | F-12, F-30 |
@@ -280,6 +282,8 @@ flowchart LR
 
 ## C3. Diseño arquitectónico (CE0213)
 
+Desarrollado el 24/11/2026 en `docs/software/e1/arquitectura/` (Sección 3 del entregable): diagramas C4 DS-20, DS-21 y DS-22, y los 15 ADR en formato MADR en `adr/`. Lo que sigue es el resumen.
+
 ### C3.1 C1 — Contexto
 
 ```mermaid
@@ -303,10 +307,10 @@ flowchart TB
 | Contenedor | Tecnología | Responsabilidad | Despliegue (CE03) |
 | --- | --- | --- | --- |
 | `celeris-node` | Rust (Hudsucker, rustls, Hyper, Tokio, moka) | Proxy, caché, TLS selectivo, precarga, métricas | EDGE01, EDGE02 |
-| `celeris-console` (API) | Rust (axum) | Catálogo, laboratorios, precargas, aprobaciones, reportes, auditoría, firma de configuración, generación del PAC y del portal | CTRL01 |
-| Consola web | SPA servida por la API | Interfaz del encargado (P-01 a P-08) | CTRL01 |
+| `celeris-console` (API) | Rust (axum) | Catálogo, laboratorios, precargas, solicitudes, aprobaciones, reportes, auditoría, firma de configuración (con la lista de nodos para el PAC) y generación del sitio del portal | CTRL01 |
+| Consola web | SPA servida por la API | Interfaz del encargado, el docente, el administrador y el auditor (P-01 a P-08 y P-11) | CTRL01 |
 | Base de datos | PostgreSQL (local, por socket Unix) | Catálogo, laboratorios, precargas, usuarios, auditoría, KPI diarios | CTRL01; respaldos cifrados en S3 (sin réplica) |
-| Portal | Sitio estático firmado | Aviso y huella de la CA (P-09, P-10) | PORTAL01 (Caddy + Coraza) |
+| Portal | Sitio estático firmado | Aviso y huella de la CA (P-09, P-10) | PORTAL01 (Caddy + Coraza); el sitio lo despliega JMP01 por F20 y el certificado llega por F33 (D-29) |
 | PAC | Servido por el propio nodo (`pac.rs`) | Lista de nodos + `DIRECT` | EDGE01, EDGE02 |
 | Gateway de acceso remoto | Caddy + Coraza, sin estado | TLS público, WAF, límite de intentos; reenvía a la API con certificado de cliente | EC2-GW (AWS); no es parte del software del proyecto, se configura con IaC |
 
@@ -325,7 +329,7 @@ flowchart LR
   end
   N1 & N2 -- "F10: configuración firmada y KPI (8443 mTLS)" --> API
   API --> D
-  API -- "sitio firmado" --> PT
+  JMP[JMP01] -- "F20: despliega el sitio firmado que genera la API" --> PT
   GW -- "F30: 443 mTLS por VPN" --> API
   API -- "F18: restic cifrado" --> B
 ```
@@ -354,12 +358,12 @@ flowchart TB
 
 | Componente | Responsabilidad | Requisitos |
 | --- | --- | --- |
-| `auth` | Login, segundo factor, sesiones, RBAC por laboratorio; marca el origen de la sesión (`campus` / `remoto` por el certificado de EC2-GW) y bloquea acciones críticas desde `remoto` | F-33, F-37, RN-06 |
-| `catalog` | Fuentes, dominios, modos, simulador, aprobaciones | F-31, F-20, RN-04, RN-07, RN-09 |
+| `auth` | Login, segundo factor, sesiones, RBAC por rol (encargado, admin, auditor, docente) y laboratorio; marca el origen de la sesión (`campus` / `remoto` por el certificado de EC2-GW); gestiona usuarios, perfil BYOD y rotación de CA solo desde `campus` | F-33, F-37, RN-06 |
+| `catalog` | Fuentes, dominios, modos, simulador, aprobaciones, purga | F-31, F-20, F-19, RN-04, RN-07, RN-09 |
 | `labs` | Laboratorios, rangos, horarios | F-32 |
 | `prefetch` | Precargas y solicitudes | F-34, F-35, RN-10 |
-| `publisher` | Compilar y firmar la configuración (incluida la lista de redes BYOD en modo `nunca`), el PAC y el portal | F-17, F-26, F-30, F-36, RN-11 |
-| `reports` | KPI por laboratorio y fuente | F-25 |
+| `publisher` | Compilar y firmar la configuración (incluidas la lista de nodos que el nodo usa para armar el PAC y las redes BYOD en modo `nunca`) y generar el sitio del portal | F-17, F-26, F-30, F-36, RN-11 |
+| `reports` | KPI por laboratorio y fuente; vista en vivo (P-11) | F-25, F-13 |
 | `audit` | Registro de cambios solo de inserción | F-24 |
 
 **Del código actual al diseño:**
@@ -372,6 +376,8 @@ flowchart TB
 | `access.rs`, `clients.rs` | `ingress` (rangos por laboratorio) |
 | `detect.rs`, `security.rs` | `security` |
 | `stats.rs`, `access_log.rs`, `monitor.rs`, `live.rs` | `telemetry` (etiqueta de laboratorio) |
+| `pac.rs` | `pac` (se queda en el nodo) |
+| `signed.rs` | `agent` (verificación de la configuración firmada; en R2 la descarga por F10) |
 | `admin.rs`, `panel/` | Se reemplazan por `celeris-console` |
 | `notice.rs` | Generación del aviso, reutilizada por `publisher` |
 
@@ -484,8 +490,8 @@ sequenceDiagram
   N->>O: GET /app.msi (una sola vez, sin cabeceras del cliente)
   Note over N: PC 2 espera en el coalescer
   O-->>N: 200 cacheable
-  N-->>C1: 200 (Cache-Status: miss, stored)
-  N-->>C2: 200 (Cache-Status: miss, collapsed)
+  N-->>C1: 200 (Cache-Status: celeris#59; fwd=miss#59; stored)
+  N-->>C2: 200 (Cache-Status: celeris#59; hit#59; ttl=…#59; esperó en el coalescer)
 ```
 
 ### C4.5 Estados de una fuente del catálogo
@@ -520,53 +526,75 @@ stateDiagram-v2
 
 ### C4.7 Estados de una entrada de caché
 
+Corregido el 24/11/2026 según el código (`store.rs`, `handler.rs`) y DS-09 (cierra el hueco H-09). Antes, una copia
+vencida volvía a «Llenando» con un 200. En el código, una copia vencida que tiene ETag o Last-Modified se revalida, y
+tanto el 304 como el 200 nuevo la dejan Fresca. Solo vuelve a «Llenando» si no tiene validadores.
+
 ```mermaid
 stateDiagram-v2
   [*] --> Ausente
-  Ausente --> Llenando: MISS o precarga
-  Llenando --> Fresca: guardada
-  Llenando --> Ausente: error o no cacheable
-  Fresca --> Vencida: expira
-  Vencida --> Fresca: 304
-  Vencida --> Llenando: 200 nuevo
+  Ausente --> Llenando: MISS cacheable o precarga
+  Llenando --> Fresca: 200 cacheable guardado
+  Llenando --> Ausente: no cacheable, demasiado grande o error del origen
+  Fresca --> Fresca: HIT (verifica el hash)
+  Fresca --> Vencida: pasa expires_at
+  Vencida --> Revalidando: tiene ETag o Last-Modified
+  Vencida --> Llenando: sin validadores
+  Revalidando --> Fresca: 304 (refresh del TTL)
+  Revalidando --> Fresca: 200 con contenido nuevo (put)
   Fresca --> Corrupta: hash no coincide
-  Corrupta --> Ausente
+  Vencida --> Corrupta: hash no coincide
+  Corrupta --> Ausente: se borra el objeto
   Fresca --> Expulsada: límite de disco
+  Vencida --> Expulsada: límite de disco
   Expulsada --> [*]
 ```
 
 ### C4.8 Modelo de datos preliminar (base para CE022 en S2)
 
-| Tabla | Columnas principales | Nota |
+Actualizado el 24/11/2026 desde el SRS §1.11.4 (cierra el hueco H-10). Diagrama: DS-12. Lo marcado *(nueva)* no estaba en la versión anterior de esta tabla.
+
+| Tabla | Columnas principales | Regla |
 | --- | --- | --- |
-| `laboratorio` | id, nombre, rango_cidr, horario, habilitado | Rangos de CE03 D1.8 |
-| `usuario` | id, nombre, rol, mfa_secret_cifrado | Roles: encargado, admin, auditor |
-| `asignacion` | usuario_id, laboratorio_id | RN-06 |
-| `fuente` | id, nombre, categoria, modo, estado | |
-| `fuente_dominio` | fuente_id, sufijo | |
-| `aprobacion` | fuente_id, aprobada_por, fecha, decision | RN-07 |
-| `precarga` | id, laboratorio_id, ventana_inicio, ventana_fin, estado, bytes_total | |
-| `precarga_item` | precarga_id, url_sin_query, sha256, estado | |
-| `solicitud` | id, docente, laboratorio_id, fecha_clase, descripcion, estado, precarga_id | |
-| `version_config` | version, contenido, firma, publicada_por, publicada_en | Inmutable |
-| `nodo` | id, hostname, version_aplicada, ultimo_contacto | |
-| `kpi_diario` | fecha, laboratorio_id, fuente_id, bytes_cache, bytes_origen, hits, misses | Sin datos personales |
-| `cambio` | id, usuario_id, accion, objeto, antes, despues, fecha | Solo inserción |
+| `laboratorio` | id, nombre, rango_cidr, habilitado, horario | Los rangos vienen de `infra/inventory.yaml` (LAB-01 10.20.32.0/26 … LAB-10 10.20.34.64/26) y no se editan |
+| `usuario` | id, nombre, rol (`encargado`, `admin`, `auditor`, `docente`), hash_contraseña, totp_secreto_cifrado, bloqueado_hasta | El rol `docente` es nuevo (H-03) |
+| `asignacion` | usuario_id, laboratorio_id | REQ-RN-06 |
+| `sesion` *(nueva)* | id, usuario_id, origen (`campus`, `remoto`), equipo (ENC01, JMP01, EC2-GW), vence | REQ-F-37 |
+| `fuente` | id, nombre, categoria, modo, estado, fija *(nueva)* | `fija` = lista de la DTI (REQ-RN-09) |
+| `fuente_dominio` | fuente_id, sufijo | — |
+| `aprobacion` | id, objeto_tipo (fuente, rotacion_ca), objeto_id, decision, por, sesion_id, fecha | La sesión debe ser de origen `campus` (REQ-F-37) |
+| `ca_intermedia` *(nueva)* | serie, nodo_id, vence, huella_sha256, name_constraints | P-07, REQ-F-18 |
+| `precarga` | id, laboratorio_id, fecha, ventana_inicio, ventana_fin, estado, bytes_total, fuente_id | REQ-RN-10 |
+| `precarga_item` | precarga_id, url_sin_query, sha256, estado | La URL se guarda sin parámetros (REQ-NF-07) |
+| `solicitud` | id, docente_id *(antes `docente` en texto)*, laboratorio_id, fecha_clase, descripcion, estado, precarga_id | REQ-F-35 |
+| `version_config` | version, contenido, firma, publicada_por, publicada_en | Inmutable. Incluye las órdenes de purga (REQ-F-19) y las redes BYOD (REQ-RN-11) |
+| `nodo` | id (EDGE01, EDGE02), version_aplicada, ultimo_informe | — |
+| `kpi_intervalo` *(nueva)* | nodo_id, laboratorio_id, ts, hit, revalidated, miss, bypass, rechazos_403, bytes_cache, bytes_origen | Fuente de P-11. Ningún campo identifica a una PC o a una persona (REQ-NF-07, D-22) |
+| `kpi_diario` | fecha, laboratorio_id, fuente_id, bytes_cache, bytes_origen, hits, misses | Fuente de P-02 y REQ-F-25 |
+| `cambio` | id, usuario_id, sesion_id *(nueva)*, accion, objeto, antes, despues, resultado *(nueva)*, fecha | Solo inserción (REQ-F-24) |
 
-### C4.9 API de la consola (borrador)
+### C4.9 API de la consola
 
-| Método | Ruta | Uso | Rol |
-| --- | --- | --- | --- |
-| POST | `/v1/sesion` | Login con segundo factor | Todos |
-| GET/POST/PATCH | `/v1/fuentes` | Catálogo | Encargado |
-| POST | `/v1/fuentes/{id}/simular` | ¿Se cachearía? | Encargado |
-| POST | `/v1/fuentes/{id}/aprobar` | Aprobar descifrado | Admin, solo origen `campus` (F-37) |
-| GET/PATCH | `/v1/laboratorios/{id}` | Habilitar, horario | Encargado asignado |
-| GET/POST | `/v1/precargas` | Programar y ver avance | Encargado |
-| GET | `/v1/reportes/ahorro?lab=&desde=&hasta=` | Ahorro | Encargado, auditor |
-| GET | `/v1/nodos/{id}/config?desde=v` | El nodo descarga la configuración firmada | Nodo (mTLS) |
-| POST | `/v1/nodos/{id}/kpi` | El nodo reporta KPI | Nodo (mTLS) |
-| GET | `/v1/auditoria` | Cambios | Auditor, admin |
+Actualizada el 24/11/2026 desde el SRS §1.11.3 (cierra el hueco H-11). Las rutas *(nueva)* no estaban en el borrador anterior.
+
+| Método | Ruta | Uso | Rol | Origen permitido | Requisitos |
+| --- | --- | --- | --- | --- | --- |
+| POST | `/v1/sesion` | Iniciar sesión con contraseña y TOTP. La sesión guarda su origen | Todos | campus o remoto | REQ-F-33, F-37 |
+| GET/POST/PATCH | `/v1/fuentes` | Catálogo | Encargado | campus o remoto | REQ-F-31, RN-07, RN-09 |
+| POST | `/v1/fuentes/{id}/simular` | ¿Se descifraría? ¿Se guardaría? ¿La CA lo cubre? | Encargado | campus o remoto | REQ-F-20, RN-04 |
+| POST | `/v1/fuentes/{id}/purgar` *(nueva)* | Purgar la fuente, una URL o un prefijo | Encargado | campus o remoto | REQ-F-19, F-24 |
+| POST | `/v1/fuentes/{id}/aprobar` | Aprobar o rechazar una fuente a descifrar | Admin | **solo campus** | REQ-RN-07, F-37 |
+| POST | `/v1/ca/{nodo}/rotacion` *(nueva)* | Proponer y aprobar la rotación de una CA intermedia | Admin | **solo campus** | REQ-F-18, F-37 |
+| GET/PATCH | `/v1/laboratorios/{id}` | Habilitar y fijar el horario (el rango /26 es de solo lectura) | Encargado asignado | campus o remoto | REQ-F-32, RN-06 |
+| GET/POST/PATCH | `/v1/precargas` | Programar, editar y ver el avance | Encargado | campus o remoto | REQ-F-34, RN-10 |
+| GET/POST | `/v1/solicitudes` *(nueva)* | El docente las crea y ve las suyas; el encargado las convierte en precarga | Docente, encargado | campus o remoto | REQ-F-35 |
+| GET | `/v1/reportes/ahorro?lab=&desde=&hasta=` | Ahorro | Encargado, auditor | campus o remoto | REQ-F-25 |
+| GET | `/v1/reportes/en-vivo?lab=` *(nueva)* | Últimos agregados de 30 s por laboratorio y nodo | Encargado, admin | campus o remoto | REQ-F-13, NF-13, NF-07 |
+| GET | `/v1/auditoria` | Cambios e intentos rechazados, con su origen | Auditor, admin | campus o remoto | REQ-F-24, F-37 |
+| POST/PATCH | `/v1/usuarios` *(nueva)* | Crear usuarios y asignar laboratorios | Admin | **solo campus** | REQ-F-33, F-37, RN-06 |
+| PATCH | `/v1/perfil-byod` *(nueva)* | Cambiar las redes de origen BYOD de la configuración | Admin | **solo campus** | REQ-F-36, F-37, RN-11 |
+| GET | `/v1/nodos/{id}/config?desde=v` | El nodo descarga la configuración firmada (cada 30 s) | Nodo (mTLS) | F10 | REQ-F-17, RN-08 |
+| POST | `/v1/nodos/{id}/kpi` | El nodo reporta la versión aplicada, el avance de las precargas y los agregados por laboratorio | Nodo (mTLS) | F10 | REQ-F-13, F-22, NF-16 |
 
 ---
 
@@ -618,4 +646,4 @@ Se genera en CI a partir de etiquetas en Markdown (`REQ-F-31`), Gherkin (`@REQ-F
 
 ## C8. Alcance de S2 (para no sobredimensionar ahora)
 
-En S2 la línea evalúa CE022 (datos), CE023 (programación) y CE024 (calidad). El modelo de datos C4.8 es la base de CE022; la consola es el sistema web de CE023; las pruebas Gherkin, el CI y la imagen firmada son la base de CE024. Nada de esto se implementa en S1. REQ-F-26 (PAC), el único R1 que faltaba, ya está implementado en la rama `e1/matriz-pruebas`.
+En S2 la línea evalúa CE022 (datos), CE023 (programación) y CE024 (calidad). El modelo de datos C4.8 es la base de CE022; la consola es el sistema web de CE023; las pruebas Gherkin, el CI y la imagen firmada son la base de CE024. Nada de esto se implementa en S1. REQ-F-26 (PAC), el único R1 que faltaba, ya está en `main` (`src/pac.rs`).

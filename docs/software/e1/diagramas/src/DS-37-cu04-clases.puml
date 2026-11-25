@@ -1,0 +1,44 @@
+@startuml DS-37-cu04-clases
+!include _estilo.iuml
+title DS-37 · CU-04 Habilitar un laboratorio: clases
+package "Interfaz" {
+  class "P-04 Laboratorios" as P04 <<R2>>
+}
+package "Control (consola)" {
+  class LabsService <<R2>> {
+    + actualizar(sesion, lab, habilitado, horario)
+  }
+  class Rbac <<R2>> {
+    + puede(sesion, laboratorio): bool
+  }
+  class Publisher <<R2>> {
+    + compilar(): VersionConfig
+  }
+  class AuditLog <<R2>> {
+    + registrar(sesion, accion, objeto, antes, despues)
+  }
+}
+package "Control (nodo)" {
+  class ClientGate <<R1>> {
+    check(ip): ClientDecision
+  }
+}
+package "Entidad" {
+  class Laboratorio <<R2>> {
+    nombre, rango_cidr
+    horario, habilitado
+  }
+  class Usuario <<R2>> {
+    nombre, rol
+  }
+}
+P04 --> LabsService
+LabsService --> Rbac
+LabsService --> Publisher
+LabsService --> AuditLog
+LabsService ..> Laboratorio : actualiza
+Usuario "*" -- "*" Laboratorio : asignado a
+Publisher ..> ClientGate : la versión\nllega por F10
+
+$pie_cu("DS-37", "REQ-F-10, F-24, F-32, RN-06", "P-04")
+@enduml

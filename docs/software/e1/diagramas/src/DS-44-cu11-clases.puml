@@ -1,0 +1,41 @@
+@startuml DS-44-cu11-clases
+!include _estilo.iuml
+title DS-44 · CU-11 Usar la consola desde fuera del campus: clases
+package "Interfaz" {
+  class "P-01 Inicio de sesión" as P01 <<R2>>
+}
+package "Control (consola)" {
+  class OrigenMiddleware <<R2>> {
+    + origen(req): campus | remoto
+    remoto = certificado de cliente de EC2-GW
+  }
+  class AuthService <<R2>> {
+    + login(usuario, contraseña, totp): Sesion
+    + bloquear_tras_intentos(usuario)
+  }
+  class Rbac <<R2>> {
+    + exigir_campus(sesion, accion_critica)
+  }
+  class AuditLog <<R2>> {
+    + registrar(sesion, accion, objeto, antes, despues)
+  }
+}
+package "Entidad" {
+  class Usuario <<R2>> {
+    nombre, rol
+    segundo_factor: TOTP
+  }
+  class Sesion <<R2>> {
+    origen: campus | remoto
+    equipo, inicio, vence
+  }
+}
+P01 --> AuthService
+OrigenMiddleware ..> Sesion : marca «remoto»
+AuthService ..> Sesion : crea
+Usuario "1" -- "*" Sesion
+Rbac ..> Sesion : acción crítica\nremota → 403
+AuthService --> AuditLog : intentos y 403
+
+$pie_cu("DS-44", "REQ-F-33, F-37", "P-01")
+@enduml

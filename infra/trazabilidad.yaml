@@ -636,7 +636,7 @@ decisiones:
 
 requisitos:
   REQ-F-01: Atender como proxy explícito HTTP y HTTPS (CONNECT) en un puerto configurable
-  REQ-F-02: Descifrar TLS solo si el dominio está en la lista permitida, no está en la denegada y el SNI coincide con el CONNECT
+  REQ-F-02: 'Descifrar TLS solo si el dominio pertenece a una fuente en modo descifrar_y_cachear aprobada, no está en `nunca` y el SNI coincide con el CONNECT'
   REQ-F-03: Cachear respuestas compartibles según RFC 9111
   REQ-F-04: Revalidar copias vencidas con If-None-Match / If-Modified-Since
   REQ-F-05: Coalescer peticiones concurrentes al mismo objeto ausente
@@ -644,26 +644,26 @@ requisitos:
   REQ-F-07: Normalizar claves con reglas declarativas (Store-ID, parámetros de rastreo)
   REQ-F-08: Servir peticiones Range (206) desde un objeto completo en caché
   REQ-F-09: Respetar un límite de disco expulsando lo menos usado
-  REQ-F-10: Aceptar solo clientes de redes permitidas y limitar peticiones por IP
+  REQ-F-10: 'Aceptar solo clientes de los rangos de laboratorios habilitados y limitar peticiones por IP'
   REQ-F-11: Bloquear destinos internos (SSRF) y puertos de túnel no permitidos
   REQ-F-12: Publicar una página de transparencia generada desde la configuración real
-  REQ-F-13: Exponer métricas Prometheus y trazas OTLP
-  REQ-F-14: Emitir eventos de seguridad en OCSF hacia el SIEM
+  REQ-F-13: 'Exponer métricas Prometheus por laboratorio'
+  REQ-F-14: 'Enviar eventos de seguridad al SIEM'
   REQ-F-15: Generar detecciones de actividad inusual por IP
-  REQ-F-16: Enrolar nodos en el plano de control con mTLS
-  REQ-F-17: Distribuir configuración versionada y firmada, con despliegue gradual y reversión
+  REQ-F-16: 'RETIRADO (v0.3): Enrolar nodos en el plano de control con mTLS'
+  REQ-F-17: 'Aplicar la configuración que publica la consola, solo si su firma es válida, y volver a la anterior si falla'
   REQ-F-18: Emitir y rotar una CA intermedia por nodo, limitada por Name Constraints
-  REQ-F-19: Purgar contenido por URL, prefijo o etiqueta en toda la flota
+  REQ-F-19: 'Purgar contenido por fuente, URL o prefijo'
   REQ-F-20: 'Simular una política: "¿este URL se descifraría y cachearía?" sin aplicarla'
-  REQ-F-21: Repartir objetos entre nodos por hash consistente y consultar a un shield
-  REQ-F-22: Ejecutar prefetch en una ventana horaria a partir de una lista firmada
-  REQ-F-23: Validar manifiestos firmados de publishers (RFC 9421) y digests (RFC 9530)
-  REQ-F-24: Registrar en auditoría todo cambio de configuración (quién, qué, cuándo)
-  REQ-F-25: Exportar reportes de ahorro (GB evitados, BHR, costo por GB)
+  REQ-F-21: 'RETIRADO (v0.3): Repartir objetos entre nodos por hash consistente y consultar a un shield'
+  REQ-F-22: 'Ejecutar precargas en la ventana horaria indicada por la consola, con límite de ancho de banda'
+  REQ-F-23: 'RETIRADO (v0.3): Validar manifiestos firmados de publishers (RFC 9421) y digests (RFC 9530)'
+  REQ-F-24: 'Registrar en auditoría todo cambio (quién, qué, cuándo, antes y después)'
+  REQ-F-25: 'Reportar el ahorro por laboratorio y por fuente (GB evitados, BHR, minutos ahorrados)'
   REQ-F-26: Generar el archivo PAC con varios nodos y DIRECT de respaldo
-  REQ-F-27: Alertar cuando se pide una honey-URL
+  REQ-F-27: 'RETIRADO (v0.3): Alertar cuando se pide una honey-URL'
   REQ-F-28: Eliminar de forma explícita las cabeceras que identifican al cliente (X-Forwarded-For, Via, Forwarded) antes de enviar una petición al origen o al shield
-  REQ-F-29: Enviar los MISS a un proxy padre (shield) configurable, con mTLS
+  REQ-F-29: 'RETIRADO (v0.3): Enviar los MISS a un proxy padre (shield) configurable, con mTLS'
   REQ-F-30: Exportar el aviso de transparencia como sitio estático firmado para el portal
   REQ-F-31: Gestionar el catálogo de contenido (fuentes con dominios, categoría y modo) desde la consola
   REQ-F-32: Gestionar el acceso por laboratorio (habilitar o deshabilitar un laboratorio, su rango de IP y su horario)
@@ -673,32 +673,32 @@ requisitos:
   REQ-F-36: Tratar como passthrough todo el tráfico que llega desde redes de origen BYOD (WIFI-EST), aunque el dominio esté en una fuente a descifrar
   REQ-F-37: Distinguir el origen de cada sesión (campus o remoto por EC2-GW) y rechazar desde remoto las acciones críticas
   REQ-NF-01: Latencia añadida p95 ≤ 5 ms en HIT desde memoria y ≤ 20 ms desde disco, en LAN
-  REQ-NF-02: ≥ 5 000 conexiones concurrentes por nodo de 4 vCPU y 8 GB (meta a confirmar con prueba)
-  REQ-NF-03: Disponibilidad para el usuario ≥ 99,5 % mensual gracias al DIRECT del PAC y al DNS secundario
+  REQ-NF-02: 'Un nodo de 4 vCPU y 8 GB atiende un laboratorio de 40 PCs descargando a la vez a ≥ 900 Mbps agregados desde caché'
+  REQ-NF-03: 'La navegación del laboratorio sigue disponible ≥ 99,5 % gracias al segundo nodo y al DIRECT del PAC'
   REQ-NF-04: Tras un corte de energía, ningún objeto corrupto se sirve
   REQ-NF-05: La llave de una CA nunca sale de su nodo; la raíz vive offline
   REQ-NF-06: TLS ≥ 1.2 hacia clientes y orígenes; X25519MLKEM768 preferido cuando ambos lo soporten
-  REQ-NF-07: No se guardan cookies, credenciales, cuerpos de peticiones ni parámetros de URL
+  REQ-NF-07: 'No se guardan cookies, credenciales, cuerpos ni parámetros de URL; los reportes son por laboratorio, no por persona'
   REQ-NF-08: Ante error al evaluar la política, el nodo no intercepta (passthrough)
   REQ-NF-09: Cobertura ≥ 70 % en policy, cache y tls; clippy sin advertencias
-  REQ-NF-10: Compila para Linux x86_64 y aarch64 y para Windows x86_64; imagen OCI multi-arquitectura
+  REQ-NF-10: 'Linux x86_64 y aarch64; imagen OCI multiarquitectura'
   REQ-NF-11: HTTP/1.1 y HTTP/2 con clientes; cabecera Cache-Status (RFC 9211); eventos OCSF 1.x
-  REQ-NF-12: Panel con SUS ≥ 75 en la validación con usuarios
+  REQ-NF-12: 'La consola obtiene SUS ≥ 75 con encargados reales; las tareas CU-03 a CU-06 se completan sin ayuda en ≤ 5 min'
   REQ-NF-13: Cada decisión (HIT, MISS, bypass, rechazo) produce una métrica
   REQ-NF-14: El puerto de administración y métricas solo acepta TLS (o mTLS); el token nunca viaja en claro
   REQ-NF-15: Imagen OCI sin privilegios (usuario no root), firmada y con SBOM
   REQ-NF-16: Un cambio en la consola llega a los nodos en ≤ 60 s
   REQ-RN-01: 'Nunca se guarda una respuesta con Set-Cookie, Cache-Control: private o no-store'
   REQ-RN-02: Nunca se sirve desde caché una petición con Authorization o Cookie
-  REQ-RN-03: Los dominios de never_intercept ganan siempre sobre intercept_domains
-  REQ-RN-04: Un dominio nuevo en intercept_domains exige una CA que lo cubra; si no, el nodo no arranca
+  REQ-RN-03: 'El modo `nunca` gana siempre sobre cualquier otra fuente'
+  REQ-RN-04: 'Un dominio en modo descifrar_y_cachear exige una CA que lo cubra; si no la hay, la fuente no se activa'
   REQ-RN-05: El aviso debe estar disponible y entregado antes de instalar la CA y de configurar el proxy en un equipo
-  REQ-RN-06: Los registros con IP real solo se activan con aviso actualizado y retención definida
-  REQ-RN-07: Un cambio de configuración necesita aprobación de un segundo operador (cuatro ojos)
+  REQ-RN-06: 'Un encargado solo gestiona los laboratorios que tiene asignados'
+  REQ-RN-07: 'El encargado puede activar sin aprobación fuentes en modo cachear; una fuente en modo descifrar_y_cachear queda pendiente hasta que la aprueba un administrador DTI'
   REQ-RN-08: Un bundle de configuración sin firma válida se rechaza
   REQ-RN-09: Bancos, inicios de sesión y servicios de identidad están en `nunca` por defecto y no se pueden mover a otro modo desde la consola
   REQ-RN-10: Una precarga no puede superar el límite de ancho de banda ni salir de la ventana horaria configurada por la DTI
-  REQ-RN-11: Ninguna configuración puede habilitar el descifrado para redes de origen BYOD; el nodo la rechaza aunque llegue firmada
+  REQ-RN-11: 'Ninguna configuración puede habilitar el descifrado para redes de origen BYOD; la consola no ofrece esa opción y el nodo la rechaza aunque llegue firmada'
 
 # Capas de defensa en profundidad (D1.9 v0.4, tabla «Defensa en profundidad»). Antes vivían en infra/gen/drawio.py (CAPAS_D19, v0.2; CI-30, CI-63).
 defensa_profundidad:

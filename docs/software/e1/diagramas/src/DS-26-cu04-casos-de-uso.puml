@@ -1,0 +1,26 @@
+@startuml DS-26-cu04-casos-de-uso
+!include _estilo.iuml
+title DS-26 · CU-04 Habilitar un laboratorio y su horario
+left to right direction
+actor "Encargado de\nlaboratorio" as ENC
+actor "Nodo EDGE01 / EDGE02" as NODO
+rectangle "Consola (CTRL01)" {
+  usecase "CU-04 Habilitar un\nlaboratorio y su horario" as UC <<R2>>
+  usecase "Iniciar sesión con\nsegundo factor\n(REQ-F-33)" as LOGIN <<R2>>
+  usecase "Comprobar que el laboratorio\nestá asignado (REQ-RN-06)" as ASG <<R2>>
+  usecase "Registrar el cambio\nen la auditoría\n(REQ-F-24)" as AUDIT <<R2>>
+  usecase "Publicar la configuración\nfirmada (REQ-F-17)" as PUB <<R2>>
+}
+ENC --> UC
+UC ..> LOGIN : <<include>>
+UC ..> ASG : <<include>>
+UC ..> AUDIT : <<include>>
+UC ..> PUB : <<include>>
+PUB --> NODO : por F10\nen ≤ 60 s
+note bottom of UC
+  Una PC de un laboratorio deshabilitado o
+  fuera de horario recibe 403 (REQ-F-10).
+end note
+
+$pie_cu("DS-26", "REQ-F-10, F-24, F-32, RN-06, NF-16", "P-04")
+@enduml

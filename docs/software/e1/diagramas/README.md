@@ -1,4 +1,4 @@
-# Diseño detallado — diagramas UML (CE02 E1, sección 4)
+# Diseño detallado — diagramas UML (CE02 E1, sección 4) y C4 (sección 3)
 
 Versión: **v0.2** (24/11/2026), alineada con la **arquitectura v0.4** y con `docs/celeris/Celeris-CE02-Ingenieria-Software.md`
 §C3.3 y §C4. Herramienta: PlantUML 1.2026.9 + Graphviz. Fuentes: CE02 C4.1–C4.9, el código del nodo en `src/`, el
@@ -22,19 +22,56 @@ Cubre lo que pide la rúbrica de CE02 (C7): dominio, tres o más secuencias, tre
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | DS-14 | Casos de uso | Casos de uso | R1 + R2 | C1.6 | REQ-F-31…F-37, RN-05, RN-07 | CU-01…CU-11 | P-01…P-11 |
 | DS-01 | Modelo de dominio | Clases | R1 + R2 | C4.1 | REQ-F-17, F-18, F-24, F-31…F-37, NF-07, RN-06…RN-11 | CU-03…CU-07, CU-09…CU-11 | P-02…P-08, P-11 |
-| DS-02 | Clases de diseño de `celeris-node` | Clases | R1 + puertos R2 | C3.3 | REQ-F-01…F-11, F-13…F-15, F-17, F-28 | CU-01, CU-06 | P-02, P-11 |
+| DS-02 | Clases de diseño de `celeris-node` | Clases | R1 + puertos R2 | C3.3 | REQ-F-01…F-11, F-13…F-15, F-17, F-28, F-36, RN-08 | CU-01, CU-06 | P-02, P-11 |
 | DS-03 | Clases de diseño de `celeris-console` | Clases | R2 | C3.3 | REQ-F-17, F-20, F-24…F-26, F-30…F-37 | CU-03…CU-07, CU-09…CU-11 | P-01…P-08, P-11 |
 | DS-15 | Fuente que requiere descifrado: creación, 403 desde remoto y aprobación desde el campus | Secuencia | R2 | C4.2 | REQ-F-20, F-31, F-37, RN-04, RN-05, RN-07, RN-08 | CU-03, CU-07, CU-11 | P-03, P-07, P-08, P-09 |
 | DS-16 | Precarga nocturna desde una solicitud y HIT en la clase | Secuencia | R2 | C4.3 | REQ-F-22, F-34, F-35, RN-10, NF-07 | CU-05, CU-06, CU-09 | P-02, P-05, P-06, P-11 |
 | DS-04 | MISS con coalescencia y HIT | Secuencia | R1 | C4.4 | REQ-F-03, F-05, F-06, F-07, F-28 | CU-01 | P-02, P-05, P-11 |
 | DS-19 | Cambio de laboratorio firmado hasta los nodos y KPI de vuelta (F10) | Secuencia | R2 | C3.2, C4.9 | REQ-F-10, F-13, F-17, F-32, NF-16, RN-08, RN-11 | CU-04, CU-06 | P-04, P-08, P-11 |
-| DS-05 | CONNECT y decisión de descifrado por SNI (con BYOD en R2) | Secuencia | R1 + R2 | C3.3 | REQ-F-02, F-10, F-11, F-36, RN-03, RN-11 | CU-01, CU-03 | P-03, P-04, P-09 |
+| DS-05 | CONNECT y decisión de descifrado por SNI y red de origen (BYOD) | Secuencia | R1 (catálogo en R2) | C3.3 | REQ-F-02, F-10, F-11, F-36, RN-03, RN-11 | CU-01, CU-03 | P-03, P-04, P-09 |
 | DS-06 | Revalidación 304 | Secuencia | R1 | — | REQ-F-04, F-06, F-09 | CU-01 | P-02, P-11 |
 | DS-17 | Estados de una fuente del catálogo | Estados | R2 | C4.5 | REQ-F-31, F-37, RN-03, RN-04, RN-07, RN-09 | CU-03, CU-07, CU-08 | P-03, P-07, P-09 |
 | DS-18 | Estados de una precarga | Estados | R2 | C4.6 | REQ-F-22, F-34, F-35, RN-10 | CU-05, CU-09 | P-02, P-05, P-06 |
 | DS-09 | Estados de una entrada de caché | Estados | R1 | C4.7 | REQ-F-03…F-06, F-09, RN-01, RN-02 | CU-01 | P-02, P-05, P-11 |
 | DS-12 | Modelo de datos de la consola | Entidad-relación | R2 | C4.8 | REQ-F-17, F-24, F-25, F-31…F-35, F-37, NF-07 | CU-03…CU-07, CU-09…CU-11 | P-01…P-08, P-11 |
-| DS-13 | Componentes C3 del nodo → archivos y crates | Componentes | R1 + R2 | C3.3 | REQ-F-01…F-15, F-17, F-26, F-28 | CU-01, CU-04, CU-06 | P-02, P-04, P-09, P-11 |
+| DS-13 | Componentes C3 del nodo → archivos y crates | Componentes | R1 + R2 | C3.3 | REQ-F-01…F-15, F-17, F-26, F-28, F-36, NF-14 | CU-01, CU-04, CU-06 | P-02, P-04, P-09, P-11 |
+
+**Un diagrama de casos de uso y uno de clases por cada caso de uso (sección 4.1.1 del informe).** Las clases son las
+de DS-01, DS-02 y DS-03, ordenadas en interfaz · control · entidad; no se agregan clases nuevas. Usan el pie corto
+`$pie_cu` porque en el informe van de a dos por fila.
+
+| ID | Diagrama | Tipo | Versión | CE02 | Requisitos principales | CU | Pantallas |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| DS-23 | CU-01 Descargar a través de la caché | Casos de uso | R1 | C1.6 | REQ-F-01…F-05, F-10, F-36 | CU-01 | — (transparente) |
+| DS-24 | CU-02 Consultar qué se descifra y la huella de la CA | Casos de uso | R2 | C1.6 | REQ-F-12, F-30, RN-05 | CU-02 | P-09, P-10 |
+| DS-25 | CU-03 Agregar una fuente al catálogo | Casos de uso | R2 | C1.6 | REQ-F-20, F-24, F-31, RN-04, RN-07, RN-09 | CU-03 | P-03 |
+| DS-26 | CU-04 Habilitar un laboratorio y su horario | Casos de uso | R2 | C1.6 | REQ-F-10, F-24, F-32, RN-06, NF-16 | CU-04 | P-04 |
+| DS-27 | CU-05 Programar una precarga para una clase | Casos de uso | R2 | C1.6 | REQ-F-22, F-34, F-35, RN-10 | CU-05 | P-05, P-06 |
+| DS-28 | CU-06 Ver el ahorro y la actividad del laboratorio | Casos de uso | R2 | C1.6 | REQ-F-13, F-25, NF-07, NF-13 | CU-06 | P-02, P-11 |
+| DS-29 | CU-07 Aprobar una fuente que requiere descifrado | Casos de uso | R2 | C1.6 | REQ-F-24, F-30, F-31, F-37, RN-04, RN-07 | CU-07 | P-07 |
+| DS-30 | CU-08 Purgar un contenido | Casos de uso | R2 | C1.6 | REQ-F-19, F-24 | CU-08 | P-03 |
+| DS-31 | CU-09 Registrar una solicitud de preparación | Casos de uso | R2 | C1.6 | REQ-F-33, F-35 | CU-09 | P-06 |
+| DS-32 | CU-10 Revisar la auditoría de cambios | Casos de uso | R2 | C1.6 | REQ-F-24, F-37 | CU-10 | P-08 |
+| DS-33 | CU-11 Usar la consola desde fuera del campus | Casos de uso | R2 | C1.6 | REQ-F-33, F-37 | CU-11 | P-01, P-02 |
+| DS-34 | CU-01 Descargar a través de la caché: clases del nodo | Clases | R1 | C1.6 | REQ-F-01…F-05, F-10, F-36 | CU-01 | — |
+| DS-35 | CU-02 Consultar qué se descifra: clases | Clases | R2 | C1.6 | REQ-F-12, F-30, RN-05 | CU-02 | P-09, P-10 |
+| DS-36 | CU-03 Agregar una fuente: clases | Clases | R2 | C1.6 | REQ-F-20, F-24, F-31, RN-04, RN-07, RN-09 | CU-03 | P-03 |
+| DS-37 | CU-04 Habilitar un laboratorio: clases | Clases | R1 + R2 | C1.6 | REQ-F-10, F-24, F-32, RN-06 | CU-04 | P-04 |
+| DS-38 | CU-05 Programar una precarga: clases | Clases | R2 | C1.6 | REQ-F-22, F-34, F-35, RN-10 | CU-05 | P-05 |
+| DS-39 | CU-06 Ver el ahorro y la actividad: clases | Clases | R1 + R2 | C1.6 | REQ-F-13, F-25, NF-07, NF-13 | CU-06 | P-02, P-11 |
+| DS-40 | CU-07 Aprobar una fuente: clases | Clases | R2 | C1.6 | REQ-F-24, F-31, F-37, RN-07 | CU-07 | P-07 |
+| DS-41 | CU-08 Purgar un contenido: clases | Clases | R1 + R2 | C1.6 | REQ-F-19, F-24 | CU-08 | P-03 |
+| DS-42 | CU-09 Registrar una solicitud: clases | Clases | R2 | C1.6 | REQ-F-33, F-35 | CU-09 | P-06 |
+| DS-43 | CU-10 Revisar la auditoría: clases | Clases | R2 | C1.6 | REQ-F-24, F-37 | CU-10 | P-08 |
+| DS-44 | CU-11 Usar la consola desde fuera del campus: clases | Clases | R2 | C1.6 | REQ-F-33, F-37 | CU-11 | P-01 |
+
+**Sección 3 (C4, C4-PlantUML incluido en PlantUML):**
+
+| ID | Diagrama | Tipo | Versión | CE02 | Requisitos principales | CU | Pantallas |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| DS-20 | C4 nivel 1 — Contexto | C4 | R1 + R2 | C3.1 | REQ-F-01, F-12, F-26, F-33, F-36, F-37, NF-07 | CU-01…CU-11 | P-01…P-11 |
+| DS-21 | C4 nivel 2 — Contenedores como vista de despliegue | C4 | R1 + R2 | C3.2 | REQ-F-01, F-12, F-17, F-26, F-30, F-33, F-36, F-37, NF-03, NF-14 | CU-01…CU-11 | P-01…P-11 |
+| DS-22 | C4 nivel 3 — Componentes de `celeris-console` | C4 | R2 | C3.3 | REQ-F-17, F-19, F-20, F-24, F-25, F-30…F-37, RN-06, RN-07, RN-11, NF-07 | CU-03…CU-11 | P-01…P-08, P-11 |
 
 Archivos: fuente en `src/DS-nn-*.puml` (estilo común en `src/_estilo.iuml`), imágenes en `png/` (para el informe) y
 `svg/` (vectorial).
@@ -61,6 +98,7 @@ REQ-F-37: **solo campus** significa que una llamada que llega por EC2-GW recibe 
 | POST | `/v1/sesion` | Login con contraseña y TOTP; la sesión guarda su origen | Todos | campus o remoto | REQ-F-33, F-37 | DS-03 · P-01 |
 | GET/POST/PATCH | `/v1/fuentes` | Catálogo | Encargado | campus o remoto | REQ-F-31, RN-07, RN-09 | DS-15 · P-03 |
 | POST | `/v1/fuentes/{id}/simular` | ¿Se descifraría? ¿Se guardaría? ¿La CA lo cubre? | Encargado | campus o remoto | REQ-F-20, RN-04 | DS-15 · P-03 |
+| POST | `/v1/fuentes/{id}/purgar` *(nueva)* | Purgar la fuente, una URL o un prefijo (hueco H-01) | Encargado | campus o remoto | REQ-F-19, F-24 | DS-17 · P-03 (v0.3) |
 | POST | `/v1/fuentes/{id}/aprobar` | Aprobar o rechazar una fuente a descifrar | Admin | **solo campus** | REQ-RN-07, F-37 | DS-15 · P-07 |
 | POST | `/v1/ca/{nodo}/rotacion` *(nueva)* | Proponer y aprobar la rotación de una CA intermedia | Admin | **solo campus** para aprobar | REQ-F-18, F-37 | DS-01 · P-07 |
 | GET/PATCH | `/v1/laboratorios/{id}` | Habilitar y horario (el rango /26 es de solo lectura) | Encargado asignado | campus o remoto | REQ-F-32, RN-06 | DS-19 · P-04 |
@@ -70,10 +108,11 @@ REQ-F-37: **solo campus** significa que una llamada que llega por EC2-GW recibe 
 | GET | `/v1/reportes/en-vivo?lab=` *(nueva)* | Últimos agregados de 30 s por laboratorio y nodo | Encargado, admin | campus o remoto | REQ-F-13, NF-13, NF-07 | DS-19 · P-11 |
 | GET | `/v1/auditoria` | Cambios e intentos rechazados, con origen | Auditor, admin | campus o remoto | REQ-F-24, F-37 | DS-15 · P-08 |
 | POST/PATCH | `/v1/usuarios` *(nueva)* | Crear usuarios y asignar laboratorios | Admin | **solo campus** | REQ-F-33, F-37, RN-06 | DS-12 · — |
+| PATCH | `/v1/perfil-byod` *(nueva)* | Cambiar las redes de origen BYOD | Admin | **solo campus** | REQ-F-36, F-37, RN-11 | DS-12 · — |
 | GET | `/v1/nodos/{id}/config?desde=v` | El nodo descarga la configuración firmada (cada 30 s) | Nodo (mTLS) | F10 | REQ-F-17, RN-08 | DS-15, DS-19 |
 | POST | `/v1/nodos/{id}/kpi` | El nodo reporta versión aplicada, avance de precargas y agregados por laboratorio | Nodo (mTLS) | F10 | REQ-F-13, F-22, NF-16 | DS-16, DS-19 |
 
-Las rutas marcadas *(nueva)* no están en C4.9 (hueco H-11).
+Las rutas marcadas *(nueva)* no estaban en C4.9 (hueco H-11, cerrado: la tabla pasó al SRS §1.11.3 y a CE02 C4.9).
 
 ## Huecos encontrados al diseñar (para el SRS y CE02)
 
@@ -83,11 +122,11 @@ operadores ni tokens de enrolamiento.
 
 | ID | Hueco | Propuesta |
 | --- | --- | --- |
-| H-04 | C4.4 muestra `Cache-Status: celeris; fwd=miss; stored` y «collapsed»; el código responde `x-celeris-cache: MISS/HIT/REVALIDATED` y el que esperó en el coalescer recibe HIT. REQ-NF-11 exige Cache-Status (RFC 9211). | Implementar Cache-Status en R2 y corregir C4.4. DS-04 dibuja lo real. |
-| H-08 | REQ-NF-14 exige TLS en el puerto de administración del nodo; está hecho en la rama `e1/matriz-pruebas`, falta fusionarlo en `main`. | Mantenerlo como «hecho en la rama» en el SRS. |
-| H-09 | C4.7 lleva «Vencida → Llenando» con 200; en el código un 200 nuevo se guarda directo y la entrada queda Fresca. | DS-09 dibuja el comportamiento real; corregir C4.7. |
-| H-10 | C4.8 no tiene `sesion` (con origen campus/remoto, que exige REQ-F-37), `ca_intermedia` (P-07), `kpi_intervalo` (P-11) ni las columnas `cambio.sesion_id`, `cambio.resultado` y `fuente.fija`. | Agregarlas a C4.8 (DS-12 las marca «nueva»). |
-| H-11 | C4.9 no tiene rutas para solicitudes (REQ-F-35), usuarios, rotación de CA ni la vista en vivo (P-11). | Agregarlas a C4.9 (tabla de arriba, *(nueva)*). |
+| H-04 | C4.4 muestra «collapsed» para el que esperó en el coalescer; el código le responde `hit`. El nodo ya envía `Cache-Status` (RFC 9211, REQ-NF-11) junto a `x-celeris-cache`, sin `key` ni `detail`. | Corregir C4.4. DS-04 y DS-06 dibujan lo real. (Corregido el 24/11/2026: la v0.2 de este README decía que `Cache-Status` faltaba.) |
+| H-08 | REQ-NF-14: el puerto de administración del nodo (9128) ya exige TLS en `main` (`admin_tls`; si no es de bucle local y está desactivado, el nodo no arranca). Falta la consola (F28, F30), que no existe. | **Cerrado** para el nodo (24/11/2026); la consola queda en R2. |
+| H-09 | C4.7 llevaba «Vencida → Llenando» con 200; en el código, una copia vencida con validadores se revalida y el 200 nuevo la deja Fresca. | **Cerrado** (24/11/2026): C4.7 se corrigió con los mismos estados que DS-09. |
+| H-10 | C4.8 no tiene `sesion` (con origen campus/remoto, que exige REQ-F-37), `ca_intermedia` (P-07), `kpi_intervalo` (P-11) ni las columnas `cambio.sesion_id`, `cambio.resultado` y `fuente.fija`. | **Cerrado** (24/11/2026): SRS §1.11.4 y CE02 C4.8; DS-12 las marca «nueva». |
+| H-11 | C4.9 no tiene rutas para solicitudes (REQ-F-35), usuarios, rotación de CA ni la vista en vivo (P-11). | **Cerrado** (24/11/2026): SRS §1.11.3 y CE02 C4.9, con purga y perfil BYOD. |
 | H-12 | D-20, D-21 y D-22 estaban en CE02 C3.4 pero no en `infra/trazabilidad.yaml`. | **Cerrado** por CI-95: agregadas al YAML; DS-01, DS-12, DS-16, DS-17 y DS-18 las citan. |
 
 ## Cómo regenerar

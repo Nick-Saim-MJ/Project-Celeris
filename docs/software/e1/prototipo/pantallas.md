@@ -259,6 +259,6 @@ acta ni resultados, y esta sección no debe presentarse como evidencia hasta com
 
 | ID | Hueco | Propuesta |
 | --- | --- | --- |
-| H-01 | CU-08 (purgar, REQ-F-19) no tiene pantalla. | Agregar la acción «Purgar contenido» en cada fila del catálogo (P-03) en la v0.3 |
-| H-02 | El horario por laboratorio (P-04) no tiene regla de negocio que diga qué pasa fuera del horario. | Agregar una RN: fuera del horario el nodo responde 403 a ese rango (hoy solo lo dice la prueba T52) |
-| H-03 | El docente es actor de CU-09, pero su forma de registrar la solicitud (cuenta, formulario) no está especificada. | Definir en el SRS si el docente tiene rol propio en la consola o usa un formulario aparte |
+| H-01 | CU-08 (purgar, REQ-F-19) no tiene pantalla. | **Resuelto en el SRS** (§1.7.3, §1.11.3): acción «Purgar» en cada fila de P-03 y `POST /v1/fuentes/{id}/purgar`. Se dibuja en la v0.3 del prototipo |
+| H-02 | El horario por laboratorio (P-04) no tiene regla de negocio que diga qué pasa fuera del horario. | **Resuelto en el SRS** sin regla nueva: REQ-F-32 precisa que fuera del horario el nodo responde 403 a ese rango (`laboratorios.feature`); T52 se amplía con el caso de horario en S2 |
+| H-03 | El docente es actor de CU-09, pero su forma de registrar la solicitud (cuenta, formulario) no está especificada. | **Resuelto en el SRS** (§1.7.3): rol propio `docente` en la consola, con el mismo inicio de sesión (P-01); solo crea y ve sus solicitudes (P-06) |

@@ -1,0 +1,42 @@
+@startuml DS-36-cu03-clases
+!include _estilo.iuml
+title DS-36 · CU-03 Agregar una fuente: clases
+package "Interfaz" {
+  class "P-03 Catálogo de contenido" as P03 <<R2>>
+}
+package "Control (consola)" {
+  class CatalogService <<R2>> {
+    + crear_fuente(sesion, datos): Fuente
+    + simular(url): Simulacion
+  }
+  class ReglasCatalogo <<R2>> {
+    + nunca_gana(dominio): bool
+    + ca_cubre(nodo, dominio): bool
+    + es_fija(fuente): bool
+  }
+  class Publisher <<R2>> {
+    + compilar(): VersionConfig
+  }
+  class AuditLog <<R2>> {
+    + registrar(sesion, accion, objeto, antes, despues)
+  }
+}
+package "Entidad" {
+  class Fuente <<R2>> {
+    nombre, categoria
+    modo: cachear | descifrar_y_cachear | nunca
+    estado, fija
+  }
+  class Dominio <<R2>> {
+    sufijo
+  }
+}
+P03 --> CatalogService
+CatalogService --> ReglasCatalogo
+CatalogService --> Publisher
+CatalogService --> AuditLog
+CatalogService ..> Fuente : crea
+Fuente "1" *-- "1..*" Dominio
+
+$pie_cu("DS-36", "REQ-F-20, F-24, F-31, RN-04, RN-07, RN-09", "P-03")
+@enduml

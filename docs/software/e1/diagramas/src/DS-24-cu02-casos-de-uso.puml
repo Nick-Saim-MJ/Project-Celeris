@@ -1,0 +1,25 @@
+@startuml DS-24-cu02-casos-de-uso
+!include _estilo.iuml
+title DS-24 · CU-02 Consultar qué se descifra y la huella de la CA
+left to right direction
+actor "Usuario" as U
+actor "Auditor" as AU
+rectangle "Portal de transparencia (PORTAL01)" {
+  usecase "CU-02 Consultar qué se\ndescifra y la huella de la CA" as UC <<R2>>
+  usecase "Ver las fuentes que\nse descifran (P-09)" as LST <<R2>>
+  usecase "Ver la huella y el\nvencimiento de la CA\n(REQ-RN-05)" as HUE <<R2>>
+  usecase "Ver cómo llega la CA\na las PCs (P-10)" as CA <<R2>>
+}
+U --> UC
+AU --> UC
+UC ..> LST : <<include>>
+UC ..> HUE : <<include>>
+CA .> UC : <<extend>>
+note bottom of UC
+  Sin inicio de sesión. El sitio lo genera la
+  consola desde la configuración real (REQ-F-30)
+  y JMP01 lo despliega por F20.
+end note
+
+$pie_cu("DS-24", "REQ-F-12, F-30, RN-05", "P-09, P-10")
+@enduml

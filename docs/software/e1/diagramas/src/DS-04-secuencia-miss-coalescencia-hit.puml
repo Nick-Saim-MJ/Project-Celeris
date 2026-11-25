@@ -37,14 +37,14 @@ H -> H : response_is_cacheable(res, max_object_bytes)\nmemory.try_reserve(bytes)
 H -> S : put(key_hash, meta, body)
 S -> S : SHA-256 del cuerpo → objects/ab/cd…\nescritura atómica (REQ-F-06, REQ-NF-04)
 S --> H : PutOutcome::New
-H --> C1 : 200 + x-celeris-cache: MISS
+H --> C1 : 200 + x-celeris-cache: MISS\n+ Cache-Status: celeris; fwd=miss; stored
 H -> F : drop(guard)
 F --> H : Waited (despierta a C2)
 H -> S : get(key_hash)
 S --> H : Meta fresca
 H -> S : read_object(meta)
 S --> H : bytes (hash verificado)
-H --> C2 : 200 + x-celeris-cache: HIT\n(stats.coalesced += 1)
+H --> C2 : 200 + x-celeris-cache: HIT\n+ Cache-Status: celeris; hit; ttl=…\n(stats.coalesced += 1)
 deactivate H
 
 ... más tarde, dentro de max-age ...
@@ -55,13 +55,13 @@ H -> S : get(key_hash)
 S --> H : Meta fresca (is_fresh)
 H -> S : read_object(meta)
 S --> H : bytes (hash verificado)
-H --> C1 : 200 + x-celeris-cache: HIT, Age
+H --> C1 : 200 + Age + x-celeris-cache: HIT\n+ Cache-Status: celeris; hit; ttl=…
 deactivate H
 
 note over H, S
-  Diferencia con el maestro (H-04): el código responde x-celeris-cache: MISS/HIT/REVALIDATED;
-  la cabecera Cache-Status de RFC 9211 (p. ej. «celeris; fwd=miss; stored») es REQ-NF-11 y queda para R2.
-  El que esperó recibe HIT, no «collapsed».
+  Cache-Status (RFC 9211, REQ-NF-11) va junto a x-celeris-cache; no lleva key ni detail porque la clave
+  contiene la URL completa. En un HIT no se repite el Cache-Status que trajo el origen.
+  Diferencia con el maestro (H-04): el que esperó en el coalescer recibe «hit», no «collapsed».
 end note
 
 $pie("DS-04", "REQ-F-03, F-05, F-06, F-07, F-28, NF-04, NF-13", "CU-01", "P-02, P-05, P-11")

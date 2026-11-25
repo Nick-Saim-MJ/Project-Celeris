@@ -1,0 +1,36 @@
+@startuml DS-35-cu02-clases
+!include _estilo.iuml
+title DS-35 · CU-02 Consultar qué se descifra: clases
+package "Interfaz (PORTAL01)" {
+  class "P-09 Aviso de transparencia" as P09 <<R2>>
+  class "P-10 La CA en las PCs" as P10 <<R2>>
+}
+package "Control (consola)" {
+  class Publisher <<R2>> {
+    + generar_portal(version): SitioFirmado
+  }
+  class FirmaEd25519 <<R2>> {
+    + firmar(bytes): Firma
+  }
+}
+package "Entidad" {
+  class Fuente <<R2>> {
+    nombre, modo, estado
+  }
+  class CaIntermedia <<R2>> {
+    serie, vence, huella
+  }
+  class RedByod <<R2>> {
+    nombre: WIFI-EST
+    modo: nunca
+  }
+}
+Publisher --> FirmaEd25519
+Publisher ..> Fuente : lista las que\nse descifran
+Publisher ..> CaIntermedia : huella
+Publisher ..> RedByod
+Publisher .up.> P09 : genera
+Publisher .up.> P10 : genera
+
+$pie_cu("DS-35", "REQ-F-12, F-30, RN-05", "P-09, P-10")
+@enduml

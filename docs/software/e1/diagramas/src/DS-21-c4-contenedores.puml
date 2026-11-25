@@ -1,0 +1,63 @@
+@startuml DS-21-c4-contenedores
+!include <C4/C4_Container>
+!include _estilo.iuml
+title DS-21 · C4 nivel 2 — Contenedores como vista de despliegue (CE02 C3.2, D-24, D-25, D-28)
+caption Cada contenedor lleva la VM donde corre y su IP de infra/inventory.yaml. Todo tráfico entre zonas pasa por FW01 (D-17). «R1» = existe en src/ · «R2» = se construye en S2 (fondo azul).
+LAYOUT_LEFT_RIGHT()
+AddElementTag("R2", $bgColor = "#E8F1FB", $fontColor = "#0B0B0B", $borderColor = "#2A78D6", $legendText = "«R2» diseño, se construye en S2")
+AddElementTag("R1", $bgColor = "#FFFFFF", $fontColor = "#0B0B0B", $borderColor = "#0B0B0B", $legendText = "«R1» existe en el código")
+AddElementTag("ext", $bgColor = "#EEEEEE", $fontColor = "#0B0B0B", $borderColor = "#52514E", $legendText = "fuera del software del proyecto")
+AddRelTag("opcional", $lineStyle = DashedLine())
+
+Person(usr, "PCs de LAB-01…LAB-10", "Usuarios de laboratorio; PAC por GPO")
+Person(byod, "Equipos BYOD en WIFI-EST", "Proxy opcional")
+Person(enc, "Encargado en ENC01 10.20.35.10", "Navegador")
+Person(adm, "Administrador en JMP01 10.20.10.20", "Navegador y SSH con MFA")
+
+Boundary(campus, "Campus · ESX01 (detrás de FW01 y del FortiGate)") {
+  Boundary(zedge, "Zona EDGE · VLAN 60") {
+    Container(n1, "celeris-node · EDGE01 10.20.60.10", "Rust: Hudsucker, rustls, Hyper, Tokio", "«R1» Proxy, caché CAS SHA-256, TLS selectivo, PAC (pac.rs), configuración firmada (signed.rs). «R2» agente F10 y precarga", $tags = "R1")
+    Container(n2, "celeris-node · EDGE02 10.20.60.11", "Misma imagen OCI", "«R1» Segundo nodo (fase 2): quita el punto único de falla de la caché", $tags = "R1")
+  }
+  Boundary(zsrv, "Zona SERVERS · VLAN 20 · CTRL01") {
+    Container(spa, "Consola web (SPA) en CTRL01 10.20.20.10", "Servida por la API (mismo origen)", "«R2» Pantallas P-01…P-08 y P-11", $tags = "R2")
+    Container(api, "celeris-console API en CTRL01 10.20.20.10", "Rust: axum", "«R2» Catálogo, laboratorios, precargas, solicitudes, aprobaciones, reportes, auditoría; compila y firma la configuración (ed25519, D-11)", $tags = "R2")
+    ContainerDb(db, "PostgreSQL local", "Socket Unix, sin puerto de red", "«R2» Datos de la consola (DS-12); sin réplica (D-12, D-25)", $tags = "R2")
+    Container(ca, "CA interna (step-ca)", "En CTRL01", "Certificados de mTLS para F10 y F30", $tags = "ext")
+  }
+  Boundary(zdmz, "Zona DMZ-SVC · VLAN 40") {
+    Container(portal, "Portal · PORTAL01 10.20.40.10", "Caddy + Coraza (OWASP CRS)", "«R2» Sitio estático firmado: aviso y huella de la CA (P-09, P-10)", $tags = "R2")
+  }
+  Boundary(zsec, "Zona SECURITY · VLAN 50") {
+    Container(siem, "Wazuh · SIEM01 10.20.50.10", "Manager Wazuh", "Correlación y alertas", $tags = "ext")
+  }
+}
+
+Boundary(aws, "AWS (var.region)") {
+  Boundary(vpc, "AWS-VPC · subred pública AWS-PUB-A") {
+  Container(gw, "Proxy inverso · EC2-GW 10.30.0.10", "Caddy + Coraza, sin estado", "TLS público, WAF, límite de intentos; sin datos ni llaves de firma (D-24)", $tags = "ext")
+  }
+  ContainerDb(s3, "S3 celeris-backups (regional, fuera de la VPC)", "Versionado + Object Lock 30 días", "Respaldo restic cifrado en origen", $tags = "ext")
+}
+System_Ext(inet, "Orígenes en Internet vía FortiGate (FGT-EXT)", "FortiGuard filtra la salida")
+
+Rel(usr, n1, "Proxy TCP 3128 y PAC TCP 80", "F1, F3")
+Rel(usr, n2, "Respaldo en el PAC; si ambos caen, DIRECT", "F1, F3")
+Rel(byod, n1, "Proxy y PAC, siempre sin descifrar", "F31", $tags = "opcional")
+Rel(usr, portal, "Aviso antes de instalar la CA, TCP 443", "F5")
+Rel(enc, spa, "TLS + TOTP, TCP 443", "F28")
+Rel(adm, api, "Acciones críticas solo desde aquí o ENC01, TCP 443", "F20")
+Rel(adm, portal, "Despliega el sitio firmado que genera la consola, TCP 22", "F20")
+Rel(enc, gw, "Fuera del campus: TLS 1.3 + TOTP", "F29")
+Rel(gw, api, "TCP 443, mTLS con certificado de cliente, dentro de IPsec; sesión «remoto»", "F30")
+Rel(spa, api, "JSON /v1/…")
+Rel(api, db, "SQL")
+Rel(n1, api, "GET config firmada / POST KPI, TCP 8443 mTLS", "F10")
+Rel(n2, api, "Igual que EDGE01", "F10")
+Rel(n1, inet, "Solo MISS y precargas, TCP 80/443", "F8")
+Rel(api, s3, "restic cifrado, TCP 443", "F18")
+Rel(n1, siem, "Agente Wazuh TCP 1514/1515 (también CTRL01, PORTAL01, EC2-GW)", "F13")
+
+SHOW_LEGEND()
+$pie("DS-21", "REQ-F-01, F-12, F-17, F-26, F-30, F-33, F-36, F-37, NF-03, NF-14", "CU-01…CU-11", "P-01…P-11")
+@enduml

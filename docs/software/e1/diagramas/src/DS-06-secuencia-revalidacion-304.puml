@@ -33,11 +33,11 @@ H -> O : GET /app.js + If-None-Match: "etag"\n+ If-Modified-Since
 alt 304 Not Modified
   O --> H : 304
   H -> S : refresh(key_hash, meta, ttl)
-  H --> C : 200 + x-celeris-cache: REVALIDATED\n(cuerpo desde la copia; ahorra la descarga)
+  H --> C : 200 + x-celeris-cache: REVALIDATED\n+ Cache-Status: celeris; hit; fwd=stale; fwd-status=304\n(cuerpo desde la copia; ahorra la descarga)
 else 200 con contenido nuevo
   O --> H : 200 + cuerpo nuevo
   H -> S : put(key_hash, meta_nueva, body)
-  H --> C : 200 + x-celeris-cache: MISS
+  H --> C : 200 + x-celeris-cache: MISS\n+ Cache-Status: celeris; fwd=miss; stored
 end
 H -> F : drop(guard)
 deactivate H

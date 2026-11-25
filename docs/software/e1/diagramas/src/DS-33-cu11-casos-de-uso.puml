@@ -1,0 +1,27 @@
+@startuml DS-33-cu11-casos-de-uso
+!include _estilo.iuml
+title DS-33 · CU-11 Usar la consola desde fuera del campus
+left to right direction
+actor "Encargado de\nlaboratorio" as ENC
+actor "Administrador DTI" as ADM
+actor "EC2-GW\n(proxy inverso en AWS)" as GW
+rectangle "Consola (CTRL01)" {
+  usecase "CU-11 Usar la consola\ndesde fuera del campus" as UC <<R2>>
+  usecase "Iniciar sesión con\nsegundo factor\n(REQ-F-33)" as LOGIN <<R2>>
+  usecase "Marcar la sesión\ncomo «remoto»" as REM <<R2>>
+  usecase "Rechazar una acción\ncrítica con 403 (REQ-F-37)" as R403 <<R2>>
+}
+ENC --> UC
+ADM --> UC
+UC --> GW : F29 → F30
+UC ..> LOGIN : <<include>>
+UC ..> REM : <<include>>
+R403 .> UC : <<extend>>
+note bottom of UC
+  Permite CU-03 a CU-06 y CU-08 a CU-10.
+  Aprobar descifrado, rotar llaves, crear
+  usuarios o cambiar el perfil BYOD: no.
+end note
+
+$pie_cu("DS-33", "REQ-F-33, F-37", "P-01, P-02")
+@enduml

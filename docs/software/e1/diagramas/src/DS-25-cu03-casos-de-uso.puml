@@ -1,0 +1,29 @@
+@startuml DS-25-cu03-casos-de-uso
+!include _estilo.iuml
+title DS-25 · CU-03 Agregar una fuente al catálogo
+left to right direction
+actor "Encargado de\nlaboratorio" as ENC
+actor "Administrador DTI" as ADM
+rectangle "Consola (CTRL01)" {
+  usecase "CU-03 Agregar una\nfuente al catálogo" as UC <<R2>>
+  usecase "Iniciar sesión con\nsegundo factor\n(REQ-F-33)" as LOGIN <<R2>>
+  usecase "Simular una URL\n(REQ-F-20)" as SIM <<R2>>
+  usecase "Registrar el cambio\nen la auditoría\n(REQ-F-24)" as AUDIT <<R2>>
+  usecase "Publicar la configuración\nfirmada (REQ-F-17)" as PUB <<R2>>
+  usecase "CU-07 Aprobar una fuente\nque requiere descifrado" as ucSiete <<R2>>
+}
+ENC --> UC
+UC ..> LOGIN : <<include>>
+UC ..> SIM : <<include>>
+UC ..> AUDIT : <<include>>
+UC ..> PUB : <<include>>
+ucSiete .> UC : <<extend>>\nsi el modo es\ndescifrar_y_cachear
+ADM --> ucSiete
+note bottom of UC
+  Una fuente fija «nunca» (banca, identidad)
+  no se puede cambiar (REQ-RN-09). Si la CA
+  no cubre el dominio, no se activa (REQ-RN-04).
+end note
+
+$pie_cu("DS-25", "REQ-F-20, F-24, F-31, RN-04, RN-07, RN-09", "P-03")
+@enduml

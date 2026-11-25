@@ -1054,3 +1054,24 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Qué pasa:** CE02 C3.4 define D-20 (catálogo con tres modos y aprobación DTI solo para descifrar), D-21 (precarga en el nodo) y D-22 (ahorro por laboratorio, nunca por persona), y C5 cita D-20…D-22. El YAML salta de D-19 a D-23. El validador de diagramas (`render.py`, D-05) los rechaza.
 - **Decisión aplicada:** D-20, D-21 y D-22 se agregaron a `infra/trazabilidad.yaml → decisiones` con el texto de CE02 C3.4 (sin cambiar su contenido). Los diagramas UML vuelven a citarlas: D-20 en DS-17, D-21 en DS-16 y DS-18, D-22 en DS-01 y DS-12.
 - **Decide:** equipo del proyecto
+
+### CI-96 — Textos de requisitos de la v0.2 en `infra/trazabilidad.yaml`
+- **Estado:** resuelto (2026-11-24, aprobado por el equipo)
+- **Tipo:** discrepancia entre la fuente de verdad y CE02
+- **Dónde:** `infra/trazabilidad.yaml` → `requisitos`; `docs/celeris/Celeris-CE02-Ingenieria-Software.md` C1.2 a C1.4; `docs/software/e1/srs/` (§1.13.4)
+- **Qué pasa:** 19 requisitos del YAML conservan textos de la v0.2.
+  - En 11 cambia el significado: REQ-F-13, F-17, F-19, F-22, F-25, NF-02, NF-03, NF-10, RN-04, RN-06 y RN-07. Por ejemplo:
+    - RN-06 trata en el YAML de registros con IP real; en CE02, de los laboratorios asignados.
+    - RN-07 exige en el YAML «cuatro ojos»; en CE02, aprobación de la DTI solo para descifrar.
+    - NF-02 pide en el YAML 5 000 conexiones; en CE02, 40 PCs a ≥ 900 Mbps. Ese último valor es el que usa `infra/centro_datos.yaml`.
+  - En 4 falta una parte: REQ-F-24, NF-07, NF-12 y RN-11.
+  - En 4 solo cambia la terminología: REQ-F-02, F-10, F-14 y RN-03.
+  - Los requisitos retirados F-16, F-21, F-23, F-27 y F-29 siguen sin marca de retiro.
+  - REQ-NF-11 faltaba en CE02 C1.3. Se agregó a CE02 el 2026-11-24.
+  - El validador solo comprueba que los IDs existan, por eso `make validate` no lo detecta.
+- **Decisión aplicada:**
+  - Los requisitos se definen en CE02 (00 M4.1). Por eso se igualan los textos del YAML a CE02 v0.4 y al SRS.
+  - Se antepone «RETIRADO (v0.3):» a los cinco retirados, sin borrar sus IDs.
+  - Se regeneró CE0311 v1.4 (47 páginas), porque su huella depende del YAML (V-80).
+  - No cambia ningún ID, IP, flujo ni prueba.
+- **Decide:** equipo del proyecto

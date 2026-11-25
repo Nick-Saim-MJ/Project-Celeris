@@ -24,6 +24,13 @@ package "auth" {
     + puede(sesion, laboratorio): bool
     + exigir_campus(sesion, accion_critica)
   }
+  class AdminService <<R2>> {
+    + crear_usuario(sesion, nombre, rol)
+    + asignar_laboratorios(sesion, usuario, labs)
+    + cambiar_perfil_byod(sesion, redes)
+    + rotar_ca(sesion, nodo)
+    todas exigen origen campus
+  }
 }
 
 package "catalog" {
@@ -32,6 +39,7 @@ package "catalog" {
     + simular(url): Simulacion
     + aprobar(sesion, fuente)
     + rechazar(sesion, fuente)
+    + purgar(sesion, fuente, url | prefijo)
   }
   class ReglasCatalogo <<R2>> {
     + nunca_gana(dominio): bool
@@ -61,7 +69,8 @@ package "prefetch" {
 package "publisher" {
   class Publisher <<R2>> {
     + compilar(): VersionConfig
-    + generar_pac(nodos_activos)
+    + lista_nodos_pac(nodos_activos)
+    (el nodo arma el PAC: pac.rs)
     + generar_portal(version): SitioFirmado
   }
   class FirmaEd25519 <<R2>> {
@@ -96,6 +105,9 @@ ApiRouter --> OrigenMiddleware
 ApiRouter --> AuthService
 OrigenMiddleware ..> Rbac : marca la sesión
 CatalogService --> Rbac : exigir_campus(aprobar)
+AdminService --> Rbac : exigir_campus
+AdminService --> Publisher
+AdminService --> AuditLog
 CatalogService --> ReglasCatalogo
 LabsService --> Rbac : puede(lab)
 PrefetchService --> Rbac
@@ -129,5 +141,5 @@ note right of Publisher
   JMP01 en PORTAL01 por F20.
 end note
 
-$pie("DS-03", "REQ-F-17, F-20, F-24, F-25, F-26, F-30…F-37, RN-03, RN-04, RN-06, RN-07, RN-09…RN-11", "CU-03…CU-07, CU-09…CU-11", "P-01…P-08, P-11")
+$pie("DS-03", "REQ-F-17, F-18, F-19, F-20, F-24, F-25, F-26, F-30…F-37, RN-03, RN-04, RN-06, RN-07, RN-09…RN-11", "CU-03…CU-07, CU-09…CU-11", "P-01…P-08, P-11")
 @enduml

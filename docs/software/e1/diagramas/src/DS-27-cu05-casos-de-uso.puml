@@ -1,0 +1,25 @@
+@startuml DS-27-cu05-casos-de-uso
+!include _estilo.iuml
+title DS-27 · CU-05 Programar una precarga para una clase
+left to right direction
+actor "Encargado de\nlaboratorio" as ENC
+actor "Nodo EDGE01 / EDGE02" as NODO
+rectangle "Consola (CTRL01)" {
+  usecase "CU-05 Programar una\nprecarga para una clase" as UC <<R2>>
+  usecase "Iniciar sesión con\nsegundo factor\n(REQ-F-33)" as LOGIN <<R2>>
+  usecase "Validar la ventana y el\nlímite de la DTI (REQ-RN-10)" as VEN <<R2>>
+  usecase "Publicar la configuración\nfirmada (REQ-F-17)" as PUB <<R2>>
+  usecase "Convertir una solicitud\nde docente (CU-09)" as SOL <<R2>>
+}
+rectangle "Nodo de caché" {
+  usecase "Descargar en la ventana\nnocturna (REQ-F-22)" as DESC <<R2>>
+}
+ENC --> UC
+UC ..> LOGIN : <<include>>
+UC ..> VEN : <<include>>
+UC ..> PUB : <<include>>
+SOL .> UC : <<extend>>
+NODO --> DESC
+
+$pie_cu("DS-27", "REQ-F-22, F-34, F-35, RN-10", "P-05, P-06")
+@enduml

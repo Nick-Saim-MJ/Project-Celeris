@@ -8,7 +8,7 @@ entity usuario {
   * id : uuid <<PK>>
   --
   * nombre : text <<unique>>
-  * rol : text (encargado | admin | auditor)
+  * rol : text (encargado | admin | auditor | docente)
   * hash_contraseña : text
   * totp_secreto_cifrado : bytea
   * bloqueado_hasta : timestamptz
@@ -65,7 +65,7 @@ entity aprobacion {
 entity solicitud {
   * id : text <<PK>> (SOL-12…)
   --
-  * docente : text
+  * docente_id : uuid <<FK>> (rol docente, H-03)
   * laboratorio_id : smallint <<FK>>
   * fecha_clase : timestamptz
   * descripcion : text
@@ -77,6 +77,7 @@ entity precarga {
   --
   * laboratorio_id : smallint <<FK>>
   * fecha : date
+  * ventana_inicio, ventana_fin : time
   * estado : text (DS-18)
   bytes_total : bigint
   fuente_id : uuid <<FK>>
@@ -150,6 +151,7 @@ fuente ||--|{ fuente_dominio
 fuente ||--o{ aprobacion
 usuario ||--o{ aprobacion
 laboratorio ||--o{ solicitud
+usuario ||--o{ solicitud
 solicitud |o--o| precarga
 laboratorio ||--o{ precarga
 precarga ||--|{ precarga_item
@@ -168,9 +170,10 @@ note bottom of kpi_intervalo
   (REQ-NF-07, D-22). Fuente de P-11 y, agregada por día, de kpi_diario.
 end note
 note bottom of version_config
-  Incluye laboratorios, fuentes activas, precargas y la red
-  WIFI-EST en «nunca» (REQ-RN-11). Los nodos la piden por F10.
+  Incluye laboratorios, fuentes activas, precargas, órdenes
+  de purga (REQ-F-19) y la red WIFI-EST en «nunca» (REQ-RN-11).
+  Los nodos la piden por F10.
 end note
 
-$pie("DS-12", "REQ-F-17, F-18, F-24, F-25, F-31…F-35, F-37, NF-07, RN-06, RN-07, RN-09, RN-11", "CU-03…CU-07, CU-09…CU-11", "P-01…P-08, P-11")
+$pie("DS-12", "REQ-F-17, F-18, F-19, F-24, F-25, F-31…F-35, F-37, NF-07, RN-06, RN-07, RN-09, RN-11", "CU-03…CU-07, CU-09…CU-11", "P-01…P-08, P-11")
 @enduml

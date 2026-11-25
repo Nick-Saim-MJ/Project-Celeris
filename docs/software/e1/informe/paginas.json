@@ -1,0 +1,479 @@
+{
+  "motor": "Microsoft Word (COM)",
+  "paginas": 41,
+  "marcas": [
+    {
+      "texto": "Resumen ejecutivo",
+      "nivel": 1,
+      "pagina": 2
+    },
+    {
+      "texto": "Sección 0: Identificadores, supuestos y decisiones",
+      "nivel": 1,
+      "pagina": 4
+    },
+    {
+      "texto": "0.1 Prefijos de los identificadores",
+      "nivel": 2,
+      "pagina": 4
+    },
+    {
+      "texto": "0.2 Supuestos",
+      "nivel": 2,
+      "pagina": 4
+    },
+    {
+      "texto": "0.3 Decisiones de arquitectura",
+      "nivel": 2,
+      "pagina": 5
+    },
+    {
+      "texto": "Sección 1: Especificación de Requerimientos",
+      "nivel": 1,
+      "pagina": 7
+    },
+    {
+      "texto": "1.1 Requerimientos funcionales",
+      "nivel": 2,
+      "pagina": 7
+    },
+    {
+      "texto": "1.2 Requerimientos no funcionales",
+      "nivel": 2,
+      "pagina": 9
+    },
+    {
+      "texto": "1.3 Reglas de negocio",
+      "nivel": 2,
+      "pagina": 10
+    },
+    {
+      "texto": "1.4 Restricciones del sistema",
+      "nivel": 2,
+      "pagina": 10
+    },
+    {
+      "texto": "1.5 Historias de usuario o casos de uso",
+      "nivel": 2,
+      "pagina": 11
+    },
+    {
+      "texto": "Figura 1. DS-14. Casos de uso de Celeris Edge",
+      "nivel": 10,
+      "pagina": 11
+    },
+    {
+      "texto": "1.6 Criterios de aceptación",
+      "nivel": 2,
+      "pagina": 13
+    },
+    {
+      "texto": "Sección 2: Prototipo Navegable",
+      "nivel": 1,
+      "pagina": 15
+    },
+    {
+      "texto": "2.1 Prototipo de alta fidelidad",
+      "nivel": 2,
+      "pagina": 15
+    },
+    {
+      "texto": "2.2 Flujo de navegación",
+      "nivel": 2,
+      "pagina": 15
+    },
+    {
+      "texto": "Figura 2. Flujo de navegación y tabla pantalla → actor → requisitos → casos de uso",
+      "nivel": 10,
+      "pagina": 15
+    },
+    {
+      "texto": "2.3 Pantallas principales",
+      "nivel": 2,
+      "pagina": 16
+    },
+    {
+      "texto": "Figura 3. P-01 · Inicio de sesión con segundo factor\r\u0007",
+      "nivel": 10,
+      "pagina": 16
+    },
+    {
+      "texto": "Figura 4. P-02 · Resumen: ahorro por laboratorio, nodos, precargas\r\u0007",
+      "nivel": 10,
+      "pagina": 16
+    },
+    {
+      "texto": "Figura 5. P-03 · Catálogo de contenido y simulador\r\u0007",
+      "nivel": 10,
+      "pagina": 16
+    },
+    {
+      "texto": "Figura 6. P-04 · Laboratorios: acceso, rango y horario\r\u0007",
+      "nivel": 10,
+      "pagina": 16
+    },
+    {
+      "texto": "Figura 7. P-05 · Precargas\r\u0007",
+      "nivel": 10,
+      "pagina": 16
+    },
+    {
+      "texto": "Figura 8. P-06 · Solicitudes de docentes\r\u0007",
+      "nivel": 10,
+      "pagina": 16
+    },
+    {
+      "texto": "Figura 9. P-07 · Aprobaciones pendientes y certificados\r\u0007",
+      "nivel": 10,
+      "pagina": 17
+    },
+    {
+      "texto": "Figura 10. P-08 · Auditoría de cambios\r\u0007",
+      "nivel": 10,
+      "pagina": 17
+    },
+    {
+      "texto": "Figura 11. P-09 · Portal público: aviso de transparencia\r\u0007",
+      "nivel": 10,
+      "pagina": 17
+    },
+    {
+      "texto": "Figura 12. P-10 · Portal público: instalación de la CA y verificación de la huella\r\u0007",
+      "nivel": 10,
+      "pagina": 17
+    },
+    {
+      "texto": "Figura 13. P-11 · Actividad en vivo por laboratorio y nodo\r\u0007",
+      "nivel": 10,
+      "pagina": 17
+    },
+    {
+      "texto": "2.4 Evidencia de validación con usuarios o stakeholders",
+      "nivel": 2,
+      "pagina": 17
+    },
+    {
+      "texto": "Sección 3: Diseño Arquitectónico",
+      "nivel": 1,
+      "pagina": 18
+    },
+    {
+      "texto": "3.1 Vistas arquitectónicas C4",
+      "nivel": 2,
+      "pagina": 18
+    },
+    {
+      "texto": "Figura 14. DS-20. C4 nivel 1 — Contexto de Celeris Edge",
+      "nivel": 10,
+      "pagina": 19
+    },
+    {
+      "texto": "Figura 15. DS-21. C4 nivel 2 — Contenedores como vista de despliegue",
+      "nivel": 10,
+      "pagina": 20
+    },
+    {
+      "texto": "Figura 16. DS-22. C4 nivel 3 — Componentes de celeris-console en CTRL01",
+      "nivel": 10,
+      "pagina": 21
+    },
+    {
+      "texto": "3.2 Registro de decisiones arquitectónicas (ADR)",
+      "nivel": 2,
+      "pagina": 21
+    },
+    {
+      "texto": "Sección 4: Diseño Detallado",
+      "nivel": 1,
+      "pagina": 23
+    },
+    {
+      "texto": "4.1 Diagramas UML",
+      "nivel": 2,
+      "pagina": 23
+    },
+    {
+      "texto": "Figura 17. DS-01. Modelo de dominio",
+      "nivel": 10,
+      "pagina": 23
+    },
+    {
+      "texto": "Figura 18. DS-23. CU-01 Descargar a través de la caché\r\u0007",
+      "nivel": 10,
+      "pagina": 24
+    },
+    {
+      "texto": "Figura 19. DS-34. CU-01 Descargar a través de la caché: clases del nodo\r\u0007",
+      "nivel": 10,
+      "pagina": 24
+    },
+    {
+      "texto": "Figura 20. DS-24. CU-02 Consultar qué se descifra y la huella de la CA\r\u0007",
+      "nivel": 10,
+      "pagina": 24
+    },
+    {
+      "texto": "Figura 21. DS-35. CU-02 Consultar qué se descifra: clases\r\u0007",
+      "nivel": 10,
+      "pagina": 24
+    },
+    {
+      "texto": "Figura 22. DS-25. CU-03 Agregar una fuente al catálogo\r\u0007",
+      "nivel": 10,
+      "pagina": 24
+    },
+    {
+      "texto": "Figura 23. DS-36. CU-03 Agregar una fuente: clases\r\u0007",
+      "nivel": 10,
+      "pagina": 24
+    },
+    {
+      "texto": "Figura 24. DS-26. CU-04 Habilitar un laboratorio y su horario\r\u0007",
+      "nivel": 10,
+      "pagina": 25
+    },
+    {
+      "texto": "Figura 25. DS-37. CU-04 Habilitar un laboratorio: clases\r\u0007",
+      "nivel": 10,
+      "pagina": 25
+    },
+    {
+      "texto": "Figura 26. DS-27. CU-05 Programar una precarga para una clase\r\u0007",
+      "nivel": 10,
+      "pagina": 25
+    },
+    {
+      "texto": "Figura 27. DS-38. CU-05 Programar una precarga: clases\r\u0007",
+      "nivel": 10,
+      "pagina": 25
+    },
+    {
+      "texto": "Figura 28. DS-28. CU-06 Ver el ahorro y la actividad del laboratorio\r\u0007",
+      "nivel": 10,
+      "pagina": 25
+    },
+    {
+      "texto": "Figura 29. DS-39. CU-06 Ver el ahorro y la actividad: clases\r\u0007",
+      "nivel": 10,
+      "pagina": 25
+    },
+    {
+      "texto": "Figura 30. DS-29. CU-07 Aprobar una fuente que requiere descifrado\r\u0007",
+      "nivel": 10,
+      "pagina": 26
+    },
+    {
+      "texto": "Figura 31. DS-40. CU-07 Aprobar una fuente: clases\r\u0007",
+      "nivel": 10,
+      "pagina": 26
+    },
+    {
+      "texto": "Figura 32. DS-30. CU-08 Purgar un contenido\r\u0007",
+      "nivel": 10,
+      "pagina": 26
+    },
+    {
+      "texto": "Figura 33. DS-41. CU-08 Purgar un contenido: clases\r\u0007",
+      "nivel": 10,
+      "pagina": 26
+    },
+    {
+      "texto": "Figura 34. DS-31. CU-09 Registrar una solicitud de preparación\r\u0007",
+      "nivel": 10,
+      "pagina": 26
+    },
+    {
+      "texto": "Figura 35. DS-42. CU-09 Registrar una solicitud: clases\r\u0007",
+      "nivel": 10,
+      "pagina": 26
+    },
+    {
+      "texto": "Figura 36. DS-32. CU-10 Revisar la auditoría de cambios\r\u0007",
+      "nivel": 10,
+      "pagina": 27
+    },
+    {
+      "texto": "Figura 37. DS-43. CU-10 Revisar la auditoría: clases\r\u0007",
+      "nivel": 10,
+      "pagina": 27
+    },
+    {
+      "texto": "Figura 38. DS-33. CU-11 Usar la consola desde fuera del campus\r\u0007",
+      "nivel": 10,
+      "pagina": 27
+    },
+    {
+      "texto": "Figura 39. DS-44. CU-11 Usar la consola desde fuera del campus: clases\r\u0007",
+      "nivel": 10,
+      "pagina": 27
+    },
+    {
+      "texto": "4.2 Diagramas de secuencia",
+      "nivel": 2,
+      "pagina": 28
+    },
+    {
+      "texto": "Figura 40. DS-15. Secuencia: el encargado agrega una fuente que requiere descifrado y la DTI la aprueba",
+      "nivel": 10,
+      "pagina": 28
+    },
+    {
+      "texto": "Figura 41. DS-16. Secuencia: precarga nocturna desde una solicitud y HIT al iniciar la clase",
+      "nivel": 10,
+      "pagina": 28
+    },
+    {
+      "texto": "4.3 Diagramas de estados",
+      "nivel": 2,
+      "pagina": 29
+    },
+    {
+      "texto": "Figura 42. DS-17. Estados de una fuente del catálogo",
+      "nivel": 10,
+      "pagina": 29
+    },
+    {
+      "texto": "Figura 43. DS-18. Estados de una precarga",
+      "nivel": 10,
+      "pagina": 29
+    },
+    {
+      "texto": "4.4 Modelo de diseño detallado",
+      "nivel": 2,
+      "pagina": 30
+    },
+    {
+      "texto": "Figura 44. DS-12. Modelo de datos de la consola",
+      "nivel": 10,
+      "pagina": 30
+    },
+    {
+      "texto": "Anexos",
+      "nivel": 1,
+      "pagina": 31
+    },
+    {
+      "texto": "Anexo A. Acta de validación con stakeholders",
+      "nivel": 2,
+      "pagina": 31
+    },
+    {
+      "texto": "Anexo B. Matriz de trazabilidad de requerimientos",
+      "nivel": 2,
+      "pagina": 33
+    },
+    {
+      "texto": "Anexo C. Diagramas complementarios",
+      "nivel": 2,
+      "pagina": 36
+    },
+    {
+      "texto": "Figura 45. DS-03. Clases de diseño de celeris-console",
+      "nivel": 10,
+      "pagina": 36
+    },
+    {
+      "texto": "Figura 46. DS-02. Clases de diseño de celeris-node (código actual + puertos R2)",
+      "nivel": 10,
+      "pagina": 37
+    },
+    {
+      "texto": "Figura 47. DS-04. Secuencia: MISS con coalescencia y HIT posterior",
+      "nivel": 10,
+      "pagina": 37
+    },
+    {
+      "texto": "Figura 48. DS-05. Secuencia: CONNECT y decisión de descifrado por SNI y red de origen (REQ-F-02 y REQ-F-36 implementados; catálogo en R2)",
+      "nivel": 10,
+      "pagina": 38
+    },
+    {
+      "texto": "Figura 49. DS-06. Secuencia: revalidación de una copia vencida (REQ-F-04, implementado)",
+      "nivel": 10,
+      "pagina": 38
+    },
+    {
+      "texto": "Figura 50. DS-09. Estados de una entrada de caché",
+      "nivel": 10,
+      "pagina": 39
+    },
+    {
+      "texto": "Figura 51. DS-19. Secuencia: un cambio de laboratorio llega firmado a los nodos y vuelven los KPI (F10, CU-04 + CU-06)",
+      "nivel": 10,
+      "pagina": 39
+    },
+    {
+      "texto": "Figura 52. DS-13. Componentes C3 de celeris-node → archivos del código y crate destino",
+      "nivel": 10,
+      "pagina": 40
+    },
+    {
+      "texto": "Anexo D. Evidencia de sustentación",
+      "nivel": 2,
+      "pagina": 41
+    }
+  ],
+  "paginas_cuerpo": 30,
+  "docx": "entregables/CE02/Informe_Requerimientos_Diseno_CE02_E1_v0.4.docx",
+  "pdf": "entregables/CE02/Informe_Requerimientos_Diseno_CE02_E1_v0.4.pdf",
+  "commit_fuente": "aa3b8e5",
+  "figuras": [
+    "DS-14",
+    "00-flujo-navegacion",
+    "P-01",
+    "P-02",
+    "P-03",
+    "P-04",
+    "P-05",
+    "P-06",
+    "P-07",
+    "P-08",
+    "P-09",
+    "P-10",
+    "P-11",
+    "DS-20",
+    "DS-21",
+    "DS-22",
+    "DS-01",
+    "DS-23",
+    "DS-34",
+    "DS-24",
+    "DS-35",
+    "DS-25",
+    "DS-36",
+    "DS-26",
+    "DS-37",
+    "DS-27",
+    "DS-38",
+    "DS-28",
+    "DS-39",
+    "DS-29",
+    "DS-40",
+    "DS-30",
+    "DS-41",
+    "DS-31",
+    "DS-42",
+    "DS-32",
+    "DS-43",
+    "DS-33",
+    "DS-44",
+    "DS-15",
+    "DS-16",
+    "DS-17",
+    "DS-18",
+    "DS-12",
+    "DS-03",
+    "DS-02",
+    "DS-04",
+    "DS-05",
+    "DS-06",
+    "DS-09",
+    "DS-19",
+    "DS-13"
+  ],
+  "completar": [
+    "[COMPLETAR tras la sesión]",
+    "[COMPLETAR: semestre académico]",
+    "[COMPLETAR]"
+  ]
+}

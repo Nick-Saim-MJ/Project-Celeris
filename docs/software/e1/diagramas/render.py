@@ -15,7 +15,7 @@ Validación (regla del proyecto: no se inventan IP, nombres ni IDs):
   D-05  cada D-nn existe en infra/trazabilidad.yaml; cada CU-nn en CE02 v0.4 (C1.6); cada P-nn en pantallas.md
   D-06  cada S-nn existe en infra/trazabilidad.yaml o en la tabla «Supuestos nuevos» de README.md
   D-07  cada CI-nn existe en docs/infra/e1/CAMBIOS-INVENTARIO.md
-  D-08  cada diagrama tiene título con su propio ID (DS-nn) y pie de trazabilidad ($pie)
+  D-08  cada diagrama tiene título con su propio ID (DS-nn) y pie de trazabilidad ($pie o $pie_cu)
 """
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ RE_REQ_CORTO = re.compile(r"(?<![A-Z-])(F|NF|RN)-(\d{2})\b")
 RE_DEC = re.compile(r"(?<![A-Z-])D-(\d{2})\b")
 RE_CU = re.compile(r"\bCU-(\d{2})\b")
 RE_PANT = re.compile(r"(?<![A-Z-])P-(\d{2})\b")
-RE_SUP = re.compile(r"\[?S-(\d{2})\]?")
+RE_SUP = re.compile(r"(?<![A-Z])\[?S-(\d{2})\]?")  # (?<![A-Z]): «DS-20» no es el supuesto S-20
 RE_CI = re.compile(r"\bCI-(\d{2})\b")
 
 
@@ -120,7 +120,7 @@ def validar(archivo: Path, ctx: dict) -> list[str]:
             errores.append(f"D-07 CI-{n} no está en CAMBIOS-INVENTARIO.md")
     if not re.search(rf"^title {re.escape(did)} ", cuerpo, flags=re.M):
         errores.append(f"D-08 falta «title {did} …»")
-    if not re.search(rf'^\$pie\("{re.escape(did)}"', cuerpo, flags=re.M):
+    if not re.search(rf'^\$pie(?:_cu)?\("{re.escape(did)}"', cuerpo, flags=re.M):
         errores.append(f"D-08 falta el pie $pie(\"{did}\", …)")
     return errores
 

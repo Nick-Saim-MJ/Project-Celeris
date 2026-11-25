@@ -1,0 +1,41 @@
+@startuml DS-41-cu08-clases
+!include _estilo.iuml
+title DS-41 · CU-08 Purgar un contenido: clases
+package "Interfaz" {
+  class "P-03 Catálogo (acción Purgar)" as P03 <<R2>>
+}
+package "Control (consola)" {
+  class CatalogService <<R2>> {
+    + purgar(sesion, fuente, url | prefijo)
+  }
+  class Publisher <<R2>> {
+    + compilar(): VersionConfig
+  }
+  class AuditLog <<R2>> {
+    + registrar(sesion, accion, objeto, antes, despues)
+  }
+}
+package "Entidad" {
+  class Fuente <<R2>> {
+    nombre, modo
+  }
+  class Cambio <<R2>> {
+    accion, objeto
+    antes, despues
+  }
+}
+package "Nodo" {
+  class Store <<R1>> {
+    get(key_hash)
+    put(key_hash, meta, body)
+  }
+}
+P03 --> CatalogService
+CatalogService --> Publisher
+CatalogService --> AuditLog
+CatalogService ..> Fuente
+AuditLog ..> Cambio : inserta
+Publisher ..> Store : la orden llega en la\nsiguiente versión (F10)
+
+$pie_cu("DS-41", "REQ-F-19, F-24", "P-03")
+@enduml

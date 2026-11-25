@@ -1,0 +1,40 @@
+@startuml DS-38-cu05-clases
+!include _estilo.iuml
+title DS-38 · CU-05 Programar una precarga: clases
+package "Interfaz" {
+  class "P-05 Precargas" as P05 <<R2>>
+}
+package "Control (consola)" {
+  class PrefetchService <<R2>> {
+    + programar(sesion, lab, urls, fecha): Precarga
+    + desde_solicitud(sesion, solicitud): Precarga
+    + registrar_avance(nodo, precarga, bytes, estado)
+  }
+  class Rbac <<R2>> {
+    + puede(sesion, laboratorio): bool
+  }
+  class Publisher <<R2>> {
+    + compilar(): VersionConfig
+  }
+}
+package "Entidad" {
+  class Precarga <<R2>> {
+    fecha, ventana
+    estado, bytes_total
+  }
+  class Laboratorio <<R2>> {
+    nombre, horario
+  }
+  class Solicitud <<R2>> {
+    curso, fecha_clase, estado
+  }
+}
+P05 --> PrefetchService
+PrefetchService --> Rbac
+PrefetchService --> Publisher
+PrefetchService ..> Precarga : crea
+Precarga "*" --> "1" Laboratorio
+Solicitud "0..1" --> "0..1" Precarga : se convierte en
+
+$pie_cu("DS-38", "REQ-F-22, F-34, F-35, RN-10", "P-05")
+@enduml

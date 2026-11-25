@@ -4,7 +4,7 @@
 PYTHON ?= $(shell command -v python3 2>/dev/null || command -v python 2>/dev/null || echo python)
 VERSION ?= v1.0
 
-.PHONY: diagrams-dc diagrams-dc-check matrices-dc informe-dc help entorno lab-gen tofu-gen tofu-check tofu-emulador image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
+.PHONY: diagrams-dc diagrams-dc-check matrices-dc informe-dc informe-ce02 help entorno lab-gen tofu-gen tofu-check tofu-emulador image test-imagen deps deps-dev gen test-gen validate lab-up lab-down test-lab matrices diagrams-check informe release-e1
 
 help:
 	@echo "make validate        fuente única + artefactos + secretos (infra/validate.py y gitleaks si está instalado)"
@@ -22,6 +22,7 @@ help:
 	@echo "make matrices        genera las dos matrices XLSX (componentes y pruebas)"
 	@echo "make diagrams-check  genera, exporta y valida los diagramas draw.io (V-50…V-56)"
 	@echo "make informe         genera el informe DOCX y PDF desde la plantilla y valida V-80+ (Word o LibreOffice)"
+	@echo "make informe-ce02    genera el Entregable 1 de CE02 (SRS, prototipo, C4 + ADR, UML) en DOCX y PDF (Word)"
 	@echo "make release-e1      copia la versión final a entregables/CE0311/vX.Y/ (pendiente de P5)"
 
 entorno:
@@ -111,6 +112,11 @@ matrices-dc:
 informe-dc:
 	$(PYTHON) docs/infra/e2/build_informe.py --pdf
 	$(PYTHON) infra/validate.py
+
+# CE02 Entregable 1 (Requerimientos y Diseño del Sistema): regenera los UML/C4 y arma el informe.
+informe-ce02:
+	$(PYTHON) docs/software/e1/diagramas/render.py
+	$(PYTHON) docs/software/e1/build_informe_ce02.py --pdf
 
 release-e1: validate
 	@echo "pendiente de P5: copia a entregables/CE0311/$(VERSION)/ tras make informe y make matrices" >&2; exit 1

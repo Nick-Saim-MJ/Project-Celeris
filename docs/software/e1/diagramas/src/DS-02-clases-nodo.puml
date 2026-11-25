@@ -48,9 +48,9 @@ package "policy (config.rs, policy.rs)" {
   class Config <<R1>> {
     intercept_domains: Vec<String>
     never_intercept: Vec<String>
+    byod_networks: Vec<String>
+    signed_config, config_public_key
     store_id: Vec<StoreIdRule>
-    should_intercept(host): bool
-    is_never_intercept(host): bool
   }
   class KeyNormalizer <<R1>> {
     normalize(url: AbsUrl): String
@@ -60,6 +60,24 @@ package "policy (config.rs, policy.rs)" {
     request_is_cacheable(req): bool
     response_is_cacheable(res, max): bool
     ttl_secs(headers, default): u64
+  }
+}
+
+package "signed (signed.rs)" {
+  class Policy <<R1>> {
+    intercept_domains, never_intercept
+    -byod: Vec<Network>
+    is_byod(ip): bool
+    is_never_intercept(host): bool
+    should_intercept(host, ip): bool
+  }
+  class LivePolicy <<R1>> {
+    current(): Arc<Policy>
+  }
+  class Firmada <<R1>> {
+    -llave: ed25519 fijada al arrancar
+    -version: u64
+    recargar(): Aplicada | SinCambios | rechazo
   }
 }
 
@@ -139,7 +157,6 @@ package "Puertos del workspace (C3.3, R2)" {
   interface MetricsSink <<R2>>
   interface ConfigAgent <<R2>> {
     poll(desde_version) por F10 cada 30 s
-    verificar_firma_ed25519(): aplica o conserva la anterior
     enviar_kpi(agregados por laboratorio)
   }
 }
@@ -148,6 +165,10 @@ HttpHandler <|.. CacheHandler
 CacheHandler --> Shared : Arc
 CacheHandler ..> Exchange
 Shared *-- Config
+Shared *-- LivePolicy
+LivePolicy *-- Policy
+Firmada --> LivePolicy : sustituye entera\no conserva la anterior
+Firmada --> SecurityLog : rechazo → evento
 Shared *-- KeyNormalizer
 Shared *-- ClientGate
 Shared *-- DestinationPolicy
@@ -166,12 +187,12 @@ Detector --> SecurityLog : eventos
 Stats ..> Outcome
 CacheHandler ..> PolicyFns
 
-Config ..|> PolicyEngine : implementa (R2: fuentes y modos del catálogo)
+Policy ..|> PolicyEngine : implementa (R2: fuentes y modos del catálogo)
 Store ..|> ObjectStore : implementa (R2)
 SecurityLog ..|> SecuritySink : implementa (R2)
 Stats ..|> MetricsSink : implementa (R2)
-ConfigAgent ..> Config : reemplaza config.toml (R2, REQ-F-17)
+ConfigAgent ..> Firmada : escribe config.toml + .sig\ndescargados por F10 (R2, REQ-F-17)
 Stats ..> ConfigAgent : KPI por laboratorio (R2, REQ-F-13)
 
-$pie("DS-02", "REQ-F-01…F-11, F-13…F-15, F-17, F-28, NF-08, NF-13", "CU-01, CU-06", "P-02, P-11")
+$pie("DS-02", "REQ-F-01…F-11, F-13…F-15, F-17, F-28, F-36, NF-08, NF-13, RN-08", "CU-01, CU-06", "P-02, P-11")
 @enduml

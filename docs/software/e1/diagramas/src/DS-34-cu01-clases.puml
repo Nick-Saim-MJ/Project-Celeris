@@ -1,0 +1,45 @@
+@startuml DS-34-cu01-clases
+!include _estilo.iuml
+title DS-34 · CU-01 Descargar a través de la caché: clases del nodo
+package "Interfaz (Hudsucker)" {
+  interface HttpHandler <<R1>> {
+    handle_request(req)
+    handle_response(res)
+  }
+}
+package "Control (handler.rs, access.rs, signed.rs)" {
+  class CacheHandler <<R1>> {
+    -tls_decision(cfg, sni, connect)
+    -serve_from_cache(meta, estado, reserva)
+  }
+  class ClientGate <<R1>> {
+    check(ip): ClientDecision
+  }
+  class Policy <<R1>> {
+    is_byod(ip): bool
+    should_intercept(host, ip): bool
+  }
+  class Flights <<R1>> {
+    enter(key): Entry
+  }
+}
+package "Entidad (store.rs)" {
+  class Store <<R1>> {
+    get(key_hash): Option<Meta>
+    put(key_hash, meta, body)
+  }
+  class Meta <<R1>> {
+    url, object, size
+    expires_at, etag
+    is_fresh(): bool
+  }
+}
+HttpHandler <|.. CacheHandler
+CacheHandler --> ClientGate : 1. ¿laboratorio\nhabilitado?
+CacheHandler --> Policy : 2. ¿se descifra?
+CacheHandler --> Flights : 3. un solo\ndescargador
+CacheHandler --> Store : 4. HIT o guarda
+Store ..> Meta
+
+$pie_cu("DS-34", "REQ-F-01…F-05, F-10, F-36", "—")
+@enduml

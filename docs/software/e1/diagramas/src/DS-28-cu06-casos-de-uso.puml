@@ -1,0 +1,27 @@
+@startuml DS-28-cu06-casos-de-uso
+!include _estilo.iuml
+title DS-28 · CU-06 Ver el ahorro y la actividad del laboratorio
+left to right direction
+actor "Encargado de\nlaboratorio" as ENC
+actor "Auditor" as AU
+actor "Nodo EDGE01 / EDGE02" as NODO
+rectangle "Consola (CTRL01)" {
+  usecase "CU-06 Ver el ahorro y la\nactividad del laboratorio" as UC <<R2>>
+  usecase "Iniciar sesión con\nsegundo factor\n(REQ-F-33)" as LOGIN <<R2>>
+  usecase "Consultar el ahorro del mes\n(P-02, REQ-F-25)" as AHO <<R2>>
+  usecase "Ver la actividad en vivo\n(P-11, REQ-NF-13)" as VIVO <<R2>>
+  usecase "Recibir los agregados\nde 30 s (REQ-F-13)" as KPI <<R2>>
+}
+ENC --> UC
+AU --> UC
+UC ..> LOGIN : <<include>>
+UC ..> AHO : <<include>>
+VIVO .> UC : <<extend>>
+NODO --> KPI : por F10
+note bottom of UC
+  Solo agregados por laboratorio y nodo:
+  sin URL ni IP de equipos (REQ-NF-07).
+end note
+
+$pie_cu("DS-28", "REQ-F-13, F-25, NF-07, NF-13", "P-02, P-11")
+@enduml

@@ -17,7 +17,7 @@ participant "40 PCs de LAB-03\n(rango /26 de LAB-03)" as P
 
 == Solicitud y programación (P-06 → P-05) ==
 D -> SOL : registrar SOL-12: IntelliJ IDEA para la clase del 25/11 08:00 (REQ-F-35)
-note right of D : Cómo entra el docente aún no está definido (hueco H-03).
+note right of D : Entra con el rol docente (P-01, segundo factor) y solo\ncrea y ve sus solicitudes (H-03, resuelto en el SRS §1.7.3).
 E -> PF : POST /v1/precargas desde SOL-12 (F28)
 PF -> PF : RBAC LAB-03 (REQ-RN-06) · ventana y límite los fija la DTI:\n00:00–05:00, 50 Mbps por nodo (REQ-RN-10)
 PF -> PUB : compilar() → configuración firmada con la precarga

@@ -6,7 +6,7 @@ caption «R1» existe en el código del nodo · «R2» diseño de celeris-consol
 package "Consola del encargado (celeris-console, CTRL01 10.20.20.10, D-25)" {
   class Usuario <<R2>> {
     nombre
-    rol: encargado | admin | auditor
+    rol: encargado | admin | auditor | docente
     segundo_factor: TOTP (REQ-F-33)
   }
   class Sesion <<R2>> {
@@ -36,7 +36,7 @@ package "Consola del encargado (celeris-console, CTRL01 10.20.20.10, D-25)" {
     origen: campus (REQ-F-37)
   }
   class Solicitud <<R2>> {
-    docente, curso
+    curso
     fecha_clase
     descripcion
     estado: nueva | en_preparacion | lista
@@ -104,6 +104,7 @@ Fuente "1" *-- "1..*" Dominio
 Fuente "1" -- "0..1" Aprobacion : si descifra\n(REQ-RN-07)
 Solicitud "*" --> "1" Laboratorio
 Solicitud "0..1" --> "0..1" Precarga : se convierte en
+Usuario "1" -- "*" Solicitud : registra (rol docente, H-03)
 Precarga "*" --> "1" Laboratorio
 Precarga "*" ..> "0..1" Fuente : URLs de
 VersionConfig "1" o-- "*" Fuente : compila

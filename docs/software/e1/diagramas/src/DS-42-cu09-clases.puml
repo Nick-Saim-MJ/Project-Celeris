@@ -1,0 +1,33 @@
+@startuml DS-42-cu09-clases
+!include _estilo.iuml
+title DS-42 · CU-09 Registrar una solicitud: clases
+package "Interfaz" {
+  class "P-06 Solicitudes de docentes" as P06 <<R2>>
+}
+package "Control (consola)" {
+  class SolicitudService <<R2>> {
+    + registrar(docente, lab, fecha_clase, descripcion)
+    + responder(sesion, solicitud, mensaje)
+  }
+  class PrefetchService <<R2>> {
+    + desde_solicitud(sesion, solicitud): Precarga
+  }
+}
+package "Entidad" {
+  class Usuario <<R2>> {
+    rol: docente
+  }
+  class Solicitud <<R2>> {
+    curso, fecha_clase, descripcion
+    estado: nueva | en_preparacion | lista
+  }
+  class Laboratorio <<R2>>
+}
+P06 --> SolicitudService
+SolicitudService --> PrefetchService : convierte
+SolicitudService ..> Solicitud : crea
+Usuario "1" -- "*" Solicitud : registra
+Solicitud "*" --> "1" Laboratorio
+
+$pie_cu("DS-42", "REQ-F-33, F-35", "P-06")
+@enduml

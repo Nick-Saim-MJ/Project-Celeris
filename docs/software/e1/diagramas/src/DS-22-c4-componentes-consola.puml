@@ -1,0 +1,57 @@
+@startuml DS-22-c4-componentes-consola
+!include <C4/C4_Component>
+!include _estilo.iuml
+title DS-22 · C4 nivel 3 — Componentes de celeris-console en CTRL01 (CE02 C3.3)
+caption Todo «R2»: la consola se construye en S2. Las clases de cada componente están en DS-03 y las tablas en DS-12. Los componentes del nodo están en DS-13.
+LAYOUT_TOP_DOWN()
+AddElementTag("R2", $bgColor = "#E8F1FB", $fontColor = "#0B0B0B", $borderColor = "#2A78D6", $legendText = "«R2» diseño, se construye en S2")
+AddElementTag("R1", $bgColor = "#FFFFFF", $fontColor = "#0B0B0B", $borderColor = "#0B0B0B", $legendText = "«R1» existe en el código")
+AddElementTag("ext", $bgColor = "#EEEEEE", $fontColor = "#0B0B0B", $borderColor = "#52514E", $legendText = "fuera de la consola")
+
+Container(spa, "Consola web (SPA)", "Servida por la API", "P-01…P-08, P-11", $tags = "R2")
+Container(gw, "EC2-GW 10.30.0.10", "Proxy inverso", "Llega por F30 con certificado de cliente", $tags = "ext")
+Container(nodos, "celeris-node (EDGE01, EDGE02)", "Rust", "Piden configuración y envían KPI por F10", $tags = "R1")
+Container(jmp, "JMP01 10.20.10.20", "Jump host", "Despliega el portal en PORTAL01 (F20)", $tags = "ext")
+
+Container_Boundary(con, "celeris-console API · CTRL01 10.20.20.10 (axum, TCP 443 y 8443)") {
+  Component(router, "router + origen", "axum, middleware", "Rutas /v1 (443) y /v1/nodos (8443 mTLS). Marca cada sesión campus (ENC01, JMP01) o remoto (certificado de EC2-GW)", $tags = "R2")
+  Component(auth, "auth", "AuthService, Rbac, AdminService", "Contraseña + TOTP, RBAC por rol y laboratorio, bloqueo por intentos. Acciones críticas solo con origen campus", $tags = "R2")
+  Component(catalog, "catalog", "CatalogService, ReglasCatalogo", "Fuentes, dominios y modos; simulador; aprobación; purga", $tags = "R2")
+  Component(labs, "labs", "LabsService", "Habilitar laboratorios y horario; el rango /26 es de solo lectura", $tags = "R2")
+  Component(prefetch, "prefetch", "PrefetchService, SolicitudService", "Precargas y solicitudes de docentes", $tags = "R2")
+  Component(publisher, "publisher", "Publisher, FirmaEd25519", "Compila la versión de configuración (fuentes, laboratorios, precargas, purgas, redes BYOD en nunca) y la firma; genera el sitio del portal", $tags = "R2")
+  Component(reports, "reports", "ReportsService", "Recibe KPI de 30 s; ahorro del mes y vista en vivo, solo por laboratorio", $tags = "R2")
+  Component(audit, "audit", "AuditLog", "Cambios e intentos rechazados, solo inserción", $tags = "R2")
+  ComponentDb(repo, "PostgreSQL local", "Socket Unix", "Tablas de DS-12", $tags = "R2")
+}
+
+Rel(spa, router, "JSON /v1/…", "F28 o F30")
+Rel(gw, router, "Sesiones remotas", "F30")
+Rel(nodos, router, "GET config / POST kpi", "F10")
+Rel(router, auth, "sesión y origen")
+Rel(router, catalog, "/v1/fuentes")
+Rel(router, labs, "/v1/laboratorios")
+Rel(router, prefetch, "/v1/precargas, /v1/solicitudes")
+Rel(router, reports, "/v1/reportes, /v1/nodos/{id}/kpi")
+Rel(router, publisher, "/v1/nodos/{id}/config")
+Rel(catalog, auth, "exigir_campus(aprobar)")
+Rel(catalog, publisher, "nueva versión")
+Rel(labs, publisher, "nueva versión")
+Rel(prefetch, publisher, "nueva versión")
+Rel(auth, publisher, "perfil BYOD, rotación de CA")
+Rel(catalog, audit, "registra")
+Rel(labs, audit, "registra")
+Rel(prefetch, audit, "registra")
+Rel(publisher, audit, "registra la publicación")
+Rel(auth, audit, "intentos y 403")
+Rel(catalog, repo, "SQL")
+Rel(labs, repo, "SQL")
+Rel(prefetch, repo, "SQL")
+Rel(reports, repo, "SQL")
+Rel(audit, repo, "INSERT")
+Rel(publisher, repo, "version_config")
+Rel(jmp, publisher, "toma el sitio firmado del portal", "F20")
+
+SHOW_LEGEND()
+$pie("DS-22", "REQ-F-17, F-19, F-20, F-24, F-25, F-30…F-37, RN-06, RN-07, RN-11, NF-07", "CU-03…CU-11", "P-01…P-08, P-11")
+@enduml

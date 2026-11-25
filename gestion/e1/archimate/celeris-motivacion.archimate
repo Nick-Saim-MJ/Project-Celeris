@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Celeris Edge — Motivación (CE01 E1, CE0112)" id="id-celeris-e1" version="5.0.0">
+  <folder name="Strategy" id="id-aa4c9db35c0a486484956fad9a8360b0" type="strategy"/>
+  <folder name="Business" id="id-798a4cacda9f43f8a415e2476bb50a00" type="business"/>
+  <folder name="Application" id="id-2517ae4e6e4b4cbfba98166e05b713ec" type="application">
+    <element xsi:type="archimate:ApplicationComponent" name="Nodo de caché (EDGE01/EDGE02)" id="id-EDGE01"/>
+    <element xsi:type="archimate:ApplicationComponent" name="Consola del encargado (CTRL01)" id="id-CTRL01"/>
+    <element xsi:type="archimate:ApplicationComponent" name="Portal de transparencia (PORTAL01)" id="id-PORTAL01"/>
+    <element xsi:type="archimate:ApplicationComponent" name="Detección (SIEM01)" id="id-SIEM01"/>
+  </folder>
+  <folder name="Technology &amp; Physical" id="id-8f7d58c8b5e5491bac661f6f5b40fce4" type="technology"/>
+  <folder name="Motivation" id="id-d965472439b6433b8d6ebcdc224b9195" type="motivation">
+    <element xsi:type="archimate:Driver" name="Costo y saturación del enlace" id="id-dr1"/>
+    <element xsi:type="archimate:Driver" name="Calidad de la enseñanza en laboratorios" id="id-dr2"/>
+    <element xsi:type="archimate:Driver" name="Ley 29733 y su reglamento" id="id-dr3"/>
+    <element xsi:type="archimate:Assessment" name="La misma descarga se repite en 40 PCs" id="id-as1"/>
+    <element xsi:type="archimate:Assessment" name="El contenido HTTPS no se reutiliza" id="id-as2"/>
+    <element xsi:type="archimate:Assessment" name="El encargado no puede decidir ni medir" id="id-as3"/>
+    <element xsi:type="archimate:Assessment" name="Descifrar exige aviso previo" id="id-as4"/>
+    <element xsi:type="archimate:Goal" name="OE-a Fortalecer la infraestructura tecnológica para la enseñanza" id="id-OE-a"/>
+    <element xsi:type="archimate:Goal" name="OE-b Calidad académica: laboratorios listos para cada clase" id="id-OE-b"/>
+    <element xsi:type="archimate:Goal" name="OE-c Gestión eficiente de los recursos" id="id-OE-c"/>
+    <element xsi:type="archimate:Goal" name="OE-d Seguridad de la información y cumplimiento" id="id-OE-d"/>
+    <element xsi:type="archimate:Outcome" name="OB-1 Ahorro de Internet: BHR ≥ 25 %" id="id-OB-1"/>
+    <element xsi:type="archimate:Outcome" name="OB-2 Ahorro de tiempo: −70 %" id="id-OB-2"/>
+    <element xsi:type="archimate:Outcome" name="OB-3 Autonomía del encargado: ≤ 5 min" id="id-OB-3"/>
+    <element xsi:type="archimate:Outcome" name="OB-4 Transparencia: 100 %" id="id-OB-4"/>
+    <element xsi:type="archimate:Outcome" name="OB-5 Seguridad del servicio: ≥ 90 % en S2" id="id-OB-5"/>
+    <element xsi:type="archimate:Requirement" name="REQ-F-03 Cachear lo compartible (RFC 9111)" id="id-REQ-F-03"/>
+    <element xsi:type="archimate:Requirement" name="REQ-F-05 Coalescer peticiones al mismo objeto" id="id-REQ-F-05"/>
+    <element xsi:type="archimate:Requirement" name="REQ-F-25 Reportar el ahorro por laboratorio" id="id-REQ-F-25"/>
+    <element xsi:type="archimate:Requirement" name="REQ-F-34 Programar una precarga" id="id-REQ-F-34"/>
+    <element xsi:type="archimate:Requirement" name="REQ-F-31 Gestionar el catálogo de contenido" id="id-REQ-F-31"/>
+    <element xsi:type="archimate:Requirement" name="REQ-F-32 Gestionar el acceso por laboratorio" id="id-REQ-F-32"/>
+    <element xsi:type="archimate:Requirement" name="REQ-F-12 Publicar la página de transparencia" id="id-REQ-F-12"/>
+    <element xsi:type="archimate:Requirement" name="REQ-F-14 Enviar eventos de seguridad al SIEM" id="id-REQ-F-14"/>
+  </folder>
+  <folder name="Implementation &amp; Migration" id="id-db5f8d9e99e742fcbc33c28a04510f5a" type="implementation_migration"/>
+  <folder name="Other" id="id-695c2e1e9a2c4af9a207a448d933de1f" type="other"/>
+  <folder name="Relations" id="id-069ab97c924746a0b634bae51f413aeb" type="relations">
+    <element xsi:type="archimate:AssociationRelationship" id="id-r-as1-dr1" source="id-as1" target="id-dr1"/>
+    <element xsi:type="archimate:AssociationRelationship" id="id-r-as2-dr1" source="id-as2" target="id-dr1"/>
+    <element xsi:type="archimate:AssociationRelationship" id="id-r-as3-dr2" source="id-as3" target="id-dr2"/>
+    <element xsi:type="archimate:AssociationRelationship" id="id-r-as4-dr3" source="id-as4" target="id-dr3"/>
+    <element xsi:type="archimate:InfluenceRelationship" id="id-r-as1-OE-a" source="id-as1" target="id-OE-a"/>
+    <element xsi:type="archimate:InfluenceRelationship" id="id-r-as2-OE-a" source="id-as2" target="id-OE-a"/>
+    <element xsi:type="archimate:InfluenceRelationship" id="id-r-as3-OE-b" source="id-as3" target="id-OE-b"/>
+    <element xsi:type="archimate:InfluenceRelationship" id="id-r-as3-OE-c" source="id-as3" target="id-OE-c"/>
+    <element xsi:type="archimate:InfluenceRelationship" id="id-r-as4-OE-d" source="id-as4" target="id-OE-d"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-OB-1-OE-a" source="id-OB-1" target="id-OE-a"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-OB-1-OE-c" source="id-OB-1" target="id-OE-c"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-OB-2-OE-b" source="id-OB-2" target="id-OE-b"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-OB-3-OE-c" source="id-OB-3" target="id-OE-c"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-OB-4-OE-d" source="id-OB-4" target="id-OE-d"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-OB-5-OE-d" source="id-OB-5" target="id-OE-d"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-REQ-F-03-OB-1" source="id-REQ-F-03" target="id-OB-1"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-EDGE01-REQ-F-03" source="id-EDGE01" target="id-REQ-F-03"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-REQ-F-05-OB-1" source="id-REQ-F-05" target="id-OB-1"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-EDGE01-REQ-F-05" source="id-EDGE01" target="id-REQ-F-05"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-REQ-F-25-OB-1" source="id-REQ-F-25" target="id-OB-1"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-CTRL01-REQ-F-25" source="id-CTRL01" target="id-REQ-F-25"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-REQ-F-34-OB-2" source="id-REQ-F-34" target="id-OB-2"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-CTRL01-REQ-F-34" source="id-CTRL01" target="id-REQ-F-34"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-EDGE01-REQ-F-34" source="id-EDGE01" target="id-REQ-F-34"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-REQ-F-31-OB-3" source="id-REQ-F-31" target="id-OB-3"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-CTRL01-REQ-F-31" source="id-CTRL01" target="id-REQ-F-31"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-REQ-F-32-OB-3" source="id-REQ-F-32" target="id-OB-3"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-CTRL01-REQ-F-32" source="id-CTRL01" target="id-REQ-F-32"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-REQ-F-12-OB-4" source="id-REQ-F-12" target="id-OB-4"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-PORTAL01-REQ-F-12" source="id-PORTAL01" target="id-REQ-F-12"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-REQ-F-14-OB-5" source="id-REQ-F-14" target="id-OB-5"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-EDGE01-REQ-F-14" source="id-EDGE01" target="id-REQ-F-14"/>
+    <element xsi:type="archimate:RealizationRelationship" id="id-r-SIEM01-REQ-F-14" source="id-SIEM01" target="id-REQ-F-14"/>
+  </folder>
+  <folder name="Views" id="id-b473177f4d0149e78d7f1c68bb7c2b3f" type="diagrams">
+    <element xsi:type="archimate:ArchimateDiagramModel" name="Motivación de Celeris Edge" id="id-vista-motivacion">
+      <child xsi:type="archimate:Note" id="id-t0" font="1|Calibri|13.0|1|WINDOWS|1|0|0|0|0|700|0|0|0|1|0|0|0|0|Calibri" fontColor="#003865" lineColor="#ffffff" textAlignment="1" fillColor="#ffffff" alpha="0">
+        <bounds x="20" y="10" width="200" height="30"/>
+        <feature name="lineAlpha" value="0"/>
+        <content>Drivers</content>
+      </child>
+      <child xsi:type="archimate:Note" id="id-t1" font="1|Calibri|13.0|1|WINDOWS|1|0|0|0|0|700|0|0|0|1|0|0|0|0|Calibri" fontColor="#003865" lineColor="#ffffff" textAlignment="1" fillColor="#ffffff" alpha="0">
+        <bounds x="260" y="10" width="200" height="30"/>
+        <feature name="lineAlpha" value="0"/>
+        <content>Assessments</content>
+      </child>
+      <child xsi:type="archimate:Note" id="id-t2" font="1|Calibri|13.0|1|WINDOWS|1|0|0|0|0|700|0|0|0|1|0|0|0|0|Calibri" fontColor="#003865" lineColor="#ffffff" textAlignment="1" fillColor="#ffffff" alpha="0">
+        <bounds x="500" y="10" width="200" height="30"/>
+        <feature name="lineAlpha" value="0"/>
+        <content>Goals (OE)</content>
+      </child>
+      <child xsi:type="archimate:Note" id="id-t3" font="1|Calibri|13.0|1|WINDOWS|1|0|0|0|0|700|0|0|0|1|0|0|0|0|Calibri" fontColor="#003865" lineColor="#ffffff" textAlignment="1" fillColor="#ffffff" alpha="0">
+        <bounds x="740" y="10" width="200" height="30"/>
+        <feature name="lineAlpha" value="0"/>
+        <content>Outcomes (OB)</content>
+      </child>
+      <child xsi:type="archimate:Note" id="id-t4" font="1|Calibri|13.0|1|WINDOWS|1|0|0|0|0|700|0|0|0|1|0|0|0|0|Calibri" fontColor="#003865" lineColor="#ffffff" textAlignment="1" fillColor="#ffffff" alpha="0">
+        <bounds x="980" y="10" width="200" height="30"/>
+        <feature name="lineAlpha" value="0"/>
+        <content>Requirements (CE02)</content>
+      </child>
+      <child xsi:type="archimate:Note" id="id-t5" font="1|Calibri|13.0|1|WINDOWS|1|0|0|0|0|700|0|0|0|1|0|0|0|0|Calibri" fontColor="#003865" lineColor="#ffffff" textAlignment="1" fillColor="#ffffff" alpha="0">
+        <bounds x="1220" y="10" width="200" height="30"/>
+        <feature name="lineAlpha" value="0"/>
+        <content>Componentes (CE03)</content>
+      </child>
+      <child xsi:type="archimate:Note" id="id-nota" font="1|Calibri|10.0|2|WINDOWS|1|0|0|0|0|0|1|0|0|1|0|0|0|0|Calibri" fontColor="#7f7f7f" lineColor="#ffffff" textAlignment="1" fillColor="#ffffff" alpha="0">
+        <bounds x="20" y="782" width="1400" height="28"/>
+        <feature name="lineAlpha" value="0"/>
+        <content>OE-a…OE-d: rótulos de trabajo de los objetivos estratégicos institucionales [confirmar con el plan estratégico]. OB-x: infra/trazabilidad.yaml. REQ-x: SRS de CE02. Componentes: infra/inventory.yaml.</content>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-dr1" targetConnections="c-id-r-as1-dr1 c-id-r-as2-dr1" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#dce5ef" archimateElement="id-dr1">
+        <bounds x="20" y="281" width="200" height="80"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-dr2" targetConnections="c-id-r-as3-dr2" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#dce5ef" archimateElement="id-dr2">
+        <bounds x="20" y="371" width="200" height="80"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-dr3" targetConnections="c-id-r-as4-dr3" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#dce5ef" archimateElement="id-dr3">
+        <bounds x="20" y="461" width="200" height="80"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-as1" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#2f5d8a" fillColor="#dce5ef" archimateElement="id-as1">
+        <bounds x="260" y="236" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-as1-dr1" lineColor="#7f7f7f" source="n-id-as1" target="n-id-dr1" archimateRelationship="id-r-as1-dr1"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-as1-OE-a" lineColor="#7f7f7f" source="n-id-as1" target="n-id-OE-a" archimateRelationship="id-r-as1-OE-a"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-as2" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#2f5d8a" fillColor="#dce5ef" archimateElement="id-as2">
+        <bounds x="260" y="326" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-as2-dr1" lineColor="#7f7f7f" source="n-id-as2" target="n-id-dr1" archimateRelationship="id-r-as2-dr1"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-as2-OE-a" lineColor="#7f7f7f" source="n-id-as2" target="n-id-OE-a" archimateRelationship="id-r-as2-OE-a"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-as3" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#2f5d8a" fillColor="#dce5ef" archimateElement="id-as3">
+        <bounds x="260" y="416" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-as3-dr2" lineColor="#7f7f7f" source="n-id-as3" target="n-id-dr2" archimateRelationship="id-r-as3-dr2"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-as3-OE-b" lineColor="#7f7f7f" source="n-id-as3" target="n-id-OE-b" archimateRelationship="id-r-as3-OE-b"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-as3-OE-c" lineColor="#7f7f7f" source="n-id-as3" target="n-id-OE-c" archimateRelationship="id-r-as3-OE-c"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-as4" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#2f5d8a" fillColor="#dce5ef" archimateElement="id-as4">
+        <bounds x="260" y="506" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-as4-dr3" lineColor="#7f7f7f" source="n-id-as4" target="n-id-dr3" archimateRelationship="id-r-as4-dr3"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-as4-OE-d" lineColor="#7f7f7f" source="n-id-as4" target="n-id-OE-d" archimateRelationship="id-r-as4-OE-d"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-OE-a" targetConnections="c-id-r-as1-OE-a c-id-r-as2-OE-a c-id-r-OB-1-OE-a" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#f8a800" fillColor="#fcd98a" archimateElement="id-OE-a">
+        <bounds x="500" y="236" width="200" height="80"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-OE-b" targetConnections="c-id-r-as3-OE-b c-id-r-OB-2-OE-b" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#f8a800" fillColor="#fcd98a" archimateElement="id-OE-b">
+        <bounds x="500" y="326" width="200" height="80"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-OE-c" targetConnections="c-id-r-as3-OE-c c-id-r-OB-1-OE-c c-id-r-OB-3-OE-c" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#f8a800" fillColor="#fcd98a" archimateElement="id-OE-c">
+        <bounds x="500" y="416" width="200" height="80"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-OE-d" targetConnections="c-id-r-as4-OE-d c-id-r-OB-4-OE-d c-id-r-OB-5-OE-d" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#f8a800" fillColor="#fcd98a" archimateElement="id-OE-d">
+        <bounds x="500" y="506" width="200" height="80"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-OB-1" targetConnections="c-id-r-REQ-F-03-OB-1 c-id-r-REQ-F-05-OB-1 c-id-r-REQ-F-25-OB-1" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#f8a800" fillColor="#fcd98a" archimateElement="id-OB-1">
+        <bounds x="740" y="191" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-OB-1-OE-a" lineColor="#7f7f7f" source="n-id-OB-1" target="n-id-OE-a" archimateRelationship="id-r-OB-1-OE-a"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-OB-1-OE-c" lineColor="#7f7f7f" source="n-id-OB-1" target="n-id-OE-c" archimateRelationship="id-r-OB-1-OE-c"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-OB-2" targetConnections="c-id-r-REQ-F-34-OB-2" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#f8a800" fillColor="#fcd98a" archimateElement="id-OB-2">
+        <bounds x="740" y="281" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-OB-2-OE-b" lineColor="#7f7f7f" source="n-id-OB-2" target="n-id-OE-b" archimateRelationship="id-r-OB-2-OE-b"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-OB-3" targetConnections="c-id-r-REQ-F-31-OB-3 c-id-r-REQ-F-32-OB-3" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#f8a800" fillColor="#fcd98a" archimateElement="id-OB-3">
+        <bounds x="740" y="371" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-OB-3-OE-c" lineColor="#7f7f7f" source="n-id-OB-3" target="n-id-OE-c" archimateRelationship="id-r-OB-3-OE-c"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-OB-4" targetConnections="c-id-r-REQ-F-12-OB-4" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#f8a800" fillColor="#fcd98a" archimateElement="id-OB-4">
+        <bounds x="740" y="461" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-OB-4-OE-d" lineColor="#7f7f7f" source="n-id-OB-4" target="n-id-OE-d" archimateRelationship="id-r-OB-4-OE-d"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-OB-5" targetConnections="c-id-r-REQ-F-14-OB-5" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#f8a800" fillColor="#fcd98a" archimateElement="id-OB-5">
+        <bounds x="740" y="551" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-OB-5-OE-d" lineColor="#7f7f7f" source="n-id-OB-5" target="n-id-OE-d" archimateRelationship="id-r-OB-5-OE-d"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-REQ-F-03" targetConnections="c-id-r-EDGE01-REQ-F-03" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#8fa9c4" archimateElement="id-REQ-F-03">
+        <bounds x="980" y="56" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-REQ-F-03-OB-1" lineColor="#7f7f7f" source="n-id-REQ-F-03" target="n-id-OB-1" archimateRelationship="id-r-REQ-F-03-OB-1"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-REQ-F-05" targetConnections="c-id-r-EDGE01-REQ-F-05" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#8fa9c4" archimateElement="id-REQ-F-05">
+        <bounds x="980" y="146" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-REQ-F-05-OB-1" lineColor="#7f7f7f" source="n-id-REQ-F-05" target="n-id-OB-1" archimateRelationship="id-r-REQ-F-05-OB-1"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-REQ-F-25" targetConnections="c-id-r-CTRL01-REQ-F-25" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#8fa9c4" archimateElement="id-REQ-F-25">
+        <bounds x="980" y="236" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-REQ-F-25-OB-1" lineColor="#7f7f7f" source="n-id-REQ-F-25" target="n-id-OB-1" archimateRelationship="id-r-REQ-F-25-OB-1"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-REQ-F-34" targetConnections="c-id-r-CTRL01-REQ-F-34 c-id-r-EDGE01-REQ-F-34" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#8fa9c4" archimateElement="id-REQ-F-34">
+        <bounds x="980" y="326" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-REQ-F-34-OB-2" lineColor="#7f7f7f" source="n-id-REQ-F-34" target="n-id-OB-2" archimateRelationship="id-r-REQ-F-34-OB-2"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-REQ-F-31" targetConnections="c-id-r-CTRL01-REQ-F-31" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#8fa9c4" archimateElement="id-REQ-F-31">
+        <bounds x="980" y="416" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-REQ-F-31-OB-3" lineColor="#7f7f7f" source="n-id-REQ-F-31" target="n-id-OB-3" archimateRelationship="id-r-REQ-F-31-OB-3"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-REQ-F-32" targetConnections="c-id-r-CTRL01-REQ-F-32" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#8fa9c4" archimateElement="id-REQ-F-32">
+        <bounds x="980" y="506" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-REQ-F-32-OB-3" lineColor="#7f7f7f" source="n-id-REQ-F-32" target="n-id-OB-3" archimateRelationship="id-r-REQ-F-32-OB-3"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-REQ-F-12" targetConnections="c-id-r-PORTAL01-REQ-F-12" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#8fa9c4" archimateElement="id-REQ-F-12">
+        <bounds x="980" y="596" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-REQ-F-12-OB-4" lineColor="#7f7f7f" source="n-id-REQ-F-12" target="n-id-OB-4" archimateRelationship="id-r-REQ-F-12-OB-4"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-REQ-F-14" targetConnections="c-id-r-EDGE01-REQ-F-14 c-id-r-SIEM01-REQ-F-14" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#8fa9c4" archimateElement="id-REQ-F-14">
+        <bounds x="980" y="686" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-REQ-F-14-OB-5" lineColor="#7f7f7f" source="n-id-REQ-F-14" target="n-id-OB-5" archimateRelationship="id-r-REQ-F-14-OB-5"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-EDGE01" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#ffffff" archimateElement="id-EDGE01">
+        <bounds x="1220" y="236" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-EDGE01-REQ-F-03" lineColor="#7f7f7f" source="n-id-EDGE01" target="n-id-REQ-F-03" archimateRelationship="id-r-EDGE01-REQ-F-03"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-EDGE01-REQ-F-05" lineColor="#7f7f7f" source="n-id-EDGE01" target="n-id-REQ-F-05" archimateRelationship="id-r-EDGE01-REQ-F-05"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-EDGE01-REQ-F-34" lineColor="#7f7f7f" source="n-id-EDGE01" target="n-id-REQ-F-34" archimateRelationship="id-r-EDGE01-REQ-F-34"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-EDGE01-REQ-F-14" lineColor="#7f7f7f" source="n-id-EDGE01" target="n-id-REQ-F-14" archimateRelationship="id-r-EDGE01-REQ-F-14"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-CTRL01" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#ffffff" archimateElement="id-CTRL01">
+        <bounds x="1220" y="326" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-CTRL01-REQ-F-25" lineColor="#7f7f7f" source="n-id-CTRL01" target="n-id-REQ-F-25" archimateRelationship="id-r-CTRL01-REQ-F-25"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-CTRL01-REQ-F-34" lineColor="#7f7f7f" source="n-id-CTRL01" target="n-id-REQ-F-34" archimateRelationship="id-r-CTRL01-REQ-F-34"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-CTRL01-REQ-F-31" lineColor="#7f7f7f" source="n-id-CTRL01" target="n-id-REQ-F-31" archimateRelationship="id-r-CTRL01-REQ-F-31"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-CTRL01-REQ-F-32" lineColor="#7f7f7f" source="n-id-CTRL01" target="n-id-REQ-F-32" archimateRelationship="id-r-CTRL01-REQ-F-32"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-PORTAL01" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#ffffff" archimateElement="id-PORTAL01">
+        <bounds x="1220" y="416" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-PORTAL01-REQ-F-12" lineColor="#7f7f7f" source="n-id-PORTAL01" target="n-id-REQ-F-12" archimateRelationship="id-r-PORTAL01-REQ-F-12"/>
+      </child>
+      <child xsi:type="archimate:DiagramObject" id="n-id-SIEM01" font="1|Calibri|11.0|0|WINDOWS|1|0|0|0|0|0|0|0|0|1|0|0|0|0|Calibri" fontColor="#262626" lineColor="#003865" fillColor="#ffffff" archimateElement="id-SIEM01">
+        <bounds x="1220" y="506" width="200" height="80"/>
+        <sourceConnection xsi:type="archimate:Connection" id="c-id-r-SIEM01-REQ-F-14" lineColor="#7f7f7f" source="n-id-SIEM01" target="n-id-REQ-F-14" archimateRelationship="id-r-SIEM01-REQ-F-14"/>
+      </child>
+    </element>
+  </folder>
+  <purpose>Generado por gestion/e1/archimate/generar.py desde gestion/e1/datos/diagnostico.yaml e infra/trazabilidad.yaml. No editar a mano.</purpose>
+</archimate:model>

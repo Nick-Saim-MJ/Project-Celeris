@@ -2,42 +2,42 @@
 
 ## 2.1 Prototipo de alta fidelidad
 
-El prototipo es de **alta fidelidad**: sus 11 pantallas tienen datos y textos finales. Se diseñó en la
-herramienta pen.dev y se exportó como una página web navegable: se recorre haciendo clic en el menú y en los
-botones, como si fuera la consola real. Corresponde a la versión v0.4 de la arquitectura.
+El prototipo es de **alta fidelidad**: sus 11 pantallas contienen datos y textos definitivos. Se diseñó en la
+herramienta pen.dev y se exportó como una página web navegable, que se recorre mediante el menú y los botones de
+forma equivalente a la consola real. Corresponde a la versión v0.4 de la arquitectura.
 
-**Reglas que sigue:**
+**Criterios de elaboración:**
 
-- **Datos de ejemplo.** Todos los números son de ejemplo y el pie de cada pantalla lo dice. Las cifras de negocio salen
-  de los supuestos S-03, S-04, S-05, S-26 y S-27, no de una medición.
-- **Trazabilidad en el pie.** Cada pantalla muestra su ID y los requisitos que cubre.
-- **Etiqueta R2.** Las pantallas de la consola llevan «R2 — diseño», porque la consola se construye en S2.
-- **Datos reales de la red.** Los nombres, las IP y los rangos son los del diseño de red (CE03):
+- **Datos de ejemplo.** Todas las cifras son ilustrativas, condición que se indica en el pie de cada pantalla. Las
+  cifras de negocio proceden de los supuestos S-03, S-04, S-05, S-26 y S-27, y no de una medición.
+- **Trazabilidad en el pie.** Cada pantalla muestra su identificador y los requisitos que cubre.
+- **Etiqueta R2.** Las pantallas de la consola se rotulan «R2 — diseño», dado que la consola se construirá en S2.
+- **Datos reales de la red.** Los nombres, direcciones IP y rangos corresponden al diseño de red (CE03):
   - CTRL01 10.20.20.10, EDGE01 10.20.60.10, EDGE02 10.20.60.11 y ENC01 10.20.35.10;
   - LAB-01 10.20.32.0/26 … LAB-10 10.20.34.64/26;
   - PAC en `http://pac.celeris.internal/wpad.dat`.
-- **Origen de la sesión.** La barra superior siempre dice desde dónde llega la sesión (REQ-F-37):
+- **Origen de la sesión.** La barra superior indica en todo momento el origen de la sesión (REQ-F-37):
   - verde: «Sesión desde el campus» (ENC01 o JMP01);
   - ámbar: «Acceso remoto · EC2-GW».
 
-**Cómo se abre.** El prototipo es la página `navegable.html`, que se abre en cualquier navegador. Se mostrará en
-vivo durante la sustentación.
+**Forma de acceso.** El prototipo corresponde a la página `navegable.html`, que puede abrirse en cualquier
+navegador. Se presentará en vivo durante la sustentación.
 
 ## 2.2 Flujo de navegación
 
-{{figura_prototipo:00-flujo-navegacion|Flujo de navegación y tabla pantalla → actor → requisitos → casos de uso|El portal (P-09, P-10) es público y no pide inicio de sesión. Dentro de la consola, la barra lateral lleva de P-02 a cualquier pantalla; los atajos siguen el trabajo del encargado: una fuente a descifrar lleva a P-07 y una solicitud de docente se convierte en precarga en P-05.}}
+{{figura_prototipo:00-flujo-navegacion|Flujo de navegación y tabla pantalla → actor → requisitos → casos de uso|El portal (P-09, P-10) es público y no requiere inicio de sesión. Dentro de la consola, la barra lateral permite acceder desde P-02 a cualquier pantalla; los atajos siguen el flujo de trabajo del encargado: una fuente por descifrar conduce a P-07 y una solicitud docente se convierte en precarga en P-05.}}
 
 **Recorrido principal:**
 
 1. P-01 «Entrar».
 2. P-02 Resumen.
-3. Menú lateral a P-03…P-08 y P-11.
+3. Menú lateral hacia P-03…P-08 y P-11.
 
 **Atajos:**
 
-- Desde P-03, la fila pendiente lleva a P-07.
-- Desde P-06, «Crear precarga» lleva a P-05.
-- Desde P-08, el intento rechazado lleva a P-07.
+- Desde P-03, la fila pendiente conduce a P-07.
+- Desde P-06, la acción «Crear precarga» conduce a P-05.
+- Desde P-08, el intento rechazado conduce a P-07.
 
 ## 2.3 Pantallas principales
 
@@ -55,39 +55,41 @@ vivo durante la sustentación.
 | P-10 | Portal público: instalación de la CA y huella | Usuario, técnico DTI | REQ-RN-05, F-12, F-36 | CU-02 |
 | P-11 | Actividad en vivo por laboratorio y nodo | Encargado, admin DTI | REQ-F-13, NF-13, NF-07 | CU-06 |
 
-**Cobertura.** Hay pantalla para todos los casos de uso menos dos:
+**Cobertura.** Todos los casos de uso cuentan con pantalla, salvo dos:
 
-- **CU-01:** el navegador descarga por el PAC y no hay interfaz.
-- **CU-08 (purgar):** será una acción «Purgar» en cada fila de P-03 (H-01); se agregará en la próxima versión del
-  prototipo.
+- **CU-01:** el navegador descarga a través del PAC, por lo que no existe interfaz.
+- **CU-08 (purgar):** se implementará como una acción «Purgar» en cada fila de P-03 (H-01), que se incorporará en la
+  próxima versión del prototipo.
 
-**P-11 es una pantalla adicional** a las planificadas en el documento de ingeniería de software del proyecto. Usa solo los agregados por laboratorio que el
-nodo ya envía por F10 y no muestra URL, IP de equipos ni usuarios (REQ-NF-07). Si se considera innecesaria, se
-puede quitar sin afectar a las demás.
+**P-11 constituye una pantalla adicional** a las planificadas en el documento de ingeniería de software del proyecto.
+Emplea únicamente los agregados por laboratorio que el nodo ya envía por F10 y no muestra URL, direcciones IP de
+equipos ni usuarios (REQ-NF-07). En caso de considerarse innecesaria, puede retirarse sin afectar a las demás.
 
 {{rejilla:P-01-inicio-sesion|P-02-resumen|P-03-catalogo|P-04-laboratorios|P-05-precargas|P-06-solicitudes|P-07-aprobaciones|P-08-auditoria|P-09-portal-aviso|P-10-portal-instalacion-ca|P-11-actividad-en-vivo}}
 
 **Qué observar:**
 
-- **P-03:** el modo `nunca` de bancos e identidad aparece fijo y con candado (REQ-RN-09).
-- **P-07:** la sesión llega por EC2-GW, así que «Aprobar» está deshabilitado y el navegable responde 403 (T54).
-- **P-09:** el recuadro BYOD dice que el equipo personal nunca se descifra (REQ-F-36).
+- **P-03:** el modo `nunca` para banca e identidad aparece fijo y bloqueado (REQ-RN-09).
+- **P-07:** la sesión procede de EC2-GW, por lo que la acción «Aprobar» está deshabilitada y el navegable responde
+  403 (T54).
+- **P-09:** el recuadro BYOD informa que los equipos personales nunca se descifran (REQ-F-36).
 - **P-04:** LAB-04 está deshabilitado y el nodo responde 403 a 10.20.32.192/26 (T52).
 
 ## 2.4 Evidencia de validación con usuarios o stakeholders
 
-> **Pendiente.** El prototipo todavía no se ha probado con encargados reales; no hay resultados, firmas ni
-> cuestionario SUS. El Anexo A trae el protocolo de validación (participantes, seis tareas, medición) y el acta en
-> blanco.
+> **Pendiente.** El prototipo aún no ha sido evaluado con encargados de laboratorio; en consecuencia, no se dispone
+> de resultados, firmas ni cuestionario SUS. El Anexo A presenta el protocolo de validación (participantes, seis
+> tareas y medición) y el acta en blanco.
 
-Lo que sí se hizo es una revisión interna del prototipo contra la arquitectura v0.4 y el diseño de red (24/11/2026). Corrigió seis
-incoherencias:
+Se realizó, en cambio, una revisión interna del prototipo contrastándolo con la arquitectura v0.4 y el diseño de red
+(24/11/2026), que permitió corregir seis incoherencias:
 
-- faltaba «cambiar el perfil BYOD» entre las acciones críticas;
-- el aviso de P-09 listaba dominios pendientes como descifrados;
-- había una fila de P-05 fuera del catálogo;
-- LAB-04 aparecía con actividad estando deshabilitado;
-- el indicador de P-02 no era de alertas;
-- la auditoría no estaba en orden cronológico.
+- la acción «cambiar el perfil BYOD» no figuraba entre las acciones críticas;
+- el aviso de P-09 presentaba como descifrados dominios aún pendientes de aprobación;
+- una fila de P-05 no pertenecía al catálogo;
+- LAB-04 mostraba actividad a pesar de estar deshabilitado;
+- el indicador de P-02 no correspondía a alertas;
+- la auditoría no se presentaba en orden cronológico.
 
-Esta revisión es una inspección del equipo, no una validación con usuarios, y no se presenta como tal.
+Esta revisión constituye una inspección interna del equipo y no una validación con usuarios, por lo que no se
+presenta como tal.

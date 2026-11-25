@@ -39,27 +39,27 @@ IDs retirados se listan en 1.13.3.
 | REQ-F-24 | Registrar en auditoría todo cambio (quién, qué, cuándo, antes y después) | M | R2 | Pendiente | P-08 | `auditoria.feature`, T51 |
 | REQ-F-25 | Reportar el ahorro por laboratorio y por fuente (GB evitados, BHR, minutos ahorrados) | M | R2 | Parcial (panel local global) | P-02 | `reportes.feature` |
 | REQ-F-30 | Publicar el portal de transparencia como sitio estático firmado | S | R2 | Pendiente | P-09, P-10 | T15, T16 |
-| REQ-F-31 | Gestionar el **catálogo de contenido**: crear, editar, activar o desactivar fuentes con sus dominios, categoría y modo | M | R2 | Pendiente (hoy se edita `config.toml`) | P-03, P-07 | `catalogo.feature`, T51 |
+| REQ-F-31 | Gestionar el **catálogo de contenido**: crear, editar, activar o desactivar fuentes con sus dominios, categoría y modo | M | R2 | Pendiente (actualmente se edita `config.toml`) | P-03, P-07 | `catalogo.feature`, T51 |
 | REQ-F-32 | Gestionar el **acceso por laboratorio**: habilitar o deshabilitar un laboratorio, su rango de IP y su horario | M | R2 | Pendiente | P-04 | `laboratorios.feature`, T52 |
-| REQ-F-33 | Autenticar usuarios de la consola con contraseña + segundo factor y aplicar RBAC por rol y laboratorio | M | R2 | Pendiente (hoy: token único) | P-01 | `auth.feature`, T53 |
+| REQ-F-33 | Autenticar usuarios de la consola con contraseña + segundo factor y aplicar RBAC por rol y laboratorio | M | R2 | Pendiente (actualmente: token único) | P-01 | `auth.feature`, T53 |
 | REQ-F-34 | Programar una **precarga** (lista de URLs o fuente completa, laboratorio, fecha y ventana horaria) y ver su avance | M | R2 | Pendiente | P-05 | `precarga.feature`, T50 |
 | REQ-F-35 | Registrar solicitudes de los docentes para preparar un laboratorio y convertirlas en precargas | S | R2 | Pendiente | P-06 | `solicitudes.feature` |
 | REQ-F-37 | Distinguir el origen de cada sesión (`campus`: ENC01/JMP01; `remoto`: por EC2-GW con su certificado de cliente) y rechazar desde `remoto` las acciones críticas: aprobar fuentes a descifrar, rotar llaves, gestionar usuarios, cambiar el perfil BYOD | M | R2 | Pendiente | P-01, P-07 | `origen.feature`, T54 |
 
 ### 1.7.3 Precisiones que salen del diseño
 
-Estas precisiones no agregan requisitos: concretan cómo se cumplen los que ya existen. Cada una viene del prototipo
-(Sección 2) o de los diagramas UML (Sección 4).
+Estas precisiones no incorporan requisitos nuevos: especifican la forma en que se satisfacen los existentes. Cada
+una procede del prototipo (Sección 2) o de los diagramas UML (Sección 4).
 
 | Requisito | Precisión | De dónde sale |
 | --- | --- | --- |
 | REQ-F-01 | Escucha en TCP 3128 (F1 desde LAB, F31 desde WIFI-EST) | `infra/inventory.yaml` |
 | REQ-F-10 | Más allá del límite por minuto responde 429 con `Retry-After: 60`; fuera de rango, 403 | DS-05, código (`handler.rs`) |
 | REQ-F-13 | Además de las métricas, el nodo envía a la consola agregados de 30 s por laboratorio en `POST /v1/nodos/{id}/kpi` (F10). La vista «Actividad en vivo» (P-11) los muestra por laboratorio y por nodo, sin URL, IP de equipos ni usuarios (REQ-NF-07): por eso no hay vista por PC | Desviación P-11 (1.13.2), DS-19 |
-| REQ-F-17 | Hoy el nodo recarga `config.toml` + `config.toml.sig` por intervalo o con SIGHUP y rechaza una firma inválida o una versión menor que la aplicada (DS-02, DS-13). En R2 el agente consulta `GET /v1/nodos/{id}/config?desde=v` cada 30 s, escribe esos dos archivos y reporta la versión aplicada en su KPI | DS-15, DS-19 |
+| REQ-F-17 | Actualmente, el nodo recarga `config.toml` + `config.toml.sig` por intervalo o con SIGHUP y rechaza una firma inválida o una versión menor que la aplicada (DS-02, DS-13). En R2 el agente consulta `GET /v1/nodos/{id}/config?desde=v` cada 30 s, escribe esos dos archivos y reporta la versión aplicada en su KPI | DS-15, DS-19 |
 | REQ-F-19 | Se lanza desde una acción «Purgar» en cada fila del catálogo (P-03). La orden llega a los nodos en la siguiente configuración firmada (F10) y queda en auditoría | H-01 |
 | REQ-F-20 | El simulador responde también si la CA del nodo cubre el dominio (REQ-RN-04) | P-03, DS-15 |
 | REQ-F-24 | También se auditan los intentos rechazados (p. ej., una acción crítica desde `remoto`), con el origen de la sesión | P-08, DS-15 |
 | REQ-F-32 | El rango /26 de cada laboratorio lo fija el diseño de red (CE03) y en la consola es de solo lectura. Fuera del horario configurado, el nodo responde 403 a los clientes de ese rango, igual que con el laboratorio deshabilitado | H-02 |
 | REQ-F-33 | El segundo factor es TOTP. Los roles son `encargado`, `admin`, `auditor` y `docente`. El docente tiene un rol propio, `docente`: entra con el mismo inicio de sesión (P-01), solo crea y ve sus solicitudes y no ve el catálogo, las precargas ni la auditoría | H-03 |
-| REQ-F-37 | En una sesión `remoto`, P-01 y P-02 muestran el distintivo «acceso remoto» y las acciones críticas aparecen deshabilitadas con el motivo. La API responde 403 aunque se llame directo | P-01, P-07, DS-15 |
+| REQ-F-37 | En una sesión `remoto`, P-01 y P-02 muestran el distintivo «acceso remoto» y las acciones críticas aparecen deshabilitadas con el motivo. La API responde 403 aun cuando se invoque directamente | P-01, P-07, DS-15 |

@@ -1,0 +1,10 @@
+# Autoevaluación del E1 contra la rúbrica oficial (docs/fuentes/CE01/contenido-minimo.yaml).
+# Cada evidencia es un título del informe o el id de una figura o tabla; el generador comprueba que exista (chequeo f).
+- criterio: "Análisis del contexto organizacional"
+  evidencia: ["t-porter", "fig-organigrama", "fig-cadena-valor", "fig-mendelow", "t-pestel"]
+- criterio: "Identificación de brechas estratégicas"
+  evidencia: ["t-cobit", "t-brechas", "fig-brechas", "fig-impacto-frecuencia", "t-impacto"]
+- criterio: "Alineamiento estratégico del proyecto"
+  evidencia: ["fig-mapa-estrategico", "t-tows", "t-alineamiento", "fig-motivacion", "fig-roadmap"]
+- criterio: "Sustentación y defensa técnica"
+  evidencia: ["t-defensa", "t-5porques", "t-riesgos", "Preguntas previsibles de la sustentación"]

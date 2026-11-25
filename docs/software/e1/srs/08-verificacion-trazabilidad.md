@@ -87,9 +87,11 @@ indicador en CE01; se conserva como «debería».
 
 ### 1.12.3 Cobertura
 
-- **Requisitos vigentes:** 59. Son 32 REQ-F (F-01…F-37 menos los 5 retirados), 16 REQ-NF y 11 REQ-RN.
+- **Requisitos vigentes:** 59, distribuidos en 32 REQ-F (F-01…F-37, excluidos los 5 retirados), 16 REQ-NF y
+  11 REQ-RN.
 - **Método de verificación:** 51 se verifican por prueba (Txx, Gherkin o prueba del nodo), 4 por inspección, 3 por
   demostración y 1 por análisis.
-- **Caso de uso:** todos, menos REQ-F-14, NF-09, NF-10 y NF-15. Esos cuatro son de operación y calidad interna, no de
-  interacción con un actor.
-- **Pantallas:** las 11 tienen al menos un requisito. Ningún requisito de la consola queda sin pantalla.
+- **Caso de uso:** todos los requisitos cuentan con caso de uso, excepto REQ-F-14, NF-09, NF-10 y NF-15, que
+  corresponden a operación y calidad interna y no a la interacción con un actor.
+- **Pantallas:** las 11 pantallas tienen al menos un requisito asociado, y ningún requisito de la consola carece de
+  pantalla.

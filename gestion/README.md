@@ -55,4 +55,6 @@ escrito. PNG de 200 dpi, Calibri, 25,7 × 13,4 cm como máximo en página horizo
 - Contenido mínimo y rúbrica cotejados con el texto literal del EPE (CI-99 resuelto): el generador exige cada título y
   cada ítem del contenido mínimo como subtítulo.
 - Archi 5.12 instalado (vista de motivación del E1).
+- E1 (P1) generado: informe, matrices XLSX, figuras y vista ArchiMate (`gestion/e1/README.md`). Pendiente: entrevista
+  COBIT con la DTI (`actual: null`) y datos marcados [levantar con la DTI].
 - Aviso abierto: la fila RACI «Prototipo de la consola y validación» no tiene aprobador (lo define P3).

@@ -1,29 +1,29 @@
 ## Anexo B. Matriz de trazabilidad de requerimientos
 
-La matriz recorre cada requisito vigente de punta a punta: el objetivo del proyecto que lo justifica (OB), el
-caso de uso y la pantalla donde aparece, el componente de software que lo implementa (C3), la decisión de
-arquitectura que lo sostiene (ADR), el diagrama UML que lo detalla, la prueba que lo verifica y la parte de la
+La matriz traza cada requisito vigente de extremo a extremo: el objetivo del proyecto que lo justifica (OB), el
+caso de uso y la pantalla en que se manifiesta, el componente de software que lo implementa (C3), la decisión de
+arquitectura que lo sustenta (ADR), el diagrama UML que lo detalla, la prueba que lo verifica y el elemento de
 infraestructura que lo soporta (equipo y flujo de red de CE03).
 
-**Cómo se construye.** La matriz no se escribe a mano: el programa que genera este informe la arma a partir de la
-especificación de requisitos, de los ADR y de la asignación de componentes, y se detiene con error si algo no cuadra.
-Los componentes son los de DS-13 (nodo, `node.*`) y DS-22 (consola, `console.*`). Un asterisco (\*) en la columna
-OB marca un enlace agregado al redactar los requisitos. En S2 la matriz se generará además desde las etiquetas de
-las pruebas automáticas y del código.
+**Método de construcción.** La matriz no se elabora manualmente: el programa que genera este informe la construye a
+partir de la especificación de requisitos, de los ADR y de la asignación de componentes, y se detiene con error ante
+cualquier inconsistencia. Los componentes corresponden a DS-13 (nodo, `node.*`) y DS-22 (consola, `console.*`). Un
+asterisco (\*) en la columna OB identifica un enlace incorporado durante la redacción de los requisitos. En S2, la
+matriz se generará además a partir de las etiquetas de las pruebas automatizadas y del código.
 
-**Qué garantiza.** En cada generación se comprueba que:
+**Garantías.** En cada generación se comprueba que:
 
-- Todo requisito vigente tiene componente e infraestructura.
-- Todo componente de DS-13 y DS-22 aparece al menos una vez.
-- Las 11 pantallas aparecen al menos una vez.
+- Todo requisito vigente cuenta con componente e infraestructura.
+- Todo componente de DS-13 y DS-22 figura al menos una vez.
+- Las 11 pantallas figuran al menos una vez.
 
-Un «—» en la columna ADR significa que ninguna decisión enlaza ese requisito; igual se puede seguir por su
-componente, su prueba y su infraestructura.
+Un «—» en la columna ADR indica que ninguna decisión enlaza ese requisito; no obstante, este puede rastrearse
+mediante su componente, su prueba y su infraestructura.
 
 {{tabla:matriz}}
 
-**Vacíos encontrados al diseñar y cómo se cerraron.** Al cruzar requisitos, prototipo y diseño aparecieron
-estos vacíos. Todos quedaron cerrados o resueltos antes de este informe:
+**Vacíos identificados durante el diseño y su resolución.** El contraste entre requisitos, prototipo y diseño
+permitió identificar los siguientes vacíos, todos cerrados o resueltos antes de la emisión de este informe:
 
 {{incluir:srs/09-huecos-cambios.md|### 1.13.1 Huecos encontrados al diseñar|tabla}}
 

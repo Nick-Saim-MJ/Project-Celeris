@@ -1,7 +1,7 @@
 ## 1.8 Requisitos no funcionales (ISO/IEC 25010:2023)
 
-Los requisitos se agrupan por característica del modelo de calidad de producto. Cada uno tiene una métrica, un
-umbral y un método de verificación. Una meta sin medir se informa como pendiente, nunca como cumplida.
+Los requisitos se agrupan según las características del modelo de calidad de producto. Cada uno cuenta con una
+métrica, un umbral y un método de verificación. Una meta no medida se informa como pendiente y nunca como cumplida.
 
 | Característica (subcaracterística) | ID | Requisito medible | Estado | Verificación |
 | --- | --- | --- | --- | --- |
@@ -22,10 +22,12 @@ umbral y un método de verificación. Una meta sin medir se informa como pendien
 | Mantenibilidad (analizabilidad) | REQ-NF-13 | Cada decisión (HIT, MISS, bypass, rechazo) produce una métrica etiquetada por laboratorio | Parcial (métricas globales) | Revisión de métricas; P-11 |
 | Flexibilidad (adaptabilidad) | REQ-NF-10 | Linux x86_64 y aarch64; imagen OCI multiarquitectura | Pendiente | CI |
 
-**Cómo se ven en el producto.**
+**Manifestación en el producto.**
 
-- **REQ-NF-07 y D-22**: P-02 y P-11 solo muestran cifras por laboratorio y por nodo.
-- **REQ-NF-08**: está dibujado en DS-05. Sin SNI, o con un SNI que no coincide con el `CONNECT`, el nodo no descifra.
-- **REQ-NF-16**: está dibujado en DS-19. La consola publica la configuración y cada nodo la recoge en su siguiente
-  consulta (cada 30 s), lo que deja margen dentro de los 60 s.
-- **REQ-NF-12**: es la meta de la validación con usuarios. Mientras no haya acta, no se presenta como cumplido.
+- **REQ-NF-07 y D-22**: P-02 y P-11 muestran únicamente cifras por laboratorio y por nodo.
+- **REQ-NF-08**: se representa en DS-05. En ausencia de SNI, o si el SNI no coincide con el `CONNECT`, el nodo no
+  descifra.
+- **REQ-NF-16**: se representa en DS-19. La consola publica la configuración y cada nodo la obtiene en su siguiente
+  consulta (cada 30 s), lo que asegura margen dentro de los 60 s.
+- **REQ-NF-12**: constituye la meta de la validación con usuarios. Mientras no exista el acta, no se presenta como
+  cumplido.

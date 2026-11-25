@@ -1,8 +1,9 @@
 ## Anexo A. Acta de validación con stakeholders
 
-> **Estado: PENDIENTE.** A la fecha de este informe la validación con usuarios no se ha hecho. Este anexo contiene el
-> protocolo y el acta en blanco que se llenará en la sesión. No hay resultados, firmas ni hallazgos, y nada de este
-> anexo se presenta como evidencia de validación hasta completarlo.
+> **Estado: PENDIENTE.** A la fecha de emisión del presente informe, la validación con usuarios no se ha realizado.
+> Este anexo contiene el protocolo y el acta en blanco que se completará durante la sesión. No se registran
+> resultados, firmas ni hallazgos, y ningún contenido de este anexo se presenta como evidencia de validación hasta
+> su cumplimentación.
 
 ### A.1 Protocolo
 
@@ -11,20 +12,20 @@
 | Objeto | Prototipo navegable (pantallas P-01…P-11), abierto en un navegador |
 | Participantes | Al menos 2 encargados de laboratorio (usuarios principales), 1 técnico de la DTI, 1 docente y 1 estudiante |
 | Modalidad | Sesión individual de 30 min por participante, en el campus, con el prototipo abierto en un navegador |
-| Moderación | Un integrante lee las tareas y no ayuda; el otro toma el tiempo y anota los errores |
+| Moderación | Un integrante del equipo lee las tareas sin intervenir; el otro registra los tiempos y los errores |
 | Medición | Éxito por tarea (sí / con ayuda / no), tiempo por tarea (meta ≤ 5 min, REQ-NF-12) y SUS al final (meta ≥ 75) |
 | Registro | Esta acta, el cuestionario SUS de cada participante y la lista de hallazgos priorizados |
-| Cierre | Los hallazgos de prioridad alta se aplican en el prototipo v0.3 y se anotan antes/después en A.5 |
+| Cierre | Los hallazgos de prioridad alta se incorporan en el prototipo v0.3 y se documentan (antes/después) en A.5 |
 
 ### A.2 Tareas
 
-| # | Tarea | Pantallas | Requisito | Quién la hace |
+| # | Tarea | Pantallas | Requisito | Responsable |
 | --- | --- | --- | --- | --- |
 | 1 | Agregar una fuente sin descifrado | P-03 | REQ-F-31, RN-07 | Encargados |
-| 2 | Agregar una fuente que requiere descifrado y verla pendiente | P-03 → P-07 | REQ-RN-07, F-37 | Encargados, técnico DTI |
+| 2 | Agregar una fuente que requiere descifrado y verificar su estado pendiente | P-03 → P-07 | REQ-RN-07, F-37 | Encargados, técnico DTI |
 | 3 | Habilitar un laboratorio en un horario | P-04 | REQ-F-32, RN-06 | Encargados |
 | 4 | Programar una precarga a partir de una solicitud | P-06 → P-05 | REQ-F-34, F-35, RN-10 | Encargados, docente |
-| 5 | Encontrar el ahorro del mes de un laboratorio | P-02 | REQ-F-25 | Encargados |
+| 5 | Consultar el ahorro mensual de un laboratorio | P-02 | REQ-F-25 | Encargados |
 | 6 | Verificar la huella de la CA desde el portal | P-09 → P-10 | REQ-RN-05, F-12 | Estudiante, técnico DTI |
 
 ### A.3 Participantes
@@ -55,10 +56,10 @@
 | --- | --- | --- | --- | --- |
 | — | [COMPLETAR tras la sesión] | — | — | — |
 
-Ya se conocen dos cambios para la v0.3, que no salen de la validación sino del diseño:
+Se han identificado previamente dos cambios para la v0.3, derivados del diseño y no de la validación:
 
-- dibujar la acción «Purgar» en P-03 (H-01);
-- y el caso de horario en T52 (H-02).
+- incorporar la acción «Purgar» en P-03 (H-01);
+- incorporar el caso de horario en T52 (H-02).
 
 ### A.6 Conformidad
 

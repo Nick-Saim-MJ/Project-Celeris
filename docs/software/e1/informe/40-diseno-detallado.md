@@ -1,15 +1,15 @@
 # Sección 4: Diseño Detallado
 
-Esta sección baja la arquitectura de la Sección 3 al nivel de clases, mensajes y estados. Cada diagrama nombra en su
-pie los requisitos y las pantallas que cubre; así cualquier elemento se puede seguir hasta la Sección 1 (qué se pide)
-y la Sección 2 (cómo se ve).
+La presente sección desarrolla la arquitectura de la Sección 3 en el nivel de clases, mensajes y estados. Cada
+diagrama identifica en su pie los requisitos y las pantallas que cubre, de modo que cualquier elemento puede
+rastrearse hasta la Sección 1 (requisito) y la Sección 2 (representación en el prototipo).
 
-**Cómo leer los diagramas.** Están hechos en PlantUML. Antes de generarlos, un validador automático comprueba que
-existan de verdad todas las direcciones IP, equipos, flujos de red, requisitos, decisiones, casos de uso y pantallas
-que mencionan. El estereotipo indica la entrega:
+**Lectura de los diagramas.** Los diagramas se elaboraron en PlantUML. Antes de generarlos, un validador automático
+comprueba la existencia efectiva de todas las direcciones IP, equipos, flujos de red, requisitos, decisiones, casos
+de uso y pantallas que mencionan. El estereotipo indica la entrega correspondiente:
 
-- **«R1»** (fondo blanco): ya existe en el código del nodo, con los nombres reales de sus clases y métodos.
-- **«R2»** (fondo azul claro): diseño que se construye en el segundo semestre (S2).
+- **«R1»** (fondo blanco): implementado en el código del nodo, con los nombres reales de sus clases y métodos.
+- **«R2»** (fondo azul claro): diseño que se construirá en el segundo semestre (S2).
 
 | Subsección | En el cuerpo del informe | En el Anexo C |
 | --- | --- | --- |
@@ -20,71 +20,71 @@ que mencionan. El estereotipo indica la entrega:
 
 ## 4.1 Diagramas UML
 
-{{figura:DS-01|Las clases del dominio y cómo se relacionan: una fuente agrupa dominios; una precarga pertenece a un laboratorio y puede nacer de una solicitud; cada nodo aplica una versión de configuración firmada. Los indicadores se guardan por laboratorio, nunca por persona (REQ-NF-07), y cada sesión deja sus cambios en la auditoría (REQ-F-24).}}
+{{figura:DS-01|Clases del dominio y sus relaciones: una fuente agrupa dominios; una precarga pertenece a un laboratorio y puede originarse en una solicitud; cada nodo aplica una versión de configuración firmada. Los indicadores se almacenan por laboratorio y nunca por persona (REQ-NF-07), y cada sesión registra sus cambios en la auditoría (REQ-F-24).}}
 
-**Reglas que el modelo hace visibles:**
+**Reglas que el modelo hace explícitas:**
 
-- **El encargado ve solo sus laboratorios.** Un `Usuario` con rol `encargado` está asignado a uno o más
+- **El encargado accede únicamente a sus laboratorios.** Un `Usuario` con rol `encargado` se asigna a uno o más
   `Laboratorio` (REQ-RN-06).
-- **El docente solo crea solicitudes.** El rol `docente` registra `Solicitud` y no puede hacer nada más.
-- **El nodo aplica solo lo firmado.** Un `Nodo` acepta una `VersionConfig` únicamente si su firma es válida
-  (REQ-RN-08).
+- **El docente solo registra solicitudes.** El rol `docente` registra `Solicitud` y no dispone de otras acciones.
+- **El nodo aplica únicamente configuración firmada.** Un `Nodo` acepta una `VersionConfig` solo si su firma es
+  válida (REQ-RN-08).
 - **El contenido no se duplica.** Varias `CacheEntry` comparten un mismo `ContentObject`, identificado por su
   SHA-256 (D-03).
 
 ### 4.1.1 Casos de uso y clases por caso de uso
 
-Para cada uno de los once casos de uso hay dos diagramas lado a lado. A la izquierda, el **diagrama de casos de
-uso**: quién participa, qué pasos incluye siempre («include») y qué variantes pueden ocurrir («extend»). A la
-derecha, el **diagrama de clases** de ese caso, ordenado en tres capas: *interfaz* (la pantalla del prototipo),
-*control* (el servicio que aplica las reglas) y *entidad* (los datos que se crean o cambian). Las clases son las
-mismas del modelo de dominio (DS-01) y de las clases de diseño (DS-02 y DS-03, Anexo C); ningún diagrama agrega
-clases nuevas.
+Cada uno de los once casos de uso se representa mediante dos diagramas contiguos. A la izquierda, el **diagrama de
+casos de uso** muestra los participantes, los pasos que se incluyen siempre («include») y las variantes que pueden
+ocurrir («extend»). A la derecha, el **diagrama de clases** del caso se organiza en tres capas: *interfaz* (la
+pantalla del prototipo), *control* (el servicio que aplica las reglas) y *entidad* (los datos que se crean o
+modifican). Las clases coinciden con las del modelo de dominio (DS-01) y con las clases de diseño (DS-02 y DS-03,
+Anexo C); ningún diagrama introduce clases nuevas.
 
-{{par_uml:DS-23|DS-34|el usuario de laboratorio y el BYOD usan el mismo caso, pero el BYOD nunca se descifra (REQ-F-36). En las clases, `CacheHandler` sigue cuatro pasos: verifica el laboratorio, decide si descifra, deja que un solo cliente descargue y sirve o guarda la copia.}}
+{{par_uml:DS-23|DS-34|el usuario de laboratorio y el usuario BYOD comparten el mismo caso, pero el tráfico BYOD nunca se descifra (REQ-F-36). En las clases, `CacheHandler` ejecuta cuatro pasos: verifica el laboratorio, decide si descifra, permite que un único cliente descargue y sirve o almacena la copia.}}
 
-{{par_uml:DS-24|DS-35|el portal no pide inicio de sesión. `Publisher` genera el sitio desde la configuración real, de modo que el aviso no puede quedar desactualizado respecto de lo que el nodo descifra (REQ-F-30).}}
+{{par_uml:DS-24|DS-35|el portal no requiere inicio de sesión. `Publisher` genera el sitio a partir de la configuración real, de modo que el aviso no puede quedar desactualizado respecto de lo que el nodo descifra (REQ-F-30).}}
 
-{{par_uml:DS-25|DS-36|CU-07 extiende a CU-03 solo cuando la fuente pide descifrado. `ReglasCatalogo` concentra las tres reglas que pueden frenar el cambio: «nunca» siempre gana, la CA debe cubrir el dominio y una fuente fija no se toca.}}
+{{par_uml:DS-25|DS-36|CU-07 extiende a CU-03 únicamente cuando la fuente requiere descifrado. `ReglasCatalogo` concentra las tres reglas que pueden impedir el cambio: el modo «nunca» siempre prevalece, la CA debe cubrir el dominio y una fuente fija no puede modificarse.}}
 
-{{par_uml:DS-26|DS-37|el cambio llega a los nodos por F10 en ≤ 60 s (REQ-NF-16). Quien lo aplica en el nodo es `ClientGate`, que ya existe («R1»): responde 403 a una PC de un laboratorio deshabilitado o fuera de horario.}}
+{{par_uml:DS-26|DS-37|el cambio llega a los nodos por F10 en ≤ 60 s (REQ-NF-16). En el nodo lo aplica `ClientGate`, ya implementado («R1»), que responde 403 a una estación de un laboratorio deshabilitado o fuera de horario.}}
 
-{{par_uml:DS-27|DS-38|una precarga puede nacer de una solicitud del docente («extend»). La ventana y el límite de la DTI se validan antes de publicar (REQ-RN-10); la descarga la hace el nodo, no la consola.}}
+{{par_uml:DS-27|DS-38|una precarga puede originarse en una solicitud docente («extend»). La ventana y el límite definidos por la DTI se validan antes de publicar (REQ-RN-10); la descarga la ejecuta el nodo y no la consola.}}
 
-{{par_uml:DS-28|DS-39|los indicadores salen del nodo cada 30 s, ya agrupados por laboratorio. Ninguna clase guarda URL ni IP de equipos (REQ-NF-07).}}
+{{par_uml:DS-28|DS-39|los indicadores se envían desde el nodo cada 30 s, ya agregados por laboratorio. Ninguna clase almacena URL ni direcciones IP de equipos (REQ-NF-07).}}
 
-{{par_uml:DS-29|DS-40|aprobar exige origen campus: `OrigenMiddleware` marca la sesión y `Rbac.exigir_campus` responde 403 a una sesión remota (REQ-F-37, T54). Cada decisión queda en la auditoría.}}
+{{par_uml:DS-29|DS-40|la aprobación exige origen en el campus: `OrigenMiddleware` clasifica la sesión y `Rbac.exigir_campus` responde 403 a una sesión remota (REQ-F-37, T54). Cada decisión se registra en la auditoría.}}
 
-{{par_uml:DS-30|DS-41|la orden de purga no viaja sola: va dentro de la siguiente versión firmada de la configuración, y el nodo la aplica sobre su `Store` (REQ-F-19).}}
+{{par_uml:DS-30|DS-41|la orden de purga no se transmite de forma aislada: se incorpora a la siguiente versión firmada de la configuración, y el nodo la aplica sobre su `Store` (REQ-F-19).}}
 
-{{par_uml:DS-31|DS-42|el docente solo registra y sigue sus solicitudes; convertirlas en precarga le corresponde al encargado (CU-05).}}
+{{par_uml:DS-31|DS-42|el docente únicamente registra y da seguimiento a sus solicitudes; su conversión en precarga corresponde al encargado (CU-05).}}
 
-{{par_uml:DS-32|DS-43|la auditoría se lee por la API, pero `AuditLog` solo inserta: ninguna clase ofrece editar ni borrar una entrada (REQ-F-24).}}
+{{par_uml:DS-32|DS-43|la auditoría se consulta mediante la API, pero `AuditLog` solo admite inserciones: ninguna clase permite editar ni eliminar una entrada (REQ-F-24).}}
 
-{{par_uml:DS-33|DS-44|desde fuera del campus se puede trabajar, pero las acciones críticas se rechazan. La sesión sabe de dónde viene porque EC2-GW presenta su propio certificado de cliente.}}
+{{par_uml:DS-33|DS-44|desde fuera del campus es posible trabajar, pero las acciones críticas se rechazan. La sesión identifica su origen porque EC2-GW presenta su propio certificado de cliente.}}
 
 ## 4.2 Diagramas de secuencia
 
-{{figura:DS-15|El encargado crea en P-03 una fuente que requiere descifrado; queda «Pendiente DTI» (REQ-RN-07) y el simulador avisa que la CA no cubre el dominio (REQ-RN-04). El administrador intenta aprobarla desde fuera del campus y recibe 403 (REQ-F-37, T54). Desde el campus, la aprobación activa la fuente solo si la CA de cada nodo la cubre, y `publisher` firma la versión siguiente.}}
+{{figura:DS-15|El encargado crea en P-03 una fuente que requiere descifrado; esta queda en estado «Pendiente DTI» (REQ-RN-07) y el simulador advierte que la CA no cubre el dominio (REQ-RN-04). El administrador intenta aprobarla desde fuera del campus y recibe 403 (REQ-F-37, T54). Desde el campus, la aprobación activa la fuente solo si la CA de cada nodo la cubre, y `publisher` firma la versión siguiente.}}
 
-{{figura:DS-16|El docente registra la solicitud SOL-12 y el encargado la convierte en precarga. En la ventana nocturna, el nodo descarga 1,1 GB una sola vez; al iniciar la clase, las 40 PCs reciben la copia local en lugar de traer 44 GB por el enlace. La rama alternativa muestra por qué una fuente no aprobada no ahorra: su tráfico no se descifra.}}
+{{figura:DS-16|El docente registra la solicitud SOL-12 y el encargado la convierte en precarga. En la ventana nocturna, el nodo descarga 1,1 GB una sola vez; al iniciar la clase, las 40 estaciones reciben la copia local en lugar de transferir 44 GB por el enlace. La rama alternativa muestra por qué una fuente no aprobada no genera ahorro: su tráfico no se descifra.}}
 
 ## 4.3 Diagramas de estados
 
-{{figura:DS-17|Los estados de una fuente, con los mismos nombres que muestra P-03. Una fuente en modo `cachear` se activa sin aprobación; una en `descifrar_y_cachear` espera a la DTI. Un intento de aprobación desde fuera del campus no cambia el estado y queda en la auditoría. Las fuentes fijas de la DTI no se pueden mover (REQ-RN-09).}}
+{{figura:DS-17|Estados de una fuente, con las mismas denominaciones que muestra P-03. Una fuente en modo `cachear` se activa sin aprobación; una en `descifrar_y_cachear` requiere la aprobación de la DTI. Un intento de aprobación desde fuera del campus no modifica el estado y se registra en la auditoría. Las fuentes fijas de la DTI no pueden modificarse (REQ-RN-09).}}
 
-{{figura:DS-18|Una precarga solo corre entre las 00:00 y las 05:00 y con un máximo de 50 Mbps por nodo (REQ-RN-10). Si la ventana termina, se pausa y sigue la noche siguiente. «Fallida» vuelve a «Programada» cuando el encargado corrige la URL.}}
+{{figura:DS-18|Una precarga solo se ejecuta entre las 00:00 y las 05:00, con un máximo de 50 Mbps por nodo (REQ-RN-10). Si la ventana concluye, se pausa y se reanuda la noche siguiente. El estado «Fallida» retorna a «Programada» cuando el encargado corrige la URL.}}
 
 ## 4.4 Modelo de diseño detallado
 
-{{figura:DS-12@0.85|Modelo de datos de la consola. La base PostgreSQL corre en CTRL01 10.20.20.10 y solo se accede localmente, sin puerto de red (D-12). La tabla `cambio` solo admite inserciones (REQ-F-24) y `kpi_intervalo` guarda agregados de 30 s por laboratorio y nodo, sin URL ni IP de equipos (REQ-NF-07).}}
+{{figura:DS-12@0.85|Modelo de datos de la consola. La base PostgreSQL opera en CTRL01 10.20.20.10 y solo admite acceso local, sin puerto de red (D-12). La tabla `cambio` solo admite inserciones (REQ-F-24) y `kpi_intervalo` almacena agregados de 30 s por laboratorio y nodo, sin URL ni direcciones IP de equipos (REQ-NF-07).}}
 
 **Del código al diseño.** DS-13 (Anexo C) relaciona cada componente del nodo con el archivo de código que lo
-implementa hoy y con el módulo al que pasará. Faltan tres piezas, que se construyen en S2: el agente que descarga la
-configuración por F10, la precarga y las descargas parciales (REQ-F-08).
+implementa actualmente y con el módulo al que se trasladará. Restan tres elementos, que se construirán en S2: el
+agente que descarga la configuración por F10, la precarga y las descargas parciales (REQ-F-08).
 
 **API de la consola.** La consola publica sus rutas `/v1/…` en el puerto TCP 443 de CTRL01. El equipo del encargado
-(ENC01) llega por F28 y el acceso remoto por EC2-GW llega por F30. Los nodos usan otro puerto, TCP 8443, con
-autenticación mutua (mTLS) por F10. Las acciones críticas responden 403 a una sesión remota.
+(ENC01) accede por F28 y el acceso remoto a través de EC2-GW, por F30. Los nodos emplean un puerto distinto, TCP 8443,
+con autenticación mutua (mTLS) por F10. Las acciones críticas responden 403 a una sesión remota.
 
 {{incluir:srs/07-datos-interfaces.md|### 1.11.3 API de la consola (cierra H-11)|tabla}}

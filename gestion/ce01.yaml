@@ -70,6 +70,7 @@ referencias:
     S-02: { enlace_mbps: [300, "300 Mbps"] }
     S-03: { usd_mbps_mes: [8, "US$ 8 por Mbps-mes"] }
     S-04: { bhr: [0.30, "30 %"] }
+    S-05: { tb_mes: [19.4, "19,4 TB"] }
     S-06: { ciclos_anio: [2, "2 por PC"] }
     S-07: { horas_pc_ciclo: [0.25, "0,25 h"], tarifa_usd_h: [5, "US$ 5/h"] }
     S-08: { servidor_usd: [3800, "US$ 3 800"] }

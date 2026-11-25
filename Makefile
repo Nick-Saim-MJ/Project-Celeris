@@ -140,6 +140,7 @@ informe-ce01-e1:
 	$(PYTHON) gestion/validate_ce01.py
 
 informe-ce01-e2:
+	$(PYTHON) gestion/analytics/business_case.py
 	$(PYTHON) gestion/build_informe_ce01.py --entregable E2 --pdf
 	$(PYTHON) gestion/validate_ce01.py
 

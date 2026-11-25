@@ -195,7 +195,8 @@ def num(x: float, dec: int = 0) -> str:
 
 
 def usd(x: float, dec: int = 0) -> str:
-    return f"US$ {num(x, dec)}"
+    """«US$ 1 234»; los negativos con signo menos tipográfico delante: «−US$ 774»."""
+    return ("−" if round(x, dec) < 0 else "") + f"US$ {num(abs(x), dec)}"
 
 
 def pct(x: float, dec: int = 0) -> str:

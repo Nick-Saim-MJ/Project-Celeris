@@ -1,0 +1,10 @@
+# Autoevaluación del E2 contra la rúbrica oficial (docs/fuentes/CE01/contenido-minimo.yaml).
+# Cada evidencia es un título del informe o el id de una figura o tabla; el generador comprueba que exista (chequeo f).
+- criterio: "Análisis de alternativas"
+  evidencia: ["t-fichas", "t-ahp", "fig-matriz", "t-justificacion", "fig-sensibilidad", "t-pugh"]
+- criterio: "Evaluación económica"
+  evidencia: ["t-indicadores-eco", "t-flujo", "fig-montecarlo", "fig-tornado", "t-escenarios", "t-conciliacion"]
+- criterio: "Identificación de riesgos"
+  evidencia: ["t-riesgos-eco", "fig-riesgos-van", "Estrategias de mitigación"]
+- criterio: "Sustentación y defensa técnica"
+  evidencia: ["Por qué A4 gana aunque pierde en soporte", "Qué decide el resultado económico", "t-defensa-e2", "Limitaciones"]

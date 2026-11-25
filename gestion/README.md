@@ -57,4 +57,7 @@ escrito. PNG de 200 dpi, Calibri, 25,7 × 13,4 cm como máximo en página horizo
 - Archi 5.12 instalado (vista de motivación del E1).
 - E1 (P1) generado: informe, matrices XLSX, figuras y vista ArchiMate (`gestion/e1/README.md`). Pendiente: entrevista
   COBIT con la DTI (`actual: null`) y datos marcados [levantar con la DTI].
+- E2 (P2) generado: informe, Business Case XLSX con fórmulas vivas (VAN de Excel = VAN de Python), Monte Carlo,
+  AHP y figuras (`gestion/e2/README.md`, CI-102). Pendiente: sesión de pesos con la DTI, costo de A5, cotización del
+  ISP y mediciones del piloto.
 - Aviso abierto: la fila RACI «Prototipo de la consola y validación» no tiene aprobador (lo define P3).

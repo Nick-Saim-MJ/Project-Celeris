@@ -119,7 +119,7 @@ def w5h2():
     d = calculos.datos()
     cuanto = (f"{d['gb_ciclo_lab']} por laboratorio en cada ciclo ({d['pcs_lab']} PCs × {d['gb_pc']}) [S-26, S-27]; "
               f"{d['gb_repetidos_anio']} repetidos al año en los {d['labs']} laboratorios; al menos {d['min_lab']} "
-              f"de descarga por laboratorio aunque use todo el enlace de {d['enlace']} [S-02]")
+              f"de descarga por laboratorio aun utilizando la totalidad del enlace de {d['enlace']} [S-02]")
     return [["Pregunta", "Respuesta"]] + [
         [f["pregunta"], cuanto if f["respuesta"] == "calc" else f["respuesta"]] for f in D["w5h2"]["filas"]]
 
@@ -136,7 +136,7 @@ def impacto():
     return [["Indicador", "Valor", "Cómo se calcula", "Supuestos"],
             ["GB por laboratorio y ciclo", d["gb_ciclo_lab"], f"{d['pcs_lab']} PCs × {d['gb_pc']} por PC", "S-26, S-27"],
             ["GB repetidos por laboratorio y ciclo", d["gb_repetidos_lab"],
-             f"Todas las copias menos la primera ({d['fraccion_repetida']} del volumen)", "S-26, S-27"],
+             f"Todas las copias excepto la primera ({d['fraccion_repetida']} del volumen)", "S-26, S-27"],
             ["GB repetidos al año (todo el alcance)", d["gb_repetidos_anio"],
              f"Repetidos por laboratorio × {d['labs']} laboratorios × {d['ciclos']} ciclos", "S-06, S-26, S-27"],
             ["Tiempo mínimo de descarga de un laboratorio", f"{d['horas_lab']} ({d['min_lab']})",

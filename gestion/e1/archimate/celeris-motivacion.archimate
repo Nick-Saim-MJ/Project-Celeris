@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <archimate:model xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:archimate="http://www.archimatetool.com/archimate" name="Celeris Edge — Motivación (CE01 E1, CE0112)" id="id-celeris-e1" version="5.0.0">
-  <folder name="Strategy" id="id-0fa24e3907eb4ec29bcf85d7c97b1e54" type="strategy"/>
-  <folder name="Business" id="id-998df72010c8498c9a7a803b51a05b13" type="business"/>
-  <folder name="Application" id="id-9ef87c1aa6aa4d3c962a31b773ca12fb" type="application">
+  <folder name="Strategy" id="id-aa4c9db35c0a486484956fad9a8360b0" type="strategy"/>
+  <folder name="Business" id="id-798a4cacda9f43f8a415e2476bb50a00" type="business"/>
+  <folder name="Application" id="id-2517ae4e6e4b4cbfba98166e05b713ec" type="application">
     <element xsi:type="archimate:ApplicationComponent" name="Nodo de caché (EDGE01/EDGE02)" id="id-EDGE01"/>
     <element xsi:type="archimate:ApplicationComponent" name="Consola del encargado (CTRL01)" id="id-CTRL01"/>
     <element xsi:type="archimate:ApplicationComponent" name="Portal de transparencia (PORTAL01)" id="id-PORTAL01"/>
     <element xsi:type="archimate:ApplicationComponent" name="Detección (SIEM01)" id="id-SIEM01"/>
   </folder>
-  <folder name="Technology &amp; Physical" id="id-cde656af22f54b56a43650e5a35ae586" type="technology"/>
-  <folder name="Motivation" id="id-632ed1d77c1f4d4f964f2ec69799097b" type="motivation">
+  <folder name="Technology &amp; Physical" id="id-8f7d58c8b5e5491bac661f6f5b40fce4" type="technology"/>
+  <folder name="Motivation" id="id-d965472439b6433b8d6ebcdc224b9195" type="motivation">
     <element xsi:type="archimate:Driver" name="Costo y saturación del enlace" id="id-dr1"/>
     <element xsi:type="archimate:Driver" name="Calidad de la enseñanza en laboratorios" id="id-dr2"/>
     <element xsi:type="archimate:Driver" name="Ley 29733 y su reglamento" id="id-dr3"/>
@@ -35,9 +35,9 @@
     <element xsi:type="archimate:Requirement" name="REQ-F-12 Publicar la página de transparencia" id="id-REQ-F-12"/>
     <element xsi:type="archimate:Requirement" name="REQ-F-14 Enviar eventos de seguridad al SIEM" id="id-REQ-F-14"/>
   </folder>
-  <folder name="Implementation &amp; Migration" id="id-f28e885f59ee43d09638a2e0764d462e" type="implementation_migration"/>
-  <folder name="Other" id="id-37d768724f7e434da74b816556cca29e" type="other"/>
-  <folder name="Relations" id="id-166ad60211a94d749df25af35fa2c031" type="relations">
+  <folder name="Implementation &amp; Migration" id="id-db5f8d9e99e742fcbc33c28a04510f5a" type="implementation_migration"/>
+  <folder name="Other" id="id-695c2e1e9a2c4af9a207a448d933de1f" type="other"/>
+  <folder name="Relations" id="id-069ab97c924746a0b634bae51f413aeb" type="relations">
     <element xsi:type="archimate:AssociationRelationship" id="id-r-as1-dr1" source="id-as1" target="id-dr1"/>
     <element xsi:type="archimate:AssociationRelationship" id="id-r-as2-dr1" source="id-as2" target="id-dr1"/>
     <element xsi:type="archimate:AssociationRelationship" id="id-r-as3-dr2" source="id-as3" target="id-dr2"/>
@@ -72,7 +72,7 @@
     <element xsi:type="archimate:RealizationRelationship" id="id-r-EDGE01-REQ-F-14" source="id-EDGE01" target="id-REQ-F-14"/>
     <element xsi:type="archimate:RealizationRelationship" id="id-r-SIEM01-REQ-F-14" source="id-SIEM01" target="id-REQ-F-14"/>
   </folder>
-  <folder name="Views" id="id-806df53492fc440c879258d76e79d0e2" type="diagrams">
+  <folder name="Views" id="id-b473177f4d0149e78d7f1c68bb7c2b3f" type="diagrams">
     <element xsi:type="archimate:ArchimateDiagramModel" name="Motivación de Celeris Edge" id="id-vista-motivacion">
       <child xsi:type="archimate:Note" id="id-t0" font="1|Calibri|13.0|1|WINDOWS|1|0|0|0|0|700|0|0|0|1|0|0|0|0|Calibri" fontColor="#003865" lineColor="#ffffff" textAlignment="1" fillColor="#ffffff" alpha="0">
         <bounds x="20" y="10" width="200" height="30"/>

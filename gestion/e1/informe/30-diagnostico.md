@@ -1,51 +1,51 @@
 # 1.3 Diagnóstico digital / TI
 
-El diagnóstico de TI responde cuatro preguntas: qué sistemas existen hoy alrededor de los laboratorios, qué tan maduros son los procesos de TI que el proyecto toca, qué brechas hay entre lo actual y lo que se necesita, y qué problemas operativos produce esa distancia.
+El diagnóstico de tecnologías de información responde a cuatro preguntas: qué sistemas operan actualmente en torno a los laboratorios, qué grado de madurez presentan los procesos de TI involucrados en el proyecto, qué brechas existen entre la situación actual y la requerida, y qué problemas operativos se derivan de dichas brechas.
 
 ## 1.3.1 Inventario de sistemas de información existentes
 
-La {{ref:t-inventario}} lista los sistemas relacionados con los laboratorios, con su dueño, versión, soporte, dependencia de Internet y criticidad. La última columna dice qué tan firme es cada dato: un supuesto del registro común o un dato por levantar con la DTI.
+La {{ref:t-inventario}} presenta los sistemas relacionados con los laboratorios, con su responsable, versión, soporte, dependencia de Internet y criticidad. La última columna indica el grado de certeza de cada dato: un supuesto del registro común o un dato pendiente de levantamiento con la DTI.
 
 {{tabla:t-inventario}}
 
-Tres datos de este inventario cambian decisiones. Primero, el modelo del FortiGate y si tiene caché web, porque eso define si la alternativa A5 es real. Segundo, si existe un servidor de actualizaciones (WSUS o similar), porque cubriría las actualizaciones de Windows (A3). Tercero, la herramienta de imágenes y políticas de las PCs, porque por ella se reparte el PAC (D-05). Los tres están en la guía de entrevista con la DTI.
+Tres datos de este inventario condicionan decisiones del proyecto. El primero es el modelo del FortiGate y la disponibilidad de caché web, que determina la viabilidad de la alternativa A5. El segundo es la existencia de un servidor de actualizaciones (WSUS o equivalente), que cubriría las actualizaciones de Windows (alternativa A3). El tercero es la herramienta de gestión de imágenes y políticas de las estaciones, mediante la cual se distribuye el archivo PAC (D-05). Los tres datos se incluyen en la guía de entrevista con la DTI.
 
 ## 1.3.2 Nivel de madurez digital (COBIT 2019)
 
-La madurez se mide con la escala de capacidad de COBIT 2019 (0 a 5) en los seis objetivos que el proyecto toca. El nivel actual no se supone: se obtiene en una entrevista estructurada con evidencia, y el instrumento está en `gestion/e1/instrumentos/entrevista-cobit.md`. La {{ref:t-cobit}} muestra, por objetivo, la pregunta guía, la evidencia que se pedirá y el nivel que el proyecto necesita al cierre del piloto.
+La madurez se evalúa mediante la escala de capacidad de COBIT 2019 (0 a 5) en los seis objetivos de gobierno y gestión que el proyecto involucra. El nivel actual no se presume: se determinará mediante una entrevista estructurada sustentada en evidencia, cuyo instrumento se encuentra en el repositorio del proyecto (`gestion/e1/instrumentos/entrevista-cobit.md`). La {{ref:t-cobit}} presenta, para cada objetivo, la pregunta guía, la evidencia que se solicitará y el nivel requerido al cierre del piloto.
 
 {{tabla:t-cobit}}
 
-La {{ref:fig-radar-cobit}} dibuja el nivel objetivo de cada proceso. El nivel actual aparecerá como segunda línea cuando se registre la entrevista en `gestion/e1/datos/madurez.yaml`; hasta entonces la figura lo marca como pendiente.
+La {{ref:fig-radar-cobit}} representa el nivel objetivo de cada proceso. El nivel actual se incorporará como segunda serie una vez registrados los resultados de la entrevista; hasta entonces, la figura lo identifica como pendiente.
 
 {{figura:fig-radar-cobit}}
 
-La figura muestra un objetivo casi uniforme en el nivel definido (3): los procesos tienen que estar documentados, tener responsable y medirse. La excepción es APO12, para el que basta un registro de riesgos gestionado (2). La brecha que importa no es la forma del polígono, sino la distancia que dé la entrevista. Por eso el criterio «brechas con evidencia objetiva» de la rúbrica depende de esa medición.
+La figura muestra un perfil objetivo prácticamente uniforme en el nivel definido (3), lo que implica procesos documentados, con responsable asignado y sujetos a medición. La excepción es APO12, para el cual resulta suficiente un registro de riesgos gestionado (2). La brecha relevante no reside en la forma del polígono, sino en la distancia que revele la entrevista; por esta razón, el criterio de identificación de brechas con evidencia objetiva depende de dicha medición.
 
 ## 1.3.3 Brechas tecnológicas
 
-El análisis de brechas de la {{ref:t-brechas}} une cada situación actual con el estado deseado, la acción que la cierra, el componente de Celeris que la ejecuta y el objetivo del proyecto que sirve. La columna COBIT conecta cada brecha con el proceso que la entrevista va a medir.
+El análisis de brechas de la {{ref:t-brechas}} relaciona cada situación actual con el estado deseado, la acción que la cierra, el componente de Celeris que la ejecuta y el objetivo del proyecto al que contribuye. La columna COBIT vincula cada brecha con el proceso que la entrevista evaluará.
 
 {{tabla:t-brechas}}
 
-La {{ref:fig-brechas}} cuantifica las brechas que ya se pueden calcular con los supuestos y las metas del repositorio, y deja visible la brecha COBIT que falta medir.
+La {{ref:fig-brechas}} cuantifica las brechas que ya pueden calcularse con los supuestos y las metas del registro del proyecto, y mantiene visible la brecha COBIT pendiente de medición.
 
 {{figura:fig-brechas}}
 
-La brecha más grande es la de volumen: hoy cruzan el enlace {{dato:gb_ciclo_lab}} por laboratorio y ciclo, cuando bastaría con traer una copia de {{dato:gb_pc}}. La de tiempo se reduce de {{dato:min_lab}} a {{dato:min_lab_meta}} con la meta de OB-2, y la de transparencia pasa de ninguna PC avisada a todas. Las tres son cotas que salen de supuestos y se reemplazan por medidas en el piloto.
+La brecha de mayor magnitud es la de volumen: actualmente atraviesan el enlace {{dato:gb_ciclo_lab}} por laboratorio y ciclo, cuando sería suficiente transferir una sola copia de {{dato:gb_pc}}. La brecha de tiempo se reduce de {{dato:min_lab}} a {{dato:min_lab_meta}} con la meta de OB-2, y la de transparencia pasa de ninguna estación informada a la totalidad. Las tres cifras constituyen cotas derivadas de supuestos y serán reemplazadas por mediciones durante el piloto.
 
-Pensar en lateral obliga a reconocer lo que ya funciona. La {{ref:t-ya-resuelto}} registra lo que la infraestructura actual ya resuelve y que Celeris no debe duplicar.
+El análisis con enfoque de pensamiento lateral exige reconocer las capacidades que ya funcionan. La {{ref:t-ya-resuelto}} registra las necesidades que la infraestructura actual ya atiende y que Celeris no debe duplicar.
 
 {{tabla:t-ya-resuelto}}
 
 ## 1.3.4 Problemas operativos asociados a TI
 
-La {{ref:t-problemas}} lista los cinco problemas operativos que el diagnóstico relaciona con TI, con su impacto y frecuencia (valoración del equipo) y la evidencia que los confirmará.
+La {{ref:t-problemas}} presenta los cinco problemas operativos que el diagnóstico asocia a TI, con su impacto y frecuencia según la valoración del equipo, y la evidencia que permitirá confirmarlos.
 
 {{tabla:t-problemas}}
 
-La {{ref:fig-impacto-frecuencia}} ubica esos problemas en una matriz de impacto × frecuencia con los mismos umbrales que la matriz de riesgos.
+La {{ref:fig-impacto-frecuencia}} ubica dichos problemas en una matriz de impacto × frecuencia con los mismos umbrales empleados en la matriz de riesgos.
 
 {{figura:fig-impacto-frecuencia}}
 
-Dos problemas quedan en la zona alta: la saturación del enlace en clase (PO-1), por su impacto, y la falta de medición del desperdicio (PO-5), porque ocurre siempre. Los otros tres están en la zona media y son consecuencia de los dos primeros. Si el desperdicio se midiera, la saturación tendría dueño y solución; por eso la causa raíz del §1.4 apunta a la medición y a la decisión, no solo al enlace.
+Dos problemas se sitúan en la zona alta: la saturación del enlace durante las clases (PO-1), por su impacto, y la ausencia de medición del desperdicio (PO-5), por su frecuencia permanente. Los tres restantes se ubican en la zona media y se derivan de los dos primeros. Si el desperdicio se midiera, la saturación tendría un responsable y una vía de solución; por ello, el análisis de causa raíz del §1.4 se orienta hacia la medición y la toma de decisiones, y no únicamente hacia la capacidad del enlace.

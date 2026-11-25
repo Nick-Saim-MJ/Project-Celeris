@@ -74,7 +74,7 @@ cadena_valor:
     - { tipo: Primaria, actividad: "Enseñanza en laboratorios", dependencia: Alta, por_que: "Software de cada curso, actualizaciones y plataforma virtual se descargan en las PCs del laboratorio", problema: "La clase empieza tarde si la descarga no terminó" }
     - { tipo: Primaria, actividad: "Investigación", dependencia: Media, por_que: "Datasets, bibliotecas y modelos que se descargan en los laboratorios", problema: "Descargas largas compiten con las clases" }
     - { tipo: Primaria, actividad: "Admisión y extensión", dependencia: Baja, por_que: "Usa sistemas web, no los laboratorios", problema: "Sufre la saturación del enlace, no la causa" }
-    - { tipo: Apoyo, actividad: "Infraestructura de TI y soporte", dependencia: Alta, por_que: "Prepara y mantiene los laboratorios, PC por PC", problema: "Horas técnicas en cada ciclo de actualización" }
+    - { tipo: Apoyo, actividad: "Infraestructura de TI y soporte", dependencia: Alta, por_que: "Prepara y mantiene los laboratorios estación por estación", problema: "Horas técnicas en cada ciclo de actualización" }
     - { tipo: Apoyo, actividad: "Gestión administrativa y financiera", dependencia: Baja, por_que: "Paga el enlace", problema: "Costo de ampliar el enlace cada año" }
 
 stakeholders:
@@ -139,7 +139,7 @@ foda:
   D:
     - { id: D1, texto: "Enlace limitado y caro", fuente: "[S-02], [S-03]" }
     - { id: D2, texto: "Descargas repetidas en cada PC (40 por laboratorio)", fuente: "[S-26], [S-27]" }
-    - { id: D3, texto: "Preparación manual, PC por PC", fuente: "[S-07]; [levantar con la DTI]" }
+    - { id: D3, texto: "Preparación manual, estación por estación", fuente: "[S-07]; [levantar con la DTI]" }
     - { id: D4, texto: "Sin medición del desperdicio de ancho de banda", fuente: "00 M2.3 (línea base «A medir»)" }
   A:
     - { id: A1, texto: "Más tráfico cifrado (HTTPS, QUIC, ECH) reduce lo que se puede cachear", fuente: "RFC 9849; RFC 9000" }
@@ -151,16 +151,16 @@ tows:
   fuente: "Elaboración propia a partir del FODA; decisiones D-xx de infra/trazabilidad.yaml"
   estrategias:
     - { tipo: FO, id: FO-1, cruza: "F1, O2, O4", estrategia: "Instalar la caché detrás del FortiGate existente sobre ESXi gratuito y repartir el PAC con las políticas centrales de las PCs", apunta_a: "D-26, D-05" }
-    - { tipo: FO, id: FO-2, cruza: "F2, O1", estrategia: "Que el encargado arme el catálogo de contenido del curso; la DTI solo aprueba lo que se descifra", apunta_a: "D-20" }
-    - { tipo: FO, id: FO-3, cruza: "F3, O3", estrategia: "Probar todo en un laboratorio emulado y en AWS efímero antes de tocar el campus", apunta_a: "D-18" }
+    - { tipo: FO, id: FO-2, cruza: "F2, O1", estrategia: "El encargado elabora el catálogo de contenido del curso; la DTI aprueba únicamente lo que se descifra", apunta_a: "D-20" }
+    - { tipo: FO, id: FO-3, cruza: "F3, O3", estrategia: "Validar la solución en un laboratorio emulado y en AWS efímero antes de intervenir el campus", apunta_a: "D-18" }
     - { tipo: FA, id: FA-1, cruza: "F1, A1", estrategia: "Proxy explícito por URL fija del PAC y bloqueo de QUIC en las PCs institucionales para conservar lo cacheable", apunta_a: "D-05, D-06" }
     - { tipo: FA, id: FA-2, cruza: "F1, A3", estrategia: "Descifrar solo en PCs institucionales con aviso previo; el BYOD nunca se descifra", apunta_a: "D-27, D-15, D-04" }
     - { tipo: FA, id: FA-3, cruza: "F3, A2", estrategia: "Diseño independiente del hipervisor: la misma imagen corre en ESXi, en Proxmox o en el laboratorio emulado", apunta_a: "D-18 (RE-10)" }
-    - { tipo: DO, id: DO-1, cruza: "D2, O4", estrategia: "Usar primero lo que ya existe: la caché web del FortiGate (si el modelo la tiene) y un servidor de actualizaciones del fabricante para Windows. Celeris cubre lo que ellos no: instaladores de cursos, paquetes y fuentes HTTPS aprobadas", apunta_a: "Alternativas A3 y A5 (E2)" }
+    - { tipo: DO, id: DO-1, cruza: "D2, O4", estrategia: "Aprovechar primero las capacidades existentes: la caché web del FortiGate (si el modelo la dispone) y un servidor de actualizaciones del fabricante para Windows. Celeris cubre lo que estas no atienden: instaladores de cursos, paquetes y fuentes HTTPS aprobadas", apunta_a: "Alternativas A3 y A5 (E2)" }
     - { tipo: DO, id: DO-2, cruza: "D3, O1", estrategia: "Precargar el contenido de la clase en el nodo fuera del horario de clase", apunta_a: "D-21" }
     - { tipo: DO, id: DO-3, cruza: "D4, O1", estrategia: "Medir el ahorro por laboratorio con métricas del nodo, nunca por persona", apunta_a: "D-22" }
-    - { tipo: DA, id: DA-1, cruza: "D1, A1", estrategia: "Revisar el BHR cada mes y ampliar el enlace solo si la caché deja de rendir", apunta_a: "RE-03; alternativa A0 (E2)" }
-    - { tipo: DA, id: DA-2, cruza: "D1, A4", estrategia: "Segmentar: el Wi-Fi y los laboratorios no alcanzan los servidores del proyecto; base del futuro modo examen", apunta_a: "D-16, D-17" }
+    - { tipo: DA, id: DA-1, cruza: "D1, A1", estrategia: "Revisar la BHR mensualmente y ampliar el enlace solo si la caché pierde efectividad", apunta_a: "RE-03; alternativa A0 (E2)" }
+    - { tipo: DA, id: DA-2, cruza: "D1, A4", estrategia: "Segmentar la red: el Wi-Fi y los laboratorios no acceden a los servidores del proyecto; base del futuro modo examen", apunta_a: "D-16, D-17" }
 
 pestel:
   fuente: "Normas y hechos citados por fila"
@@ -204,10 +204,10 @@ brechas:
     - { id: BR-3, cobit: APO02, actual: "El encargado pide a la DTI cada cambio (días)", deseado: "El encargado habilita una fuente o un laboratorio en minutos", accion: "Consola del encargado con roles por laboratorio", componente: "CTRL01, ENC01 (REQ-F-31, REQ-F-32, REQ-F-33)", ob: OB-3 }
     - { id: BR-4, cobit: MEA01, actual: "No se mide el desperdicio ni el BHR (línea base «A medir», 00 M2.3)", deseado: "Ahorro mensual por laboratorio y por fuente", accion: "Métricas del nodo y reporte en la consola", componente: "EDGE01, CTRL01 (REQ-F-13, REQ-F-25)", ob: OB-1 }
     - { id: BR-5, cobit: DSS05, actual: "Detección en la red de laboratorios [levantar con la DTI]", deseado: "Escenarios de abuso del proxy detectados", accion: "Eventos de seguridad al SIEM y señuelos", componente: "SIEM01, HNY01, HNY02 (REQ-F-14, REQ-F-15)", ob: OB-5 }
-    - { id: BR-6, cobit: DSS05, actual: "No hay aviso previo a los usuarios porque nada se descifra hoy", deseado: "Aviso entregado antes de instalar la CA en cada PC", accion: "Portal de transparencia generado de la configuración real", componente: "PORTAL01 (REQ-F-12, REQ-F-30)", ob: OB-4 }
+    - { id: BR-6, cobit: DSS05, actual: "No existe aviso previo a los usuarios, dado que actualmente no se descifra tráfico", deseado: "Aviso entregado antes de instalar la CA en cada PC", accion: "Portal de transparencia generado de la configuración real", componente: "PORTAL01 (REQ-F-12, REQ-F-30)", ob: OB-4 }
     - { id: BR-7, cobit: APO12, actual: "Registro de riesgos de TI [levantar con la DTI]", deseado: "Riesgos del servicio con dueño y disparador", accion: "Matriz RE-01…RE-12 de este informe y RP-xx del E3", componente: "Gestión del proyecto (E1 §1.7, E3)", ob: "OB-1…OB-5" }
   ya_resuelto:
-    - { que: "Filtrar sitios por categoría (redes sociales, malware)", quien: "FortiGate con FortiGuard [S-29]", decision: "Se mantiene; Celeris no lo duplica" }
+    - { que: "Filtrar sitios por categoría (redes sociales, malware)", quien: "FortiGate con FortiGuard [S-29]", decision: "Se mantiene; Celeris no duplica esta función" }
     - { que: "Actualizaciones de Windows desde un servidor interno", quien: "WSUS o similar, si existe [levantar con la DTI]", decision: "Si existe, se mantiene y Celeris no cachea esas actualizaciones; si no, es la alternativa A3 del E2" }
     - { que: "Caché web en el perímetro", quien: "FortiGate, solo si el modelo tiene disco y la función [levantar con la DTI]", decision: "Alternativa A5 del E2: se evalúa antes de recomendar Celeris" }
 
@@ -218,47 +218,47 @@ problemas:
     - { id: PO-2, problema: "Descargas que no terminan en una sesión", impacto: 4, frecuencia: 3, evidencia: "Tickets de la mesa de ayuda; entrevista a docentes" }
     - { id: PO-3, problema: "Preparar un laboratorio toma horas", impacto: 4, frecuencia: 3, evidencia: "Cronometraje de un ciclo (E4)" }
     - { id: PO-4, problema: "El encargado depende de la DTI para cualquier cambio", impacto: 3, frecuencia: 4, evidencia: "Solicitudes a la DTI por laboratorio y su tiempo de atención" }
-    - { id: PO-5, problema: "Nadie mide cuánto ancho de banda se desperdicia", impacto: 3, frecuencia: 5, evidencia: "Ausencia de indicador (00 M2.3, línea base «A medir»)" }
+    - { id: PO-5, problema: "No se mide el ancho de banda desperdiciado", impacto: 3, frecuencia: 5, evidencia: "Ausencia de indicador (00 M2.3, línea base «A medir»)" }
 
 # ------------------------------------------------------------------------------------------------ 1.4 Problema
 w5h2:
   fuente: "00 M2.1; cifras de gestion/e1/calculos.py"
   filas:
-    - { pregunta: "¿Qué?", respuesta: "Cada PC descarga por separado los mismos archivos grandes (actualizaciones, instaladores de cursos, paquetes) y el enlace se satura" }
-    - { pregunta: "¿Por qué?", respuesta: "No hay una copia compartida en el campus: casi todo viaja por HTTPS y el FortiGate filtra, pero no reutiliza" }
-    - { pregunta: "¿Dónde?", respuesta: "En los 10 laboratorios de cómputo del Campus Juliaca [S-26]; el resto del campus sufre la saturación" }
-    - { pregunta: "¿Cuándo?", respuesta: "En cada ciclo de actualización masiva y al preparar una clase, en horario de clase" }
-    - { pregunta: "¿Quién?", respuesta: "Lo sufren docentes y estudiantes; lo atiende el encargado, que depende de la DTI" }
-    - { pregunta: "¿Cómo?", respuesta: "Un laboratorio entero descarga a la vez; nadie decide qué conviene reutilizar ni mide cuánto se desperdicia" }
+    - { pregunta: "¿Qué?", respuesta: "Cada estación descarga de forma independiente los mismos archivos de gran tamaño (actualizaciones, instaladores de cursos, paquetes), lo que satura el enlace" }
+    - { pregunta: "¿Por qué?", respuesta: "El campus no dispone de una copia compartida: la mayor parte del tráfico viaja cifrado (HTTPS) y el FortiGate filtra, pero no reutiliza contenido" }
+    - { pregunta: "¿Dónde?", respuesta: "En los 10 laboratorios de cómputo del Campus Juliaca [S-26]; el resto del campus resulta afectado por la saturación" }
+    - { pregunta: "¿Cuándo?", respuesta: "En cada ciclo de actualización masiva y durante la preparación de las clases, dentro del horario lectivo" }
+    - { pregunta: "¿Quién?", respuesta: "Afecta a docentes y estudiantes; lo atiende el encargado de laboratorio, que depende de la DTI" }
+    - { pregunta: "¿Cómo?", respuesta: "Todas las estaciones de un laboratorio descargan simultáneamente; no existe un responsable que decida qué reutilizar ni una medición del desperdicio" }
     - { pregunta: "¿Cuánto?", respuesta: "calc" }
 
 ishikawa:
   fuente: "Guía CE01 v0.4 B1.5 y 00 M2.2 (6M adaptado)"
-  efecto: "Laboratorios que descargan lo mismo 40 veces: enlace saturado y clases que empiezan tarde"
+  efecto: "Descarga repetida del mismo contenido en 40 estaciones: enlace saturado y retraso en el inicio de las clases"
   categorias:
-    - { nombre: "Método", causas: ["Cada PC descarga sola, PC por PC", "Descargas en horario de clase", "Sin ventana de precarga"] }
-    - { nombre: "Personas", causas: ["El encargado no tiene herramienta ni atribución", "Todo cambio se pide a la DTI"] }
-    - { nombre: "Tecnología", causas: ["Casi todo es HTTPS: la caché clásica no sirve", "El FortiGate filtra, pero no reutiliza", "QUIC y ECH ocultan el tráfico"] }
-    - { nombre: "Recursos", causas: ["Enlace limitado [S-02]", "Ampliar es un costo recurrente [S-03]"] }
+    - { nombre: "Método", causas: ["Descarga independiente en cada estación", "Descargas en horario de clase", "Sin ventana de precarga"] }
+    - { nombre: "Personas", causas: ["El encargado carece de herramienta y atribución", "Cada cambio requiere solicitud a la DTI"] }
+    - { nombre: "Tecnología", causas: ["Tráfico mayoritariamente HTTPS: la caché clásica no aplica", "El FortiGate filtra, pero no reutiliza contenido", "QUIC y ECH ocultan el tráfico"] }
+    - { nombre: "Recursos", causas: ["Enlace limitado [S-02]", "La ampliación es un costo recurrente [S-03]"] }
     - { nombre: "Medición", causas: ["No se mide el desperdicio ni el BHR", "Sin indicadores por laboratorio"] }
     - { nombre: "Entorno", causas: ["Menor oferta de conectividad en el altiplano", "Tráfico cifrado en aumento"] }
 
 arbol:
   fuente: "00 M2.1 y M2.2; efectos de la cadena de valor (§1.1)"
-  problema: "Los laboratorios descargan lo mismo en cada PC y saturan el enlace del campus"
-  causas: ["La misma descarga se repite en 40 PCs", "Las descargas ocurren en horario de clase", "Casi todo es HTTPS: la caché clásica no sirve", "Nadie tiene el rol ni la herramienta para decidir qué se reutiliza"]
-  efectos: ["Clases que empiezan tarde", "El resto del campus pierde ancho de banda", "Presión para ampliar el enlace cada año", "Horas técnicas en cada ciclo", "Nadie sabe cuánto se desperdicia"]
+  problema: "Descarga repetida del mismo contenido en cada estación y saturación del enlace del campus"
+  causas: ["La misma descarga se repite en 40 estaciones", "Las descargas ocurren en horario de clase", "Tráfico mayoritariamente HTTPS: la caché clásica no aplica", "Ausencia de un rol y una herramienta para decidir qué se reutiliza"]
+  efectos: ["Retraso en el inicio de las clases", "Pérdida de ancho de banda para el resto del campus", "Presión anual para ampliar el enlace", "Consumo de horas técnicas en cada ciclo", "Desperdicio no cuantificado"]
 
 cinco_porques:
   fuente: "Elaboración propia a partir de 00 M2.2"
   causa: "La misma descarga se repite en 40 PCs por laboratorio"
   pasos:
-    - { porque: "¿Por qué se satura el enlace en clase?", respuesta: "Porque un laboratorio entero descarga los mismos archivos al mismo tiempo." }
-    - { porque: "¿Por qué cada PC descarga lo mismo?", respuesta: "Porque cada PC va directo al origen: en el campus no hay una copia compartida." }
-    - { porque: "¿Por qué no hay una copia compartida?", respuesta: "Porque el contenido viaja por HTTPS, una caché clásica no lo puede guardar y el FortiGate solo filtra." }
-    - { porque: "¿Por qué no se descifra lo que conviene reutilizar?", respuesta: "Porque nadie tiene el rol ni la herramienta para decidir qué fuente es segura de reutilizar, con aviso a los usuarios." }
-    - { porque: "¿Por qué no existe ese rol?", respuesta: "Porque la gestión de los laboratorios no mide el desperdicio: sin dato no hay decisión (brecha MEA01)." }
-  raiz: "Falta una capacidad de gestión (medir y decidir qué se reutiliza) y el mecanismo técnico controlado que la ejecute."
+    - { porque: "¿Por qué se satura el enlace en clase?", respuesta: "Porque todas las estaciones de un laboratorio descargan los mismos archivos simultáneamente." }
+    - { porque: "¿Por qué cada estación descarga el mismo contenido?", respuesta: "Porque cada estación accede directamente al origen: el campus no dispone de una copia compartida." }
+    - { porque: "¿Por qué no hay una copia compartida?", respuesta: "Porque el contenido viaja cifrado (HTTPS), una caché clásica no puede almacenarlo y el FortiGate solo filtra." }
+    - { porque: "¿Por qué no se descifra lo que conviene reutilizar?", respuesta: "Porque no existe un rol con la herramienta necesaria para decidir qué fuente es segura de reutilizar, con aviso previo a los usuarios." }
+    - { porque: "¿Por qué no existe ese rol?", respuesta: "Porque la gestión de los laboratorios no mide el desperdicio y, sin datos, no es posible fundamentar la decisión (brecha MEA01)." }
+  raiz: "Ausencia de una capacidad de gestión (medir y decidir qué se reutiliza) y de un mecanismo técnico controlado que la ejecute."
 
 # ------------------------------------------------------------------------------------------------ 1.5 Alineamiento
 alineamiento:

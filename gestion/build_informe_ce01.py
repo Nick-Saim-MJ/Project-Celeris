@@ -427,8 +427,8 @@ class InformeCE01(base.Informe):
     def anexo_supuestos(self, letra: str):
         self.titulo(f"Anexo {letra}. Supuestos citados en el informe", 2, salto=self._salto_anexo())
         ids = sorted(self.supuestos_citados)
-        self.parrafo(f"La {self.num['supuestos-citados']} reúne los supuestos que cita el informe. Ninguno se presenta "
-                     "como dato: cada uno indica cómo se valida (Marco común M5).")
+        self.parrafo(f"La {self.num['supuestos-citados']} consolida los supuestos citados en el informe. Ninguno de ellos se "
+                     "presenta como dato verificado: cada uno indica su método de validación (Marco común M5).")
         filas = [["ID", "Supuesto", "Valor usado", "Cómo validarlo", "Responsable"]]
         for sid in ids:
             s = ce01_datos.texto_supuesto(sid)

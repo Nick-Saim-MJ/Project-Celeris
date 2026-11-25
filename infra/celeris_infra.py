@@ -103,14 +103,14 @@ def ids_en_cambios() -> set[str]:
     """IDs CI-nn registrados en docs/infra/e1/CAMBIOS-INVENTARIO.md (encabezados `### CI-nn`)."""
     if not CAMBIOS_MD.exists():
         return set()
-    return set(re.findall(r"^#{2,4}\s+(CI-\d{2})\b", CAMBIOS_MD.read_text(encoding="utf-8"), flags=re.M))
+    return set(re.findall(r"^#{2,4}\s+(CI-\d{2,3})\b", CAMBIOS_MD.read_text(encoding="utf-8"), flags=re.M))
 
 
 def titulos_de_cambios() -> dict[str, str]:
     """{CI-nn: título} de los encabezados `### CI-nn — título` de CAMBIOS-INVENTARIO.md."""
     if not CAMBIOS_MD.exists():
         return {}
-    return {m.group(1): m.group(2).strip() for m in re.finditer(r"^#{2,4}\s+(CI-\d{2})\s+—\s+(.+)$", CAMBIOS_MD.read_text(encoding="utf-8"), flags=re.M)}
+    return {m.group(1): m.group(2).strip() for m in re.finditer(r"^#{2,4}\s+(CI-\d{2,3})\s+—\s+(.+)$", CAMBIOS_MD.read_text(encoding="utf-8"), flags=re.M)}
 
 
 def resultados_mas_recientes(raiz: Path = RAIZ) -> tuple[Path | None, dict | None]:

@@ -2,3 +2,10 @@
 # Terceros importados por infra/ y tests/: yaml, jsonschema, openpyxl (requirements.txt) y pytest (make test-gen).
 -r requirements.txt
 pytest>=8.0
+
+# CE01 Gestión de TI (gestion/): modelo económico, Monte Carlo, gráficos y validación de BPMN (P0).
+numpy>=1.26
+numpy-financial>=1.0
+pandas>=2.0
+matplotlib>=3.8
+xmlschema>=3.0

@@ -573,6 +573,32 @@ supuestos:
     valor: "Personas que usan o administran el servicio: hasta 400 estudiantes y docentes simultáneos en laboratorio (una persona por PC, derivado de S-26) y 10 encargados de laboratorio (uno por laboratorio). Sin cifra definida: administradores de la DTI, auditor y usuarios BYOD del Wi-Fi, que no se han levantado"
     validacion: "Levantamiento con la DTI antes de S2: cuántos administradores de la DTI tendrán rol sobre FW01 y JMP01, cuántos auditores tendrán acceso de lectura y cuántos dispositivos BYOD se conectan a la vez. Hasta entonces ninguna cifra del diseño depende de esos tres números"
     responsable: Henyelrey
+  # S-37…S-41: costos y derivaciones del business case de CE01 que la guía CE01 v0.4 (B2.3–B2.4) usaba sin supuesto (CI-97).
+  S-37:
+    supuesto: Switch núcleo L2 con 10 GbE (SW-CORE01), si se compra
+    valor: US$ 600
+    validacion: Cotización de un proveedor local
+    responsable: Nick
+  S-38:
+    supuesto: UPS online de 1,5 kVA (UPS01), si se compra
+    valor: US$ 700
+    validacion: Cotización de un proveedor local
+    responsable: Nick
+  S-39:
+    supuesto: Cableado y accesorios del gabinete (patch cords, PDU, organizadores)
+    valor: US$ 200
+    validacion: Cotización de un proveedor local
+    responsable: Nick
+  S-40:
+    supuesto: Mbps de ampliación del enlace que el proyecto difiere
+    valor: "Derivado, sin cifra propia: BHR [S-04] × enlace del campus [S-02]. Es el ancho de banda que la caché deja de pedir al enlace en hora punta"
+    validacion: BHR medido en hora punta durante el piloto (contadores del FortiGate frente a los registros del nodo)
+    responsable: Henyelrey
+  S-41:
+    supuesto: Mantenimiento anual del hardware
+    valor: 10 % de la inversión inicial en hardware (servidor [S-08] + switch [S-37] + UPS [S-38] + cableado [S-39])
+    validacion: Contrato de soporte o garantía extendida cotizados
+    responsable: Nick
 
 decisiones:
   D-01:

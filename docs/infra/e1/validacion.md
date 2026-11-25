@@ -70,7 +70,7 @@
 | V-73 | Ensayo L: ninguna FALLA sin causa y acción; NO_APLICA, PARCIAL y sin ensayo nunca como PASA | PASA | — |
 | V-74 | XLSX de pruebas: fórmulas sin errores tras recalcular con LibreOffice y coherentes con la biblioteca | PASA | 0 errores, 0 advertencias |
 | V-75 | XLSX de pruebas: el archivo versionado está al día con pruebas.yaml, el inventario y el último ensayo | PASA | — |
-| V-80 | Informe: DOCX y PDF existen, abren, son de la fuente actual y las referencias están en formato IEEE | PASA | entregables/CE0311/Informe_Diseno_Red_v1.4.docx; PDF 47 páginas; motor Microsoft Word (COM) |
+| V-80 | Informe: DOCX y PDF existen, abren, son de la fuente actual y las referencias están en formato IEEE | PASA | entregables/CE0311/Informe_Diseno_Red_v1.4.docx; PDF 48 páginas; motor Microsoft Word (COM) |
 | V-81 | Informe: 11 secciones de la plantilla, en orden y con contenido | PASA | 26 títulos de sección |
 | V-82 | Informe: sin texto guía ni marcadores de la plantilla | PASA | 48 textos guía comprobados |
 | V-83 | Informe: ningún ID retirado en v0.4 presentado como vigente | PASA | 35 IDs retirados buscados |
@@ -79,7 +79,7 @@
 | V-86 | Informe: cifras repetidas coherentes con la fuente | PASA | 7 VLAN · 31 componentes · T05 27,2 s · T09 8,7 s |
 | V-87 | Informe: evidencia citada para cada criterio de la rúbrica | PASA | criterios con toda su evidencia: R1, R2, R3, R4, R5, R6, R7, R8 |
 | V-88 | Informe: marcas [COMPLETAR] pendientes | PASA | 0 pendientes |
-| V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.4 · commit aa3b8e5 |
+| V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.4 · commit 5d8e77f |
 | V-90 | centro_datos.yaml: esquema, referencias (componentes, zonas, S-xx, CI-nn) e IDs retirados | PASA | 11 VM · 9 port groups · 30 elementos propios · 9 servicios |
 | V-91 | VM: 1 a 1 con el inventario, mismos recursos, port group y zona; ninguna > 8 vCPU | PASA | 11 VM en el YAML · 11 en el inventario · máx. 4 vCPU |
 | V-92 | Dimensionamiento: sumas = tablas D2.4; núcleos, RAM y disco recalculados; holgura ≥ 15 % y la caché cabe | PASA | F2: 27 vCPU → 9.75 núcleos de 12 (holgura 18.8%) · RAM 79.2 de 96 GB (holgura 31.2%; tras crecimiento 17.5%) · disco 1206 de 1920 GB (holgura 37.2%) |
@@ -113,7 +113,7 @@ Ninguno.
 ## Información
 
 - **V-27** — 28 de 60 celdas denegadas tienen una prueba dedicada; el resto se cubre por la política deny-all (OD-06) y las reglas de denegación con registro
-- **V-29** — 0 elementos pendientes en los YAML; 90 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-01', 'CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-06', 'CI-07', 'CI-08', 'CI-09', 'CI-10', 'CI-11', 'CI-12', 'CI-13', 'CI-14', 'CI-15', 'CI-16', 'CI-17', 'CI-18', 'CI-19', 'CI-20', 'CI-21', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-27', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-49', 'CI-50', 'CI-51', 'CI-52', 'CI-53', 'CI-54', 'CI-55', 'CI-56', 'CI-57', 'CI-58', 'CI-59', 'CI-60', 'CI-61', 'CI-62', 'CI-63', 'CI-70', 'CI-71', 'CI-72', 'CI-73', 'CI-74', 'CI-75', 'CI-76', 'CI-77', 'CI-78', 'CI-79', 'CI-80', 'CI-81', 'CI-82', 'CI-83', 'CI-84', 'CI-85', 'CI-86', 'CI-87', 'CI-88', 'CI-89', 'CI-90', 'CI-91', 'CI-92', 'CI-93', 'CI-94', 'CI-95', 'CI-96']
+- **V-29** — 0 elementos pendientes en los YAML; 94 entradas CI en CAMBIOS-INVENTARIO.md; sin referencia desde los YAML: ['CI-01', 'CI-02', 'CI-03', 'CI-04', 'CI-05', 'CI-06', 'CI-07', 'CI-08', 'CI-09', 'CI-10', 'CI-100', 'CI-11', 'CI-12', 'CI-13', 'CI-14', 'CI-15', 'CI-16', 'CI-17', 'CI-18', 'CI-19', 'CI-20', 'CI-21', 'CI-22', 'CI-23', 'CI-24', 'CI-25', 'CI-26', 'CI-27', 'CI-28', 'CI-29', 'CI-30', 'CI-31', 'CI-32', 'CI-33', 'CI-34', 'CI-35', 'CI-36', 'CI-37', 'CI-38', 'CI-39', 'CI-40', 'CI-41', 'CI-42', 'CI-43', 'CI-44', 'CI-45', 'CI-46', 'CI-47', 'CI-48', 'CI-49', 'CI-50', 'CI-51', 'CI-52', 'CI-53', 'CI-54', 'CI-55', 'CI-56', 'CI-57', 'CI-58', 'CI-59', 'CI-60', 'CI-61', 'CI-62', 'CI-63', 'CI-70', 'CI-71', 'CI-72', 'CI-73', 'CI-74', 'CI-75', 'CI-76', 'CI-77', 'CI-78', 'CI-79', 'CI-80', 'CI-81', 'CI-82', 'CI-83', 'CI-84', 'CI-85', 'CI-86', 'CI-87', 'CI-88', 'CI-89', 'CI-90', 'CI-91', 'CI-92', 'CI-93', 'CI-94', 'CI-95', 'CI-96', 'CI-97', 'CI-98', 'CI-99']
 - **V-42** — Resultados de 2026-11-23-L (commit descono): {'PASA': 34, 'FALLA': 0, 'PARCIAL': 1, 'NO_APLICA': 17}
 - **V-72** — Celdas denegadas no críticas sin prueba dedicada: 32 de 60 (las cubre la política deny-all; ver hoja «Cobertura»)
 - **V-74** — 605 fórmulas recalculadas con LibreOffice sin errores

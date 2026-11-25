@@ -1,0 +1,78 @@
+# docs/fuentes/CE01/contenido-minimo.yaml — Contenido mínimo y rúbrica de CE01 S1 (E1–E4), en forma legible por máquina.
+#
+# La fuente oficial es el texto literal del EPE (área B, GTI) en docs/fuentes/CE01/E1-E4-contenido-y-rubrica.md.
+# Este archivo solo lo estructura para que gestion/build_informe_ce01.py compruebe que el informe tiene todos los títulos
+# del contenido mínimo y arme el anexo de autoevaluación.
+#
+# Estado: PRELIMINAR. Los títulos salen de la guía docs/celeris/Celeris-CE01-Gestion-TI.md v0.4 (B1.9, B2.7, B3.8, B4.6)
+# porque el texto del EPE todavía no está en el repositorio (CI-99). Mientras `cotejado: false`:
+#   - gestion/validate_ce01.py lo reporta como AVISO;
+#   - el generador se niega a producir un informe (no se entrega nada armado sobre títulos supuestos).
+# Al pegar el EPE: corregir cada `titulo` y `criterio` para que sea idéntico al texto literal, completar `excelente`
+# con el descriptor literal del nivel Excelente y poner `cotejado: true`. El validador comprueba que cada título y cada
+# criterio aparezcan tal cual en el texto literal.
+
+meta:
+  fuente_literal: docs/fuentes/CE01/E1-E4-contenido-y-rubrica.md
+  fuente_preliminar: "docs/celeris/Celeris-CE01-Gestion-TI.md v0.4"
+  cotejado: false
+  cambio: CI-99
+
+entregables:
+  E1:
+    nombre: "Diagnóstico Organizacional y Alineamiento Estratégico"
+    evidencias: [CE0111, CE0112, CE0113, CE0114, CE0115]
+    contenido_minimo:
+      - { id: "1.1", titulo: "Contexto organizacional" }
+      - { id: "1.2", titulo: "Análisis estratégico" }
+      - { id: "1.3", titulo: "Diagnóstico digital / TI" }
+      - { id: "1.4", titulo: "Identificación del problema" }
+    rubrica:
+      - { criterio: "Análisis del contexto organizacional", excelente: null }
+      - { criterio: "Identificación de brechas estratégicas", excelente: null }
+      - { criterio: "Alineamiento estratégico del proyecto", excelente: null }
+      - { criterio: "Sustentación y defensa técnica", excelente: null }
+  E2:
+    nombre: "Business Case del Proyecto"
+    evidencias: [CE0113, CE0124]
+    contenido_minimo:
+      - { id: "2.1", titulo: "Justificación" }
+      - { id: "2.2", titulo: "Análisis de alternativas" }
+      - { id: "2.3", titulo: "Beneficios" }
+      - { id: "2.4", titulo: "Costos" }
+      - { id: "2.5", titulo: "Riesgos iniciales" }
+    rubrica:
+      - { criterio: "Análisis de alternativas", excelente: null }
+      - { criterio: "Evaluación económica", excelente: null }
+      - { criterio: "Identificación de riesgos", excelente: null }
+      - { criterio: "Sustentación", excelente: null }
+  E3:
+    nombre: "Plan de Gestión del Proyecto"
+    evidencias: [CE0121, CE0122, CE0123, CE0124, CE0125]
+    contenido_minimo:
+      - { id: "3.1", titulo: "Acta de constitución" }
+      - { id: "3.2", titulo: "Alcance" }
+      - { id: "3.3", titulo: "Cronograma" }
+      - { id: "3.4", titulo: "Costos" }
+      - { id: "3.5", titulo: "Riesgos" }
+      - { id: "3.6", titulo: "Gestión ágil" }
+    rubrica:
+      - { criterio: "Acta", excelente: null }
+      - { criterio: "Alcance", excelente: null }
+      - { criterio: "Cronograma", excelente: null }
+      - { criterio: "Costos", excelente: null }
+      - { criterio: "Riesgos", excelente: null }
+      - { criterio: "Ágil", excelente: null }
+      - { criterio: "Sustentación", excelente: null }
+  E4:
+    nombre: "Modelado de Procesos AS-IS / TO-BE"
+    evidencias: [CE0131, CE0132, CE0133, CE0134, CE0135]
+    contenido_minimo:
+      - { id: "4.1", titulo: "AS-IS" }
+      - { id: "4.2", titulo: "TO-BE" }
+      - { id: "4.3", titulo: "Análisis comparativo" }
+    rubrica:
+      - { criterio: "Modelado AS-IS", excelente: null }
+      - { criterio: "Propuesta TO-BE", excelente: null }
+      - { criterio: "Análisis comparativo", excelente: null }
+      - { criterio: "Sustentación", excelente: null }

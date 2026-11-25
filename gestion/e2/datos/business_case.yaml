@@ -1,0 +1,227 @@
+# gestion/e2/datos/business_case.yaml — Datos propios del Entregable 2 de CE01 (Business Case).
+#
+# Este archivo NO repite cifras de los supuestos ni de la infraestructura: el modelo las lee de gestion/ce01_datos.py.
+# Aquí solo vive lo que es propio del E2 y que no es un supuesto medible:
+#   - los rangos de la simulación de Monte Carlo (guía CE01 v0.4 B2.5 y prompt P2; CI-102);
+#   - los juicios del equipo (comparaciones AHP, justificación de cada puntaje, escenarios de estrés de los riesgos);
+#   - el texto de las fichas de alternativas, de los beneficios cualitativos, del árbol de objetivos y del BDN.
+# Los juicios del equipo llevan `fuente` y se validan con la DTI; no se presentan como datos verificados (00 M5).
+
+meta:
+  fuente: "Guía CE01 v0.4 B2; prompt P2; CI-102"
+
+# ------------------------------------------------------------------------------------------------ Monte Carlo
+# Distribución triangular (mín, moda, máx) con la moda en el valor del supuesto (CI-102). Las variables `factor`
+# multiplican la partida del caso base (1 = caso base).
+montecarlo:
+  iteraciones: 10000
+  semilla: 20261125
+  variables:
+    - { id: bhr,      nombre: "Byte hit ratio",                 supuesto: S-04,  min: 0.10, max: 0.40, moda: "S-04.bhr" }
+    - { id: usd_mbps, nombre: "Costo por Mbps-mes",             supuesto: S-03,  min: 4,    max: 12,   moda: "S-03.usd_mbps_mes" }
+    - { id: adopcion, nombre: "Adopción del proxy",             supuesto: CI-102, min: 0.60, max: 1.00, moda: 1.00 }
+    - { id: f_aws,    nombre: "Costo AWS (factor)",             supuesto: S-12,  min: 0.70, max: 1.30, moda: 1.00 }
+    - { id: f_capex,  nombre: "Inversión inicial (factor)",     supuesto: S-08,  min: 0.85, max: 1.15, moda: 1.00 }
+
+# ------------------------------------------------------------------------------------------------ AHP (Saaty)
+# Matriz de comparación por pares de los criterios C1…C6 de gestion/ce01.yaml (escala 1–9 de Saaty). Solo se escribe el
+# triángulo superior; el inferior es el recíproco. Juicio del equipo, a validar con la DTI en una sesión de pesos.
+ahp:
+  fuente: "Juicio del equipo con la escala de Saaty; validar con la DTI"
+  indice_aleatorio: { 3: 0.58, 4: 0.90, 5: 1.12, 6: 1.24, 7: 1.32 }
+  cr_max: 0.10
+  pares:
+    - { a: C1, b: C2, v: 2,   motivo: "Sin eficacia sobre HTTPS el problema central no se resuelve; la privacidad es además una restricción que todas las alternativas deben cumplir (BYOD nunca se descifra)" }
+    - { a: C1, b: C3, v: 1,   motivo: "Una solución eficaz pero insostenible en costo no es aprobable por la DTI; ambos criterios pesan lo mismo" }
+    - { a: C1, b: C4, v: 2,   motivo: "La autonomía del encargado solo aporta valor si la reutilización de contenido funciona" }
+    - { a: C1, b: C5, v: 3,   motivo: "El soporte se puede contratar o transferir; la eficacia depende del diseño" }
+    - { a: C1, b: C6, v: 3,   motivo: "El valor académico es un beneficio secundario frente al problema operativo" }
+    - { a: C2, b: C3, v: 1,   motivo: "La aceptación por privacidad (RE-02) y el costo condicionan por igual la aprobación" }
+    - { a: C2, b: C4, v: 1,   motivo: "La transparencia y la autonomía del encargado son igualmente necesarias para la adopción" }
+    - { a: C2, b: C5, v: 2,   motivo: "Un incidente de privacidad tiene mayor impacto institucional que un problema de soporte" }
+    - { a: C2, b: C6, v: 2,   motivo: "La seguridad del servicio prevalece sobre el valor formativo" }
+    - { a: C3, b: C4, v: 2,   motivo: "La DTI debe justificar el gasto recurrente antes que la facilidad de gestión" }
+    - { a: C3, b: C5, v: 2,   motivo: "El costo total ya incorpora el mantenimiento del hardware" }
+    - { a: C3, b: C6, v: 2,   motivo: "El costo es un criterio de aprobación; el valor académico, uno de preferencia" }
+    - { a: C4, b: C5, v: 2,   motivo: "La autonomía es la causa raíz de gestión identificada en el E1 (§1.4.2)" }
+    - { a: C4, b: C6, v: 1,   motivo: "Ambos criterios son complementarios y de importancia similar" }
+    - { a: C5, b: C6, v: 1,   motivo: "Ambos criterios son secundarios y de importancia similar" }
+
+# ------------------------------------------------------------------------------------------------ Alternativas
+# `costo` dice qué partidas del modelo de Celeris (CX-x, OX-x) necesita cada alternativa; `ampliacion: true` es la compra
+# de los mismos Mbps que difiere Celeris [S-40]. C3 (TCO) no se juzga: se calcula con el TCO a 3 años (CI-102).
+# `justificacion` da una línea por criterio C1, C2, C4, C5 y C6 (el puntaje está en gestion/ce01.yaml).
+alternativas:
+  A0:
+    corto: "Ampliar el enlace"
+    descripcion: "Contratar al ISP los Mbps adicionales necesarios para absorber las descargas en hora punta."
+    resuelve: "La saturación inmediata del enlace, sin cambios técnicos en el campus."
+    no_resuelve: "Cada copia sigue atravesando el enlace una vez por estación; no aporta medición ni autonomía; el costo es recurrente y crece con la demanda."
+    riesgos: "Dependencia del precio del ISP [S-03]; la demanda vuelve a crecer y exige otra ampliación."
+    madurez: "Alta: servicio comercial estándar."
+    costo: { capex: [], opex: [], ampliacion: true }
+    justificacion:
+      C1: "Alivia la saturación, pero no elimina ninguna descarga repetida"
+      C2: "No introduce riesgos nuevos ni controles nuevos de privacidad"
+      C4: "El encargado no gana capacidad de decisión; depende del contrato de la DTI"
+      C5: "El soporte lo presta el ISP bajo contrato"
+      C6: "No genera conocimiento ni producto institucional"
+  A1:
+    corto: "Squid + SSL-Bump"
+    descripcion: "Proxy caché de software libre con descifrado TLS (SSL-Bump) [10] administrado por la DTI."
+    resuelve: "La reutilización de contenido HTTP y HTTPS con una tecnología madura y documentada."
+    no_resuelve: "No ofrece consola para el encargado, aviso previo a los usuarios ni métricas por laboratorio sin desarrollo adicional."
+    riesgos: "Configuración de descifrado amplia si no se acota por dominio; dependencia de un especialista en Squid."
+    madurez: "Alta: proyecto con más de dos décadas de uso en producción [11]."
+    costo: { capex: [CX-1, CX-2, CX-3, CX-4], opex: [OX-2, OX-3], ampliacion: false }
+    justificacion:
+      C1: "Reutiliza HTTP y HTTPS descifrado; carece de coalescencia de solicitudes simultáneas"
+      C2: "El descifrado depende de reglas manuales; no incluye aviso previo ni portal de transparencia"
+      C4: "Toda modificación exige editar la configuración del servidor"
+      C5: "Comunidad amplia y documentación abundante"
+      C6: "Valor formativo limitado a la administración del servicio"
+  A2:
+    corto: "LanCache"
+    descripcion: "Caché de contenido HTTP [9] para servicios de distribución (juegos y algunas actualizaciones) basada en DNS."
+    resuelve: "Las descargas HTTP de los servicios compatibles, sin descifrado."
+    no_resuelve: "El contenido HTTPS, que es la mayor parte del tráfico (E1, §1.4.2); no ofrece consola ni métricas por laboratorio."
+    riesgos: "Cobertura decreciente a medida que los fabricantes migran a HTTPS (RE-03)."
+    madurez: "Media: proyecto comunitario orientado a eventos y redes domésticas [12]."
+    costo: { capex: [CX-1, CX-2, CX-3, CX-4], opex: [OX-2, OX-3], ampliacion: false }
+    justificacion:
+      C1: "Solo cubre HTTP de servicios compatibles"
+      C2: "No descifra tráfico; el riesgo de privacidad es bajo"
+      C4: "La configuración se gestiona por DNS y archivos, sin interfaz para el encargado"
+      C5: "Soporte comunitario, sin respaldo comercial"
+      C6: "Valor formativo limitado"
+  A3:
+    corto: "WSUS / Delivery Optimization"
+    descripcion: "Servidor de actualizaciones del fabricante (WSUS) o caché entre pares de Windows (Delivery Optimization) [14]."
+    resuelve: "Las actualizaciones de Windows y Microsoft 365, sin descifrado y con herramientas del fabricante."
+    no_resuelve: "Los instaladores de otros fabricantes y el material de la plataforma virtual; no otorga control al encargado."
+    riesgos: "Microsoft anunció la deprecación de WSUS [13]; si la DTI ya lo opera, el beneficio incremental es menor."
+    madurez: "Alta para Windows; nula fuera del ecosistema Microsoft."
+    costo: { capex: [CX-1, CX-2, CX-3, CX-4], opex: [OX-2, OX-3], ampliacion: false }
+    justificacion:
+      C1: "Eficaz para Windows; no cubre el resto del contenido repetido"
+      C2: "Sin descifrado; usa canales firmados del fabricante"
+      C4: "Lo administra la DTI con consolas del fabricante"
+      C5: "Soporte del fabricante, sujeto a la deprecación anunciada de WSUS"
+      C6: "Sin aporte académico propio"
+  A4:
+    corto: "Celeris Edge"
+    descripcion: "Nodo de caché con coalescencia, descifrado controlado por fuente aprobada, consola del encargado y métricas por laboratorio (D-01…D-29)."
+    resuelve: "La descarga repetida HTTP y HTTPS, la precarga fuera del horario de clase y la medición del desperdicio por laboratorio."
+    no_resuelve: "No descifra el tráfico BYOD por diseño; depende de que la DTI distribuya el PAC (D-05) y apruebe la CA."
+    riesgos: "Dependencia de dos personas (RE-01), aceptación de la CA (RE-02) y aprobación de la DTI (RE-05)."
+    madurez: "Baja: producto propio en etapa de prueba de concepto, construido sobre componentes maduros."
+    costo: { capex: [CX-1, CX-2, CX-3, CX-4], opex: [OX-1, OX-2, OX-3], ampliacion: false }
+    justificacion:
+      C1: "Reutiliza HTTP y HTTPS aprobado y agrupa las solicitudes simultáneas (coalescencia)"
+      C2: "Descifra solo fuentes aprobadas, con aviso previo, CA limitada y BYOD excluido"
+      C4: "El encargado habilita fuentes y laboratorios desde la consola (OB-3)"
+      C5: "Lo sostienen dos personas hasta la transferencia a la DTI (RE-01)"
+      C6: "Producto propio, documentado como código y reutilizable en la docencia"
+  A5:
+    corto: "Caché del FortiGate"
+    descripcion: "Función de caché web del FortiGate perimetral existente, si el modelo dispone de disco y licencia [15]."
+    resuelve: "La reutilización de contenido sin hardware nuevo en el campus."
+    no_resuelve: "Para HTTPS exige inspección profunda sobre todo el tráfico, incluido el BYOD; no otorga control al encargado y carga al equipo que protege todo el campus."
+    riesgos: "Degradación del rendimiento del firewall perimetral; conflicto con la regla de no descifrar el BYOD."
+    madurez: "Alta como producto; su disponibilidad depende del modelo instalado [levantar con la DTI]."
+    costo: { capex: [], opex: [], ampliacion: false, cota_inferior: true }
+    justificacion:
+      C1: "Cachea HTTP; para HTTPS requiere inspección profunda generalizada"
+      C2: "La inspección generalizada alcanzaría al BYOD, que nunca se descifra"
+      C4: "Lo administra exclusivamente la DTI desde el firewall perimetral"
+      C5: "Soporte comercial del fabricante"
+      C6: "Sin aporte académico propio"
+
+# ------------------------------------------------------------------------------------------------ Riesgos: estrés
+# Escenario de estrés de cada RE-xx: qué parámetros del modelo cambia si el riesgo se materializa. Son juicios del
+# equipo (CI-102), no supuestos medibles; cada uno se justifica en una línea.
+riesgos_estres:
+  RE-01: { cambios: { horizonte_efectivo: 1 }, efecto: "El servicio se detiene al cabo del primer año por falta de personal" }
+  RE-02: { cambios: { bhr: 0.10 }, efecto: "Sin descifrado solo se reutiliza HTTP: BHR en el mínimo del rango" }
+  RE-03: { cambios: { bhr: 0.15 }, efecto: "El BHR cae al umbral del disparador" }
+  RE-04: { cambios: { factor_bn1_anio1: 0.75 }, efecto: "El descifrado se suspende un trimestre mientras se reemite la CA" }
+  RE-05: { cambios: { adopcion_labs: 1, factor_bn2: 0.10 }, efecto: "El servicio queda limitado al laboratorio piloto" }
+  RE-06: { cambios: { factor_bn2: 0.0 }, efecto: "Sin uso de la consola no se ahorran horas técnicas" }
+  RE-07: { cambios: { f_aws: 1.30 }, efecto: "El costo AWS sube al máximo del rango" }
+  RE-08: { cambios: { adopcion: 0.90 }, efecto: "Una décima parte del contenido queda excluida por certificate pinning" }
+  RE-09: { cambios: { factor_beneficio_anio1: 0.50 }, efecto: "El despliegue se retrasa medio año" }
+  RE-10: { cambios: { f_capex: 1.15 }, efecto: "La migración de hipervisor eleva la inversión al máximo del rango" }
+  RE-11: { cambios: { aws_cantidades: { C2: 0, C3: 1460, C4: 0 } }, efecto: "Se reemplaza EC2-GW por una VPN de acceso remoto en el campus" }
+  RE-12: { cambios: {}, efecto: "EC2-GW no guarda datos y se recrea con OpenTofu; el impacto es reputacional" }
+
+# ------------------------------------------------------------------------------------------------ Beneficios
+beneficios_cualitativos:
+  - { id: BQ-1, beneficio: "Clases que empiezan a tiempo", observacion: "Minutos de clase perdidos por esperas, según encuesta a docentes antes y después del piloto", ob: OB-2 }
+  - { id: BQ-2, beneficio: "Autonomía y visibilidad del encargado", observacion: "Solicitudes atendidas sin intervención de la DTI y uso semanal de la consola", ob: OB-3 }
+  - { id: BQ-3, beneficio: "Confianza de los usuarios en el tratamiento de su tráfico", observacion: "Avisos entregados antes de instalar la CA y quejas formales registradas", ob: OB-4 }
+  - { id: BQ-4, beneficio: "Menor exposición a abusos del servicio", observacion: "Escenarios de abuso planificados que la detección registra en S2", ob: OB-5 }
+  - { id: BQ-5, beneficio: "Capacidad institucional y producto propio", observacion: "Registro de software, documentación transferida a la DTI y uso en asignaturas", ob: OB-3 }
+
+indicadores_valor:
+  - { id: IV-1, indicador: "GB evitados por mes", formula: "BHR × tráfico mensual de los laboratorios", supuestos: "S-04, S-05", ob: OB-1 }
+  - { id: IV-2, indicador: "BHR por laboratorio", formula: "Bytes servidos por la caché ÷ bytes solicitados, por laboratorio", supuestos: "S-04", ob: OB-1 }
+  - { id: IV-3, indicador: "Costo por GB servido desde la caché", formula: "(OPEX anual + inversión ÷ horizonte) ÷ GB servidos por año", supuestos: "S-04, S-05, S-08…S-12", ob: OB-1 }
+  - { id: IV-4, indicador: "Adopción del proxy", formula: "Bytes de los laboratorios que pasan por la caché ÷ bytes totales de los laboratorios", supuestos: "CI-102", ob: OB-1 }
+  - { id: IV-5, indicador: "Minutos de descarga por laboratorio", formula: "Tiempo de descarga de un ciclo para las estaciones de un laboratorio", supuestos: "S-26, S-27", ob: OB-2 }
+
+# ------------------------------------------------------------------------------------------------ Árbol de objetivos
+# Espejo del árbol de problemas del E1 (gestion/e1/datos/diagnostico.yaml → arbol): un medio por causa y un fin por
+# efecto, en el mismo orden. gestion/e2/figuras/generar.py falla si las cantidades no coinciden.
+arbol_objetivos:
+  objetivo: "Reutilizar en el campus el contenido que se repite y descongestionar el enlace en horario de clase"
+  medios:
+    - "Una copia compartida sirve a las 40 estaciones del laboratorio"
+    - "La precarga se programa fuera del horario de clase"
+    - "Descifrado controlado de las fuentes aprobadas, con aviso previo"
+    - "El encargado decide qué se reutiliza, con consola y métricas"
+  fines:
+    - "Las clases comienzan a tiempo"
+    - "El resto del campus recupera ancho de banda"
+    - "La ampliación del enlace se difiere"
+    - "Se liberan horas técnicas en cada ciclo"
+    - "El desperdicio se mide por laboratorio"
+
+# ------------------------------------------------------------------------------------------------ BDN (Ward y Daniel)
+bdn:
+  fuente: "Elaboración propia con la red de dependencia de beneficios de Ward y Daniel [3]"
+  habilitadores:
+    - { id: H1, texto: "Nodo de caché EDGE01/EDGE02 con coalescencia" }
+    - { id: H2, texto: "CA limitada y PAC distribuido (D-05)" }
+    - { id: H3, texto: "Consola del encargado en CTRL01" }
+    - { id: H4, texto: "Portal de transparencia PORTAL01" }
+    - { id: H5, texto: "Métricas y detección (SIEM01)" }
+  cambios:
+    - { id: K1, texto: "Las estaciones descargan a través de la caché", de: [H1, H2] }
+    - { id: K2, texto: "El encargado programa la precarga fuera de clase", de: [H1, H3] }
+    - { id: K3, texto: "El encargado habilita fuentes sin pedirlo a la DTI", de: [H3] }
+    - { id: K4, texto: "Los usuarios reciben aviso antes de la CA", de: [H2, H4] }
+    - { id: K5, texto: "El BHR se mide cada mes por laboratorio", de: [H5, H3] }
+  beneficios:
+    - { id: BN-1, texto: "Mbps de ampliación diferidos", de: [K1, K5] }
+    - { id: BN-2, texto: "Horas técnicas ahorradas", de: [K2, K3] }
+    - { id: BQ-1, texto: "Clases que empiezan a tiempo", de: [K1, K2] }
+    - { id: BQ-2, texto: "Autonomía y visibilidad del encargado", de: [K3, K5] }
+    - { id: BQ-3, texto: "Confianza de los usuarios", de: [K4] }
+    - { id: BQ-4, texto: "Menor exposición a abusos", de: [K5] }
+  objetivos:
+    - { id: OB-1, de: [BN-1] }
+    - { id: OB-2, de: [BQ-1, BN-2] }
+    - { id: OB-3, de: [BQ-2] }
+    - { id: OB-4, de: [BQ-3] }
+    - { id: OB-5, de: [BQ-4] }
+
+# ------------------------------------------------------------------------------------------------ Objetivos SMART
+# Plazo y relevancia de cada OB-x. La meta y el indicador NO se copian: se leen de infra/trazabilidad.yaml.
+smart:
+  fuente: "Guía CE01 v0.4 B2.1 (plazos); metas e indicadores de infra/trazabilidad.yaml"
+  plazos:
+    OB-1: { plazo: "3 meses tras el piloto", relevancia: "Ataca la causa de volumen y sustenta BN-1" }
+    OB-2: { plazo: "1 ciclo de preparación", relevancia: "Reduce la espera al inicio de clase (BQ-1) y sustenta BN-2" }
+    OB-3: { plazo: "Fin del piloto", relevancia: "Cierra la causa raíz de gestión identificada en el E1" }
+    OB-4: { plazo: "Antes del piloto", relevancia: "Condición de aceptación por privacidad (RE-02)" }
+    OB-5: { plazo: "Fin de S2", relevancia: "Protege el servicio y la CA frente a abusos (RE-04, RE-12)" }

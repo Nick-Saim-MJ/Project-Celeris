@@ -1139,3 +1139,21 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - Tiempo de descarga de un laboratorio (OB-2): 00 M2.3 da «≈ 1,8 h (ilustrativo)» sin derivarlo. El E1 lo calcula con los supuestos (40 PCs × 3 GB [S-26, S-27] con todo el enlace de 300 Mbps [S-02]) y lo presenta como cota inferior (≈ 0,89 h); el 1,8 h equivale a usar la mitad del enlace. La línea base real se mide en el E4.
   - Prefijos locales del E1, sin uso fuera de CE01: PO-1…PO-5 (problemas operativos asociados a TI), FCE-1…FCE-5 (factores críticos de éxito), BR-1…BR-7 (brechas) y OE-a…OE-d (rótulos de trabajo de los objetivos estratégicos institucionales, hasta tener los códigos oficiales del plan estratégico). No son IDs del contrato M6 y no se reutilizan con otro significado.
 - **Decide:** equipo del proyecto
+
+### CI-102 — Business Case E2 de CE01: rangos de Monte Carlo, juicios AHP, costo de las alternativas y escenarios de estrés
+- **Estado:** resuelto (2026-11-25, P2)
+- **Tipo:** vacío | decisión de diseño
+- **Dónde:** guía CE01 v0.4 B2.2–B2.5; prompt P2; `gestion/e2/datos/business_case.yaml`; `gestion/analytics/business_case.py`; `gestion/ce01.yaml` → `referencias.supuestos.S-05`
+- **Qué faltaba:**
+  - La guía y el prompt piden Monte Carlo con distribuciones triangulares, pero no fijan los rangos de todas las variables ni la moda de la adopción del proxy.
+  - Ni la guía ni el repositorio tienen los juicios por pares para derivar los pesos con AHP, ni el costo de cada alternativa con las mismas partidas.
+  - B1.8 no traduce los riesgos RE-01…RE-12 en cambios de parámetros del modelo.
+  - Los indicadores de valor necesitan el tráfico mensual de laboratorios (S-05) como número; `ce01.yaml` solo tenía su texto.
+- **Decisión aplicada:**
+  - Monte Carlo: 10 000 iteraciones, semilla 20261125, triangular (mín, moda, máx) con la moda en el valor del supuesto: BHR 10–40 % [S-04], costo por Mbps-mes US$ 4–12 [S-03], adopción 60–100 % con moda 100 % (sin dato: el caso base supone que todo el tráfico del laboratorio pasa por la caché), factor AWS 0,70–1,30 [S-12] y factor de inversión 0,85–1,15 [S-08]. La adopción es un parámetro del modelo, no un supuesto S-xx; se mide en el piloto.
+  - AHP: quince juicios del equipo con la escala de Saaty, cada uno con su motivo (anexo B del informe); CR = 0,014 < 0,10. El modelo falla si un cambio de juicios lleva el CR al umbral. Los pesos AHP prevalecen sobre los de partida de B2.2 y se validan con la DTI en una sesión de ponderación.
+  - El criterio C3 no se juzga: se calcula del TCO a tres años con escala lineal (menor costo = 5, mayor = 1).
+  - Costo de las alternativas con las partidas del modelo: A1, A2 y A3 con el mismo hardware que A4 (servidor, switch, UPS y cableado), sin EC2-GW ni S3; A0 como la compra de los mismos Mbps que difiere Celeris [S-40] al costo de S-03; A5 con costo nulo como cota inferior hasta que la DTI informe disco y licencia del FortiGate.
+  - Escenarios de estrés por riesgo (juicio del equipo): RE-01 servicio solo el primer año; RE-02 BHR 10 %; RE-03 BHR 15 %; RE-04 beneficio BN-1 al 75 % el primer año; RE-05 un solo laboratorio y BN-2 al 10 %; RE-06 sin BN-2; RE-07 AWS × 1,30; RE-08 adopción 90 %; RE-09 beneficio del primer año al 50 %; RE-10 inversión × 1,15; RE-11 sin EC2-GW (VPN en el campus); RE-12 sin efecto en el flujo (reputacional).
+  - S-05 recibe el número `tb_mes: 19,4` (el mismo valor que ya decía su texto); no cambia el supuesto.
+- **Decide:** equipo del proyecto (juicios a validar con la DTI)

@@ -1,0 +1,46 @@
+# Registro de figuras del E2 (lo escribe gestion/e2/figuras/generar.py; no editar a mano).
+fig-arbol-objetivos:
+  archivo: arbol-objetivos.png
+  titulo: 'Árbol de objetivos: medios, objetivo central y fines'
+  fuente: Elaboración propia; espejo del árbol de problemas del E1 (Figura 1.9)
+  horizontal: true
+fig-tco:
+  archivo: tco-alternativas.png
+  titulo: Costo total de propiedad a tres años por alternativa
+  fuente: Elaboración propia; partidas CX-x y OX-x de gestion/ce01.yaml; supuestos S-03, S-08…S-12, S-37…S-41
+  horizontal: false
+fig-matriz:
+  archivo: matriz-ponderada.png
+  titulo: Matriz de decisión ponderada con pesos AHP
+  fuente: Elaboración propia; puntajes de la guía CE01 v0.4 B2.2, C3 calculado con el TCO y pesos AHP [1]
+  horizontal: true
+fig-sensibilidad:
+  archivo: sensibilidad-pesos.png
+  titulo: Sensibilidad de la decisión al peso de cada criterio
+  fuente: Elaboración propia; gestion/analytics/business_case.py
+  horizontal: true
+fig-bdn:
+  archivo: bdn.png
+  titulo: 'Red de dependencia de beneficios: habilitador, cambio, beneficio y objetivo'
+  fuente: Elaboración propia, adaptado de Ward y Daniel [3]; objetivos OB-x de infra/trazabilidad.yaml
+  horizontal: true
+fig-flujo:
+  archivo: flujo-caja.png
+  titulo: Flujo de caja del caso base y flujo acumulado
+  fuente: Elaboración propia; gestion/analytics/business_case.py
+  horizontal: false
+fig-montecarlo:
+  archivo: montecarlo.png
+  titulo: Distribución del VAN en la simulación de Monte Carlo
+  fuente: Elaboración propia; distribuciones triangulares de gestion/e2/datos/business_case.yaml (CI-102)
+  horizontal: false
+fig-tornado:
+  archivo: tornado.png
+  titulo: Diagrama de tornado del VAN
+  fuente: Elaboración propia; una variable a la vez en los extremos de su rango (CI-102)
+  horizontal: false
+fig-riesgos-van:
+  archivo: riesgos-van.png
+  titulo: Mapa de calor de los riesgos RE-01…RE-12 con su efecto en el VAN
+  fuente: Elaboración propia; P e I de gestion/ce01.yaml; ΔVAN de los escenarios de estrés (CI-102)
+  horizontal: false

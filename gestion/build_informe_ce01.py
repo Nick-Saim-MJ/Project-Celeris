@@ -25,7 +25,8 @@ Salida: entregables/CE01/EN/Informe_CE01_EN_vX.Y.docx (+ .pdf con --pdf, vía Wo
 supuestos citados y el anexo «Autoevaluación contra la rúbrica».
 
 Falla (código ≠ 0) y lista todos los problemas si:
-  a) falta un título del contenido mínimo (docs/fuentes/CE01/contenido-minimo.yaml) o este no está cotejado (CI-99);
+  a) falta un título del contenido mínimo o uno de sus ítems como subtítulo (docs/fuentes/CE01/contenido-minimo.yaml),
+     o el contenido mínimo no está cotejado con el texto literal del EPE (CI-99);
   b) queda un {{…}} sin resolver o un {{ref:}} a un id que no existe;
   c) una figura citada no existe (ni en el registro ni su PNG);
   d) una cifra con US$, %, h, min, GB, TB, Mbps, W o kWh aparece en el texto fuera de un {{dato:}} o de una tabla generada;
@@ -78,6 +79,13 @@ def _norm(t: str) -> str:
     t = re.sub(r"[*`_]", "", t)
     t = re.sub(r"^\s*(?:\d+(?:\.\d+)*\.?|[A-Z]\.)\s+", "", t)      # «1.1 Contexto…» → «Contexto…»
     return re.sub(r"\s+", " ", t).strip().casefold()
+
+
+def _cubre(exigido: str, titulos: set[str]) -> bool:
+    """¿Algún título del informe empieza con el texto exigido? Lo que va entre paréntesis en el EPE («(si aplica)»,
+    «(SMART)», «(opcional según complejidad)») no se exige; el informe puede ampliar el título («Análisis FODA y TOWS»)."""
+    base = _norm(re.sub(r"\s*\([^)]*\)", "", exigido)).rstrip(".")
+    return any(t.startswith(base) for t in titulos)
 
 
 def _hex(nombre: str) -> str:
@@ -186,8 +194,11 @@ def comprobar(f: Fuentes, exigir_cotejado: bool = True) -> list[str]:
     todo = f.cuerpo + f.anexos
     titulos = {_norm(b[1]) for _, bl in todo for b in bl if b[0].startswith("h")}
     for c in cont["contenido_minimo"]:
-        if _norm(c["titulo"]) not in titulos:
+        if not _cubre(c["titulo"], titulos):
             p.append(f"a) falta el título del contenido mínimo {c['id']} «{c['titulo']}»")
+        for item in c.get("incluye", []):
+            if not _cubre(item, titulos):
+                p.append(f"a) falta el subtítulo del contenido mínimo {c['id']} «{item}»")
 
     num = numerar(f)
     palabras_min = ce01_datos.estilo()["numeracion"]["palabras_min_interpretacion"]

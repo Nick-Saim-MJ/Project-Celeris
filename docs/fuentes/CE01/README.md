@@ -1,16 +1,12 @@
 # docs/fuentes/CE01 — Fuentes oficiales de CE01 Gestión de TI (S1, E1–E4)
 
-| Archivo | Qué es | Estado |
-| --- | --- | --- |
-| `E1-E4-contenido-y-rubrica.md` | Texto **literal** del EPE, área B (GTI), para CE01 S1: descripción del producto, contenido mínimo y rúbrica de los 4 entregables y lista de evidencias CE0111–CE0135. Sin resumir. | **Pendiente (CI-99)**: el texto no estaba en el repositorio al ejecutar P0 |
-| `contenido-minimo.yaml` | Los títulos del contenido mínimo y los criterios de la rúbrica en forma legible por máquina. Lo usan `gestion/build_informe_ce01.py` y `gestion/validate_ce01.py` | Preliminar (`cotejado: false`), tomado de la guía CE01 v0.4 |
-| Plantilla DOCX oficial de CE01 | Si el docente entrega una, va aquí; el generador la usa en lugar de la portada UPeU de CE03 | No existe: la estructura del informe es la del contenido mínimo, título por título |
+| Archivo | Qué es |
+| --- | --- |
+| `E1-E4-contenido-y-rubrica.md` | Texto **literal** del EPE 2026, área B (GTI): nombre, descripción, competencias CE011–CE014, evidencias CE0111–CE0145, distribución por semestre y, para E1–E4, descripción del producto, contenido mínimo y rúbrica. Copiado de `transcripcion.md` (líneas 488–805) sin resumir (CI-99) |
+| `contenido-minimo.yaml` | Generado desde el texto literal: títulos, ítems («incluye») y los cuatro descriptores de cada criterio. Lo usan `gestion/build_informe_ce01.py` (exige títulos e ítems) y `gestion/validate_ce01.py` (comprueba que todo esté tal cual en el texto literal) |
 
-## Cómo cerrar CI-99
+**Formato de los informes.** El EPE no fija plantilla, extensión ni formato para GTI (CE02 y CE03 sí los tienen): la
+estructura de cada informe es su «Contenido mínimo requerido», título por título, y cada ítem es un subtítulo. No hay
+plantilla DOCX oficial de CE01; el generador usa la portada UPeU del proyecto y referencias IEEE, como las demás áreas.
 
-1. Pegar en `E1-E4-contenido-y-rubrica.md` el bloque «B. ÁREA DE GESTIÓN DE TECNOLOGÍAS DE INFORMACIÓN» de
-   `transcripcion.md`, completo hasta antes de «Entregable 5».
-2. En `contenido-minimo.yaml`, igualar cada `titulo` y `criterio` al texto literal, completar `excelente` y poner
-   `meta.cotejado: true`.
-3. `mingw32-make validate-ce01` (o `make validate-ce01`): falla si un título o un criterio del YAML no aparece tal cual
-   en el texto literal.
+Si el texto del EPE cambia: volver a copiar el bloque B, regenerar `contenido-minimo.yaml` y correr `make validate-ce01`.

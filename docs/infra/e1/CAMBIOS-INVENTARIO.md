@@ -1102,13 +1102,17 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
 - **Decide:** equipo del proyecto
 
 ### CI-99 — Texto literal del EPE para CE01 S1 ausente del repositorio
-- **Estado:** abierto
+- **Estado:** resuelto (2026-11-25)
 - **Tipo:** vacío
-- **Dónde:** `docs/fuentes/CE01/E1-E4-contenido-y-rubrica.md` (no existe); `docs/fuentes/CE01/contenido-minimo.yaml` (`cotejado: false`)
-- **Qué pasa:** P0 pide transcribir literal el bloque «B. ÁREA DE GESTIÓN DE TECNOLOGÍAS DE INFORMACIÓN» de `transcripcion.md` (descripción del producto, contenido mínimo, rúbrica y evidencias CE0111–CE0135). El texto no está en el repositorio ni se entregó al ejecutar P0. No hay plantilla DOCX oficial de CE01.
-- **Propuesta:** `contenido-minimo.yaml` se dejó preliminar, con los títulos y criterios de la guía CE01 v0.4 (B1.9, B2.7, B3.8, B4.6). Mientras no se coteje, `validate-ce01` lo reporta como AVISO y el generador no arma ningún informe. Para cerrar: pegar el texto literal, igualar títulos y criterios, completar el descriptor «Excelente» y poner `cotejado: true` (pasos en `docs/fuentes/CE01/README.md`).
+- **Dónde:** `docs/fuentes/CE01/E1-E4-contenido-y-rubrica.md`; `docs/fuentes/CE01/contenido-minimo.yaml`
+- **Qué pasaba:** P0 se ejecutó sin el bloque «B. ÁREA DE GESTIÓN DE TECNOLOGÍAS DE INFORMACIÓN» de `transcripcion.md`; el contenido mínimo quedó preliminar, con los títulos de la guía CE01 v0.4, y el generador no podía armar informes.
+- **Decisión aplicada:**
+  - El bloque B se copió literal (líneas 488–805 de `transcripcion.md`, hasta antes de «Entregable 5»), comprobado línea a línea contra la fuente; el encabezado del archivo guarda la huella SHA-256 de la fuente.
+  - `contenido-minimo.yaml` se regeneró desde ese texto: E1 4 títulos y 16 ítems, E2 5 y 14, E3 6 y 17, E4 3 y 11; la rúbrica con sus cuatro descriptores (4, 4, 7 y 4 criterios). `cotejado: true`.
+  - Varios títulos de la guía no eran los del EPE: «Justificación» → «Justificación del Proyecto», «Beneficios» → «Evaluación de Beneficios», «Costos» → «Estimación de Costos», «Alcance/Cronograma/Costos/Riesgos» → «Gestión del …», «AS-IS/TO-BE» → «Proceso Actual (AS-IS)» / «Proceso Propuesto (TO-BE)». En la rúbrica, el último criterio de todos los entregables es «Sustentación y defensa técnica».
+  - El generador exige ahora, además de cada título, cada ítem del contenido mínimo como subtítulo (lo que va entre paréntesis, como «(opcional según complejidad)» o «(si aplica)», no se exige). `validate-ce01` comprueba que títulos, ítems y descriptores estén tal cual en el texto literal.
+  - El EPE no fija plantilla, extensión ni formato para GTI (a diferencia de CE02 y CE03): la estructura es el contenido mínimo. No hay plantilla DOCX oficial de CE01: se usa la portada UPeU del proyecto. Evidencias según el índice del EPE: E1 CE0111–CE0115, E2 CE0113, E3 CE0121–CE0125, E4 CE0131–CE0135.
 - **Decide:** Henyelrey
-- **Efecto al resolver:** el validador pasa a comprobar que cada título y criterio del YAML esté tal cual en el texto literal; P1–P4 pueden generar sus informes.
 
 ### CI-100 — Identidad visual y numeración de figuras y tablas de CE01
 - **Estado:** resuelto (2026-11-24, pedido del equipo antes de P0)

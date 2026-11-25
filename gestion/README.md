@@ -50,8 +50,9 @@ escrito. PNG de 200 dpi, Calibri, 25,7 × 13,4 cm como máximo en página horizo
 
 `make validate-ce01` · `make figuras-ce01` · `make informe-ce01-e1` … `make informe-ce01-e4`
 
-## Pendiente antes de P1
+## Estado
 
-- **CI-99**: pegar el texto literal del EPE en `docs/fuentes/CE01/E1-E4-contenido-y-rubrica.md` y cotejar
-  `contenido-minimo.yaml`. Hasta entonces el generador no arma ningún informe.
-- Instalar Archi (vista de motivación del E1).
+- Contenido mínimo y rúbrica cotejados con el texto literal del EPE (CI-99 resuelto): el generador exige cada título y
+  cada ítem del contenido mínimo como subtítulo.
+- Archi 5.12 instalado (vista de motivación del E1).
+- Aviso abierto: la fila RACI «Prototipo de la consola y validación» no tiene aprobador (lo define P3).

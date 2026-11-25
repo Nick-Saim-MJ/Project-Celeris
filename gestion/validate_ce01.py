@@ -53,13 +53,17 @@ def main() -> int:
         texto = _norm(literal.read_text(encoding="utf-8"))
         for ent, e in cont["entregables"].items():
             for c in e["contenido_minimo"]:
-                if _norm(c["titulo"]) not in texto:
+                if _norm(f"{c['id']} {c['titulo']}") not in texto:
                     fallas.append(f"{ent} {c['id']}: «{c['titulo']}» no aparece tal cual en el texto literal del EPE")
+                for item in c.get("incluye", []):
+                    if _norm(f"- {item}") not in texto:
+                        fallas.append(f"{ent} {c['id']}: el ítem «{item}» no aparece tal cual en el texto literal")
             for r in e["rubrica"]:
-                if _norm(r["criterio"]) not in texto:
-                    fallas.append(f"{ent}: el criterio «{r['criterio']}» no aparece tal cual en el texto literal")
-                if not r.get("excelente"):
-                    fallas.append(f"{ent}: el criterio «{r['criterio']}» no tiene el descriptor de nivel Excelente")
+                if _norm(f"| {r['criterio']} | {r.get('excelente') or ''} |") not in texto:
+                    fallas.append(f"{ent}: el criterio «{r['criterio']}» o su descriptor Excelente no aparecen tal cual en el texto literal")
+        info.append("contenido mínimo y rúbrica de E1–E4 cotejados con el texto literal del EPE (" +
+                    ", ".join(f"{k}: {len(v['contenido_minimo'])} títulos, {sum(len(c.get('incluye', [])) for c in v['contenido_minimo'])} ítems, "
+                              f"{len(v['rubrica'])} criterios" for k, v in cont["entregables"].items()) + ")")
 
     # 3 y 4. Entregables con texto o con DOCX
     for ent in bi.ENTREGABLES:

@@ -41,7 +41,9 @@ def _entregable(tmp: Path, **cambios) -> Path:
     archivos = {
         "e1/informe/00-resumen.md": "# Resumen ejecutivo\n\nEl enlace se satura en horas de clase [S-02].\n",
         "e1/informe/10-cuerpo.md": "\n".join([
-            "# 1.1 Contexto organizacional",
+            "# 1.1 Contexto Organizacional",
+            "",
+            "## 1.1.1 Descripción del sector y entorno competitivo",
             "",
             "La {{ref:fig-trafico}} resume el tráfico de un día típico de laboratorio.",
             "",
@@ -49,7 +51,15 @@ def _entregable(tmp: Path, **cambios) -> Path:
             "",
             INTERPRETACION,
             "",
-            "# 1.2 Análisis estratégico",
+            "## 1.1.2 Estructura organizacional", "", "Texto.", "",
+            "## 1.1.3 Cadena de valor", "", "Texto.", "",
+            "## 1.1.4 Mapa de stakeholders", "", "Texto.", "",
+            "# 1.2 Análisis Estratégico",
+            "",
+            "## 1.2.1 Misión, visión y objetivos estratégicos", "", "Texto.", "",
+            "## 1.2.2 Análisis FODA y FODA cruzado (TOWS)", "", "Texto.", "",
+            "## 1.2.3 Análisis PESTEL", "", "Texto.", "",
+            "## 1.2.4 Identificación de factores críticos de éxito",
             "",
             "La inversión inicial es {{dato:capex_total}} [S-08] y la {{ref:t-fce}} lista los factores críticos.",
             "",
@@ -58,13 +68,18 @@ def _entregable(tmp: Path, **cambios) -> Path:
             "| --- | --- |",
             "| Apoyo de la DTI | Reuniones atendidas |",
             "",
-            "# 1.3 Diagnóstico digital / TI",
+            "# 1.3 Diagnóstico Digital / TI",
             "",
-            "Texto del diagnóstico.",
+            "## 1.3.1 Inventario de sistemas de información existentes", "", "Texto.", "",
+            "## 1.3.2 Nivel de madurez digital (COBIT 2019)", "", "Texto.", "",
+            "## 1.3.3 Brechas tecnológicas", "", "Texto.", "",
+            "## 1.3.4 Problemas operativos asociados a TI", "", "Texto.", "",
+            "# 1.4 Identificación del Problema",
             "",
-            "# 1.4 Identificación del problema",
-            "",
-            "Texto del problema.",
+            "## 1.4.1 Definición estructurada del problema", "", "Texto.", "",
+            "## 1.4.2 Causas raíz", "", "Texto.", "",
+            "## 1.4.3 Impacto estratégico", "", "Texto.", "",
+            "## 1.4.4 Justificación de intervención", "", "Texto.",
         ]) + "\n",
         "e1/figuras/figuras.yaml": yaml.safe_dump({"fig-trafico": {
             "archivo": "trafico.png", "titulo": "Tráfico de un día de laboratorio", "fuente": "Elaboración propia",
@@ -152,8 +167,19 @@ def test_a_contenido_no_cotejado(tmp_path):
 
 def test_a_falta_titulo(tmp_path):
     cuerpo = (_entregable(tmp_path) / "e1/informe/10-cuerpo.md").read_text(encoding="utf-8")
-    p = _problemas(tmp_path, **{"e1/informe/10-cuerpo.md": cuerpo.replace("# 1.3 Diagnóstico digital / TI", "# Otro")})
-    assert any("1.3" in x and x.startswith("a)") for x in p)
+    p = _problemas(tmp_path, **{"e1/informe/10-cuerpo.md": cuerpo.replace("# 1.3 Diagnóstico Digital / TI", "# Otro")})
+    assert any("1.3" in x and x.startswith("a)") and "título" in x for x in p)
+
+
+def test_a_falta_item_del_contenido_minimo(tmp_path):
+    cuerpo = (_entregable(tmp_path) / "e1/informe/10-cuerpo.md").read_text(encoding="utf-8")
+    p = _problemas(tmp_path, **{"e1/informe/10-cuerpo.md": cuerpo.replace("## 1.1.3 Cadena de valor", "## 1.1.3 Procesos")})
+    assert p == ["a) falta el subtítulo del contenido mínimo 1.1 «Cadena de valor»"]
+
+
+def test_a_parentesis_del_epe_no_se_exige(tmp_path):
+    # «Análisis PESTEL (opcional según complejidad)» se cubre con «1.2.3 Análisis PESTEL»; el caso base no tiene problemas
+    assert _problemas(tmp_path) == []
 
 
 def test_b_marca_sin_resolver(tmp_path):

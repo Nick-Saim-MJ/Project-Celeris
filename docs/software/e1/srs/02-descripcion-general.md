@@ -39,7 +39,7 @@ La figura de contexto C4 (Sección 3) y DS-14 (casos de uso, Sección 4) muestra
 | --- | --- | --- | --- | --- |
 | Encargado de laboratorio | Responsable de uno o más laboratorios; sin acceso a la red de gestión | 10, uno por laboratorio [S-36] | `encargado` (laboratorios asignados, REQ-RN-06) | ENC01 (F28) o EC2-GW (F29 → F30) |
 | Administrador DTI | Técnico de infraestructura | Sin cifra [S-36] | `admin` | JMP01 o ENC01 para acciones críticas; EC2-GW solo para lectura y acciones no críticas |
-| Docente | Pide que un software esté listo para su clase | Sin cifra (sección 1.13.1, H-03) | `docente`: solo crea y ve sus solicitudes | ENC01 o EC2-GW |
+| Docente | Solicita que un software esté disponible para su clase | Sin cifra (sección 1.13.1, H-03) | `docente`: solo crea y ve sus solicitudes | ENC01 o EC2-GW |
 | Auditor | Docente evaluador u oficial de datos personales | Sin cifra [S-36] | `auditor` (solo lectura) | ENC01 o EC2-GW |
 | Usuario de laboratorio | Estudiante o docente en una PC institucional | Hasta 400 simultáneos [S-36] | Sin cuenta | PC de LAB-01…LAB-10 |
 | Usuario BYOD | Estudiante con equipo propio en el Wi-Fi | Sin cifra [S-36] | Sin cuenta | WIFI-EST [S-28] |

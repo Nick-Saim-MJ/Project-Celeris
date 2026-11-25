@@ -4,44 +4,44 @@ La arquitectura responde a las cuatro causas del problema (00 M2.2):
 
 | Causa del problema | Respuesta de la arquitectura |
 | --- | --- |
-| Cada PC repite la misma descarga | Un nodo de caché por campus que descarga una sola vez y reparte por la LAN |
-| Se descarga en horario de clase | Precargas nocturnas en el propio nodo (D-21) |
-| Casi todo es HTTPS | Descifrado selectivo y aprobado (D-02, D-04, D-20) |
-| Nadie puede decidir qué se reutiliza | Una consola para el encargado (D-25) |
+| Cada estación repite la misma descarga | Un nodo de caché por campus que descarga una sola vez y distribuye por la LAN |
+| Las descargas ocurren en horario de clase | Precargas nocturnas ejecutadas en el propio nodo (D-21) |
+| La mayor parte del tráfico es HTTPS | Descifrado selectivo y aprobado (D-02, D-04, D-20) |
+| No existe un rol que decida qué se reutiliza | Una consola para el encargado (D-25) |
 
-La vista se presenta con el modelo C4 en tres niveles: contexto, contenedores y componentes. El nivel de
-contenedores se dibuja como vista de despliegue, porque cada contenedor tiene una VM y una IP en
-`infra/inventory.yaml`. Las decisiones están en formato MADR, en `adr/`.
+La arquitectura se presenta con el modelo C4 en tres niveles: contexto, contenedores y componentes. El nivel de
+contenedores se representa como vista de despliegue, dado que cada contenedor tiene asignadas una VM y una dirección
+IP en `infra/inventory.yaml`. Las decisiones se documentan en formato MADR, en `adr/`.
 
 **Convención.**
 
-- «R1»: existe en el código (`src/`).
-- «R2»: se construye en S2.
+- «R1»: implementado en el código (`src/`).
+- «R2»: se construirá en S2.
 
-El color de cada estado siempre va acompañado del estereotipo escrito.
+El color de cada estado se acompaña siempre del estereotipo escrito.
 
 ## 3.1 Vista de contexto (C1) — DS-20
 
-**Celeris Edge** es un solo sistema formado por tres piezas: los nodos EDGE01/EDGE02, la consola en CTRL01 y el
-portal en PORTAL01. A su alrededor hay seis tipos de persona y cinco sistemas externos.
+**Celeris Edge** constituye un único sistema integrado por tres elementos: los nodos EDGE01/EDGE02, la consola en
+CTRL01 y el portal en PORTAL01. En su entorno interactúan seis tipos de persona y cinco sistemas externos.
 
-**Personas.** Cuatro tienen cuenta en la consola: encargado, administrador DTI, docente y auditor. Dos no tienen
-cuenta: el usuario de laboratorio y el usuario BYOD.
+**Personas.** Cuatro disponen de cuenta en la consola: encargado, administrador DTI, docente y auditor. Dos operan
+sin cuenta: el usuario de laboratorio y el usuario BYOD.
 
 **Sistemas externos:**
 
-- **Orígenes en Internet:** se llega a ellos solo a través del FortiGate de la DTI (F8).
-- **EC2-GW:** entrada remota a la consola, sin datos (F29 → F30).
+- **Orígenes en Internet:** se accede a ellos únicamente a través del FortiGate de la DTI (F8).
+- **EC2-GW:** punto de entrada remoto a la consola, sin almacenamiento de datos (F29 → F30).
 - **S3 `celeris-backups`:** respaldo cifrado (F18).
 - **SIEM01:** recibe los eventos de seguridad (F13).
 
 **Qué observar en el diagrama:**
 
-- El BYOD entra con línea discontinua (F31, proxy opcional) y nunca se descifra (REQ-F-36).
-- El encargado tiene dos caminos a la consola:
+- El tráfico BYOD se representa con línea discontinua (F31, proxy opcional) y nunca se descifra (REQ-F-36).
+- El encargado dispone de dos vías de acceso a la consola:
   - desde ENC01 (F28);
   - desde fuera del campus por EC2-GW (F29 → F30).
-- El administrador aprueba solo desde JMP01 (F20) o ENC01 (F28) (REQ-F-37).
+- El administrador aprueba únicamente desde JMP01 (F20) o ENC01 (F28) (REQ-F-37).
 
 ## 3.2 Vista de contenedores (C2), que cumple el rol de vista de despliegue — DS-21
 
@@ -51,23 +51,24 @@ cuenta: el usuario de laboratorio y el usuario BYOD.
 | Consola web (SPA) | Servida por la API (mismo origen) | CTRL01 10.20.20.10 | P-01…P-08 y P-11 | R2 |
 | `celeris-console` API | Rust: axum | CTRL01 10.20.20.10, TCP 443 (F28, F30) y TCP 8443 (F10) | Reglas del catálogo, laboratorios, precargas, solicitudes, aprobaciones, reportes, auditoría; compila y firma la configuración | R2 |
 | PostgreSQL | Socket Unix, sin puerto de red | CTRL01 10.20.20.10 | Datos de la consola (DS-12); respaldo por F18 | R2 |
-| Portal | Sitio estático firmado en Caddy + Coraza | PORTAL01 10.20.40.10 | Aviso y huella de la CA (P-09, P-10) | R2 (hoy el aviso lo sirve el propio nodo) |
+| Portal | Sitio estático firmado en Caddy + Coraza | PORTAL01 10.20.40.10 | Aviso y huella de la CA (P-09, P-10) | R2 (actualmente el aviso lo sirve el propio nodo) |
 | Proxy inverso | Caddy + Coraza, sin estado | EC2-GW 10.30.0.10 | TLS público, WAF, límite de intentos; reenvía a CTRL01 con mTLS | Infraestructura (CE03) |
 
 **Decisiones que fija esta vista:**
 
-- **La consola completa vive en el campus (D-25).** En AWS solo están EC2-GW y S3 (D-24).
-- **Los nodos piden su configuración.** Cada 30 s consultan a CTRL01 por F10 con mTLS; la consola no les empuja
-  nada. Si CTRL01 cae, cada nodo sigue con su última versión válida (D-11).
-- **El sitio del portal no viaja de la consola a PORTAL01.** No existe un flujo directo CTRL01 → PORTAL01 en el
-  inventario. El sitio firmado que genera `publisher` lo despliega JMP01 por F20 (TCP 22). El certificado lo
-  renueva FW01 por ACME y lo entrega por F33 (D-29).
-- **Todo tráfico entre zonas pasa por FW01 (D-17).** El diagrama lo indica en el borde del campus; las reglas
-  están en CE03.
+- **La consola reside íntegramente en el campus (D-25).** En AWS se ubican únicamente EC2-GW y S3 (D-24).
+- **Los nodos solicitan su configuración.** Cada 30 s consultan a CTRL01 por F10 con mTLS; la consola no envía
+  configuración de forma activa. Si CTRL01 deja de estar disponible, cada nodo continúa con su última versión válida
+  (D-11).
+- **El sitio del portal no se transfiere directamente de la consola a PORTAL01.** El inventario no contempla un
+  flujo directo CTRL01 → PORTAL01. El sitio firmado que genera `publisher` es desplegado por JMP01 mediante F20
+  (TCP 22), y el certificado es renovado por FW01 mediante ACME y entregado por F33 (D-29).
+- **Todo el tráfico entre zonas atraviesa FW01 (D-17).** El diagrama lo indica en el límite del campus; las reglas
+  se especifican en CE03.
 
 ## 3.3 Vista de componentes (C3) — DS-22 y DS-13
 
-**Consola (DS-22).** Los componentes son los de la tabla; sus clases están en DS-03 y sus tablas en DS-12.
+**Consola (DS-22).** Los componentes se detallan en la tabla; sus clases se presentan en DS-03 y sus tablas en DS-12.
 
 | Componente | Responsabilidad | Requisitos |
 | --- | --- | --- |
@@ -81,7 +82,7 @@ cuenta: el usuario de laboratorio y el usuario BYOD.
 | audit | Cambios e intentos rechazados, solo inserción | REQ-F-24 |
 
 **Nodo (DS-13, Anexo C).** El diagrama relaciona cada componente del nodo con el archivo de código que lo implementa
-hoy y con el módulo al que pasará cuando se reorganice el código:
+actualmente y con el módulo al que se trasladará cuando se reorganice el código:
 
 - ingress;
 - tls;
@@ -93,19 +94,19 @@ hoy y con el módulo al que pasará cuando se reorganice el código:
 - pac;
 - signed.
 
-Faltan tres, que se construyen en S2 (R2): el agente que descarga la configuración por F10, la precarga y las
-descargas parciales (`Range`, REQ-F-08).
+Restan tres componentes, que se construirán en S2 (R2): el agente que descarga la configuración por F10, la
+precarga y las descargas parciales (`Range`, REQ-F-08).
 
 ## 3.4 Registro de decisiones arquitectónicas (ADR)
 
-El proyecto tiene 29 decisiones, numeradas de D-01 a D-29. La numeración es la misma que usa el informe de
-infraestructura (CE03). La Sección 0.3 las lista todas e indica el ámbito de cada una. Aquí se presentan las 15 de
-software. Cada una está escrita en formato MADR: contexto, factores de decisión, opciones evaluadas, decisión,
-consecuencias y forma de verificarla.
+El proyecto registra 29 decisiones, numeradas de D-01 a D-29, con la misma numeración empleada en el informe de
+infraestructura (CE03). La Sección 0.3 las enumera e indica el ámbito de cada una; en esta sección se presentan las
+15 de software. Cada una se documenta en formato MADR: contexto, factores de decisión, opciones evaluadas, decisión,
+consecuencias y método de verificación.
 
 | ADR | Decisión | Alternativa descartada principal | Consecuencia clave | Verificación |
 | --- | --- | --- | --- | --- |
-| D-01 | Rust + Tokio para nodo y consola | Go, Python | Seguridad de memoria; curva alta para un equipo de dos | REQ-NF-01, NF-09 |
+| D-01 | Rust + Tokio para nodo y consola | Go, Python | Seguridad de memoria; curva de aprendizaje elevada para un equipo de dos integrantes | REQ-NF-01, NF-09 |
 | D-02 | Hudsucker para el proxy con descifrado selectivo | Squid, mitmproxy | Descifrado decidido por `CONNECT` y por SNI; por defecto no se descifra | T07, T56 |
 | D-03 | Almacenamiento por SHA-256 | Archivo por URL | Deduplica y detecta objetos corruptos | REQ-NF-04 |
 | D-04 | Raíz offline + intermedia por nodo con Name Constraints | Una CA única | Un nodo comprometido no compromete al otro; **parcial en el código** | REQ-F-18 |
@@ -123,15 +124,15 @@ consecuencias y forma de verificarla.
 
 ### Decisiones que no se mantienen
 
-Cinco decisiones de la versión anterior del diseño (v0.2) ya no se aplican. Conservan su número para que se pueda
-seguir cómo cambió el diseño, y ese número no se vuelve a usar:
+Cinco decisiones de la versión anterior del diseño (v0.2) ya no se aplican. Conservan su número para preservar la
+trazabilidad de la evolución del diseño, y dicha numeración no se reutiliza:
 
 | ADR | Decisión anterior | Por qué no se mantiene |
 | --- | --- | --- |
-| D-07 | Cedar como motor de políticas | Las reglas del nodo ya se expresan con el catálogo de fuentes y la configuración firmada (D-11, D-20). Un motor aparte no aporta nada a este tamaño; se reevaluará si el catálogo crece |
-| D-08 | OCSF para eventos de seguridad | Sigue siendo la meta de REQ-NF-11, pero hoy el nodo registra los eventos de seguridad en un formato JSON propio (REQ-F-14, parcial) |
-| D-10 | Intercambio de claves X25519MLKEM768 con aws-lc-rs | El nodo ya usa aws-lc-rs para TLS, pero aún no se configuró ni se midió este intercambio de claves. Se verificará con testssl.sh (REQ-NF-06) |
-| D-13 | Caché intermedia (*shield*) en AWS | La reemplazó D-19: no habrá caché en AWS |
+| D-07 | Cedar como motor de políticas | Las reglas del nodo ya se expresan con el catálogo de fuentes y la configuración firmada (D-11, D-20). Un motor independiente no aporta valor a esta escala; se reevaluará si el catálogo crece |
+| D-08 | OCSF para eventos de seguridad | Se mantiene como meta de REQ-NF-11, pero actualmente el nodo registra los eventos de seguridad en un formato JSON propio (REQ-F-14, parcial) |
+| D-10 | Intercambio de claves X25519MLKEM768 con aws-lc-rs | El nodo ya emplea aws-lc-rs para TLS, pero este intercambio de claves aún no se ha configurado ni medido. Se verificará con testssl.sh (REQ-NF-06) |
+| D-13 | Caché intermedia (*shield*) en AWS | Fue reemplazada por D-19: no se contempla caché en AWS |
 | D-14 | Foyer como índice de la caché | No se adoptó: el índice usa una caché en memoria (moka) y un índice en disco propio (D-03) |
 
 ## 3.5 Cómo responde la arquitectura a los atributos de calidad

@@ -25,7 +25,7 @@
     {
       "texto": "0.3 Decisiones de arquitectura",
       "nivel": 2,
-      "pagina": 5
+      "pagina": 6
     },
     {
       "texto": "Sección 1: Especificación de Requerimientos",
@@ -220,12 +220,12 @@
     {
       "texto": "Figura 22. DS-25. CU-03 Agregar una fuente al catálogo\r\u0007",
       "nivel": 10,
-      "pagina": 24
+      "pagina": 25
     },
     {
       "texto": "Figura 23. DS-36. CU-03 Agregar una fuente: clases\r\u0007",
       "nivel": 10,
-      "pagina": 24
+      "pagina": 25
     },
     {
       "texto": "Figura 24. DS-26. CU-04 Habilitar un laboratorio y su horario\r\u0007",
@@ -250,12 +250,12 @@
     {
       "texto": "Figura 28. DS-28. CU-06 Ver el ahorro y la actividad del laboratorio\r\u0007",
       "nivel": 10,
-      "pagina": 25
+      "pagina": 26
     },
     {
       "texto": "Figura 29. DS-39. CU-06 Ver el ahorro y la actividad: clases\r\u0007",
       "nivel": 10,
-      "pagina": 25
+      "pagina": 26
     },
     {
       "texto": "Figura 30. DS-29. CU-07 Aprobar una fuente que requiere descifrado\r\u0007",
@@ -280,12 +280,12 @@
     {
       "texto": "Figura 34. DS-31. CU-09 Registrar una solicitud de preparación\r\u0007",
       "nivel": 10,
-      "pagina": 26
+      "pagina": 27
     },
     {
       "texto": "Figura 35. DS-42. CU-09 Registrar una solicitud: clases\r\u0007",
       "nivel": 10,
-      "pagina": 26
+      "pagina": 27
     },
     {
       "texto": "Figura 36. DS-32. CU-10 Revisar la auditoría de cambios\r\u0007",
@@ -416,7 +416,7 @@
   "paginas_cuerpo": 30,
   "docx": "entregables/CE02/Informe_Requerimientos_Diseno_CE02_E1_v0.4.docx",
   "pdf": "entregables/CE02/Informe_Requerimientos_Diseno_CE02_E1_v0.4.pdf",
-  "commit_fuente": "aa3b8e5",
+  "commit_fuente": "4a52e3d",
   "figuras": [
     "DS-14",
     "00-flujo-navegacion",

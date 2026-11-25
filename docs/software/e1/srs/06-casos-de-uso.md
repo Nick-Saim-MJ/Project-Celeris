@@ -2,8 +2,8 @@
 
 ### 1.10.1 Catálogo de casos de uso
 
-El diagrama de casos de uso es DS-14 (Sección 4). Cada caso de uso nombra las pantallas del prototipo (Sección 2) y
-la secuencia UML que lo detalla.
+El diagrama de casos de uso corresponde a DS-14 (Sección 4). Cada caso de uso identifica las pantallas del prototipo
+(Sección 2) y la secuencia UML que lo detalla.
 
 | ID | Caso de uso | Actor | Requisitos | Pantalla | UML |
 | --- | --- | --- | --- | --- | --- |
@@ -21,23 +21,23 @@ la secuencia UML que lo detalla.
 
 ### 1.10.2 Especificación de los casos de uso críticos
 
-Se detallan los cuatro casos de uso que sostienen los objetivos OB-2, OB-3 y OB-5. Los demás siguen el mismo patrón
-y su secuencia está en la Sección 4.
+Se detallan los cuatro casos de uso que sustentan los objetivos OB-2, OB-3 y OB-5. Los demás siguen el mismo patrón
+y su secuencia se presenta en la Sección 4.
 
 **CU-03 Agregar una fuente al catálogo.**
 
 - **Precondición:** el encargado inició sesión con segundo factor (P-01).
 - **Flujo principal:**
-  1. Ingresa el nombre, los dominios, la categoría y el modo de la fuente (P-03).
-  2. Usa el simulador (REQ-F-20). La consola responde si una URL de ejemplo se cachearía, si se descifraría y si la
-     CA la cubre.
-  3. Guarda la fuente.
+  1. El encargado ingresa el nombre, los dominios, la categoría y el modo de la fuente (P-03).
+  2. El encargado emplea el simulador (REQ-F-20). La consola indica si una URL de ejemplo se almacenaría en caché,
+     si se descifraría y si la CA la cubre.
+  3. El encargado guarda la fuente.
      - Si el modo es `cachear`, la fuente queda activa.
-     - Si el modo es `descifrar_y_cachear`, queda pendiente (REQ-RN-07).
+     - Si el modo es `descifrar_y_cachear`, queda pendiente de aprobación (REQ-RN-07).
   4. La consola registra el cambio (REQ-F-24), compila y firma una nueva versión (D-11), y los nodos la aplican en
      ≤ 60 s (REQ-NF-16).
 - **Alternos:**
-  - El dominio está en una fuente fija `nunca` (bancos o identidad): la consola rechaza el cambio (REQ-RN-09).
+  - El dominio pertenece a una fuente fija `nunca` (banca o identidad): la consola rechaza el cambio (REQ-RN-09).
   - La CA no cubre el dominio: la fuente no se activa (REQ-RN-04).
 - **Postcondición:** el aviso del portal refleja la nueva fuente cuando esta queda activa (REQ-F-12).
 
@@ -45,44 +45,46 @@ y su secuencia está en la Sección 4.
 
 - **Precondición:** el laboratorio está asignado al encargado (REQ-RN-06).
 - **Flujo principal:**
-  1. El encargado elige URLs o una fuente, el laboratorio, la fecha y la ventana (P-05). También puede convertir una
-     solicitud del docente (P-06).
+  1. El encargado selecciona las URL o una fuente, el laboratorio, la fecha y la ventana (P-05). Alternativamente,
+     puede convertir una solicitud docente (P-06).
   2. La consola valida la ventana y el límite de la DTI (REQ-RN-10) y publica la precarga en la configuración firmada.
   3. Dentro de la ventana, el nodo descarga una sola vez por F8 y verifica cada objeto con SHA-256 (REQ-F-06,
      REQ-F-22).
   4. El nodo informa el avance por F10.
   5. La precarga pasa a «Completada» y la solicitud a «Lista».
 - **Alternos:**
-  - La ventana termina antes de acabar: la precarga queda «Pausada» y sigue en la ventana siguiente.
-  - El origen falla tras los reintentos: «Fallida», con una alerta en P-02 (DS-18).
-- **Postcondición:** al iniciar la clase, las PCs reciben HIT (T50).
+  - La ventana concluye antes de completar la descarga: la precarga queda «Pausada» y se reanuda en la ventana
+    siguiente.
+  - El origen falla tras los reintentos: la precarga pasa a «Fallida», con una alerta en P-02 (DS-18).
+- **Postcondición:** al iniciar la clase, las estaciones reciben HIT (T50).
 
 **CU-07 Aprobar una fuente que requiere descifrado.**
 
 - **Precondición:**
   - El administrador DTI inició sesión desde JMP01 10.20.10.20 o desde ENC01 10.20.35.10 (origen `campus`).
-  - Hay fuentes pendientes (P-07).
+  - Existen fuentes pendientes de aprobación (P-07).
 - **Flujo principal:**
-  1. Revisa los dominios, la huella y el vencimiento de la CA del nodo.
-  2. Aprueba o rechaza la fuente.
+  1. El administrador revisa los dominios, la huella y el vencimiento de la CA del nodo.
+  2. El administrador aprueba o rechaza la fuente.
   3. La consola registra la decisión, publica una nueva versión de la configuración y un aviso actualizado
      (REQ-F-30).
-- **Alterno:** si la sesión es `remoto` (por EC2-GW), la API responde 403. El intento queda en auditoría con su
-  origen y P-07 muestra la acción deshabilitada (REQ-F-37, T54).
-- **Postcondición:** el nodo descifra ese dominio solo para PCs institucionales, nunca para WIFI-EST (REQ-F-36).
+- **Alterno:** si la sesión es `remoto` (a través de EC2-GW), la API responde 403. El intento se registra en la
+  auditoría con su origen y P-07 muestra la acción deshabilitada (REQ-F-37, T54).
+- **Postcondición:** el nodo descifra ese dominio únicamente para estaciones institucionales y nunca para WIFI-EST
+  (REQ-F-36).
 
 **CU-11 Usar la consola desde fuera del campus.**
 
-- **Precondición:** el usuario tiene contraseña y TOTP.
+- **Precondición:** el usuario dispone de contraseña y TOTP.
 - **Flujo principal:**
-  1. Entra por `https://` a EC2-GW 10.30.0.10 (F29). EC2-GW aplica TLS 1.3, HSTS y el WAF.
+  1. El usuario accede por `https://` a EC2-GW 10.30.0.10 (F29). EC2-GW aplica TLS 1.3, HSTS y el WAF.
   2. EC2-GW reenvía la petición a CTRL01 10.20.20.10:443 por F30: mTLS con su certificado de cliente, dentro de
      IPsec.
   3. La API marca la sesión como `remoto`.
   4. P-01 y P-02 muestran «acceso remoto».
-  5. El usuario hace las acciones no críticas (CU-03 a CU-06, CU-08 a CU-10).
+  5. El usuario ejecuta las acciones no críticas (CU-03 a CU-06, CU-08 a CU-10).
 - **Alternos:**
-  - Falta el segundo factor, o hay 10 intentos fallidos: la sesión se rechaza (T53).
+  - Ausencia del segundo factor, o 10 intentos fallidos: la sesión se rechaza (T53).
   - Se intenta una acción crítica: la API responde 403 (T54).
 
 ### 1.10.3 Historias de usuario
@@ -92,7 +94,7 @@ y su secuencia está en la Sección 4.
 | *Como encargado, quiero agregar «Instaladores de JetBrains» al catálogo, para que la próxima vez que 40 PCs lo descarguen solo una vaya a Internet.* | CU-03 | M |
 | *Como encargado, quiero programar la descarga de un instalador la noche anterior a la clase, para que la clase empiece con todo listo.* | CU-05 | M |
 | *Como encargado, quiero habilitar solo el laboratorio 3 en el horario de su curso, para controlar quién usa el servicio.* | CU-04 | M |
-| *Como administrador DTI, quiero aprobar desde el campus las fuentes que se descifran, para que nadie con una contraseña robada lo haga desde fuera.* | CU-07, CU-11 | M |
+| *Como administrador DTI, quiero aprobar desde el campus las fuentes que se descifran, para impedir que un tercero con una contraseña sustraída lo haga desde fuera.* | CU-07, CU-11 | M |
 | *Como docente, quiero pedir que el software de mi curso esté listo para el lunes, sin tener que escribirle a la DTI.* | CU-09 | S |
 | *Como estudiante, quiero ver qué se descifra y la huella de la CA antes de usar una PC del laboratorio, para saber qué se inspecciona.* | CU-02 | M |
 | *Como encargado, quiero ver cada 30 s cuántas peticiones del laboratorio salen de la caché, para saber si la precarga funcionó durante la clase.* | CU-06 | S |
@@ -100,8 +102,8 @@ y su secuencia está en la Sección 4.
 ### 1.10.4 Criterios de aceptación ejecutables (Gherkin)
 
 Cada escenario lleva las etiquetas de sus requisitos. En S2 (CE024), la matriz de la sección 1.12 se genera desde
-estas etiquetas. Los archivos van en `tests/features/`, que se crea en S2; hoy los escenarios solo existen en este
-SRS.
+estas etiquetas. Los archivos se ubicarán en `tests/features/`, que se creará en S2; actualmente los escenarios solo
+existen en este SRS.
 
 ```gherkin
 # catalogo.feature    @REQ-F-31 @REQ-RN-07 @REQ-RN-09 @REQ-F-24

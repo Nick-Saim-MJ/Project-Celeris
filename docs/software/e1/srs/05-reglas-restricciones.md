@@ -2,9 +2,9 @@
 
 ### 1.9.1 Reglas de negocio
 
-Una regla de negocio es una condición que el sistema hace cumplir sin excepción, la pida quien la pida. La columna
-«Quién la aplica» dice en qué pieza se comprueba. Cuando son dos, el nodo es la última barrera: rechaza lo que la
-consola no debió dejar pasar.
+Una regla de negocio es una condición que el sistema hace cumplir sin excepción, con independencia de quién realice
+la solicitud. La columna «Quién la aplica» indica el elemento en que se comprueba. Cuando intervienen dos elementos,
+el nodo actúa como última barrera y rechaza lo que la consola no debió admitir.
 
 | ID | Regla | Quién la aplica | Estado | Verifica |
 | --- | --- | --- | --- | --- |
@@ -20,9 +20,9 @@ consola no debió dejar pasar.
 | REQ-RN-10 | Una precarga no puede superar el límite de ancho de banda ni salir de la ventana horaria configurada por la DTI | Nodo (precarga) y consola (validación) | Pendiente | T50 |
 | REQ-RN-11 | Ninguna configuración puede habilitar el descifrado para redes de origen BYOD; la consola no ofrece esa opción y el nodo la rechaza aunque llegue firmada | Consola y nodo | Parcial: el nodo nunca descifra las redes de `byod_networks`, pero aún no rechaza una configuración que vacíe esa lista | T56 |
 
-**Valores de la DTI que usan las reglas.** La ventana de precarga es de 00:00 a 05:00 y el límite es de 50 Mbps,
-sobre un enlace de 300 Mbps [S-02]. Los dos los fija la DTI y entran en la configuración firmada; el encargado no
-los puede cambiar (DS-18).
+**Parámetros de la DTI empleados por las reglas.** La ventana de precarga comprende de 00:00 a 05:00 y el límite es
+de 50 Mbps, sobre un enlace de 300 Mbps [S-02]. Ambos valores son definidos por la DTI, se incorporan a la
+configuración firmada y no pueden ser modificados por el encargado (DS-18).
 
 ### 1.9.2 Restricciones
 
@@ -31,6 +31,6 @@ los puede cambiar (DS-18).
 | RS-01 | Rust estable; nodo sobre Hudsucker + rustls + Hyper + Tokio | D-01, D-02 | La consola también va en Rust (axum) para compartir tipos y la verificación ed25519 |
 | RS-02 | ESXi gratuito: máximo 8 vCPU por VM | Licencia | Nodos de 4 vCPU (REQ-NF-02) |
 | RS-03 | Ningún secreto en el repositorio | Rúbricas | Las llaves de firma, de la CA y TOTP quedan fuera de Git; el repositorio solo trae llaves de laboratorio |
-| RS-04 | Equipo de dos personas | Proyecto | R2 se limita a la consola mínima; R3 queda fuera |
+| RS-04 | Equipo de dos integrantes | Proyecto | R2 se limita a la consola mínima; R3 queda fuera del alcance |
 | RS-05 | Ley 29733 y su reglamento | Normativa | Aviso previo (REQ-RN-05), minimización (REQ-NF-07) y reportes por laboratorio (D-22) |
 | RS-06 | La consola completa (SPA, API y PostgreSQL) corre en CTRL01, en el campus. En AWS solo hay un proxy inverso sin datos (EC2-GW) y respaldos en S3 | D-24, D-25 | REQ-F-37 distingue el origen de la sesión; los datos de uso no salen del campus, salvo el respaldo cifrado (F18) |

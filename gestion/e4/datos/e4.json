@@ -1,0 +1,698 @@
+{
+ "datos": {
+  "e4_pcs": "40 PCs",
+  "e4_gb_pc": "3 GB",
+  "e4_gb_lab": "120 GB",
+  "e4_mbps_wan": "150 Mbps",
+  "e4_mbps_precarga": "50 Mbps",
+  "e4_lan": "1 Gbps",
+  "e4_wan_lab": "1,8 h",
+  "e4_lan_lab": "16 min",
+  "e4_wan_precarga": "8 min",
+  "e4_guia_tobe": "18 min",
+  "e4_kpi1_mejora": "−85 %",
+  "e4_p_int": "30 %",
+  "e4_p_int_tobe": "4,5 %",
+  "e4_ciclos_p1": "20 ciclos",
+  "e4_pedidos_p2": "640 pedidos",
+  "e4_tarifa": "US$ 5/h",
+  "e4_iteraciones": "10 000",
+  "e4_semilla": "20261126",
+  "e4_ahorro_h_pc": "0,10 h",
+  "e4_horas_pc_e2": "0,25 h",
+  "e4_ahorro_h_p2_anio": "1 381 h",
+  "e4_ahorro_usd_p2_anio": "US$ 6 906",
+  "e4_bn2_e4": "US$ 392",
+  "e4_bn2_e2": "US$ 1 000",
+  "e4_n_pd": "9",
+  "e4_n_au": "7",
+  "e4_obs_min": "30",
+  "e4_meta_listo": "95 %",
+  "e4_p1_ciclo_h_asis": "35,2 h",
+  "e4_p1_ciclo_h_tobe": "16,9 h",
+  "e4_p1_ciclo_h_mejora": "−52 %",
+  "e4_p1_ocupacion_h_asis": "10,8 h",
+  "e4_p1_ocupacion_h_tobe": "5,5 h",
+  "e4_p1_ocupacion_h_mejora": "−49 %",
+  "e4_p1_horas_personal_asis": "9,0 h",
+  "e4_p1_horas_personal_tobe": "5,1 h",
+  "e4_p1_horas_personal_mejora": "−44 %",
+  "e4_p1_habilitar_h_asis": "—",
+  "e4_p1_habilitar_h_tobe": "—",
+  "e4_p1_habilitar_h_mejora": "—",
+  "e4_p1_costo_asis": "US$ 45,00",
+  "e4_p1_costo_tobe": "US$ 25,39",
+  "e4_p1_costo_mejora": "−44 %",
+  "e4_p1_costo_anio_asis": "US$ 900",
+  "e4_p1_costo_anio_tobe": "US$ 508",
+  "e4_p1_wan_asis": "145 GB",
+  "e4_p1_wan_tobe": "3 GB",
+  "e4_p1_wan_mejora": "−98 %",
+  "e4_p1_wan_anio_asis": "2 903 GB",
+  "e4_p1_wan_anio_tobe": "60 GB",
+  "e4_p2_ciclo_h_asis": "15,9 h",
+  "e4_p2_ciclo_h_tobe": "2,0 h",
+  "e4_p2_ciclo_h_mejora": "−88 %",
+  "e4_p2_ocupacion_h_asis": "3,6 h",
+  "e4_p2_ocupacion_h_tobe": "30 min",
+  "e4_p2_ocupacion_h_mejora": "−86 %",
+  "e4_p2_horas_personal_asis": "2,6 h",
+  "e4_p2_horas_personal_tobe": "25 min",
+  "e4_p2_horas_personal_mejora": "−84 %",
+  "e4_p2_habilitar_h_asis": "23,4 h",
+  "e4_p2_habilitar_h_tobe": "2,1 h",
+  "e4_p2_habilitar_h_mejora": "−91 %",
+  "e4_p2_costo_asis": "US$ 12,83",
+  "e4_p2_costo_tobe": "US$ 2,04",
+  "e4_p2_costo_mejora": "−84 %",
+  "e4_p2_costo_anio_asis": "US$ 8 213",
+  "e4_p2_costo_anio_tobe": "US$ 1 307",
+  "e4_p2_wan_asis": "120 GB",
+  "e4_p2_wan_tobe": "3 GB",
+  "e4_p2_wan_mejora": "−98 %",
+  "e4_p2_wan_anio_asis": "76 800 GB",
+  "e4_p2_wan_anio_tobe": "1 920 GB",
+  "e4_p1_inter_asis": "0,42",
+  "e4_p1_inter_tobe": "0,05",
+  "e4_p2_listo_asis": "42 %",
+  "e4_p2_listo_tobe": "87 %",
+  "e4_p2_habilitar_p90_asis": "37,0 h",
+  "e4_p2_habilitar_p90_tobe": "9,4 h",
+  "e4_p2_habilitar_p50_tobe": "4 min",
+  "e4_costo_anio_asis": "US$ 9 112",
+  "e4_costo_anio_tobe": "US$ 1 815",
+  "e4_costo_anio_ahorro": "US$ 7 298",
+  "e4_costo_anio_mejora": "−80 %",
+  "e4_meta_ob2": "−70 %",
+  "e4_meta_ob3": "≤ 5 min",
+  "e4_hab_meta_asis": "0 %",
+  "e4_hab_meta_tobe": "76 %",
+  "e4_sel_p1": "4,35",
+  "e4_sel_p2": "4,60",
+  "e4_sel_tercero": "3,25"
+ },
+ "modelo": {
+  "calculos": {
+   "pcs": 40,
+   "gb_pc": 3,
+   "gb_lab": 120,
+   "mbps_wan": 150,
+   "gbps_lan": 1.0,
+   "mbps_precarga": 50.0,
+   "wan_lab": 1.7777777777777777,
+   "lan_lab": 0.26666666666666666,
+   "wan_precarga": 0.13333333333333333,
+   "guia_tobe": 0.30444444444444446,
+   "p_interrupcion": 0.3,
+   "p_interrupcion_tobe": 0.045000000000000005,
+   "ciclos_p1_anio": 20,
+   "pedidos_p2_anio": 640,
+   "tarifa": 5,
+   "horas_pc_ciclo_e2": 0.25
+  },
+  "resultados": {
+   "P1-AS-IS": {
+    "ciclo_h": {
+     "media": 35.22715155139294,
+     "p10": 9.363183693017378,
+     "p50": 12.177078813151638,
+     "p90": 91.60167038277395,
+     "n": 10000
+    },
+    "ocupacion_h": {
+     "media": 10.761747307252797,
+     "p10": 8.41580014145468,
+     "p50": 10.709252704735277,
+     "p90": 13.117167783067998,
+     "n": 10000
+    },
+    "descarga_h": {
+     "media": 2.1501333333333337,
+     "p10": 1.7777777777777777,
+     "p50": 1.7777777777777777,
+     "p90": 2.6666666666666665,
+     "n": 10000
+    },
+    "wan_gb": {
+     "media": 145.134,
+     "p10": 120.0,
+     "p50": 120.0,
+     "p90": 180.0,
+     "n": 10000
+    },
+    "interrupciones": {
+     "media": 0.4189,
+     "p10": 0.0,
+     "p50": 0.0,
+     "p90": 1.0,
+     "n": 10000
+    },
+    "horas_tecnico": {
+     "media": 8.716778564977172,
+     "p10": 6.489012731908536,
+     "p50": 8.69639774741184,
+     "p90": 10.967745943107253,
+     "n": 10000
+    },
+    "horas_encargado": {
+     "media": 0.2824251440465784,
+     "p10": 0.17590926722878736,
+     "p50": 0.27491397069187,
+     "p90": 0.3998615866479935,
+     "n": 10000
+    },
+    "horas_docente": {
+     "media": 0.0,
+     "p10": 0.0,
+     "p50": 0.0,
+     "p90": 0.0,
+     "n": 10000
+    },
+    "horas_personal": {
+     "media": 8.999203709023748,
+     "p10": 6.7708680669130885,
+     "p50": 8.972836028427007,
+     "p90": 11.245130857841643,
+     "n": 10000
+    },
+    "costo": {
+     "media": 44.99601854511875,
+     "p10": 33.85434033456544,
+     "p50": 44.864180142135034,
+     "p90": 56.22565428920821,
+     "n": 10000
+    },
+    "listo": {
+     "media": null,
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "n": 0
+    },
+    "habilitar_h": {
+     "media": null,
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "n": 0
+    }
+   },
+   "P1-TO-BE": {
+    "ciclo_h": {
+     "media": 16.917410696353688,
+     "p10": 10.494443330404799,
+     "p50": 14.186239277606882,
+     "p90": 18.4888331520737,
+     "n": 10000
+    },
+    "ocupacion_h": {
+     "media": 5.5204575098230055,
+     "p10": 3.960016831088318,
+     "p50": 5.389248711371852,
+     "p90": 7.319974374527043,
+     "n": 10000
+    },
+    "descarga_h": {
+     "media": 0.27349333333333337,
+     "p10": 0.26666666666666666,
+     "p50": 0.26666666666666666,
+     "p90": 0.26666666666666666,
+     "n": 10000
+    },
+    "wan_gb": {
+     "media": 3.0,
+     "p10": 3.0,
+     "p50": 3.0,
+     "p90": 3.0,
+     "n": 10000
+    },
+    "interrupciones": {
+     "media": 0.0512,
+     "p10": 0.0,
+     "p50": 0.0,
+     "p90": 0.0,
+     "n": 10000
+    },
+    "horas_tecnico": {
+     "media": 4.944295948271391,
+     "p10": 3.3910456934220217,
+     "p50": 4.80165562759191,
+     "p90": 6.740045399444716,
+     "n": 10000
+    },
+    "horas_encargado": {
+     "media": 0.13327623271538697,
+     "p10": 0.08202512752801028,
+     "p50": 0.1269774025425256,
+     "p90": 0.19566951393414342,
+     "n": 10000
+    },
+    "horas_docente": {
+     "media": 0.0,
+     "p10": 0.0,
+     "p50": 0.0,
+     "p90": 0.0,
+     "n": 10000
+    },
+    "horas_personal": {
+     "media": 5.077572180986778,
+     "p10": 3.518106175424239,
+     "p50": 4.934779115865321,
+     "p90": 6.873106535553398,
+     "n": 10000
+    },
+    "costo": {
+     "media": 25.387860904933884,
+     "p10": 17.590530877121196,
+     "p50": 24.673895579326604,
+     "p90": 34.365532677766986,
+     "n": 10000
+    },
+    "listo": {
+     "media": null,
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "n": 0
+    },
+    "habilitar_h": {
+     "media": null,
+     "p10": null,
+     "p50": null,
+     "p90": null,
+     "n": 0
+    }
+   },
+   "P2-AS-IS": {
+    "ciclo_h": {
+     "media": 15.91948543854863,
+     "p10": 3.6082127287292436,
+     "p50": 11.392450951336885,
+     "p90": 35.969634416448606,
+     "n": 10000
+    },
+    "ocupacion_h": {
+     "media": 3.6492983127177796,
+     "p10": 3.0198303989056123,
+     "p50": 3.5907253917679105,
+     "p90": 4.36899791243719,
+     "n": 10000
+    },
+    "descarga_h": {
+     "media": 1.7777777777777786,
+     "p10": 1.7777777777777777,
+     "p50": 1.7777777777777777,
+     "p90": 1.7777777777777777,
+     "n": 10000
+    },
+    "wan_gb": {
+     "media": 120.0,
+     "p10": 120.0,
+     "p50": 120.0,
+     "p90": 120.0,
+     "n": 10000
+    },
+    "interrupciones": {
+     "media": 0.0,
+     "p10": 0.0,
+     "p50": 0.0,
+     "p90": 0.0,
+     "n": 10000
+    },
+    "horas_tecnico": {
+     "media": 0.2946716124091992,
+     "p10": 0.0,
+     "p50": 0.2979968174333113,
+     "p90": 0.7288422451481813,
+     "n": 10000
+    },
+    "horas_encargado": {
+     "media": 2.2717548780722265,
+     "p10": 1.613980048400082,
+     "p50": 2.2276085468405293,
+     "p90": 3.0116599950577454,
+     "n": 10000
+    },
+    "horas_docente": {
+     "media": 0.13379337623476434,
+     "p10": 0.0822973004501255,
+     "p50": 0.12792124022309573,
+     "p90": 0.1954002062575901,
+     "n": 10000
+    },
+    "horas_personal": {
+     "media": 2.5664264904814256,
+     "p10": 1.6990770239867226,
+     "p50": 2.550930239400091,
+     "p90": 3.460698125359669,
+     "n": 10000
+    },
+    "costo": {
+     "media": 12.832132452407127,
+     "p10": 8.495385119933614,
+     "p50": 12.754651197000454,
+     "p90": 17.303490626798347,
+     "n": 10000
+    },
+    "listo": {
+     "media": 0.4159,
+     "p10": 0.0,
+     "p50": 0.0,
+     "p90": 1.0,
+     "n": 10000
+    },
+    "habilitar_h": {
+     "media": 23.404904906485317,
+     "p10": 12.030567796870262,
+     "p50": 22.148616735049995,
+     "p90": 37.02267735411065,
+     "n": 5065
+    }
+   },
+   "P2-TO-BE": {
+    "ciclo_h": {
+     "media": 1.9565048002353025,
+     "p10": 0.8035567100064782,
+     "p50": 0.9237566973395848,
+     "p90": 3.9743748885481045,
+     "n": 10000
+    },
+    "ocupacion_h": {
+     "media": 0.5005059939770866,
+     "p10": 0.4218144361138743,
+     "p50": 0.494132420307161,
+     "p90": 0.5902387266931504,
+     "n": 10000
+    },
+    "descarga_h": {
+     "media": 0.26666666666666666,
+     "p10": 0.26666666666666666,
+     "p50": 0.26666666666666666,
+     "p90": 0.26666666666666666,
+     "n": 10000
+    },
+    "wan_gb": {
+     "media": 3.0,
+     "p10": 3.0,
+     "p50": 3.0,
+     "p90": 3.0,
+     "n": 10000
+    },
+    "interrupciones": {
+     "media": 0.0,
+     "p10": 0.0,
+     "p50": 0.0,
+     "p90": 0.0,
+     "n": 10000
+    },
+    "horas_tecnico": {
+     "media": 0.013954242672574406,
+     "p10": 0.0,
+     "p50": 0.0,
+     "p90": 0.06941938812033865,
+     "n": 10000
+    },
+    "horas_encargado": {
+     "media": 0.3944683855539994,
+     "p10": 0.2918171740837039,
+     "p50": 0.3904768940148684,
+     "p90": 0.5037266746405533,
+     "n": 10000
+    },
+    "horas_docente": {
+     "media": 0.1169150226079094,
+     "p10": 0.07741284567041526,
+     "p50": 0.11372007824625197,
+     "p90": 0.16154131040783662,
+     "n": 10000
+    },
+    "horas_personal": {
+     "media": 0.4084226282265738,
+     "p10": 0.293587718805026,
+     "p50": 0.39958619880367924,
+     "p90": 0.5359942026624536,
+     "n": 10000
+    },
+    "costo": {
+     "media": 2.0421131411328695,
+     "p10": 1.4679385940251297,
+     "p50": 1.9979309940183962,
+     "p90": 2.679971013312268,
+     "n": 10000
+    },
+    "listo": {
+     "media": 0.874,
+     "p10": 0.0,
+     "p50": 1.0,
+     "p90": 1.0,
+     "n": 10000
+    },
+    "habilitar_h": {
+     "media": 2.1069607152581042,
+     "p10": 0.04995504355910631,
+     "p50": 0.06633043184111914,
+     "p90": 9.392098221479548,
+     "n": 5091
+    }
+   }
+  },
+  "comparativo": {
+   "P1": {
+    "ciclo_h": {
+     "asis": 35.22715155139294,
+     "tobe": 16.917410696353688,
+     "mejora": 0.519762173456663
+    },
+    "ocupacion_h": {
+     "asis": 10.761747307252797,
+     "tobe": 5.5204575098230055,
+     "mejora": 0.4870296289058436
+    },
+    "descarga_h": {
+     "asis": 2.1501333333333337,
+     "tobe": 0.27349333333333337,
+     "mejora": 0.8728016867171028
+    },
+    "wan_gb": {
+     "asis": 145.134,
+     "tobe": 3.0,
+     "mejora": 0.97932944726942
+    },
+    "interrupciones": {
+     "asis": 0.4189,
+     "tobe": 0.0512,
+     "mejora": 0.8777751253282405
+    },
+    "horas_tecnico": {
+     "asis": 8.716778564977172,
+     "tobe": 4.944295948271391,
+     "mejora": 0.4327840369678659
+    },
+    "horas_encargado": {
+     "asis": 0.2824251440465784,
+     "tobe": 0.13327623271538697,
+     "mejora": 0.5281006825178192
+    },
+    "horas_docente": {
+     "asis": 0.0,
+     "tobe": 0.0,
+     "mejora": null
+    },
+    "horas_personal": {
+     "asis": 8.999203709023748,
+     "tobe": 5.077572180986778,
+     "mejora": 0.4357753924499611
+    },
+    "costo": {
+     "asis": 44.99601854511875,
+     "tobe": 25.387860904933884,
+     "mejora": 0.43577539244996144
+    },
+    "listo": {
+     "asis": null,
+     "tobe": null,
+     "mejora": null
+    },
+    "habilitar_h": {
+     "asis": null,
+     "tobe": null,
+     "mejora": null
+    },
+    "costo_anio": {
+     "asis": 899.920370902375,
+     "tobe": 507.7572180986777
+    },
+    "horas_personal_anio": {
+     "asis": 179.98407418047495,
+     "tobe": 101.55144361973556
+    },
+    "wan_gb_anio": {
+     "asis": 2902.68,
+     "tobe": 60.0
+    }
+   },
+   "P2": {
+    "ciclo_h": {
+     "asis": 15.91948543854863,
+     "tobe": 1.9565048002353025,
+     "mejora": 0.8770999974975525
+    },
+    "ocupacion_h": {
+     "asis": 3.6492983127177796,
+     "tobe": 0.5005059939770866,
+     "mejora": 0.8628487037541362
+    },
+    "descarga_h": {
+     "asis": 1.7777777777777786,
+     "tobe": 0.26666666666666666,
+     "mejora": 0.8500000000000001
+    },
+    "wan_gb": {
+     "asis": 120.0,
+     "tobe": 3.0,
+     "mejora": 0.975
+    },
+    "interrupciones": {
+     "asis": 0.0,
+     "tobe": 0.0,
+     "mejora": null
+    },
+    "horas_tecnico": {
+     "asis": 0.2946716124091992,
+     "tobe": 0.013954242672574406,
+     "mejora": 0.952644767650042
+    },
+    "horas_encargado": {
+     "asis": 2.2717548780722265,
+     "tobe": 0.3944683855539994,
+     "mejora": 0.8263596176851885
+    },
+    "horas_docente": {
+     "asis": 0.13379337623476434,
+     "tobe": 0.1169150226079094,
+     "mejora": 0.12615238587924457
+    },
+    "horas_personal": {
+     "asis": 2.5664264904814256,
+     "tobe": 0.4084226282265738,
+     "mejora": 0.8408594090883315
+    },
+    "costo": {
+     "asis": 12.832132452407127,
+     "tobe": 2.0421131411328695,
+     "mejora": 0.8408594090883313
+    },
+    "listo": {
+     "asis": 0.4159,
+     "tobe": 0.874,
+     "mejora": -1.1014666987256552
+    },
+    "habilitar_h": {
+     "asis": 23.404904906485317,
+     "tobe": 2.1069607152581042,
+     "mejora": 0.909977813467882
+    },
+    "costo_anio": {
+     "asis": 8212.56476954056,
+     "tobe": 1306.9524103250365
+    },
+    "horas_personal_anio": {
+     "asis": 1642.5129539081124,
+     "tobe": 261.39048206500723
+    },
+    "wan_gb_anio": {
+     "asis": 76800.0,
+     "tobe": 1920.0
+    }
+   }
+  },
+  "kpi1": {
+   "asis": 1.7777777777777777,
+   "tobe": 0.26666666666666666,
+   "mejora": 0.85,
+   "guia_tobe": 0.30444444444444446,
+   "cumple_ob2": true
+  },
+  "anual": {
+   "P1": 20,
+   "P2": 640
+  },
+  "seleccion": [
+   {
+    "id": "P2",
+    "puntajes": [
+     4,
+     5,
+     5,
+     4,
+     5
+    ],
+    "motivo": "Es el más frecuente, retrasa clases y depende de la DTI para cada cambio; el catálogo, el acceso y la precarga lo cubren (REQ-F-31, F-32, F-34, F-35)",
+    "total": 4.6
+   },
+   {
+    "id": "P1",
+    "puntajes": [
+     5,
+     4,
+     3,
+     5,
+     5
+    ],
+    "motivo": "Mueve el mayor volumen (40 PCs × el mismo paquete) y la precarga del SRS lo cubre (REQ-F-22, REQ-F-34)",
+    "total": 4.35
+   },
+   {
+    "id": "C3",
+    "puntajes": [
+     5,
+     3,
+     1,
+     5,
+     2
+    ],
+    "motivo": "Gran volumen, pero una vez por semestre y con herramientas de clonación propias, fuera del alcance de la caché",
+    "total": 3.25
+   },
+   {
+    "id": "C5",
+    "puntajes": [
+     1,
+     3,
+     3,
+     5,
+     3
+    ],
+    "motivo": "Lo resuelve en parte el acceso por laboratorio, pero la política de filtrado es del FortiGate (fuera del alcance)",
+    "total": 2.8
+   },
+   {
+    "id": "C4",
+    "puntajes": [
+     1,
+     3,
+     4,
+     4,
+     1
+    ],
+    "motivo": "Frecuente, pero no es una descarga: la caché no lo mejora",
+    "total": 2.55
+   }
+  ],
+  "ahorro_h_pc_ciclo": 0.09804078820092424,
+  "ahorro_h_p2_anio": 1381.1224718431051,
+  "iteraciones": 10000,
+  "semilla": 20261126,
+  "avisos": [],
+  "metas": {
+   "OB-2": 0.7,
+   "OB-3": 5.0,
+   "OB-2_texto": "−70 %",
+   "OB-3_texto": "≤ 5 min"
+  },
+  "habilitar_en_meta": {
+   "P2-AS-IS": 0.0,
+   "P2-TO-BE": 0.7572186210960519
+  }
+ }
+}

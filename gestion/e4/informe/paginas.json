@@ -1,0 +1,206 @@
+{
+  "motor": "Microsoft Word (COM)",
+  "paginas": 26,
+  "marcas": [
+    {
+      "texto": "Resumen ejecutivo",
+      "nivel": 1,
+      "pagina": 2
+    },
+    {
+      "texto": "4.1 Proceso Actual (AS-IS)",
+      "nivel": 1,
+      "pagina": 4
+    },
+    {
+      "texto": "4.1.1 Identificación y caracterización de los procesos",
+      "nivel": 2,
+      "pagina": 5
+    },
+    {
+      "texto": "Figura 4.1. Mapa de procesos de la universidad en lo que toca a los laboratorios",
+      "nivel": 10,
+      "pagina": 5
+    },
+    {
+      "texto": "4.1.2 Descripción narrativa del proceso",
+      "nivel": 2,
+      "pagina": 7
+    },
+    {
+      "texto": "4.1.3 Indicadores actuales",
+      "nivel": 2,
+      "pagina": 7
+    },
+    {
+      "texto": "4.1.4 Diagrama BPMN",
+      "nivel": 2,
+      "pagina": 8
+    },
+    {
+      "texto": "Figura 4.2. BPMN del proceso P1 actual (AS-IS) con sus ineficiencias PD-01…PD-04",
+      "nivel": 10,
+      "pagina": 8
+    },
+    {
+      "texto": "Figura 4.3. BPMN del proceso P2 actual (AS-IS) con sus ineficiencias PD-05…PD-09",
+      "nivel": 10,
+      "pagina": 9
+    },
+    {
+      "texto": "4.1.5 Problemas detectados",
+      "nivel": 2,
+      "pagina": 10
+    },
+    {
+      "texto": "4.2 Proceso Propuesto (TO-BE)",
+      "nivel": 1,
+      "pagina": 11
+    },
+    {
+      "texto": "4.2.1 Rediseño del flujo",
+      "nivel": 2,
+      "pagina": 12
+    },
+    {
+      "texto": "Figura 4.4. BPMN del proceso P1 propuesto (TO-BE) con el carril Celeris",
+      "nivel": 10,
+      "pagina": 12
+    },
+    {
+      "texto": "Figura 4.5. BPMN del proceso P2 propuesto (TO-BE) con el carril Celeris",
+      "nivel": 10,
+      "pagina": 13
+    },
+    {
+      "texto": "4.2.2 Automatizaciones propuestas",
+      "nivel": 2,
+      "pagina": 14
+    },
+    {
+      "texto": "4.2.3 Nuevos indicadores",
+      "nivel": 2,
+      "pagina": 15
+    },
+    {
+      "texto": "4.2.4 Mejora estimada en eficiencia",
+      "nivel": 2,
+      "pagina": 15
+    },
+    {
+      "texto": "Figura 4.6. Distribución del costo de personal por ciclo en la simulación",
+      "nivel": 10,
+      "pagina": 16
+    },
+    {
+      "texto": "4.3 Análisis Comparativo",
+      "nivel": 1,
+      "pagina": 17
+    },
+    {
+      "texto": "Figura 4.7. Comparativo AS-IS frente a TO-BE por indicador (AS-IS = 100)",
+      "nivel": 10,
+      "pagina": 17
+    },
+    {
+      "texto": "4.3.1 Reducción de tiempos",
+      "nivel": 2,
+      "pagina": 18
+    },
+    {
+      "texto": "4.3.2 Reducción de costos",
+      "nivel": 2,
+      "pagina": 18
+    },
+    {
+      "texto": "4.3.3 Mejora en calidad",
+      "nivel": 2,
+      "pagina": 18
+    },
+    {
+      "texto": "4.3.4 Alcance y verificación de la mejora",
+      "nivel": 2,
+      "pagina": 19
+    },
+    {
+      "texto": "4.4 Sustentación del análisis",
+      "nivel": 1,
+      "pagina": 20
+    },
+    {
+      "texto": "4.4.1 Coherencia del modelo",
+      "nivel": 2,
+      "pagina": 20
+    },
+    {
+      "texto": "4.4.2 Decisiones defendibles",
+      "nivel": 2,
+      "pagina": 20
+    },
+    {
+      "texto": "4.4.3 Limitaciones",
+      "nivel": 2,
+      "pagina": 20
+    },
+    {
+      "texto": "4.4.4 Preguntas previsibles de la sustentación",
+      "nivel": 2,
+      "pagina": 20
+    },
+    {
+      "texto": "Referencias",
+      "nivel": 1,
+      "pagina": 22
+    },
+    {
+      "texto": "Anexos",
+      "nivel": 1,
+      "pagina": 23
+    },
+    {
+      "texto": "Anexo A. Parámetros de la simulación",
+      "nivel": 2,
+      "pagina": 23
+    },
+    {
+      "texto": "Anexo B. Supuestos citados en el informe",
+      "nivel": 2,
+      "pagina": 25
+    },
+    {
+      "texto": "Anexo C. Autoevaluación contra la rúbrica",
+      "nivel": 2,
+      "pagina": 26
+    },
+    {
+      "texto": "Figura 4.1; Tabla 4.1; Tabla 4.2; Tabla 4.3; Descripción narrativa del proceso; Tabla 4.4; Figura 4.2; Figura 4.3; Tabla 4.5\r\u0007",
+      "nivel": 10,
+      "pagina": 26
+    },
+    {
+      "texto": "Figura 4.4; Figura 4.5; Tabla 4.6; Tabla 4.7; Tabla 4.8; Tabla 4.9; Figura 4.6; Tabla 4.10\r\u0007",
+      "nivel": 10,
+      "pagina": 26
+    },
+    {
+      "texto": "Figura 4.7; Tabla 4.11; Tabla 4.12; Tabla 4.13; Alcance y verificación de la mejora\r\u0007",
+      "nivel": 10,
+      "pagina": 26
+    }
+  ],
+  "docx": "Informe_CE01_E4_v0.1.docx",
+  "pdf": "Informe_CE01_E4_v0.1.pdf",
+  "commit_fuente": "4a52e3d",
+  "figuras": [
+    "fig-mapa",
+    "fig-p1-asis",
+    "fig-p2-asis",
+    "fig-p1-tobe",
+    "fig-p2-tobe",
+    "fig-dispersion",
+    "fig-comparativo"
+  ],
+  "completar": [
+    "[COMPLETAR: semestre académico]"
+  ]
+}

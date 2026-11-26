@@ -1,0 +1,9 @@
+{
+ "estado": "estimado por simulación (S-43, S-44); reemplaza a S-07 en el E2 solo cuando se mida con ≥ 30 observaciones",
+ "fuente": "gestion/e4/procesos.py sobre gestion/e4/simulacion.yaml",
+ "horas_pc_ciclo_ahorradas": 0.098,
+ "horas_pc_ciclo_e2_supuesto": 0.25,
+ "horas_anio_ahorradas_p2": 1381.1,
+ "ciclos_p1_anio": 20,
+ "pedidos_p2_anio": 640
+}

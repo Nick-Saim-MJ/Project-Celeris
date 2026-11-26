@@ -1179,3 +1179,24 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - Backlog de la consola: HU-01…HU-17 (prefijo local de CE01, no del contrato M6) con REQ-F y CU del SRS; puntos de historia y componentes del WSJF son estimación del equipo.
   - Las fechas del roadmap del E1 se mantienen como horizontes; el E3 las precisa en H1–H4.
 - **Decide:** equipo del proyecto (fechas a confirmar con el calendario académico; RACI y presupuesto a aprobar por el sponsor)
+
+### CI-104 — Modelado AS-IS / TO-BE E4 de CE01: parámetros de la simulación, supuestos nuevos y prefijos locales
+- **Estado:** resuelto (2026-11-26, P4)
+- **Tipo:** vacío | supuesto nuevo | decisión de diseño
+- **Dónde:** guía CE01 v0.4 B4.1–B4.6; prompt P4; `infra/trazabilidad.yaml` → `supuestos`; `gestion/ce01.yaml` → `referencias.supuestos`; `gestion/e4/{simulacion.yaml,datos/procesos.yaml}`
+- **Qué faltaba:**
+  - La guía calcula la descarga de P1 con «150 Mbps disponibles» sin supuesto que lo respalde (CI-101 ya notaba que equivale a la mitad del enlace).
+  - Ni la guía ni el repositorio tienen duraciones de las tareas manuales, probabilidades de las bifurcaciones (interrupciones, pedidos del mismo día, cambios que requieren a la DTI) ni frecuencia de P2, que la simulación necesita.
+  - El E4 necesita rotular los problemas del proceso y sus indicadores, y el contrato de IDs (00 M6) no tiene prefijo para ellos.
+  - La guía (B4.3) estima ≈ 18 min para el TO-BE descargando el primer paquete por Internet de día; la prueba T50 fija la precarga en ventana horaria con un límite de 50 Mbps.
+- **Decisión aplicada:**
+  - Supuestos nuevos: S-42 ancho de banda disponible para una descarga masiva en horario de laboratorio (150 Mbps, la mitad de S-02); S-43 duraciones triangulares de las tareas manuales, cuyos valores viven en `gestion/e4/simulacion.yaml`; S-44 probabilidades de las bifurcaciones; S-45 frecuencia de P2 (2 pedidos por laboratorio por semana lectiva, 32 semanas). Todos se validan con el cronometraje (≥ 30 observaciones por fase, `gestion/e4/instrumentos/registro-tiempos.xlsx`) o con los registros del piloto. `gestion/ce01.yaml` declara su lectura numérica, como en CI-97.
+  - La entrega por la LAN usa 1 GbE de `infra/centro_datos.yaml` → `host.enlace_acceso` [S-14]; el límite de la precarga se lee de T50. Con la precarga nocturna, la descarga de día es solo la de la LAN (≈ 16 min); el ≈ 18 min de la guía queda como referencia y el informe lo concilia.
+  - La probabilidad de interrupción del TO-BE no es un supuesto aparte: se deriva de S-44 escalada por la duración de la entrega (LAN frente a Internet).
+  - Solo se valorizan las horas del técnico y del encargado (S-07); el tiempo del docente se informa sin valorizar. El tráfico evitado no se valoriza en el E4 porque ya está en BN-1 del E2.
+  - El ahorro de personal de P1 que estima el E4 (≈ 0,10 h por PC y ciclo) es menor que S-07 (0,25 h), porque la verificación de la instalación sigue siendo manual (REQ-NF-07 impide mostrar el estado por PC); el E4 agrega el ahorro de P2, que el E2 no valoriza. Ambos se exportan a `gestion/e4/datos/resultados.json`; el E2 conserva S-07 hasta que se midan.
+  - Prefijos locales del E4, sin uso fuera de CE01: PD-01…PD-09 (problemas del proceso), KPI-1…KPI-8 (indicadores del proceso), AU-1…AU-7 (automatizaciones) y C3…C5 (procesos candidatos no elegidos). No son IDs del contrato M6.
+  - El mapa de procesos y los pesos de la matriz de selección son juicio del equipo, a validar con la DTI.
+  - Herramientas: XSD BPMN 2.0 de OMG (`gestion/e4/herramientas/xsd/`) y render con bpmn-js + puppeteer-core sobre el Chrome instalado (`gestion/e4/herramientas/render/`, `node_modules` fuera del repositorio).
+  - La huella de CE0311 incluye `infra/trazabilidad.yaml` (V-80): se regeneró el informe CE0311.
+- **Decide:** equipo del proyecto (supuestos a validar con la DTI y el cronometraje)

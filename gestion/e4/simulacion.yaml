@@ -1,0 +1,186 @@
+# gestion/e4/simulacion.yaml — Fuente única de los procesos P1 y P2 (AS-IS y TO-BE) de CE01 E4 (CI-104).
+#
+# De aquí salen, sin copiar nada a mano:
+#   - los diagramas BPMN 2.0 (gestion/e4/bpmn.py → gestion/e4/bpmn/*.bpmn), con carriles, compuertas, eventos y PD-xx;
+#   - la simulación de Monte Carlo (gestion/e4/procesos.py): tiempo de ciclo, ocupación del laboratorio, horas y costo;
+#   - los parámetros que se cargan en Bizagi Modeler (README, pasos manuales).
+#
+# Unidades: horas. `tri: [mínimo, moda, máximo]` es una distribución triangular [S-43] (estimación del equipo hasta el
+# cronometraje). `por_pc: true` multiplica la duración por las PCs del laboratorio [S-26] (una persona, PC por PC).
+# `calculo:` toma la duración de una fórmula de procesos.py con supuestos registrados (descarga por Internet [S-26, S-27,
+# S-42], precarga con el límite de la prueba T50, entrega por la LAN de 1 GbE [S-14]). Las probabilidades no se escriben
+# aquí: `p:` nombra la lectura de un supuesto de gestion/ce01.yaml («S-44.p_cambio») o una derivación de procesos.py.
+#
+# Marcas de cada nodo: ocupa_lab (el laboratorio no está disponible para clases), habilitar (cuenta en el tiempo para
+# habilitar contenido o acceso, OB-3), listo (el laboratorio queda listo: se compara con el margen hasta la clase),
+# wan (la tarea usa el enlace a Internet: GB por el enlace). `col` y `fila` solo ordenan el diagrama.
+
+meta:
+  version: "0.1"
+  iteraciones: 10000
+  semilla: 20261126
+  pool: "UPeU Campus Juliaca"
+  pool_externo: "Internet / ISP"
+  recursos_con_costo: [tecnico, encargado]      # a la tarifa de S-07; el tiempo del docente se informa, no se valoriza
+  carriles:
+    docente:   "Docente"
+    encargado: "Encargado de laboratorio"
+    celeris:   "Celeris (consola + nodo)"
+    tecnico:   "Técnico DTI Soporte"
+    pc:        "PC del laboratorio"
+
+procesos:
+  # ------------------------------------------------------------------------------------------------------------------
+  P1-AS-IS:
+    proceso: P1
+    escenario: AS-IS
+    nombre: "P1 Actualización masiva de las PCs de un laboratorio (AS-IS)"
+    carriles: [encargado, tecnico, pc]
+    nodos:
+      - { id: ini, tipo: inicio_temporizador, carril: tecnico, col: 0, nombre: "Inicio del ciclo de actualización" }
+      - { id: a1, tipo: tarea, carril: tecnico, col: 1, nombre: "Programar la actualización del laboratorio", recurso: tecnico, tri: [0.25, 0.5, 1.0] }
+      - { id: a2, tipo: tarea, carril: encargado, col: 2, nombre: "Reservar una franja libre del laboratorio", recurso: encargado, tri: [0.1, 0.25, 0.5] }
+      - { id: a3, tipo: tarea, carril: pc, col: 3, nombre: "Descargar la actualización desde Internet en cada PC", calculo: wan_lab, ocupa_lab: true, wan: true, pd: PD-01 }
+      - { id: g1, tipo: xor, carril: pc, col: 4, nombre: "¿Terminó antes de la siguiente clase?" }
+      - { id: a4, tipo: tarea, carril: tecnico, col: 5, fila: 1, nombre: "Interrumpir y reprogramar la descarga", recurso: tecnico, tri: [0.1, 0.25, 0.5], pd: PD-02 }
+      - { id: t1, tipo: temporizador, carril: tecnico, col: 6, fila: 1, nombre: "Esperar otro día con franja libre", tri: [24, 48, 96], pd: PD-03 }
+      - { id: a5r, tipo: tarea, carril: pc, col: 7, fila: 1, nombre: "Completar la descarga pendiente desde Internet", calculo: wan_lab, factor: "S-44.fraccion_pendiente", ocupa_lab: true, wan: true }
+      - { id: a5, tipo: tarea, carril: pc, col: 5, nombre: "Instalar la actualización en cada PC", tri: [0.3, 0.5, 1.0], ocupa_lab: true }
+      - { id: a6, tipo: tarea, carril: tecnico, col: 6, nombre: "Verificar PC por PC y relanzar las fallidas", recurso: tecnico, tri: [0.1, 0.2, 0.3], por_pc: true, ocupa_lab: true, pd: PD-04 }
+      - { id: fin, tipo: fin, carril: tecnico, col: 8, nombre: "Laboratorio actualizado" }
+    flujos:
+      - [ini, a1]
+      - [a1, a2]
+      - [a2, a3]
+      - [a3, g1]
+      - { de: g1, a: a5, nombre: "Sí", p: complemento }
+      - { de: g1, a: a4, nombre: "No", p: "S-44.p_interrupcion" }
+      - [a4, t1]
+      - [t1, a5r]
+      - { de: a5r, a: g1, ruta: abajo }
+      - [a5, a6]
+      - [a6, fin]
+    mensajes: [a3, a5r]
+
+  # ------------------------------------------------------------------------------------------------------------------
+  P1-TO-BE:
+    proceso: P1
+    escenario: TO-BE
+    nombre: "P1 Actualización masiva de las PCs de un laboratorio (TO-BE)"
+    carriles: [encargado, celeris, tecnico, pc]
+    nodos:
+      - { id: ini, tipo: inicio_temporizador, carril: encargado, col: 0, nombre: "Inicio del ciclo de actualización" }
+      - { id: c1, tipo: tarea_usuario, carril: encargado, col: 1, nombre: "Programar la precarga del laboratorio en la consola", recurso: encargado, tri: [0.05, 0.1, 0.25], req: [REQ-F-34] }
+      - { id: t1, tipo: temporizador, carril: celeris, col: 2, nombre: "Esperar la ventana nocturna", tri: [2, 8, 14] }
+      - { id: c2, tipo: tarea_servicio, carril: celeris, col: 3, nombre: "Descargar una sola vez desde Internet con límite de ancho de banda", calculo: wan_precarga, wan: true, req: [REQ-F-22] }
+      - { id: c3, tipo: tarea, carril: tecnico, col: 4, nombre: "Lanzar la actualización del laboratorio", recurso: tecnico, tri: [0.1, 0.25, 0.5] }
+      - { id: c4, tipo: tarea, carril: pc, col: 5, nombre: "Recibir la actualización desde la caché por la LAN", calculo: lan_lab, ocupa_lab: true }
+      - { id: g1, tipo: xor, carril: pc, col: 6, nombre: "¿Terminó antes de la siguiente clase?" }
+      - { id: c5x, tipo: tarea, carril: tecnico, col: 7, fila: 1, nombre: "Reprogramar la entrega pendiente", recurso: tecnico, tri: [0.1, 0.25, 0.5] }
+      - { id: t2, tipo: temporizador, carril: tecnico, col: 8, fila: 1, nombre: "Esperar otro día con franja libre", tri: [24, 48, 96] }
+      - { id: c5r, tipo: tarea, carril: pc, col: 9, fila: 1, nombre: "Completar la entrega pendiente desde la caché", calculo: lan_lab, factor: "S-44.fraccion_pendiente", ocupa_lab: true }
+      - { id: c5, tipo: tarea, carril: pc, col: 7, nombre: "Instalar la actualización en cada PC", tri: [0.3, 0.5, 1.0], ocupa_lab: true }
+      - { id: c6, tipo: tarea_servicio, carril: celeris, col: 8, nombre: "Reportar el HIT y el ahorro del laboratorio", tri: [0, 0, 0], req: [REQ-F-25, REQ-F-13] }
+      - { id: c7, tipo: tarea, carril: tecnico, col: 9, nombre: "Verificar la instalación PC por PC", recurso: tecnico, tri: [0.05, 0.1, 0.2], por_pc: true, ocupa_lab: true }
+      - { id: fin, tipo: fin, carril: tecnico, col: 10, nombre: "Laboratorio actualizado" }
+    flujos:
+      - [ini, c1]
+      - [c1, t1]
+      - [t1, c2]
+      - [c2, c3]
+      - [c3, c4]
+      - [c4, g1]
+      - { de: g1, a: c5, nombre: "Sí", p: complemento }
+      - { de: g1, a: c5x, nombre: "No", p: p_interrupcion_tobe }
+      - [c5x, t2]
+      - [t2, c5r]
+      - { de: c5r, a: g1, ruta: abajo }
+      - [c5, c6]
+      - [c6, c7]
+      - [c7, fin]
+    mensajes: [c2]
+    eliminadas:
+      - { tarea: "Reservar una franja libre del laboratorio para descargar", motivo: "La descarga por Internet pasa a la ventana nocturna; de día solo se entrega por la LAN" }
+      - { tarea: "Descargar la actualización desde Internet en cada PC", motivo: "El nodo descarga una sola vez y las 40 PCs reciben desde la caché (T55, T07)" }
+      - { tarea: "Completar la descarga pendiente desde Internet", motivo: "La entrega pendiente sale de la caché; el enlace no se vuelve a usar" }
+
+  # ------------------------------------------------------------------------------------------------------------------
+  P2-AS-IS:
+    proceso: P2
+    escenario: AS-IS
+    nombre: "P2 Preparación de un laboratorio para una clase (AS-IS)"
+    carriles: [docente, encargado, tecnico, pc]
+    nodos:
+      - { id: ini, tipo: inicio, carril: docente, col: 0, nombre: "El docente necesita software o material" }
+      - { id: b1, tipo: tarea, carril: docente, col: 1, nombre: "Avisar el pedido por mensaje o en persona", recurso: docente, tri: [0.05, 0.1, 0.25], pd: PD-05 }
+      - { id: g0, tipo: xor, carril: docente, col: 2, nombre: "¿Llega con un día de anticipación?" }
+      - { id: b2, tipo: tarea, carril: encargado, col: 3, nombre: "Revisar el pedido", recurso: encargado, tri: [0.1, 0.25, 0.5] }
+      - { id: g1, tipo: xor, carril: encargado, col: 4, nombre: "¿Requiere una fuente nueva o un cambio de acceso?" }
+      - { id: b3, tipo: tarea, carril: encargado, col: 5, fila: 1, nombre: "Solicitar el cambio a la DTI", recurso: encargado, tri: [0.1, 0.2, 0.4], habilitar: true, pd: PD-06 }
+      - { id: t1, tipo: temporizador, carril: tecnico, col: 6, nombre: "Esperar la atención de la DTI", tri: [4, 16, 48], habilitar: true }
+      - { id: b4, tipo: tarea, carril: tecnico, col: 7, nombre: "Aplicar el cambio en la red o en el filtrado", recurso: tecnico, tri: [0.25, 0.5, 1.0], habilitar: true }
+      - { id: b5, tipo: tarea, carril: pc, col: 8, nombre: "Descargar el material desde Internet en cada PC", calculo: wan_lab, ocupa_lab: true, wan: true, pd: PD-07 }
+      - { id: b6, tipo: tarea, carril: encargado, col: 9, nombre: "Verificar el material PC por PC", recurso: encargado, tri: [0.02, 0.04, 0.08], por_pc: true, ocupa_lab: true, listo: true, pd: PD-08 }
+      - { id: fin, tipo: fin, carril: encargado, col: 10, nombre: "Laboratorio preparado, sin registro", pd: PD-09 }
+    flujos:
+      - [ini, b1]
+      - [b1, g0]
+      - { de: g0, a: b2, nombre: "Sí", p: complemento, margen: anticipacion }
+      - { de: g0, a: b2, nombre: "No, el mismo día", p: "S-44.p_mismo_dia", margen: mismo_dia, ruta: abajo }
+      - [b2, g1]
+      - { de: g1, a: b3, nombre: "Sí", p: "S-44.p_cambio" }
+      - { de: g1, a: b5, nombre: "No", p: complemento, ruta: abajo }
+      - [b3, t1]
+      - [t1, b4]
+      - [b4, b5]
+      - [b5, b6]
+      - [b6, fin]
+    mensajes: [b5]
+
+  # ------------------------------------------------------------------------------------------------------------------
+  P2-TO-BE:
+    proceso: P2
+    escenario: TO-BE
+    nombre: "P2 Preparación de un laboratorio para una clase (TO-BE)"
+    carriles: [docente, encargado, celeris, tecnico, pc]
+    nodos:
+      - { id: ini, tipo: inicio, carril: docente, col: 0, nombre: "El docente necesita software o material" }
+      - { id: d1, tipo: tarea_usuario, carril: docente, col: 1, nombre: "Registrar el pedido en la consola", recurso: docente, tri: [0.05, 0.1, 0.2], req: [REQ-F-35] }
+      - { id: g0, tipo: xor, carril: docente, col: 2, nombre: "¿Llega con un día de anticipación?" }
+      - { id: d2, tipo: tarea_usuario, carril: encargado, col: 3, nombre: "Revisar el pedido en la consola", recurso: encargado, tri: [0.05, 0.1, 0.25], req: [REQ-F-35] }
+      - { id: g1, tipo: xor, carril: encargado, col: 4, nombre: "¿Requiere una fuente nueva o un cambio de acceso?" }
+      - { id: d3, tipo: tarea_usuario, carril: encargado, col: 5, nombre: "Agregar la fuente al catálogo o habilitar el laboratorio", recurso: encargado, tri: [0.03, 0.05, 0.083], habilitar: true, req: [REQ-F-31, REQ-F-32] }
+      - { id: g2, tipo: xor, carril: encargado, col: 6, nombre: "¿La fuente requiere descifrar?" }
+      - { id: t1, tipo: temporizador, carril: tecnico, col: 7, nombre: "Esperar la aprobación de la DTI en la consola", tri: [1, 4, 24], habilitar: true }
+      - { id: d4, tipo: tarea_usuario, carril: tecnico, col: 8, nombre: "Aprobar el descifrado en la consola", recurso: tecnico, tri: [0.05, 0.1, 0.25], habilitar: true, req: [REQ-F-31] }
+      - { id: d5, tipo: tarea_servicio, carril: celeris, col: 9, nombre: "Aplicar la configuración firmada en el nodo", tri: [0.002, 0.008, 0.0167], habilitar: true, req: [REQ-F-31] }
+      - { id: d6, tipo: tarea_servicio, carril: celeris, col: 10, nombre: "Precargar el material con límite de ancho de banda", calculo: wan_precarga, wan: true, req: [REQ-F-34, REQ-F-22] }
+      - { id: d7, tipo: tarea, carril: pc, col: 11, nombre: "Recibir el material desde la caché por la LAN", calculo: lan_lab, ocupa_lab: true }
+      - { id: d8, tipo: tarea_usuario, carril: encargado, col: 12, nombre: "Verificar en la consola la precarga y el HIT", recurso: encargado, tri: [0.1, 0.2, 0.4], ocupa_lab: true, listo: true, req: [REQ-F-25] }
+      - { id: d9, tipo: tarea_servicio, carril: celeris, col: 13, nombre: "Registrar la auditoría y el ahorro", tri: [0, 0, 0], req: [REQ-F-24, REQ-F-25] }
+      - { id: fin, tipo: fin, carril: celeris, col: 14, nombre: "Laboratorio preparado y registrado" }
+    flujos:
+      - [ini, d1]
+      - [d1, g0]
+      - { de: g0, a: d2, nombre: "Sí", p: complemento, margen: anticipacion }
+      - { de: g0, a: d2, nombre: "No, el mismo día", p: "S-44.p_mismo_dia", margen: mismo_dia, ruta: abajo }
+      - [d2, g1]
+      - { de: g1, a: d3, nombre: "Sí", p: "S-44.p_cambio" }
+      - { de: g1, a: d6, nombre: "No", p: complemento, ruta: arriba }
+      - [d3, g2]
+      - { de: g2, a: t1, nombre: "Sí", p: "S-44.p_descifrar" }
+      - { de: g2, a: d5, nombre: "No", p: complemento, ruta: arriba }
+      - [t1, d4]
+      - [d4, d5]
+      - [d5, d6]
+      - [d6, d7]
+      - [d7, d8]
+      - [d8, d9]
+      - [d9, fin]
+    mensajes: [d6]
+    eliminadas:
+      - { tarea: "Avisar el pedido por mensaje o en persona", motivo: "El pedido se registra en la consola y queda trazado (REQ-F-35)" }
+      - { tarea: "Solicitar el cambio a la DTI", motivo: "El encargado gestiona el catálogo y el acceso de su laboratorio (REQ-F-31, REQ-F-32); la DTI solo aprueba lo que requiere descifrar" }
+      - { tarea: "Aplicar el cambio en la red o en el filtrado", motivo: "El nodo aplica la configuración firmada en ≤ 60 s (T51)" }
+      - { tarea: "Descargar el material desde Internet en cada PC", motivo: "El nodo precarga una vez y las PCs reciben desde la caché (T50, T55)" }
+      - { tarea: "Verificar el material PC por PC", motivo: "La consola muestra el estado de la precarga y el HIT del laboratorio (REQ-F-25)" }

@@ -1,0 +1,126 @@
+# gestion/e4/datos/procesos.yaml — Caracterización de procesos de CE01 E4 (CE0131–CE0135, CI-104).
+#
+# Lo que es cifra no se escribe aquí: los tiempos, costos y porcentajes salen de gestion/e4/procesos.py
+# (simulacion.yaml + supuestos de infra/trazabilidad.yaml). Aquí vive lo cualitativo: mapa, matriz de selección
+# (juicio del equipo, escala 1–5), SIPOC, problemas PD-xx, automatizaciones e indicadores con su método.
+# Prefijos locales de CE01 (CI-104): PD-xx (problemas del proceso) y KPI-x (indicadores del proceso); no son IDs de 00 M6.
+
+mapa:
+  fuente: "Cadena de valor del E1 (gestion/e1/datos/diagnostico.yaml → cadena_valor) y guía CE01 v0.4 B4.1; nombres de los procesos estratégicos y de apoyo [validar con la DTI]"
+  estrategicos:
+    - "Planeamiento estratégico institucional"
+    - "Gobierno y gestión de TI (DTI)"
+    - "Gestión de la calidad académica"
+  misionales:
+    - "Enseñanza en laboratorios"
+    - "Investigación"
+    - "Admisión y extensión"
+  apoyo:
+    - nombre: "Infraestructura de TI y soporte (DTI)"
+      subprocesos:
+        - { id: P1, nombre: "Actualización masiva de las PCs de un laboratorio" }
+        - { id: P2, nombre: "Preparación de un laboratorio para una clase" }
+        - { id: C3, nombre: "Instalación de la imagen base al inicio del semestre" }
+        - { id: C4, nombre: "Atención de incidencias de las PCs" }
+        - { id: C5, nombre: "Gestión del acceso a Internet y del filtrado" }
+    - nombre: "Gestión administrativa y financiera"
+    - nombre: "Logística y compras"
+
+seleccion:
+  fuente: "Juicio del equipo (escala 1–5) sobre los procesos de apoyo que tocan los laboratorios; pesos del equipo, a validar con la DTI"
+  criterios:
+    - { id: K1, nombre: "Volumen de descarga", peso: 0.25, pregunta: "¿Cuántos GB por el enlace mueve cada ejecución?" }
+    - { id: K2, nombre: "Impacto en las clases", peso: 0.25, pregunta: "¿Retrasa o interrumpe clases?" }
+    - { id: K3, nombre: "Frecuencia", peso: 0.20, pregunta: "¿Cuántas veces al año se ejecuta?" }
+    - { id: K4, nombre: "Dependencia de TI", peso: 0.15, pregunta: "¿Cuánto depende de la red y de la DTI?" }
+    - { id: K5, nombre: "Factibilidad con Celeris", peso: 0.15, pregunta: "¿Lo resuelve el alcance actual del SRS?" }
+  candidatos:
+    - { id: P1, puntajes: [5, 4, 3, 5, 5], motivo: "Mueve el mayor volumen (40 PCs × el mismo paquete) y la precarga del SRS lo cubre (REQ-F-22, REQ-F-34)" }
+    - { id: P2, puntajes: [4, 5, 5, 4, 5], motivo: "Es el más frecuente, retrasa clases y depende de la DTI para cada cambio; el catálogo, el acceso y la precarga lo cubren (REQ-F-31, F-32, F-34, F-35)" }
+    - { id: C3, puntajes: [5, 3, 1, 5, 2], motivo: "Gran volumen, pero una vez por semestre y con herramientas de clonación propias, fuera del alcance de la caché" }
+    - { id: C4, puntajes: [1, 3, 4, 4, 1], motivo: "Frecuente, pero no es una descarga: la caché no lo mejora" }
+    - { id: C5, puntajes: [1, 3, 3, 5, 3], motivo: "Lo resuelve en parte el acceso por laboratorio, pero la política de filtrado es del FortiGate (fuera del alcance)" }
+  seleccionados: [P1, P2]
+
+sipoc:
+  P1:
+    objetivo: "Mantener las 40 PCs de un laboratorio con el software al día sin quitar tiempo a las clases"
+    dueno: "DTI Soporte (técnico), con el encargado de laboratorio"
+    disparador: "Inicio del ciclo de actualización del laboratorio [S-06] o publicación de una actualización crítica"
+    kpi: [KPI-1, KPI-2, KPI-5, KPI-6]
+    proveedores: ["Fabricantes del software (sitios de actualización)", "ISP del campus", "DTI Soporte"]
+    entradas: ["Actualización publicada", "Horario del laboratorio", "Lista de PCs del laboratorio"]
+    pasos: ["Programar", "Reservar una franja", "Descargar en cada PC", "Instalar", "Verificar PC por PC"]
+    salidas: ["PCs actualizadas", "Lista informal de PCs con falla"]
+    clientes: ["Docentes y estudiantes del laboratorio", "DTI"]
+  P2:
+    objetivo: "Dejar el laboratorio listo con el software o el material pedido antes del inicio de la clase"
+    dueno: "Encargado de laboratorio"
+    disparador: "Pedido del docente para una clase"
+    kpi: [KPI-3, KPI-4, KPI-6, KPI-7]
+    proveedores: ["Docente", "DTI (red y filtrado)", "Sitios de origen del material", "ISP del campus"]
+    entradas: ["Pedido del docente", "Horario de la clase", "Software o material"]
+    pasos: ["Avisar el pedido", "Revisar", "Pedir el cambio a la DTI", "Descargar en cada PC", "Verificar PC por PC"]
+    salidas: ["Laboratorio preparado (o no) al inicio de la clase"]
+    clientes: ["Docente", "Estudiantes de la clase"]
+
+# Problemas del AS-IS: cada PD-xx aparece en el diagrama (anotación) y en la tabla. La causa es textual del Ishikawa del E1.
+problemas:
+  - { id: PD-01, diagrama: P1-AS-IS, nodo: a3, problema: "Cada una de las 40 PCs descarga el mismo contenido desde Internet", categoria: "Método", causa: "Descarga independiente en cada estación", efecto: "Satura el enlace en horas de clase (PO-1) y multiplica por 40 el tráfico de cada actualización", kpi: [KPI-1, KPI-2] }
+  - { id: PD-02, diagrama: P1-AS-IS, nodo: a4, problema: "La descarga compite con las clases y se interrumpe", categoria: "Método", causa: "Descargas en horario de clase", efecto: "Descargas que no terminan en una sesión (PO-2) y horas técnicas para reprogramar", kpi: [KPI-5, KPI-6] }
+  - { id: PD-03, diagrama: P1-AS-IS, nodo: t1, problema: "La parte pendiente espera días a otra franja libre", categoria: "Método", causa: "Sin ventana de precarga", efecto: "PCs desactualizadas durante días y ciclo largo", kpi: [KPI-8] }
+  - { id: PD-04, diagrama: P1-AS-IS, nodo: a6, problema: "Verificación PC por PC sin saber qué PCs terminaron la descarga", categoria: "Medición", causa: "Sin indicadores por laboratorio", efecto: "Horas técnicas en cada ciclo (cadena de valor: infraestructura de TI y soporte)", kpi: [KPI-6, KPI-7] }
+  - { id: PD-05, diagrama: P2-AS-IS, nodo: b1, problema: "Pedido informal, a menudo el mismo día de la clase", categoria: "Personas", causa: "El encargado carece de herramienta y atribución", efecto: "Preparación con prisa: el laboratorio no está listo al inicio de la clase (PO-3)", kpi: [KPI-4] }
+  - { id: PD-06, diagrama: P2-AS-IS, nodo: b3, problema: "Toda fuente nueva o cambio de acceso espera a la DTI", categoria: "Personas", causa: "Cada cambio requiere solicitud a la DTI", efecto: "El encargado depende de la DTI para cualquier cambio (PO-4)", kpi: [KPI-3] }
+  - { id: PD-07, diagrama: P2-AS-IS, nodo: b5, problema: "Las 40 PCs descargan el material durante la preparación o la clase", categoria: "Método", causa: "Descarga independiente en cada estación", efecto: "Preparar un laboratorio toma horas (PO-3) y satura el enlace (PO-1)", kpi: [KPI-1, KPI-2] }
+  - { id: PD-08, diagrama: P2-AS-IS, nodo: b6, problema: "Verificación del material PC por PC", categoria: "Medición", causa: "Sin indicadores por laboratorio", efecto: "Horas del encargado en cada preparación", kpi: [KPI-6, KPI-7] }
+  - { id: PD-09, diagrama: P2-AS-IS, nodo: fin, problema: "El pedido y su resultado no se registran", categoria: "Medición", causa: "No se mide el desperdicio ni el BHR", efecto: "No se mide el ancho de banda desperdiciado (PO-5) ni el cumplimiento de los pedidos", kpi: [KPI-4] }
+
+# CE0134: tarea AS-IS → cambio → tecnología → REQ-F (SRS de CE02) → prueba (infra/pruebas.yaml o escenario BDD del SRS) → PD.
+automatizaciones:
+  - { id: AU-1, tarea: "Descargar desde Internet en cada PC (P1, P2)", cambio: "El nodo descarga una sola vez y las 40 PCs reciben desde la caché por la LAN", tecnologia: "Nodo de caché EDGE01 (proxy de reenvío con almacenamiento direccionado por contenido)", req: [REQ-F-22, REQ-F-34], prueba: [T55, T07], pd: [PD-01, PD-07] }
+  - { id: AU-2, tarea: "Interrumpir, reprogramar y esperar otro día (P1)", cambio: "Precarga en la ventana nocturna con límite de ancho de banda; de día solo se entrega por la LAN", tecnologia: "Programador de precargas de la consola CTRL01 y del nodo", req: [REQ-F-34, REQ-F-22], prueba: [T50], pd: [PD-02, PD-03] }
+  - { id: AU-3, tarea: "Verificar PC por PC qué descargas terminaron (P1)", cambio: "La consola muestra el HIT y el ahorro del laboratorio; el técnico solo verifica la instalación", tecnologia: "Consola CTRL01 (vista de ahorro P-02) y métricas por laboratorio del nodo", req: [REQ-F-25, REQ-F-13], prueba: [reportes.feature], pd: [PD-04] }
+  - { id: AU-4, tarea: "Avisar el pedido por mensaje o en persona (P2)", cambio: "El docente registra el pedido en la consola y el encargado lo convierte en precarga", tecnologia: "Consola CTRL01 (solicitudes, P-06)", req: [REQ-F-35], prueba: [solicitudes.feature], pd: [PD-05] }
+  - { id: AU-5, tarea: "Solicitar el cambio a la DTI y esperar su atención (P2)", cambio: "El encargado gestiona el catálogo y el acceso de su laboratorio; el nodo aplica la configuración firmada; la DTI solo aprueba lo que requiere descifrar", tecnologia: "Consola CTRL01 (catálogo P-03, laboratorios P-04) y configuración firmada del nodo", req: [REQ-F-31, REQ-F-32], prueba: [T51, T52], pd: [PD-06] }
+  - { id: AU-6, tarea: "Verificar el material PC por PC (P2)", cambio: "La consola muestra el avance de la precarga y el HIT del laboratorio antes de la clase", tecnologia: "Consola CTRL01 (precarga P-05, ahorro P-02)", req: [REQ-F-34, REQ-F-25], prueba: [T50, reportes.feature], pd: [PD-08] }
+  - { id: AU-7, tarea: "Cerrar sin registro (P2)", cambio: "Auditoría de cada cambio y reporte del ahorro por laboratorio", tecnologia: "Auditoría de la consola CTRL01 (P-08)", req: [REQ-F-24, REQ-F-25], prueba: [T51, auditoria.feature], pd: [PD-09] }
+
+# CE0132 (línea base) y CE0135 (nuevos indicadores). `medida` dice qué salida de procesos.py da el valor.
+indicadores:
+  - { id: KPI-1, nombre: "Tiempo de descarga para dejar listo un laboratorio", objetivo: OB-2, formula: "GB que recibe el laboratorio × 8 / Mbps efectivos del tramo más lento", medicion_asis: "Cronometraje de la fase de descarga (registro-tiempos.xlsx)", fuente_tobe: "Consola P-05 (avance de la precarga) y registros del nodo", frecuencia: "Por ciclo", medida: descarga_h }
+  - { id: KPI-2, nombre: "Tráfico por el enlace a Internet por ciclo", objetivo: OB-1, formula: "GB que cruzan el enlace del campus por ciclo de un laboratorio", medicion_asis: "Contadores del FortiGate durante el ciclo", fuente_tobe: "Contadores del FortiGate frente a los registros del nodo", frecuencia: "Por ciclo", medida: wan_gb }
+  - { id: KPI-3, nombre: "Tiempo para habilitar contenido o acceso", objetivo: OB-3, formula: "Hora del cambio aplicado − hora en que el encargado lo inicia (pedidos que lo requieren)", medicion_asis: "Fecha y hora del pedido a la DTI y de su atención (correo o ticket)", fuente_tobe: "Auditoría de la consola (P-08)", frecuencia: "Por pedido", medida: habilitar_h }
+  - { id: KPI-4, nombre: "Preparaciones listas al inicio de la clase", objetivo: null, formula: "Preparaciones listas antes del inicio de la clase / preparaciones pedidas × 100", medicion_asis: "Registro del encargado al inicio de cada clase pedida", fuente_tobe: "Consola: estado de la precarga antes del horario del laboratorio", frecuencia: "Semanal", medida: listo_pct, meta_fuente: "Guía CE01 v0.4 B4.5", meta_pct: 0.95 }
+  - { id: KPI-5, nombre: "Interrupciones por ciclo de actualización", objetivo: null, formula: "Descargas interrumpidas por una clase / ciclos", medicion_asis: "Registro del técnico en registro-tiempos.xlsx", fuente_tobe: "Consola: entregas pendientes por laboratorio", frecuencia: "Por ciclo", medida: interrupciones }
+  - { id: KPI-6, nombre: "Horas de trabajo por ciclo (técnico y encargado)", objetivo: null, formula: "Suma de las horas del técnico y del encargado en el ciclo", medicion_asis: "Cronometraje por fase (registro-tiempos.xlsx)", fuente_tobe: "Registro de horas del piloto", frecuencia: "Mensual", medida: horas_personal }
+  - { id: KPI-7, nombre: "Costo de personal por ciclo", objetivo: null, formula: "Horas del técnico y del encargado × tarifa [S-07]", medicion_asis: "Hoja de cálculo sobre el cronometraje", fuente_tobe: "Hoja de cálculo sobre el registro de horas del piloto", frecuencia: "Mensual", medida: costo }
+  - { id: KPI-8, nombre: "Ocupación del laboratorio por ciclo", objetivo: null, formula: "Horas en que el laboratorio no está disponible para clases (descarga, instalación y verificación)", medicion_asis: "Cronometraje por fase (registro-tiempos.xlsx)", fuente_tobe: "Consola (precarga y HIT) y registro del técnico", frecuencia: "Por ciclo", medida: ocupacion_h }
+
+# Fases del instrumento de cronometraje (CE0132): ≥ 30 observaciones por fase antes de pasar de «estimado» a «medido».
+cronometraje:
+  observaciones_min: 30
+  # nodos_*: tareas del AS-IS (simulacion.yaml) cuya duración estimada se compara con la medida en la hoja «Resumen».
+  fases:
+    - { fase: "Solicitud", p1: "Programar la actualización", p2: "Avisar y revisar el pedido", nodos_p1: [a1], nodos_p2: [b1, b2] }
+    - { fase: "Decisión", p1: "Reservar una franja libre", p2: "Solicitar el cambio a la DTI y esperar su atención", nodos_p1: [a2], nodos_p2: [b3, t1, b4] }
+    - { fase: "Descarga", p1: "Descargar en cada PC (sin contar lo pendiente)", p2: "Descargar el material en cada PC", nodos_p1: [a3], nodos_p2: [b5] }
+    - { fase: "Instalación", p1: "Instalar la actualización en cada PC", p2: "—", nodos_p1: [a5], nodos_p2: [] }
+    - { fase: "Verificación", p1: "Verificar PC por PC", p2: "Verificar el material PC por PC", nodos_p1: [a6], nodos_p2: [b6] }
+
+# Preguntas previsibles de la sustentación (4.4). Sin cifras escritas a mano: las cifras están en las tablas del informe.
+defensa:
+  - pregunta: "¿Por qué P1 y P2 y no otro proceso de la DTI?"
+    respuesta: "La matriz de selección pondera volumen de descarga, impacto en clases, frecuencia, dependencia de TI y factibilidad con el alcance del SRS; P1 y P2 obtienen los dos mayores puntajes. La imagen base del semestre mueve mucho volumen, pero ocurre una vez por semestre y usa herramientas de clonación fuera del alcance de la caché."
+  - pregunta: "¿Los tiempos del AS-IS están medidos?"
+    respuesta: "No todavía. Las descargas se calculan con supuestos registrados (S-26, S-27, S-42) y las tareas manuales son estimaciones triangulares (S-43) marcadas como tales. La plantilla registro-tiempos.xlsx convierte cada fase en «Medido» al llegar a 30 observaciones, y el modelo se recalcula sin tocar el texto."
+  - pregunta: "¿Por qué Monte Carlo y no un solo cálculo?"
+    respuesta: "Porque el proceso tiene bifurcaciones (interrupciones, pedidos del mismo día, cambios que requieren a la DTI) y esperas variables. La simulación entrega la media y los percentiles 10 y 90, de modo que la mejora se informa con su dispersión y no como un número único. Bizagi repite la simulación como verificación independiente."
+  - pregunta: "¿Celeris acelera la instalación del software?"
+    respuesta: "No. Solo elimina la descarga repetida por Internet y la saca del horario de clase. La instalación conserva la misma distribución en el AS-IS y en el TO-BE; por eso la reducción de la ocupación del laboratorio es menor que la de la descarga, y la mejora total depende de medir la fase de instalación."
+  - pregunta: "¿Por qué el ahorro de horas técnicas de P1 es menor que el del business case?"
+    respuesta: "El E2 supuso que se ahorran todas las horas técnicas por PC (S-07). El modelo del E4 muestra que la verificación de la instalación sigue siendo manual, porque la consola no muestra el estado de cada PC (REQ-NF-07 prohíbe registrar sus IP). En cambio, el E2 no incluye el ahorro de P2, que es mayor. Ambos valores se exportan a gestion/e4/datos/resultados.json."
+  - pregunta: "¿Por qué el TO-BE no alcanza la meta de preparaciones listas al inicio de la clase?"
+    respuesta: "Porque los pedidos del mismo día dejan un margen menor que la entrega desde la caché más la verificación. La tecnología reduce el tiempo, pero no reemplaza la anticipación del pedido; la consola registra los pedidos y permite medir y gestionar esa anticipación con los docentes en el piloto."
+  - pregunta: "¿Cómo se verifica cada automatización?"
+    respuesta: "Cada automatización nombra el requisito del SRS que la especifica y la prueba que la comprueba: T50 (precarga en ventana con límite), T51 (configuración firmada), T52 (laboratorio deshabilitado), T55 (coalescencia) y T07 (respuesta desde la caché), además de los escenarios BDD del SRS. El generador falla si falta alguno."

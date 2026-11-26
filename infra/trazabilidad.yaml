@@ -599,6 +599,28 @@ supuestos:
     valor: 10 % de la inversión inicial en hardware (servidor [S-08] + switch [S-37] + UPS [S-38] + cableado [S-39])
     validacion: Contrato de soporte o garantía extendida cotizados
     responsable: Nick
+  # S-42…S-45: parámetros del modelado AS-IS / TO-BE de CE01 E4 que la guía CE01 v0.4 (B4) no respalda (CI-104).
+  # Son estimaciones del equipo hasta el cronometraje (≥ 30 observaciones por fase) con gestion/e4/instrumentos/registro-tiempos.xlsx.
+  S-42:
+    supuesto: Ancho de banda del enlace disponible para una descarga masiva en horario de laboratorio
+    valor: 150 Mbps (la mitad del enlace del campus [S-02]; el resto lo usan las clases y los servicios del campus)
+    validacion: Contadores del FortiGate durante un ciclo real de actualización de un laboratorio
+    responsable: Henyelrey
+  S-43:
+    supuesto: Duraciones y esperas de las tareas manuales de P1 y P2 (AS-IS y TO-BE)
+    valor: Distribución triangular (mínimo, moda, máximo) por tarea, estimada por el equipo; los valores están en gestion/e4/simulacion.yaml
+    validacion: Cronometraje de al menos 30 observaciones por fase (solicitud, decisión, descarga, instalación, verificación) con gestion/e4/instrumentos/registro-tiempos.xlsx
+    responsable: Henyelrey
+  S-44:
+    supuesto: Probabilidades de las bifurcaciones de P1 y P2
+    valor: "30 % de las actualizaciones masivas se interrumpen por una clase y la mitad pendiente se completa otro día; 40 % de los pedidos de preparación llegan el mismo día de la clase, con un margen de 0,5 a 2 h (moda 1 h), y el resto con 24 h de anticipación; 50 % de los pedidos requiere una fuente nueva o un cambio de acceso; 20 % de las fuentes nuevas requiere descifrar"
+    validacion: Registro de interrupciones y de pedidos durante el cronometraje (S1) y registro de solicitudes de la consola (REQ-F-35) en el piloto (S2)
+    responsable: Henyelrey
+  S-45:
+    supuesto: Frecuencia de la preparación de un laboratorio para una clase (P2)
+    valor: 2 pedidos por laboratorio por semana lectiva y 32 semanas lectivas al año (dos semestres de 16 semanas)
+    validacion: Registro de pedidos de los encargados durante un mes y registro de solicitudes de la consola en el piloto
+    responsable: Henyelrey
 
 decisiones:
   D-01:

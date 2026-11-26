@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" id="Def_P1_AS_IS" targetNamespace="https://celeris.test/ce01/e4/P1-AS-IS" exporter="Celeris gestion/e4/bpmn.py" exporterVersion="0.1">
+  <bpmn:collaboration id="Colaboracion_P1_AS_IS">
+    <bpmn:participant id="Participante_Campus" name="UPeU Campus Juliaca" processRef="Proceso_P1_AS_IS"/>
+    <bpmn:participant id="Participante_Internet" name="Internet / ISP"/>
+    <bpmn:messageFlow id="Mensaje_1" name="Descarga" sourceRef="a3" targetRef="Participante_Internet"/>
+    <bpmn:messageFlow id="Mensaje_2" name="Descarga" sourceRef="a5r" targetRef="Participante_Internet"/>
+  </bpmn:collaboration>
+  <bpmn:process id="Proceso_P1_AS_IS" name="P1 Actualización masiva de las PCs de un laboratorio (AS-IS)" isExecutable="false">
+    <bpmn:laneSet id="Carriles">
+      <bpmn:lane id="Carril_encargado" name="Encargado de laboratorio">
+        <bpmn:flowNodeRef>a2</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Carril_tecnico" name="Técnico DTI Soporte">
+        <bpmn:flowNodeRef>ini</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>a1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>a4</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>t1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>a6</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>fin</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Carril_pc" name="PC del laboratorio">
+        <bpmn:flowNodeRef>a3</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>g1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>a5r</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>a5</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="ini" name="Inicio del ciclo de actualización">
+      <bpmn:outgoing>Flujo_1</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="Temp_ini">
+      </bpmn:timerEventDefinition>
+    </bpmn:startEvent>
+    <bpmn:task id="a1" name="Programar la actualización del laboratorio">
+      <bpmn:documentation>Duración triangular 0,250 / 0,500 / 1,000 h [S-43]. Recurso: Técnico DTI Soporte</bpmn:documentation>
+      <bpmn:incoming>Flujo_1</bpmn:incoming>
+      <bpmn:outgoing>Flujo_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="a2" name="Reservar una franja libre del laboratorio">
+      <bpmn:documentation>Duración triangular 0,100 / 0,250 / 0,500 h [S-43]. Recurso: Encargado de laboratorio</bpmn:documentation>
+      <bpmn:incoming>Flujo_2</bpmn:incoming>
+      <bpmn:outgoing>Flujo_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="a3" name="Descargar la actualización desde Internet en cada PC">
+      <bpmn:documentation>Duración calculada en gestion/e4/procesos.py (wan_lab)</bpmn:documentation>
+      <bpmn:incoming>Flujo_3</bpmn:incoming>
+      <bpmn:outgoing>Flujo_4</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="g1" name="¿Terminó antes de la siguiente clase?">
+      <bpmn:incoming>Flujo_4</bpmn:incoming>
+      <bpmn:incoming>Flujo_9</bpmn:incoming>
+      <bpmn:outgoing>Flujo_5</bpmn:outgoing>
+      <bpmn:outgoing>Flujo_6</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="a4" name="Interrumpir y reprogramar la descarga">
+      <bpmn:documentation>Duración triangular 0,100 / 0,250 / 0,500 h [S-43]. Recurso: Técnico DTI Soporte</bpmn:documentation>
+      <bpmn:incoming>Flujo_6</bpmn:incoming>
+      <bpmn:outgoing>Flujo_7</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:intermediateCatchEvent id="t1" name="Esperar otro día con franja libre">
+      <bpmn:documentation>Duración triangular 24,000 / 48,000 / 96,000 h [S-43]</bpmn:documentation>
+      <bpmn:incoming>Flujo_7</bpmn:incoming>
+      <bpmn:outgoing>Flujo_8</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="Temp_t1">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT48H</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:task id="a5r" name="Completar la descarga pendiente desde Internet">
+      <bpmn:documentation>Duración calculada en gestion/e4/procesos.py (wan_lab × S-44.fraccion_pendiente)</bpmn:documentation>
+      <bpmn:incoming>Flujo_8</bpmn:incoming>
+      <bpmn:outgoing>Flujo_9</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="a5" name="Instalar la actualización en cada PC">
+      <bpmn:documentation>Duración triangular 0,300 / 0,500 / 1,000 h [S-43]</bpmn:documentation>
+      <bpmn:incoming>Flujo_5</bpmn:incoming>
+      <bpmn:outgoing>Flujo_10</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="a6" name="Verificar PC por PC y relanzar las fallidas">
+      <bpmn:documentation>Duración triangular 0,100 / 0,200 / 0,300 h [S-43] por PC. Recurso: Técnico DTI Soporte</bpmn:documentation>
+      <bpmn:incoming>Flujo_10</bpmn:incoming>
+      <bpmn:outgoing>Flujo_11</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:endEvent id="fin" name="Laboratorio actualizado">
+      <bpmn:incoming>Flujo_11</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flujo_1" sourceRef="ini" targetRef="a1"/>
+    <bpmn:sequenceFlow id="Flujo_2" sourceRef="a1" targetRef="a2"/>
+    <bpmn:sequenceFlow id="Flujo_3" sourceRef="a2" targetRef="a3"/>
+    <bpmn:sequenceFlow id="Flujo_4" sourceRef="a3" targetRef="g1"/>
+    <bpmn:sequenceFlow id="Flujo_5" name="Sí" sourceRef="g1" targetRef="a5"/>
+    <bpmn:sequenceFlow id="Flujo_6" name="No" sourceRef="g1" targetRef="a4"/>
+    <bpmn:sequenceFlow id="Flujo_7" sourceRef="a4" targetRef="t1"/>
+    <bpmn:sequenceFlow id="Flujo_8" sourceRef="t1" targetRef="a5r"/>
+    <bpmn:sequenceFlow id="Flujo_9" sourceRef="a5r" targetRef="g1"/>
+    <bpmn:sequenceFlow id="Flujo_10" sourceRef="a5" targetRef="a6"/>
+    <bpmn:sequenceFlow id="Flujo_11" sourceRef="a6" targetRef="fin"/>
+    <bpmn:textAnnotation id="Anot_PD_01"><bpmn:text>PD-01: Cada una de las 40 PCs descarga el mismo contenido desde Internet</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_PD_01" sourceRef="Anot_PD_01" targetRef="a3" associationDirection="None"/>
+    <bpmn:textAnnotation id="Anot_PD_02"><bpmn:text>PD-02: La descarga compite con las clases y se interrumpe</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_PD_02" sourceRef="Anot_PD_02" targetRef="a4" associationDirection="None"/>
+    <bpmn:textAnnotation id="Anot_PD_03"><bpmn:text>PD-03: La parte pendiente espera días a otra franja libre</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_PD_03" sourceRef="Anot_PD_03" targetRef="t1" associationDirection="None"/>
+    <bpmn:textAnnotation id="Anot_PD_04"><bpmn:text>PD-04: Verificación PC por PC sin saber qué PCs terminaron la descarga</bpmn:text></bpmn:textAnnotation>
+    <bpmn:association id="Asoc_PD_04" sourceRef="Anot_PD_04" targetRef="a6" associationDirection="None"/>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagrama_1">
+    <bpmndi:BPMNPlane id="Plano_1" bpmnElement="Colaboracion_P1_AS_IS">
+      <bpmndi:BPMNShape id="Participante_Campus_di" bpmnElement="Participante_Campus" isHorizontal="true" bioc:fill="#DCE5EF" bioc:stroke="#003865" color:background-color="#DCE5EF" color:border-color="#003865">
+        <dc:Bounds x="20" y="0" width="1522" height="906"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Carril_encargado_di" bpmnElement="Carril_encargado" isHorizontal="true" bioc:fill="#FFFFFF" bioc:stroke="#2F5D8A" color:background-color="#FFFFFF" color:border-color="#2F5D8A">
+        <dc:Bounds x="50" y="0" width="1492" height="202"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Carril_tecnico_di" bpmnElement="Carril_tecnico" isHorizontal="true" bioc:fill="#FFFFFF" bioc:stroke="#2F5D8A" color:background-color="#FFFFFF" color:border-color="#2F5D8A">
+        <dc:Bounds x="50" y="202" width="1492" height="352"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Carril_pc_di" bpmnElement="Carril_pc" isHorizontal="true" bioc:fill="#FFFFFF" bioc:stroke="#2F5D8A" color:background-color="#FFFFFF" color:border-color="#2F5D8A">
+        <dc:Bounds x="50" y="554" width="1492" height="352"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ini_di" bpmnElement="ini" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="162" y="300" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="120" y="340" width="120" height="40"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="a1_di" bpmnElement="a1" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="278" y="282" width="120" height="72"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="a2_di" bpmnElement="a2" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="436" y="80" width="120" height="72"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="a3_di" bpmnElement="a3" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="594" y="634" width="120" height="72"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="g1_di" bpmnElement="g1" isMarkerVisible="true" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="787" y="645" width="50" height="50"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="675" y="603" width="120" height="40"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="a4_di" bpmnElement="a4" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="910" y="432" width="120" height="72"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="t1_di" bpmnElement="t1" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="1110" y="450" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1068" y="490" width="120" height="40"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="a5r_di" bpmnElement="a5r" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="1226" y="784" width="120" height="72"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="a5_di" bpmnElement="a5" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="910" y="634" width="120" height="72"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="a6_di" bpmnElement="a6" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="1068" y="282" width="120" height="72"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fin_di" bpmnElement="fin" bioc:fill="#FFFFFF" bioc:stroke="#003865" color:background-color="#FFFFFF" color:border-color="#003865">
+        <dc:Bounds x="1426" y="300" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1384" y="340" width="120" height="40"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flujo_1_di" bpmnElement="Flujo_1">
+        <di:waypoint x="198" y="318"/>
+        <di:waypoint x="278" y="318"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_2_di" bpmnElement="Flujo_2">
+        <di:waypoint x="398" y="318"/>
+        <di:waypoint x="417" y="318"/>
+        <di:waypoint x="417" y="116"/>
+        <di:waypoint x="436" y="116"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_3_di" bpmnElement="Flujo_3">
+        <di:waypoint x="556" y="116"/>
+        <di:waypoint x="575" y="116"/>
+        <di:waypoint x="575" y="670"/>
+        <di:waypoint x="594" y="670"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_4_di" bpmnElement="Flujo_4">
+        <di:waypoint x="714" y="670"/>
+        <di:waypoint x="787" y="670"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_5_di" bpmnElement="Flujo_5">
+        <di:waypoint x="837" y="670"/>
+        <di:waypoint x="910" y="670"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="841" y="652" width="80" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_6_di" bpmnElement="Flujo_6">
+        <di:waypoint x="837" y="670"/>
+        <di:waypoint x="874" y="670"/>
+        <di:waypoint x="874" y="468"/>
+        <di:waypoint x="910" y="468"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="880" y="562" width="80" height="14"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_7_di" bpmnElement="Flujo_7">
+        <di:waypoint x="1030" y="468"/>
+        <di:waypoint x="1110" y="468"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_8_di" bpmnElement="Flujo_8">
+        <di:waypoint x="1146" y="468"/>
+        <di:waypoint x="1186" y="468"/>
+        <di:waypoint x="1186" y="820"/>
+        <di:waypoint x="1226" y="820"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_9_di" bpmnElement="Flujo_9">
+        <di:waypoint x="1286" y="856"/>
+        <di:waypoint x="1286" y="902"/>
+        <di:waypoint x="794" y="902"/>
+        <di:waypoint x="794" y="695"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_10_di" bpmnElement="Flujo_10">
+        <di:waypoint x="1030" y="670"/>
+        <di:waypoint x="1049" y="670"/>
+        <di:waypoint x="1049" y="318"/>
+        <di:waypoint x="1068" y="318"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flujo_11_di" bpmnElement="Flujo_11">
+        <di:waypoint x="1188" y="318"/>
+        <di:waypoint x="1426" y="318"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Participante_Internet_di" bpmnElement="Participante_Internet" isHorizontal="true" bioc:fill="#DCE5EF" bioc:stroke="#003865" color:background-color="#DCE5EF" color:border-color="#003865">
+        <dc:Bounds x="20" y="946" width="1522" height="60"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Mensaje_1_di" bpmnElement="Mensaje_1">
+        <di:waypoint x="676" y="706"/>
+        <di:waypoint x="676" y="946"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Mensaje_2_di" bpmnElement="Mensaje_2">
+        <di:waypoint x="1308" y="856"/>
+        <di:waypoint x="1308" y="946"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Anot_PD_01_di" bpmnElement="Anot_PD_01" bioc:fill="#FFFFFF" bioc:stroke="#C0392B" color:background-color="#FFFFFF" color:border-color="#C0392B">
+        <dc:Bounds x="584" y="572" width="150" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_PD_01_di" bpmnElement="Asoc_PD_01" bioc:stroke="#C0392B" color:border-color="#C0392B">
+        <di:waypoint x="654" y="620"/>
+        <di:waypoint x="654" y="634"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Anot_PD_02_di" bpmnElement="Anot_PD_02" bioc:fill="#FFFFFF" bioc:stroke="#C0392B" color:background-color="#FFFFFF" color:border-color="#C0392B">
+        <dc:Bounds x="900" y="370" width="150" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_PD_02_di" bpmnElement="Asoc_PD_02" bioc:stroke="#C0392B" color:border-color="#C0392B">
+        <di:waypoint x="970" y="418"/>
+        <di:waypoint x="970" y="432"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Anot_PD_03_di" bpmnElement="Anot_PD_03" bioc:fill="#FFFFFF" bioc:stroke="#C0392B" color:background-color="#FFFFFF" color:border-color="#C0392B">
+        <dc:Bounds x="1058" y="374" width="150" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_PD_03_di" bpmnElement="Asoc_PD_03" bioc:stroke="#C0392B" color:border-color="#C0392B">
+        <di:waypoint x="1128" y="422"/>
+        <di:waypoint x="1128" y="450"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Anot_PD_04_di" bpmnElement="Anot_PD_04" bioc:fill="#FFFFFF" bioc:stroke="#C0392B" color:background-color="#FFFFFF" color:border-color="#C0392B">
+        <dc:Bounds x="1058" y="220" width="150" height="48"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Asoc_PD_04_di" bpmnElement="Asoc_PD_04" bioc:stroke="#C0392B" color:border-color="#C0392B">
+        <di:waypoint x="1128" y="268"/>
+        <di:waypoint x="1128" y="282"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

@@ -1,0 +1,332 @@
+{
+  "motor": "Microsoft Word (COM)",
+  "paginas": 38,
+  "marcas": [
+    {
+      "texto": "Resumen ejecutivo",
+      "nivel": 1,
+      "pagina": 2
+    },
+    {
+      "texto": "3.1 Acta de Constitución",
+      "nivel": 1,
+      "pagina": 4
+    },
+    {
+      "texto": "3.1.1 Sponsor y equipo de dirección",
+      "nivel": 2,
+      "pagina": 4
+    },
+    {
+      "texto": "3.1.2 Justificación estratégica",
+      "nivel": 2,
+      "pagina": 4
+    },
+    {
+      "texto": "3.1.3 Objetivos del proyecto",
+      "nivel": 2,
+      "pagina": 4
+    },
+    {
+      "texto": "3.1.4 Alcance preliminar",
+      "nivel": 2,
+      "pagina": 5
+    },
+    {
+      "texto": "3.1.5 Restricciones y supuestos",
+      "nivel": 2,
+      "pagina": 5
+    },
+    {
+      "texto": "3.1.6 Interesados, hitos y presupuesto resumido",
+      "nivel": 2,
+      "pagina": 5
+    },
+    {
+      "texto": "3.1.7 Criterios de éxito",
+      "nivel": 2,
+      "pagina": 5
+    },
+    {
+      "texto": "3.1.8 Aprobación",
+      "nivel": 2,
+      "pagina": 6
+    },
+    {
+      "texto": "3.2 Gestión del Alcance",
+      "nivel": 1,
+      "pagina": 7
+    },
+    {
+      "texto": "3.2.1 EDT / WBS",
+      "nivel": 2,
+      "pagina": 8
+    },
+    {
+      "texto": "Figura 3.1. Estructura de desglose del trabajo (EDT) del proyecto Celeris Edge",
+      "nivel": 10,
+      "pagina": 8
+    },
+    {
+      "texto": "3.2.2 Diccionario de entregables",
+      "nivel": 2,
+      "pagina": 10
+    },
+    {
+      "texto": "3.2.3 Asignación de responsabilidades (RACI)",
+      "nivel": 2,
+      "pagina": 11
+    },
+    {
+      "texto": "3.2.4 Control de cambios",
+      "nivel": 2,
+      "pagina": 12
+    },
+    {
+      "texto": "Figura 3.2. Procedimiento de control integrado de cambios",
+      "nivel": 10,
+      "pagina": 12
+    },
+    {
+      "texto": "3.3 Gestión del Cronograma",
+      "nivel": 1,
+      "pagina": 14
+    },
+    {
+      "texto": "3.3.1 Lista de actividades",
+      "nivel": 2,
+      "pagina": 14
+    },
+    {
+      "texto": "3.3.2 Diagrama de Gantt",
+      "nivel": 2,
+      "pagina": 16
+    },
+    {
+      "texto": "Figura 3.3. Diagrama de Gantt de S1 con la ruta crítica y los hitos",
+      "nivel": 10,
+      "pagina": 16
+    },
+    {
+      "texto": "Figura 3.4. Diagrama de Gantt de S2 con la ruta crítica y los hitos",
+      "nivel": 10,
+      "pagina": 17
+    },
+    {
+      "texto": "3.3.3 Hitos principales",
+      "nivel": 2,
+      "pagina": 18
+    },
+    {
+      "texto": "3.3.4 Verificación con Microsoft Project",
+      "nivel": 2,
+      "pagina": 18
+    },
+    {
+      "texto": "3.4 Gestión de Costos",
+      "nivel": 1,
+      "pagina": 19
+    },
+    {
+      "texto": "3.4.1 Presupuesto detallado",
+      "nivel": 2,
+      "pagina": 19
+    },
+    {
+      "texto": "3.4.2 Línea base de costos",
+      "nivel": 2,
+      "pagina": 20
+    },
+    {
+      "texto": "Figura 3.5. Curva S de la línea base, reservas y valor ganado a la fecha de corte",
+      "nivel": 10,
+      "pagina": 21
+    },
+    {
+      "texto": "3.4.3 Diferencia con el business case",
+      "nivel": 2,
+      "pagina": 22
+    },
+    {
+      "texto": "3.4.4 Control presupuestal con valor ganado",
+      "nivel": 2,
+      "pagina": 22
+    },
+    {
+      "texto": "3.5 Gestión de Riesgos",
+      "nivel": 1,
+      "pagina": 23
+    },
+    {
+      "texto": "3.5.1 Identificación",
+      "nivel": 2,
+      "pagina": 23
+    },
+    {
+      "texto": "3.5.2 Análisis cualitativo",
+      "nivel": 2,
+      "pagina": 23
+    },
+    {
+      "texto": "Figura 3.6. Mapa de calor de los riesgos del proyecto RP-01…RP-10",
+      "nivel": 10,
+      "pagina": 24
+    },
+    {
+      "texto": "3.5.3 Plan de respuesta",
+      "nivel": 2,
+      "pagina": 24
+    },
+    {
+      "texto": "3.5.4 Seguimiento",
+      "nivel": 2,
+      "pagina": 25
+    },
+    {
+      "texto": "3.6 Gestión Ágil",
+      "nivel": 1,
+      "pagina": 26
+    },
+    {
+      "texto": "3.6.1 Product backlog",
+      "nivel": 2,
+      "pagina": 26
+    },
+    {
+      "texto": "3.6.2 Sprint planning",
+      "nivel": 2,
+      "pagina": 27
+    },
+    {
+      "texto": "Figura 3.7. Tablero Kanban de la consola al iniciar el sprint 1 (planificado)",
+      "nivel": 10,
+      "pagina": 28
+    },
+    {
+      "texto": "3.6.3 Incrementos",
+      "nivel": 2,
+      "pagina": 29
+    },
+    {
+      "texto": "Figura 3.8. Burn-up planificado de la consola por sprint",
+      "nivel": 10,
+      "pagina": 29
+    },
+    {
+      "texto": "3.7 Interesados y comunicaciones",
+      "nivel": 1,
+      "pagina": 31
+    },
+    {
+      "texto": "3.7.1 Compromiso de los interesados",
+      "nivel": 2,
+      "pagina": 31
+    },
+    {
+      "texto": "3.7.2 Plan de comunicaciones",
+      "nivel": 2,
+      "pagina": 31
+    },
+    {
+      "texto": "3.8 Monitoreo, control y cierre",
+      "nivel": 1,
+      "pagina": 32
+    },
+    {
+      "texto": "3.8.1 Reunión semanal de seguimiento",
+      "nivel": 2,
+      "pagina": 32
+    },
+    {
+      "texto": "3.8.2 Umbrales de control",
+      "nivel": 2,
+      "pagina": 32
+    },
+    {
+      "texto": "3.8.3 Cierre del proyecto",
+      "nivel": 2,
+      "pagina": 32
+    },
+    {
+      "texto": "3.8.4 Lecciones aprendidas",
+      "nivel": 2,
+      "pagina": 32
+    },
+    {
+      "texto": "3.9 Sustentación del plan",
+      "nivel": 1,
+      "pagina": 33
+    },
+    {
+      "texto": "3.9.1 Coherencia entre alcance, cronograma y costos",
+      "nivel": 2,
+      "pagina": 33
+    },
+    {
+      "texto": "3.9.2 Decisiones defendibles",
+      "nivel": 2,
+      "pagina": 33
+    },
+    {
+      "texto": "3.9.3 Limitaciones",
+      "nivel": 2,
+      "pagina": 33
+    },
+    {
+      "texto": "3.9.4 Preguntas previsibles de la sustentación",
+      "nivel": 2,
+      "pagina": 33
+    },
+    {
+      "texto": "Referencias",
+      "nivel": 1,
+      "pagina": 34
+    },
+    {
+      "texto": "Anexos",
+      "nivel": 1,
+      "pagina": 35
+    },
+    {
+      "texto": "Anexo A. Formato de solicitud de cambio",
+      "nivel": 2,
+      "pagina": 35
+    },
+    {
+      "texto": "Anexo B. Criterios de aceptación de las historias",
+      "nivel": 2,
+      "pagina": 35
+    },
+    {
+      "texto": "Anexo C. Supuestos citados en el informe",
+      "nivel": 2,
+      "pagina": 37
+    },
+    {
+      "texto": "Anexo D. Autoevaluación contra la rúbrica",
+      "nivel": 2,
+      "pagina": 38
+    },
+    {
+      "texto": "Figura 3.1; Tabla 3.6; Tabla 3.7; Figura 3.2; Tabla 3.9; Tabla 3.33\r\u0007",
+      "nivel": 10,
+      "pagina": 38
+    }
+  ],
+  "docx": "Informe_CE01_E3_v0.1.docx",
+  "pdf": "Informe_CE01_E3_v0.1.pdf",
+  "commit_fuente": "4a52e3d",
+  "figuras": [
+    "fig-edt",
+    "fig-cambios",
+    "fig-gantt-s1",
+    "fig-gantt-s2",
+    "fig-curva-s",
+    "fig-riesgos",
+    "fig-kanban",
+    "fig-burnup"
+  ],
+  "completar": [
+    "[COMPLETAR: semestre académico]"
+  ]
+}

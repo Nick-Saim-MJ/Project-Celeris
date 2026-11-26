@@ -1,0 +1,129 @@
+# gestion/e3/datos/plan.yaml — Datos del Plan de Gestión del Proyecto (CE01 E3, P3; CI-103).
+#
+# Lo lee gestion/e3/plan.py, que calcula el cronograma (CPM en días laborables), el presupuesto por paquete de la EDT,
+# la línea base, la curva S y el EVM, y escribe gestion/e3/datos/plan.json. Reglas:
+#   - Los paquetes de la EDT (niveles 0–2) viven en gestion/ce01.yaml → edt; aquí van las actividades (nivel 3).
+#   - Cada actividad pertenece a un paquete de la EDT y cada paquete tiene costo; si la suma no cuadra con la línea base,
+#     plan.py falla.
+#   - Las horas son estimaciones del equipo (juicio, no supuestos medibles). La tarifa es S-07; el hardware, la inversión
+#     del E2 (gestion/ce01.yaml → economia.capex); AWS, las líneas de infra/centro_datos.yaml.
+#   - Lo terminado en main va al 100 % con la fecha real del commit que lo cierra (`real`).
+#   - Las fechas académicas no están publicadas: van marcadas para confirmar (RP-08), no como datos.
+
+meta:
+  fuente: "Guía CE01 v0.4 B3; 00 M9 (cronograma S1); roadmap del E1 (H1–H3); git log de main desde 2026-11-17; CI-103"
+  fecha_estado: "2026-11-25"          # fecha de corte del EVM (último commit en main antes del E3)
+  regla_ev: "0/100: una actividad suma su valor ganado solo al terminar (criterio conservador)"
+
+calendario:
+  nombre: "Calendario del proyecto Celeris"
+  jornada: { inicio: "08:00", fin: "17:00", horas: 8 }       # lunes a viernes; 1 h de almuerzo
+  inicio_proyecto: "2026-11-18"       # primer commit del repositorio (3aeec9e)
+  academico:
+    confirmar: "[confirmar con el calendario académico]"
+    fin_s1: "2026-12-18"              # cierre de la semana 4 de 00 M9 (consolidado y ensayo)
+    inicio_s2: "2027-03-01"           # inicio de la consola según el roadmap del E1 (H2)
+    semanas_s2: 16
+  excepciones:                        # días no laborables
+    - { desde: "2026-12-08", hasta: "2026-12-08", nombre: "Feriado nacional (Inmaculada Concepción)" }
+    - { desde: "2026-12-21", hasta: "2027-02-26", nombre: "Receso entre semestres [confirmar con el calendario académico]" }
+    - { desde: "2027-03-25", hasta: "2027-03-26", nombre: "Feriado nacional (Jueves y Viernes Santo)" }
+
+recursos:
+  - { id: Nick,       nombre: "Nick Saim Mayta Jara (líder técnico)",          tipo: equipo }
+  - { id: Henyelrey,  nombre: "Henyelrey Lucio Garcia Chura (director del proyecto)", tipo: equipo }
+  - { id: DTI,        nombre: "DTI (administradores de infraestructura)",      tipo: contraparte }
+  - { id: Encargados, nombre: "Encargados de laboratorio",                     tipo: contraparte }
+  - { id: Docente,    nombre: "Docente del curso (revisión)",                  tipo: contraparte }
+# Solo las horas del equipo se valorizan (tarifa S-07). Las horas de la DTI, de los encargados y del docente son aporte
+# institucional: se planifican como trabajo, pero no forman parte del presupuesto del proyecto (limitación declarada).
+
+costos:
+  contingencia: 0.10                   # reserva de contingencia, dentro de la línea base (guía B3.5)
+  gestion: 0.05                        # reserva de gestión, fuera de la línea base (guía B3.5)
+  umbral_alerta: 0.90                  # alerta si CPI o SPI < 0,9 (guía B3.5)
+  herramientas_usd: 0                  # licencias libres o educativas (guía B3.5)
+  aws:                                 # juicio del equipo (CI-103); precios de infra/centro_datos.yaml [S-12]
+    horas_efimero: 20                  # Modo A durante el despliegue del piloto
+    meses_24x7: 2                      # EC2-GW, VPN y S3 desde el despliegue del piloto hasta el cierre
+
+hitos:
+  H0: "Inicio del proyecto"
+  H1: "Sustentación de S1"
+  HS2: "Inicio de S2"
+  H2: "Aprobación de la DTI para el piloto"
+  H3: "Decisión de ampliación"
+  H4: "Sustentación final y cierre"
+
+# Actividades. dur = duración planificada en días laborables (línea base); pred = [id] (FS) o [id, tipo, desfase];
+# horas = esfuerzo por recurso; real = fechas de inicio y fin del trabajo terminado (commit que lo cierra).
+actividades:
+  # ------------------------------------------------------------------ S1 (hecho)
+  - { id: H0, nombre: "Inicio del proyecto", hito: true, real: { inicio: "2026-11-18", fin: "2026-11-18", commit: 3aeec9e } }
+  - { id: "4.3.1", paquete: "4.3", nombre: "Inventario único de red v0.4", dur: 4, pred: [H0], horas: { Nick: 6 },
+      real: { inicio: "2026-11-18", fin: "2026-11-22", commit: dd53542 } }
+  - { id: "5.1.1", paquete: "5.1", nombre: "Nodo de caché, PAC y configuración firmada", dur: 5, pred: [H0], horas: { Nick: 16 },
+      real: { inicio: "2026-11-18", fin: "2026-11-22", commit: 6c2aa75 } }
+  - { id: "5.2.1", paquete: "5.2", nombre: "Laboratorio emulado (Modo L) y ensayo v0.4", dur: 6, pred: ["4.3.1"], horas: { Nick: 12 },
+      real: { inicio: "2026-11-18", fin: "2026-11-23", commit: 00ef044 } }
+  - { id: "5.3.1", paquete: "5.3", nombre: "IaC de AWS contra el emulador", dur: 4, pred: ["4.3.1"], horas: { Nick: 8 },
+      real: { inicio: "2026-11-19", fin: "2026-11-23", commit: 1cd4998 } }
+  - { id: "4.1.1", paquete: "4.1", nombre: "Diseño de red e informe CE0311", dur: 10, pred: [["4.3.1", SS, 2]], horas: { Henyelrey: 36, Nick: 4 },
+      real: { inicio: "2026-11-18", fin: "2026-11-24", commit: 55f248d } }
+  - { id: "4.2.1", paquete: "4.2", nombre: "Diseño del centro de datos e informe CE0331", dur: 8, pred: [["4.1.1", SS, 5]], horas: { Nick: 30, Henyelrey: 4 },
+      real: { inicio: "2026-11-23", fin: "2026-11-24", commit: 55f248d } }
+  - { id: "3.1.1", paquete: "3.1", nombre: "SRS v0.4 (REQ-F, REQ-NF y casos de uso)", dur: 5, pred: [H0], horas: { Nick: 14, Henyelrey: 4 },
+      real: { inicio: "2026-11-19", fin: "2026-11-24", commit: 5d8e77f } }
+  - { id: "3.2.1", paquete: "3.2", nombre: "Prototipo navegable de la consola", dur: 5, pred: [["3.1.1", SS, 1]], horas: { Nick: 14 },
+      real: { inicio: "2026-11-19", fin: "2026-11-24", commit: aa3b8e5 } }
+  - { id: "3.3.1", paquete: "3.3", nombre: "Modelo C4 y ADR", dur: 3, pred: ["3.1.1"], horas: { Nick: 8 },
+      real: { inicio: "2026-11-24", fin: "2026-11-24", commit: 5d8e77f } }
+  - { id: "3.4.1", paquete: "3.4", nombre: "Diagramas UML por caso de uso", dur: 4, pred: [["3.1.1", SS, 1]], horas: { Nick: 10 },
+      real: { inicio: "2026-11-19", fin: "2026-11-24", commit: aa3b8e5 } }
+  - { id: "3.5.1", paquete: "3.5", nombre: "Matriz de trazabilidad", dur: 2, pred: ["3.3.1", "3.4.1"], horas: { Nick: 4 },
+      real: { inicio: "2026-11-24", fin: "2026-11-24", commit: 5d8e77f } }
+  - { id: "2.1.1", paquete: "2.1", nombre: "Diagnóstico organizacional e informe E1", dur: 5, pred: [H0], horas: { Henyelrey: 16, Nick: 2 },
+      real: { inicio: "2026-11-25", fin: "2026-11-25", commit: 79505c4 } }
+  - { id: "2.2.1", paquete: "2.2", nombre: "Business case e informe E2", dur: 4, pred: ["2.1.1"], horas: { Henyelrey: 16, Nick: 2 },
+      real: { inicio: "2026-11-25", fin: "2026-11-25", commit: eb5fedd } }
+  # ------------------------------------------------------------------ S1 (pendiente)
+  - { id: "2.3.1", paquete: "2.3", nombre: "Plan de gestión e informe E3", dur: 4, pred: ["2.2.1"], horas: { Henyelrey: 16, Nick: 4 } }
+  - { id: "1.1.1", paquete: "1.1", nombre: "Revisión y firma del acta de constitución", dur: 2, pred: ["2.3.1"], horas: { Henyelrey: 2, Docente: 1 } }
+  - { id: "1.2.1", paquete: "1.2", nombre: "Aprobación del plan y registro de la línea base", dur: 1, pred: ["1.1.1"], horas: { Henyelrey: 1, Nick: 1 } }
+  - { id: "1.3.1", paquete: "1.3", nombre: "Seguimiento semanal de S1", dur: 15, pred: [H0], horas: { Henyelrey: 3, Nick: 3 } }
+  - { id: "2.1.2", paquete: "2.1", nombre: "Levantamiento con la DTI y los encargados", dur: 5, pred: ["2.1.1"], horas: { Henyelrey: 10, DTI: 4, Encargados: 3 } }
+  - { id: "2.1.3", paquete: "2.1", nombre: "Actualización del E1 con los datos levantados", dur: 2, pred: ["2.1.2"], horas: { Henyelrey: 6 } }
+  - { id: "2.2.2", paquete: "2.2", nombre: "Actualización del E2 con la cotización del ISP", dur: 2, pred: ["2.1.2", "2.2.1"], horas: { Henyelrey: 4 } }
+  - { id: "2.4.1", paquete: "2.4", nombre: "Modelado AS-IS / TO-BE e informe E4", dur: 5, pred: ["2.1.1"], horas: { Henyelrey: 16, Nick: 2 } }
+  - { id: "2.4.2", paquete: "2.4", nombre: "Cronometraje de un ciclo real (≥ 30 observaciones)", dur: 3, pred: ["2.1.2"], horas: { Henyelrey: 6, Encargados: 4 } }
+  - { id: "2.4.3", paquete: "2.4", nombre: "Actualización del E4 con las mediciones", dur: 2, pred: ["2.4.1", "2.4.2"], horas: { Henyelrey: 4 } }
+  - { id: "3.2.2", paquete: "3.2", nombre: "Validación del prototipo con encargados (SUS)", dur: 3, pred: ["3.2.1", "2.1.2"], horas: { Nick: 6, Encargados: 4 } }
+  - { id: "5.2.2", paquete: "5.2", nombre: "Cierre de la prueba crítica pendiente T58", dur: 3, pred: ["5.2.1"], horas: { Nick: 4 } }
+  - { id: "6.3.1", paquete: "6.3", nombre: "Expediente consolidado de S1", dur: 3,
+      pred: ["1.2.1", "2.1.3", "2.2.2", "2.4.3", "3.2.2", "3.5.1", "4.2.1", "5.2.2", "5.3.1"], horas: { Henyelrey: 8, Nick: 8 } }
+  - { id: "6.2.1", paquete: "6.2", nombre: "Demo grabada del laboratorio emulado", dur: 2, pred: ["5.2.2"], horas: { Nick: 4 } }
+  - { id: "6.1.1", paquete: "6.1", nombre: "Ensayos de la sustentación de S1", dur: 3, pred: ["6.3.1", "6.2.1"], horas: { Henyelrey: 4, Nick: 4 } }
+  - { id: H1, nombre: "Sustentación de S1", hito: true, pred: ["6.1.1"] }
+  # ------------------------------------------------------------------ S2
+  - { id: HS2, nombre: "Inicio de S2", hito: true, pred: [H1], snet: inicio_s2 }
+  - { id: "1.3.2", paquete: "1.3", nombre: "Seguimiento semanal de S2", dur: 77, pred: [HS2], horas: { Henyelrey: 16, Nick: 16 } }
+  - { id: "5.5.1", paquete: "5.5", nombre: "Aprobación de la DTI y pedidos del FortiGate (S-29)", dur: 5, pred: [HS2], horas: { Henyelrey: 6, DTI: 4 } }
+  - { id: H2, nombre: "Aprobación de la DTI para el piloto", hito: true, pred: ["5.5.1"] }
+  - { id: "5.1.2", paquete: "5.1", nombre: "Adquisición e instalación del hardware del rack", dur: 15, pred: [H2], horas: { Nick: 8, Henyelrey: 4, DTI: 6 },
+      costo_fijo: capex }
+  - { id: "5.4.1", paquete: "5.4", nombre: "Sprints 1–2: autenticación, auditoría y catálogo", dur: 10, pred: [HS2], horas: { Nick: 40, Henyelrey: 10 }, sprints: [1, 2] }
+  - { id: "5.4.2", paquete: "5.4", nombre: "Sprints 3–4: laboratorios, configuración firmada y precargas", dur: 10, pred: ["5.4.1"], horas: { Nick: 40, Henyelrey: 10 }, sprints: [3, 4] }
+  - { id: "5.4.3", paquete: "5.4", nombre: "Sprints 5–6: ahorro, portal y solicitudes", dur: 10, pred: ["5.4.2"], horas: { Nick: 40, Henyelrey: 10 }, sprints: [5, 6] }
+  - { id: "5.4.4", paquete: "5.4", nombre: "Pruebas de aceptación de la consola con encargados", dur: 5, pred: ["5.4.3"], horas: { Nick: 8, Henyelrey: 4, Encargados: 4 } }
+  - { id: "5.5.2", paquete: "5.5", nombre: "Despliegue en el laboratorio piloto y simulacro T59", dur: 5, pred: ["5.4.4", "5.1.2"], horas: { Nick: 12, Henyelrey: 8, DTI: 4 },
+      costo_fijo: aws_efimero }
+  - { id: "5.5.3", paquete: "5.5", nombre: "Operación y medición del piloto (BHR, tiempos, SUS)", dur: 20, pred: ["5.5.2"], horas: { Nick: 10, Henyelrey: 10, Encargados: 6 },
+      costo_fijo: aws_24x7 }
+  - { id: "5.5.4", paquete: "5.5", nombre: "Informe del piloto y recomendación", dur: 3, pred: ["5.5.3"], horas: { Henyelrey: 8, Nick: 4 } }
+  - { id: H3, nombre: "Decisión de ampliación", hito: true, pred: ["5.5.4"] }
+  - { id: "5.6.1", paquete: "5.6", nombre: "Ampliación a los 10 laboratorios", dur: 10, pred: [H3], horas: { Nick: 16, Henyelrey: 16, DTI: 6, Encargados: 5 } }
+  - { id: "1.4.1", paquete: "1.4", nombre: "Lecciones aprendidas y cierre administrativo", dur: 2, pred: ["5.6.1"], horas: { Henyelrey: 3, Nick: 3 } }
+  - { id: "6.3.2", paquete: "6.3", nombre: "Expediente final del proyecto", dur: 3, pred: ["5.6.1"], horas: { Henyelrey: 8, Nick: 8 } }
+  - { id: "6.2.2", paquete: "6.2", nombre: "Demo grabada del piloto", dur: 2, pred: ["5.5.4"], horas: { Nick: 4 } }
+  - { id: "6.1.2", paquete: "6.1", nombre: "Ensayos de la sustentación final", dur: 2, pred: ["6.3.2", "6.2.2", "1.4.1"], horas: { Henyelrey: 4, Nick: 4 } }
+  - { id: H4, nombre: "Sustentación final y cierre", hito: true, pred: ["6.1.2"] }

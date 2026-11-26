@@ -1,0 +1,98 @@
+# gestion/e3/datos/gobierno.yaml — Acta, interesados, comunicaciones, control y cierre (CE01 E3, P3; CI-103).
+#
+# Lo leen gestion/e3/tablas.py y gestion/e3/plan.py. Las cifras (presupuesto, fechas, umbrales) no se escriben aquí:
+# salen del modelo (plan.py) o de gestion/ce01.yaml. Los niveles de compromiso son valoración del equipo sobre el mapa de
+# interesados del E1 (gestion/e1/datos/diagnostico.yaml → stakeholders), no datos medidos.
+
+acta:
+  proyecto: "Celeris Edge: caché de descargas para los laboratorios del Campus Juliaca, administrada por el encargado"
+  sponsor: "Dirección de la EP de Ingeniería de Sistemas (propuesto); usuario patrocinador: DTI"
+  director: "Henyelrey Lucio Garcia Chura (propuesto)"
+  lider_tecnico: "Nick Saim Mayta Jara (propuesto)"
+  proposito: >-
+    Reducir el tráfico repetido hacia Internet y el tiempo de preparación de los laboratorios, y devolver al encargado el
+    control de qué contenido se cachea y de quién accede, con transparencia sobre lo que se descifra.
+  enfoque: "Híbrido: predictivo (PMBOK 8.ª ed.) para los entregables académicos con fecha fija y Scrumban para la consola en S2"
+  exclusiones_fuente: "Marco común 00 M3.2"
+  criterios_exito:
+    - { id: CE-1, criterio: "Entregables académicos", medida: "Calificación «Logrado» o superior en los siete entregables de S1 (CE01 E1–E4, CE02 E1, CE03 E1 y E2)" }
+    - { id: CE-2, criterio: "Cronograma", medida: "H1 y H4 en la fecha de la línea base; SPI ≥ 0,9 en cada seguimiento semanal" }
+    - { id: CE-3, criterio: "Costos", medida: "CPI ≥ 0,9 y gasto dentro de la línea base; la reserva de gestión solo con aprobación del sponsor" }
+    - { id: CE-4, criterio: "Valor", medida: "OB-1…OB-5 medidos en el piloto con sus metas de infra/trazabilidad.yaml" }
+    - { id: CE-5, criterio: "Calidad", medida: "make validate en verde en cada entrega y ninguna prueba NO_APLICA o PARCIAL informada como PASA" }
+  firmas:
+    - { rol: "Sponsor", nombre: "Dirección de la EP de Ingeniería de Sistemas [nombre por confirmar]" }
+    - { rol: "Usuario patrocinador", nombre: "Jefatura de la DTI [nombre por confirmar]" }
+    - { rol: "Director del proyecto", nombre: "Henyelrey Lucio Garcia Chura" }
+    - { rol: "Líder técnico", nombre: "Nick Saim Mayta Jara" }
+  restricciones:
+    - { id: R-1, texto: "Equipo de dos personas con dedicación parcial; toda pieza la revisa el otro integrante", fuente: "Guía CE01 B3.1" }
+    - { id: R-2, texto: "Fechas de S1 y de S2 fijadas por el calendario académico", fuente: "RP-08" }
+    - { id: R-3, texto: "ESXi gratuito: 8 vCPU por VM y sin vCenter", fuente: "CE03 D2" }
+    - { id: R-4, texto: "Cuenta de AWS de laboratorio o con créditos", fuente: "S-13" }
+    - { id: R-5, texto: "FortiGate, Wi-Fi y capa de acceso administrados por la DTI; el proyecto solo solicita cambios mínimos", fuente: "S-14, S-28, S-29" }
+    - { id: R-6, texto: "El Wi-Fi de estudiantes (BYOD) nunca se descifra", fuente: "00 M3.2" }
+  supuestos: [S-01, S-07, S-08, S-12, S-13, S-14, S-26, S-28, S-29, S-37, S-38, S-39]
+
+# Compromiso (PMBOK): Desconocedor < Reticente < Neutral < Partidario < Líder. C = actual, D = deseado.
+compromiso:
+  - { interesado: "Encargados de laboratorio", actual: Neutral, deseado: Líder, accion: "Validar el prototipo (3.2.2) y la consola (5.4.4); un encargado en cada revisión de sprint" }
+  - { interesado: "DTI", actual: Neutral, deseado: Partidario, accion: "Levantamiento (2.1.2), demo del laboratorio emulado y aprobación formal del piloto (H2)" }
+  - { interesado: "Docentes", actual: Desconocedor, deseado: Partidario, accion: "Presentar las solicitudes de preparación (HU-13) y medir la espera al inicio de clase" }
+  - { interesado: "Estudiantes (PC y BYOD)", actual: Desconocedor, deseado: Neutral, accion: "Portal de transparencia antes del piloto (OB-4) y aviso en cada PC" }
+  - { interesado: "Dirección del campus", actual: Desconocedor, deseado: Partidario, accion: "Resumen ejecutivo del business case y del informe del piloto" }
+  - { interesado: "Oficial de datos personales", actual: Desconocedor, deseado: Neutral, accion: "Evaluación de impacto antes del piloto (Ley 29733)" }
+  - { interesado: "Jurado EPE y docente del curso", actual: Neutral, deseado: Partidario, accion: "Revisión semanal ante el docente y ensayos cronometrados" }
+  - { interesado: "ISP y AWS", actual: Neutral, deseado: Neutral, accion: "Monitorear contrato y uso dentro de los términos" }
+
+comunicaciones:
+  - { que: "Avance semanal (CPI, SPI, riesgos y cambios)", a_quien: "Equipo y docente del curso", frecuencia: "Semanal (viernes)", canal: "Reunión y acta en el issue de seguimiento", responsable: Henyelrey }
+  - { que: "Revisión del sprint e incremento", a_quien: "Docente y un encargado", frecuencia: "Semanal en S2", canal: "Demostración en el laboratorio o en el emulador", responsable: Nick }
+  - { que: "Solicitud de cambio y su decisión", a_quien: "Sponsor, director y líder técnico", frecuencia: "Por evento", canal: "Issue con etiqueta cambio-alcance", responsable: Henyelrey }
+  - { que: "Requerimientos mínimos del FortiGate y aprobación del piloto", a_quien: "DTI", frecuencia: "Por hito (H2)", canal: "Oficio y reunión", responsable: Henyelrey }
+  - { que: "Aviso de transparencia y huella de la CA", a_quien: "Estudiantes y docentes", frecuencia: "Antes del piloto y en cada cambio de fuentes", canal: "Portal PORTAL01 y aviso en la PC", responsable: Nick }
+  - { que: "Informe del piloto y recomendación", a_quien: "Sponsor, DTI y Dirección del campus", frecuencia: "Una vez (H3)", canal: "Informe PDF y presentación", responsable: Henyelrey }
+  - { que: "Entregables académicos", a_quien: "Jurado EPE", frecuencia: "Por hito (H1, H4)", canal: "Expediente PDF y sustentación", responsable: Henyelrey }
+
+control:
+  reunion: "Viernes, 30 min, al cierre de cada semana laborable; participan ambos integrantes y, en S2, el docente"
+  registro: "Issue semanal «Seguimiento AAAA-MM-DD» con el acta, el corte EVM de plan.py y el registro de riesgos actualizado"
+  umbrales:
+    - { condicion: "CPI y SPI ≥ 0,9", estado: "En control", accion: "Continuar; registrar el corte" }
+    - { condicion: "CPI o SPI entre 0,8 y 0,9", estado: "Alerta", accion: "Análisis de causa en la misma reunión y acción correctiva con dueño y fecha" }
+    - { condicion: "CPI o SPI < 0,8 dos semanas seguidas", estado: "Crítico", accion: "Solicitud de cambio: replanificar con plan.py y, si afecta H1 o H4, decisión del sponsor" }
+    - { condicion: "Consumo de la contingencia > 50 % antes de H3", estado: "Alerta", accion: "Revisar riesgos abiertos y estimaciones del resto del proyecto" }
+
+cambios:
+  pasos:
+    - { n: 1, paso: "Solicitud", detalle: "Cualquier interesado abre un issue con la etiqueta cambio-alcance y el formato del anexo A" }
+    - { n: 2, paso: "Análisis de impacto", detalle: "El director modifica una copia de plan.yaml y ejecuta plan.py: efecto en la ruta crítica, en H1–H4, en el BAC y en los riesgos" }
+    - { n: 3, paso: "Decisión", detalle: "Director y líder técnico si el cambio cabe en la contingencia y no mueve H1 ni H4; si no, el sponsor" }
+    - { n: 4, paso: "Registro", detalle: "Se fusiona el cambio en plan.yaml con su CI-xx en CAMBIOS-INVENTARIO.md; la línea base nueva queda en el XML de MS Project" }
+    - { n: 5, paso: "Comunicación", detalle: "Se informa en el seguimiento semanal y se cierra el issue con el enlace al commit" }
+  nivel:
+    - { cambio: "Dentro de un paquete, sin efecto en la ruta crítica ni en el BAC", aprueba: "Líder técnico" }
+    - { cambio: "Consume contingencia o mueve un hito intermedio (H2, H3)", aprueba: "Director del proyecto" }
+    - { cambio: "Mueve H1 o H4, agrega o retira un paquete de la EDT o requiere reserva de gestión", aprueba: "Sponsor" }
+
+lecciones:
+  campos:
+    - { campo: "ID", contenido: "LA-xx (siguiente libre)" }
+    - { campo: "Fecha y fase", contenido: "Fecha de registro; S1, S2 o cierre" }
+    - { campo: "Paquete de la EDT", contenido: "Código del paquete afectado" }
+    - { campo: "Situación", contenido: "Qué ocurrió, con evidencia (commit, issue, corte EVM)" }
+    - { campo: "Efecto", contenido: "Efecto en alcance, cronograma, costo o calidad, cuantificado" }
+    - { campo: "Causa raíz", contenido: "Por qué ocurrió (cinco porqués)" }
+    - { campo: "Lección", contenido: "Qué repetir o qué evitar" }
+    - { campo: "Acción", contenido: "Cambio concreto en plantillas, plan.yaml, DoD o DoR, con responsable" }
+  iniciales:
+    - { id: LA-01, situacion: "Ninguna rama de S1 estaba fusionada y la prueba de fusión dio 6 conflictos (00 M8)", leccion: "Fusionar en main antes de abrir el entregable siguiente", accion: "RP-07 y DoD: pull request revisado y fusionado" }
+    - { id: LA-02, situacion: "Las cifras de CE01, CE02 y CE03 se contradecían entre documentos", leccion: "Una sola fuente de datos con validador", accion: "infra/*.yaml y gestion/ce01.yaml; cifras del texto solo desde el modelo" }
+
+defensa:
+  - { pregunta: "¿Por qué la línea base del proyecto no coincide con la inversión del business case?", respuesta: "Porque miden cosas distintas: la línea base es el costo de ejecutar el proyecto (horas, hardware y AWS durante el proyecto); la inversión del E2 es el costo del servicio que se evalúa en el horizonte del business case" }
+  - { pregunta: "¿Por qué el SPI de S1 es mayor que 1 si faltan entregables?", respuesta: "Porque los diseños de red, centro de datos e ingeniería de software se adelantaron a la línea base; el SPI no informa si lo pendiente de la ruta crítica está en riesgo, eso lo dice la holgura" }
+  - { pregunta: "¿Por qué el CPI todavía no se mide?", respuesta: "Porque todavía no se registran horas reales: AC se iguala a EV y el CPI no se mide. Desde la aprobación del plan las horas se registran en el issue semanal" }
+  - { pregunta: "¿Qué pasa si la DTI no aprueba el piloto?", respuesta: "H2 no se alcanza, no se compra el hardware y el proyecto cierra con lecciones aprendidas: la inversión queda en cero (E1, punto de decisión)" }
+  - { pregunta: "¿Cómo se sabe que la ruta crítica es correcta?", respuesta: "Se calcula en Python con CPM y se compara, tarea por tarea, con la que calcula MS Project al abrir el XML" }
+  - { pregunta: "¿Por qué Scrumban y no Scrum puro?", respuesta: "Porque el equipo tiene dos personas con dedicación parcial: el sprint fija el compromiso y la revisión con el docente; el tablero con WIP evita empezar sin terminar" }

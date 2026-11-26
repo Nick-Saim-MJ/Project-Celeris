@@ -83,6 +83,14 @@ referencias:
     S-39: { cableado_usd: [200, "US$ 200"] }
     S-40: {}                                   # fórmula: S-04 × S-02 (sin cifra propia)
     S-41: { mant_fraccion: [0.10, "10 %"] }
+    # CI-104 (E4): parámetros del modelado AS-IS / TO-BE. Las duraciones de S-43 viven en gestion/e4/simulacion.yaml.
+    S-42: { mbps_disponible: [150, "150 Mbps"] }
+    S-43: {}
+    S-44: { p_interrupcion: [0.30, "30 % de las actualizaciones masivas se interrumpen"], fraccion_pendiente: [0.5, "la mitad pendiente"],
+            p_mismo_dia: [0.40, "40 % de los pedidos de preparación llegan el mismo día"], margen_min_h: [0.5, "de 0,5 a 2 h"],
+            margen_moda_h: [1, "moda 1 h"], margen_max_h: [2, "de 0,5 a 2 h"], anticipacion_h: [24, "24 h de anticipación"],
+            p_cambio: [0.50, "50 % de los pedidos requiere una fuente nueva"], p_descifrar: [0.20, "20 % de las fuentes nuevas requiere descifrar"] }
+    S-45: { pedidos_semana: [2, "2 pedidos por laboratorio por semana lectiva"], semanas_anio: [32, "32 semanas lectivas al año"] }
 
 # --------------------------------------------------------------------------------------------------------------------
 # Modelo económico base (P2 lo amplía con Monte Carlo). Cada partida nombra el supuesto o la referencia de donde sale.

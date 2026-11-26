@@ -88,11 +88,3 @@ lecciones:
   iniciales:
     - { id: LA-01, situacion: "Ninguna rama de S1 estaba fusionada y la prueba de fusión dio 6 conflictos (00 M8)", leccion: "Fusionar en main antes de abrir el entregable siguiente", accion: "RP-07 y DoD: pull request revisado y fusionado" }
     - { id: LA-02, situacion: "Las cifras de CE01, CE02 y CE03 se contradecían entre documentos", leccion: "Una sola fuente de datos con validador", accion: "infra/*.yaml y gestion/ce01.yaml; cifras del texto solo desde el modelo" }
-
-defensa:
-  - { pregunta: "¿Por qué la línea base del proyecto no coincide con la inversión del business case?", respuesta: "Porque miden cosas distintas: la línea base es el costo de ejecutar el proyecto (horas, hardware y AWS durante el proyecto); la inversión del E2 es el costo del servicio que se evalúa en el horizonte del business case" }
-  - { pregunta: "¿Por qué el SPI de S1 es mayor que 1 si faltan entregables?", respuesta: "Porque los diseños de red, centro de datos e ingeniería de software se adelantaron a la línea base; el SPI no informa si lo pendiente de la ruta crítica está en riesgo, eso lo dice la holgura" }
-  - { pregunta: "¿Por qué el CPI todavía no se mide?", respuesta: "Porque todavía no se registran horas reales: AC se iguala a EV y el CPI no se mide. Desde la aprobación del plan las horas se registran en el issue semanal" }
-  - { pregunta: "¿Qué pasa si la DTI no aprueba el piloto?", respuesta: "H2 no se alcanza, no se compra el hardware y el proyecto cierra con lecciones aprendidas: la inversión queda en cero (E1, punto de decisión)" }
-  - { pregunta: "¿Cómo se sabe que la ruta crítica es correcta?", respuesta: "Se calcula en Python con CPM y se compara, tarea por tarea, con la que calcula MS Project al abrir el XML" }
-  - { pregunta: "¿Por qué Scrumban y no Scrum puro?", respuesta: "Porque el equipo tiene dos personas con dedicación parcial: el sprint fija el compromiso y la revisión con el docente; el tablero con WIP evita empezar sin terminar" }

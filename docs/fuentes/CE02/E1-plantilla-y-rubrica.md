@@ -35,4 +35,4 @@ Formato sugerido: documento Word/PDF de 20-30 páginas, con secciones claras, di
 | Modelado del sistema (UML) | Diagramas completos y coherentes | Modelado adecuado | Modelado incompleto | No hay modelado |
 | Trazabilidad de requerimientos | Componentes rastreables a requerimientos | Trazabilidad parcial | Trazabilidad limitada | No hay trazabilidad |
 | Validación con stakeholders | Evidencia clara de validación | Validación parcial | Validación limitada | No hay validación |
-| Sustentación y defensa técnica | Explica y defiende con dominio las decisiones tomadas | — | — | — |
+| Sustentación y defensa técnica | Explica y defiende con dominio las decisiones tomadas | Explica con solvencia | Explica con dificultad | No sustenta |

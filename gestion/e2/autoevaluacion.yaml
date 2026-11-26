@@ -7,4 +7,5 @@
 - criterio: "Identificación de riesgos"
   evidencia: ["t-riesgos-eco", "fig-riesgos-van", "Estrategias de mitigación"]
 - criterio: "Sustentación y defensa técnica"
-  evidencia: ["Por qué A4 gana aunque pierde en soporte", "Qué decide el resultado económico", "t-defensa-e2", "Limitaciones"]
+  nota: "Se evalúa en la exposición oral. Las decisiones que se defienden están justificadas en"
+  evidencia: ["Por qué A4 gana aunque pierde en soporte", "Qué decide el resultado económico", "Qué mediría el piloto para confirmar la decisión", "Limitaciones"]

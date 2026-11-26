@@ -1,0 +1,11 @@
+# Autoevaluación del E4 contra la rúbrica oficial (docs/fuentes/CE01/contenido-minimo.yaml).
+# Cada evidencia es un título del informe o el id de una figura o tabla; el generador comprueba que exista (chequeo f).
+- criterio: "Modelado AS-IS"
+  evidencia: ["fig-mapa", "t-seleccion", "t-ficha", "t-sipoc", "Descripción narrativa del proceso", "t-indicadores-asis", "fig-p1-asis", "fig-p2-asis", "t-problemas"]
+- criterio: "Propuesta TO-BE"
+  evidencia: ["fig-p1-tobe", "fig-p2-tobe", "t-eliminadas", "t-automatizaciones", "t-indicadores-tobe", "t-mejora", "fig-dispersion", "t-e2"]
+- criterio: "Análisis comparativo"
+  evidencia: ["fig-comparativo", "t-tiempos", "t-costos", "t-calidad", "Alcance y verificación de la mejora"]
+- criterio: "Sustentación y defensa técnica"
+  nota: "Se evalúa en la exposición oral. Las decisiones que se defienden están justificadas en"
+  evidencia: ["t-seleccion", "t-e2", "Alcance y verificación de la mejora", "t-parametros"]

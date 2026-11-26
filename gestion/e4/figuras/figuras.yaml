@@ -1,0 +1,36 @@
+# Registro de figuras del E4 (lo escribe gestion/e4/figuras/generar.py; no editar a mano).
+fig-mapa:
+  archivo: mapa-procesos.png
+  titulo: Mapa de procesos de la universidad en lo que toca a los laboratorios
+  fuente: Elaboración propia; cadena de valor del E1 y gestion/e4/datos/procesos.yaml → mapa (nombres a validar con la DTI)
+  horizontal: true
+fig-p1-asis:
+  archivo: P1-AS-IS.png
+  titulo: BPMN del proceso P1 actual (AS-IS) con sus ineficiencias PD-01…PD-04
+  fuente: Elaboración propia; gestion/e4/bpmn/P1-AS-IS.bpmn (BPMN 2.0, validado contra el XSD de OMG)
+  horizontal: true
+fig-p2-asis:
+  archivo: P2-AS-IS.png
+  titulo: BPMN del proceso P2 actual (AS-IS) con sus ineficiencias PD-05…PD-09
+  fuente: Elaboración propia; gestion/e4/bpmn/P2-AS-IS.bpmn (BPMN 2.0, validado contra el XSD de OMG)
+  horizontal: true
+fig-p1-tobe:
+  archivo: P1-TO-BE.png
+  titulo: BPMN del proceso P1 propuesto (TO-BE) con el carril Celeris
+  fuente: Elaboración propia; gestion/e4/bpmn/P1-TO-BE.bpmn; requisitos del SRS de CE02
+  horizontal: true
+fig-p2-tobe:
+  archivo: P2-TO-BE.png
+  titulo: BPMN del proceso P2 propuesto (TO-BE) con el carril Celeris
+  fuente: Elaboración propia; gestion/e4/bpmn/P2-TO-BE.bpmn; requisitos del SRS de CE02
+  horizontal: true
+fig-comparativo:
+  archivo: comparativo.png
+  titulo: Comparativo AS-IS frente a TO-BE por indicador (AS-IS = 100)
+  fuente: Elaboración propia; simulación de Monte Carlo de gestion/e4/procesos.py [S-43, S-44]
+  horizontal: true
+fig-dispersion:
+  archivo: dispersion-costo.png
+  titulo: Distribución del costo de personal por ciclo en la simulación
+  fuente: Elaboración propia; simulación de Monte Carlo de gestion/e4/procesos.py [S-07, S-43, S-44]
+  horizontal: false

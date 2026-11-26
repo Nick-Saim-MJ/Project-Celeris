@@ -1,6 +1,6 @@
 {
   "motor": "Microsoft Word (COM)",
-  "paginas": 38,
+  "paginas": 37,
   "marcas": [
     {
       "texto": "Resumen ejecutivo",
@@ -253,69 +253,44 @@
       "pagina": 32
     },
     {
-      "texto": "3.9 Sustentación del plan",
-      "nivel": 1,
-      "pagina": 33
-    },
-    {
-      "texto": "3.9.1 Coherencia entre alcance, cronograma y costos",
-      "nivel": 2,
-      "pagina": 33
-    },
-    {
-      "texto": "3.9.2 Decisiones defendibles",
-      "nivel": 2,
-      "pagina": 33
-    },
-    {
-      "texto": "3.9.3 Limitaciones",
-      "nivel": 2,
-      "pagina": 33
-    },
-    {
-      "texto": "3.9.4 Preguntas previsibles de la sustentación",
-      "nivel": 2,
-      "pagina": 33
-    },
-    {
       "texto": "Referencias",
       "nivel": 1,
-      "pagina": 34
+      "pagina": 33
     },
     {
       "texto": "Anexos",
       "nivel": 1,
-      "pagina": 35
+      "pagina": 34
     },
     {
       "texto": "Anexo A. Formato de solicitud de cambio",
       "nivel": 2,
-      "pagina": 35
+      "pagina": 34
     },
     {
       "texto": "Anexo B. Criterios de aceptación de las historias",
       "nivel": 2,
-      "pagina": 35
+      "pagina": 34
     },
     {
       "texto": "Anexo C. Supuestos citados en el informe",
       "nivel": 2,
-      "pagina": 37
+      "pagina": 36
     },
     {
       "texto": "Anexo D. Autoevaluación contra la rúbrica",
       "nivel": 2,
-      "pagina": 38
+      "pagina": 37
     },
     {
-      "texto": "Figura 3.1; Tabla 3.6; Tabla 3.7; Figura 3.2; Tabla 3.9; Tabla 3.33\r\u0007",
+      "texto": "Figura 3.1; Tabla 3.6; Tabla 3.7; Figura 3.2; Tabla 3.9; Tabla 3.32\r\u0007",
       "nivel": 10,
-      "pagina": 38
+      "pagina": 37
     }
   ],
   "docx": "Informe_CE01_E3_v0.1.docx",
   "pdf": "Informe_CE01_E3_v0.1.pdf",
-  "commit_fuente": "4a52e3d",
+  "commit_fuente": "6eca02b",
   "figuras": [
     "fig-edt",
     "fig-cambios",

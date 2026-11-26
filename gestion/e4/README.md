@@ -8,12 +8,12 @@ generado. Supuestos S-42…S-45 y prefijos locales PD-xx, KPI-x y AU-x: CI-104 e
 | Ruta | Contenido |
 | --- | --- |
 | `simulacion.yaml` | Fuente única de los cuatro diagramas (P1-AS-IS, P1-TO-BE, P2-AS-IS, P2-TO-BE): nodos, carriles, flujos, mensajes, duraciones triangulares [S-43], probabilidades [S-44], PD-xx y REQ-F. Todo valor lleva su supuesto |
-| `datos/procesos.yaml` | Mapa de procesos, matriz de selección, ficha y SIPOC, problemas PD-01…PD-09 (causa textual del Ishikawa del E1), automatizaciones AU-1…AU-7, indicadores KPI-1…KPI-8, cronometraje y preguntas de la defensa |
+| `datos/procesos.yaml` | Mapa de procesos, matriz de selección, ficha y SIPOC, problemas PD-01…PD-09 (causa textual del Ishikawa del E1), automatizaciones AU-1…AU-7, indicadores KPI-1…KPI-8 y cronometraje |
 | `procesos.py` | Cálculo de la descarga, Monte Carlo (10 000 iteraciones, semilla fija), coherencia PD ↔ diagrama ↔ SRS ↔ pruebas, comparación con Bizagi y `{{dato:e4_*}}`. Escribe `datos/e4.json` y `datos/resultados.json` (no editar) |
 | `bpmn.py` | Escribe `bpmn/*.bpmn` (BPMN 2.0 con `bpmndi`, pool «UPeU Campus Juliaca», pool colapsado «Internet / ISP», anotaciones PD-xx) y los valida contra el XSD de OMG |
 | `instrumentos.py` | Plantilla de cronometraje `instrumentos/registro-tiempos.xlsx` (registro, resumen con fórmulas, fases) |
 | `tablas.py`, `figuras/generar.py` | Tablas `{{tabla:t-…}}` y figuras (mapa en draw.io, BPMN con bpmn-js o Bizagi, barras agrupadas y dispersión en matplotlib) |
-| `informe/*.md` | Texto §4.1–§4.4, referencias IEEE y anexo A (parámetros); la autoevaluación (`autoevaluacion.yaml`) se genera |
+| `informe/*.md` | Texto §4.1–§4.3, referencias IEEE y anexo A (parámetros); la autoevaluación (`autoevaluacion.yaml`) se genera |
 | `herramientas/xsd/` | XSD BPMN 2.0 de OMG (BPMN20, Semantic, BPMNDI, DI, DC) |
 | `herramientas/render/` | `render.js`: BPMN → PNG con bpmn-js y puppeteer-core sobre el Chrome instalado (`node_modules` fuera del repositorio) |
 

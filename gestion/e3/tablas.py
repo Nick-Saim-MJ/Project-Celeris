@@ -360,9 +360,6 @@ def lecciones_iniciales():
                                                         for x in G["lecciones"]["iniciales"]]
 
 
-def defensa():
-    return [["Pregunta previsible", "Respuesta del plan"]] + [[d["pregunta"], d["respuesta"]] for d in G["defensa"]]
-
 
 TABLAS = {
     "t-acta": {"titulo": "Acta de constitución del proyecto", "fuente": f"{PROPIA}; guía CE01 v0.4 B3.1; gestion/e3/datos/gobierno.yaml y plan.py", "filas": acta},
@@ -398,5 +395,4 @@ TABLAS = {
     "t-solicitud": {"titulo": "Formato de solicitud de cambio (issue cambio-alcance)", "fuente": PROPIA, "filas": solicitud},
     "t-lecciones": {"titulo": "Plantilla del registro de lecciones aprendidas", "fuente": PROPIA, "filas": lecciones},
     "t-lecciones-iniciales": {"titulo": "Lecciones aprendidas registradas en S1", "fuente": f"{PROPIA}; 00 M8", "filas": lecciones_iniciales},
-    "t-defensa-e3": {"titulo": "Preguntas previsibles de la sustentación", "fuente": PROPIA, "filas": defensa},
 }

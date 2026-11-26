@@ -13,4 +13,5 @@
 - criterio: "Gestión Ágil (si aplica)"
   evidencia: ["t-backlog", "t-sprints", "fig-kanban", "t-dor-dod", "fig-burnup", "t-metricas", "t-gherkin"]
 - criterio: "Sustentación y defensa técnica"
-  evidencia: ["Coherencia entre alcance, cronograma y costos", "Decisiones defendibles", "Limitaciones", "t-defensa-e3"]
+  nota: "Se evalúa en la exposición oral. Las decisiones que se defienden están justificadas en"
+  evidencia: ["Justificación estratégica", "t-proyecto-e2", "t-msproject", "t-riesgos-respuesta"]

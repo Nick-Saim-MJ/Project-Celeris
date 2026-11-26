@@ -1,6 +1,6 @@
 {
   "motor": "Microsoft Word (COM)",
-  "paginas": 26,
+  "paginas": 24,
   "marcas": [
     {
       "texto": "Resumen ejecutivo",
@@ -123,74 +123,49 @@
       "pagina": 19
     },
     {
-      "texto": "4.4 Sustentación del análisis",
-      "nivel": 1,
-      "pagina": 20
-    },
-    {
-      "texto": "4.4.1 Coherencia del modelo",
-      "nivel": 2,
-      "pagina": 20
-    },
-    {
-      "texto": "4.4.2 Decisiones defendibles",
-      "nivel": 2,
-      "pagina": 20
-    },
-    {
-      "texto": "4.4.3 Limitaciones",
-      "nivel": 2,
-      "pagina": 20
-    },
-    {
-      "texto": "4.4.4 Preguntas previsibles de la sustentación",
-      "nivel": 2,
-      "pagina": 20
-    },
-    {
       "texto": "Referencias",
       "nivel": 1,
-      "pagina": 22
+      "pagina": 20
     },
     {
       "texto": "Anexos",
       "nivel": 1,
-      "pagina": 23
+      "pagina": 21
     },
     {
       "texto": "Anexo A. Parámetros de la simulación",
       "nivel": 2,
-      "pagina": 23
+      "pagina": 21
     },
     {
       "texto": "Anexo B. Supuestos citados en el informe",
       "nivel": 2,
-      "pagina": 25
+      "pagina": 23
     },
     {
       "texto": "Anexo C. Autoevaluación contra la rúbrica",
       "nivel": 2,
-      "pagina": 26
+      "pagina": 24
     },
     {
       "texto": "Figura 4.1; Tabla 4.1; Tabla 4.2; Tabla 4.3; Descripción narrativa del proceso; Tabla 4.4; Figura 4.2; Figura 4.3; Tabla 4.5\r\u0007",
       "nivel": 10,
-      "pagina": 26
+      "pagina": 24
     },
     {
       "texto": "Figura 4.4; Figura 4.5; Tabla 4.6; Tabla 4.7; Tabla 4.8; Tabla 4.9; Figura 4.6; Tabla 4.10\r\u0007",
       "nivel": 10,
-      "pagina": 26
+      "pagina": 24
     },
     {
       "texto": "Figura 4.7; Tabla 4.11; Tabla 4.12; Tabla 4.13; Alcance y verificación de la mejora\r\u0007",
       "nivel": 10,
-      "pagina": 26
+      "pagina": 24
     }
   ],
   "docx": "Informe_CE01_E4_v0.1.docx",
   "pdf": "Informe_CE01_E4_v0.1.pdf",
-  "commit_fuente": "4a52e3d",
+  "commit_fuente": "6eca02b",
   "figuras": [
     "fig-mapa",
     "fig-p1-asis",

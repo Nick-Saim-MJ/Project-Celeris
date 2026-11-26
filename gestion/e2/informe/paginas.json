@@ -1,6 +1,6 @@
 {
   "motor": "Microsoft Word (COM)",
-  "paginas": 27,
+  "paginas": 26,
   "marcas": [
     {
       "texto": "Resumen ejecutivo",
@@ -163,7 +163,7 @@
       "pagina": 21
     },
     {
-      "texto": "2.6 Recomendación y sustentación",
+      "texto": "2.6 Recomendación",
       "nivel": 1,
       "pagina": 22
     },
@@ -193,44 +193,39 @@
       "pagina": 22
     },
     {
-      "texto": "2.6.6 Preguntas previsibles de la sustentación",
-      "nivel": 2,
-      "pagina": 23
-    },
-    {
       "texto": "Referencias",
       "nivel": 1,
-      "pagina": 24
+      "pagina": 23
     },
     {
       "texto": "Anexos",
       "nivel": 1,
-      "pagina": 25
+      "pagina": 24
     },
     {
       "texto": "Anexo A. Matriz de Pugh con A1 como base",
       "nivel": 2,
-      "pagina": 25
+      "pagina": 24
     },
     {
       "texto": "Anexo B. Juicios de la comparación AHP",
       "nivel": 2,
-      "pagina": 25
+      "pagina": 24
     },
     {
       "texto": "Anexo C. Supuestos citados en el informe",
       "nivel": 2,
-      "pagina": 26
+      "pagina": 25
     },
     {
       "texto": "Anexo D. Autoevaluación contra la rúbrica",
       "nivel": 2,
-      "pagina": 27
+      "pagina": 26
     }
   ],
   "docx": "Informe_CE01_E2_v0.1.docx",
   "pdf": "Informe_CE01_E2_v0.1.pdf",
-  "commit_fuente": "4a52e3d",
+  "commit_fuente": "6eca02b",
   "figuras": [
     "fig-arbol-objetivos",
     "fig-tco",

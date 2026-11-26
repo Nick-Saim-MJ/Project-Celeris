@@ -7,4 +7,5 @@
 - criterio: "Análisis comparativo"
   evidencia: ["fig-comparativo", "t-tiempos", "t-costos", "t-calidad", "Alcance y verificación de la mejora"]
 - criterio: "Sustentación y defensa técnica"
-  evidencia: ["Coherencia del modelo", "Decisiones defendibles", "Limitaciones", "t-defensa-e4", "t-parametros"]
+  nota: "Se evalúa en la exposición oral. Las decisiones que se defienden están justificadas en"
+  evidencia: ["t-seleccion", "t-e2", "Alcance y verificación de la mejora", "t-parametros"]

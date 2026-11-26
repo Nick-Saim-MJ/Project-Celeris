@@ -7,4 +7,5 @@
 - criterio: "Alineamiento estratégico del proyecto"
   evidencia: ["fig-mapa-estrategico", "t-tows", "t-alineamiento", "fig-motivacion", "fig-roadmap"]
 - criterio: "Sustentación y defensa técnica"
-  evidencia: ["t-defensa", "t-5porques", "t-riesgos", "Preguntas previsibles de la sustentación"]
+  nota: "Se evalúa en la exposición oral. Las decisiones que se defienden están justificadas en"
+  evidencia: ["Justificación de intervención", "t-5porques", "t-alineamiento", "t-riesgos"]

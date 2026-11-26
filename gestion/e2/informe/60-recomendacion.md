@@ -1,4 +1,4 @@
-# 2.6 Recomendación y sustentación
+# 2.6 Recomendación
 
 ## 2.6.1 Recomendación
 
@@ -16,7 +16,7 @@ Celeris Edge obtiene el puntaje más bajo de todas las alternativas en soporte y
 
 El tornado y la simulación de Monte Carlo coinciden en que el resultado depende de dos supuestos: el {{dato:e2_tornado_1}} y el {{dato:e2_tornado_2}}. Ambos determinan el beneficio BN-1, que representa la mayor parte del valor del proyecto. Los costos tienen un efecto menor: aun con la inversión y el costo de AWS en el extremo superior de sus rangos, el VAN se mantiene positivo. Por ello, la incertidumbre relevante no reside en lo que el proyecto cuesta, sino en cuánto contenido logra reutilizar y en cuánto vale cada Mbps que deja de contratarse.
 
-La TIR de {{dato:e2_tir}} exige una advertencia expresa ante el jurado: una tasa de esa magnitud no indica un negocio extraordinario, sino una inversión reducida frente a un beneficio que todavía es un supuesto. El indicador que mejor describe el riesgo es el punto de equilibrio ({{dato:e2_eq_mbps}} diferidos), porque expresa el resultado en una magnitud que el piloto puede medir.
+La TIR de {{dato:e2_tir}} exige una advertencia expresa: una tasa de esa magnitud no indica un negocio extraordinario, sino una inversión reducida frente a un beneficio que todavía es un supuesto. El indicador que mejor describe el riesgo es el punto de equilibrio ({{dato:e2_eq_mbps}} diferidos), porque expresa el resultado en una magnitud que el piloto puede medir.
 
 ## 2.6.4 Qué mediría el piloto para confirmar la decisión
 
@@ -38,18 +38,3 @@ El análisis presenta las siguientes limitaciones, que se declaran conforme al M
 - Los pesos AHP, los puntajes de la matriz y los escenarios de estrés de los riesgos son juicios del equipo, pendientes de validación con la DTI.
 - El costo de la alternativa A5 se desconoce y se modela como cota inferior.
 - El modelo no incorpora crecimiento de la demanda ni de los precios, ni valoriza el mantenimiento del software durante el periodo académico.
-
-## 2.6.6 Preguntas previsibles de la sustentación
-
-La {{ref:t-defensa-e2}} anticipa las preguntas previsibles de la defensa técnica e indica la respuesta sintética y la evidencia de cada una.
-
-Tabla: t-defensa-e2 | Preguntas previsibles de la sustentación y su evidencia | Elaboración propia
-| Pregunta previsible | Respuesta sintética | Evidencia |
-| --- | --- | --- |
-| ¿Por qué gana Celeris si es la alternativa con peor soporte? | Es la única que actúa sobre la causa de gestión; la debilidad en soporte se mitiga con la transferencia a la DTI y la decisión solo cambia con pesos alejados del AHP | §2.2.3; §2.6.2 |
-| ¿De dónde salen los pesos de los criterios? | De una comparación AHP por pares con razón de consistencia aceptable; prevalecen sobre los pesos de la guía | §2.2.2; Anexo B |
-| ¿No es irreal una TIR tan alta? | Refleja una inversión pequeña frente a un beneficio supuesto; por eso se presenta el punto de equilibrio y la simulación de Monte Carlo | §2.4.4; §2.4.5 |
-| ¿Qué ocurre si el BHR real es bajo? | El VAN sigue siendo positivo mientras el BHR supere el punto de equilibrio; el piloto lo mide antes de extender el servicio | §2.4.4; §2.6.4 |
-| ¿Por qué no usar el FortiGate existente? | Exige inspección profunda sobre todo el tráfico, incluido el BYOD, y no da control al encargado; su costo debe confirmarse con la DTI | §2.2.1; §2.2.3 |
-| ¿Por qué las cifras difieren de la guía? | El repositorio prevalece sobre los documentos; la conciliación explica cada diferencia y su registro | §2.4.3; CI-98 |
-| ¿Qué riesgo preocupa más desde el punto de vista económico? | La falta de aprobación de la DTI, que se mitiga con un piloto sin inversión adicional | §2.5.2; §2.5.3 |

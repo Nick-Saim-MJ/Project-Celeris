@@ -12,7 +12,7 @@ Por entregable lee gestion/eN/:
 | figuras/figuras.yaml | id → archivo PNG, titulo, fuente, horizontal (CI-90) |
 | tablas.py | TABLAS = {id: {"titulo", "fuente", "filas": función → [[cabecera], [fila], …]}} (opcional) |
 | datos/*.json | {"datos": {clave: "texto ya formateado"}} para {{dato:clave}} (lo escriben los scripts de análisis) |
-| autoevaluacion.yaml | criterio de la rúbrica → evidencia (títulos de sección o id de figura/tabla) |
+| autoevaluacion.yaml | criterio de la rúbrica → evidencia (títulos de sección o id de figura/tabla) y nota opcional |
 
 Marcas en el Markdown:
   {{dato:clave}}       cifra calculada (gestion/ce01_datos.py o datos/*.json). Ninguna cifra se escribe a mano.
@@ -449,6 +449,8 @@ class InformeCE01(base.Informe):
         for c in cont:
             a = ev.get(c["criterio"], {})
             donde = "; ".join(self.num.get(x, x) for x in a.get("evidencia", []))
+            if a.get("nota"):
+                donde = f"{a['nota']} {donde}."
             filas.append([c["criterio"], c.get("excelente") or "[COMPLETAR: descriptor literal del EPE]", donde])
         self.titulo_tabla("autoevaluacion", "Autoevaluación contra la rúbrica")
         self.tabla(filas, tam=8)

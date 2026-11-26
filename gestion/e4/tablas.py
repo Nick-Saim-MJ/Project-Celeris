@@ -231,7 +231,7 @@ def e2():
     ]
 
 
-# ------------------------------------------------------------------ Anexo y sustentación
+# ------------------------------------------------------------------ Anexo
 def parametros():
     cars = SIM["meta"]["carriles"]
     filas = [["Diagrama", "Tarea o evento", "Carril", "Duración (h): mín / moda / máx o fórmula", "Recurso"]]
@@ -266,9 +266,6 @@ def compuertas():
     ]
 
 
-def defensa():
-    return [["Pregunta previsible", "Respuesta"]] + [[d["pregunta"], d["respuesta"]] for d in CAR["defensa"]]
-
 
 TABLAS = {
     "t-seleccion": {"titulo": "Matriz de selección de procesos (escala 1–5, pesos del equipo)", "fuente": f"{PROPIA}; gestion/e4/datos/procesos.yaml → seleccion", "filas": seleccion},
@@ -286,5 +283,4 @@ TABLAS = {
     "t-e2": {"titulo": "Horas ahorradas: business case frente al modelo de procesos", "fuente": f"{PROPIA}; gestion/e4/datos/resultados.json y E2", "filas": e2},
     "t-parametros": {"titulo": "Parámetros de duración de la simulación (para Bizagi)", "fuente": f"{PROPIA}; gestion/e4/simulacion.yaml [S-43]", "filas": parametros},
     "t-compuertas": {"titulo": "Probabilidades, frecuencias y costos de la simulación", "fuente": f"{PROPIA}; supuestos S-06, S-07, S-26, S-44 y S-45", "filas": compuertas},
-    "t-defensa-e4": {"titulo": "Preguntas previsibles de la sustentación", "fuente": f"{PROPIA}; gestion/e4/datos/procesos.yaml → defensa", "filas": defensa},
 }

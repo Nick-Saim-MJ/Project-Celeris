@@ -10,7 +10,7 @@ a mano ningún archivo de `entregables/`.
 | --- | --- |
 | `datos/plan.yaml` | Calendario (feriados, receso, fechas académicas a confirmar), recursos, parámetros de costo, hitos y actividades con paquete de la EDT, duración, predecesoras FS/SS con desfase, horas por recurso, costo fijo y fechas reales (commit) de lo terminado |
 | `datos/agil.yaml` | Épicas, historias HU-01…HU-17 (REQ-F, CU, puntos, WSJF, sprint, dependencias, Gherkin), sprints, tablero Kanban, DoR, DoD, eventos y métricas |
-| `datos/gobierno.yaml` | Acta (sponsor, criterios de éxito, restricciones, supuestos, firmas), compromiso de interesados, comunicaciones, umbrales de control, control de cambios, lecciones aprendidas y preguntas de la sustentación |
+| `datos/gobierno.yaml` | Acta (sponsor, criterios de éxito, restricciones, supuestos, firmas), compromiso de interesados, comunicaciones, umbrales de control, control de cambios y lecciones aprendidas |
 | `datos/plan.json` | Generado por `plan.py` (no editar) |
 | `plan.py` | CPM en días laborables, línea base, presupuesto por paquete (falla si alcance, cronograma y costos no cuadran), curva S, EVM y `{{dato:e3_*}}` |
 | `agil.py` | WSJF y verificación del backlog contra el SRS y el cronograma (capacidad, dependencias, MoSCoW) |

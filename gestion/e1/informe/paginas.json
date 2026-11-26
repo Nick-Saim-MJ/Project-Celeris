@@ -188,16 +188,6 @@
       "pagina": 30
     },
     {
-      "texto": "1.8.1 Conclusiones del diagnóstico",
-      "nivel": 2,
-      "pagina": 30
-    },
-    {
-      "texto": "1.8.2 Preguntas previsibles de la sustentación",
-      "nivel": 2,
-      "pagina": 30
-    },
-    {
       "texto": "Referencias",
       "nivel": 1,
       "pagina": 31
@@ -225,7 +215,7 @@
   ],
   "docx": "Informe_CE01_E1_v0.1.docx",
   "pdf": "Informe_CE01_E1_v0.1.pdf",
-  "commit_fuente": "4a52e3d",
+  "commit_fuente": "6eca02b",
   "figuras": [
     "fig-organigrama",
     "fig-cadena-valor",

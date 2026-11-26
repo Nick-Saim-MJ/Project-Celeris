@@ -20,7 +20,7 @@ La {{ref:t-eliminadas}} lista las tareas del AS-IS que desaparecen o se sustituy
 
 ## 4.2.2 Automatizaciones propuestas
 
-La {{ref:t-automatizaciones}} detalla cada automatización con la tarea del AS-IS que reemplaza, la tecnología que la realiza, el requisito del SRS de CE02 que la especifica y la prueba que la verifica (infra/pruebas.yaml o un escenario BDD del SRS). Cada PD-xx queda eliminado por al menos una automatización; el generador falla si falta el requisito o la prueba.
+La {{ref:t-automatizaciones}} detalla cada automatización con la tarea del AS-IS que reemplaza, la tecnología que la realiza, el requisito del SRS de CE02 que la especifica y la prueba que la verifica (matriz de pruebas planificadas del informe de diseño de red CE0311 o un escenario BDD del SRS). Cada PD-xx queda eliminado por al menos una automatización, y ninguna automatización carece de requisito o de prueba.
 
 {{tabla:t-automatizaciones}}
 
@@ -50,4 +50,4 @@ El ahorro de personal de P1 tiene un límite explícito: la consola confirma las
 
 {{tabla:t-e2}}
 
-Los valores del E4 se exportan a `gestion/e4/datos/resultados.json` para que el E2 los use en lugar de S-07 cuando se midan; mientras tanto, el E2 conserva su supuesto. Con los valores actuales, el beneficio de P1 sería menor que el estimado en el E2, pero el de P2 lo compensa con holgura.
+Los valores del E4 quedan registrados para que el E2 los use en lugar de S-07 cuando se midan; mientras tanto, el E2 conserva su supuesto. Con los valores actuales, el beneficio de P1 sería menor que el estimado en el E2, pero el de P2 lo compensa con holgura.

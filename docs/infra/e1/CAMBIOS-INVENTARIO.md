@@ -1199,4 +1199,5 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - El mapa de procesos y los pesos de la matriz de selección son juicio del equipo, a validar con la DTI.
   - Herramientas: XSD BPMN 2.0 de OMG (`gestion/e4/herramientas/xsd/`) y render con bpmn-js + puppeteer-core sobre el Chrome instalado (`gestion/e4/herramientas/render/`, `node_modules` fuera del repositorio).
   - La huella de CE0311 incluye `infra/trazabilidad.yaml` (V-80): se regeneró el informe CE0311.
+  - Ajuste posterior (2026-11-26): el texto de S-43 remite al anexo A del informe E4 y a la plantilla de registro de tiempos, sin rutas del repositorio, porque el jurado solo recibe el informe; los valores no cambian.
 - **Decide:** equipo del proyecto (supuestos a validar con la DTI y el cronometraje)

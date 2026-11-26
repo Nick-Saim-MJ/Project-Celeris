@@ -608,8 +608,8 @@ supuestos:
     responsable: Henyelrey
   S-43:
     supuesto: Duraciones y esperas de las tareas manuales de P1 y P2 (AS-IS y TO-BE)
-    valor: Distribución triangular (mínimo, moda, máximo) por tarea, estimada por el equipo; los valores están en gestion/e4/simulacion.yaml
-    validacion: Cronometraje de al menos 30 observaciones por fase (solicitud, decisión, descarga, instalación, verificación) con gestion/e4/instrumentos/registro-tiempos.xlsx
+    valor: Distribución triangular (mínimo, moda, máximo) por tarea, estimada por el equipo; los valores están en el anexo A del informe E4 de CE01
+    validacion: Cronometraje de al menos 30 observaciones por fase (solicitud, decisión, descarga, instalación, verificación) con la plantilla de registro de tiempos del E4
     responsable: Henyelrey
   S-44:
     supuesto: Probabilidades de las bifurcaciones de P1 y P2

@@ -145,15 +145,38 @@ riesgos_estrategicos:
     - { id: RE-12, riesgo: "Compromiso del acceso remoto al panel (EC2-GW)", p: 2, i: 5, respuesta: "Segundo factor, acciones críticas solo desde el campus, EC2-GW sin datos y recreable, WAF y límite de intentos", disparador: "Alerta de fuerza bruta o de WAF", dueno: Nick }
 
 riesgos_proyecto:
-  fuente: "Guía CE01 v0.4 B3.6 (escala 1–5)"
+  fuente: "Guía CE01 v0.4 B3.6 (escala 1–5); causa, efecto, estrategia, contingencia, disparador y estado agregados en P3; RP-08…RP-10 nuevos (CI-103)"
   lista:
-    - { id: RP-01, riesgo: "Retraso en el levantamiento con la DTI o los encargados", p: 3, i: 4, respuesta: "Supuestos marcados, validación posterior", dueno: Henyelrey }
-    - { id: RP-02, riesgo: "Sobrecarga académica en exámenes", p: 4, i: 3, respuesta: "Holgura de 1 semana", dueno: Ambos }
-    - { id: RP-03, riesgo: "Datos inconsistentes entre documentos", p: 3, i: 4, respuesta: "Fuente única (00 M4.1) + validador", dueno: Nick }
-    - { id: RP-04, riesgo: "Secretos en el repositorio", p: 2, i: 5, respuesta: "gitleaks en pre-commit y CI", dueno: Nick }
-    - { id: RP-05, riesgo: "Falla de la demo en la sustentación", p: 2, i: 4, respuesta: "Laboratorio emulado sin red + video de respaldo", dueno: Ambos }
-    - { id: RP-06, riesgo: "Recursos AWS olvidados encendidos", p: 3, i: 2, respuesta: "destroy en el runbook, alarma de Budgets", dueno: Nick }
-    - { id: RP-07, riesgo: "Ramas sin fusionar y choque de IDs entre documentos y repositorio", p: 4, i: 3, respuesta: "Fusionar en main primero; los IDs nuevos se piden en CAMBIOS-INVENTARIO.md; manda el repositorio", dueno: Ambos }
+    - { id: RP-01, riesgo: "Retraso en el levantamiento con la DTI o los encargados", p: 3, i: 4, respuesta: "Supuestos marcados, validación posterior", dueno: Henyelrey,
+        causa: "La DTI y los encargados tienen agenda propia y el proyecto no tiene prioridad institucional", efecto: "E1, E2 y E4 se presentan con supuestos sin validar y la ruta crítica de S1 se desplaza",
+        estrategia: Mitigar, contingencia: "Presentar con los supuestos marcados y validar en S2 (00 M5)", disparador: "Reunión con la DTI sin fecha confirmada al cierre de la semana 2", estado: Abierto }
+    - { id: RP-02, riesgo: "Sobrecarga académica en exámenes", p: 4, i: 3, respuesta: "Adelantar el trabajo de la ruta crítica antes de exámenes; horas adicionales con cargo a la reserva de contingencia", dueno: Ambos,
+        causa: "Coinciden exámenes y entregas de otros cursos", efecto: "Una actividad de la ruta crítica se retrasa y la sustentación pierde ensayo",
+        estrategia: Mitigar, contingencia: "Redistribuir actividades entre los integrantes y recortar el alcance de la demo, nunca el de los informes", disparador: "SPI menor que 0,9 en el seguimiento semanal", estado: Abierto }
+    - { id: RP-03, riesgo: "Datos inconsistentes entre documentos", p: 3, i: 4, respuesta: "Fuente única (00 M4.1) + validador", dueno: Nick,
+        causa: "La misma cifra se usa en tres áreas y en varios documentos", efecto: "El jurado detecta contradicciones y la evidencia pierde valor",
+        estrategia: Mitigar, contingencia: "Corregir en infra/*.yaml o gestion/ce01.yaml y regenerar; registrar el CI-xx", disparador: "make validate en rojo", estado: Abierto }
+    - { id: RP-04, riesgo: "Secretos en el repositorio", p: 2, i: 5, respuesta: "gitleaks en pre-commit y CI", dueno: Nick,
+        causa: "Llaves de laboratorio, tokens o credenciales de AWS copiados por error", efecto: "Exposición de la cuenta y del laboratorio; incumplimiento de las reglas del proyecto",
+        estrategia: Evitar, contingencia: "Revocar y rotar la credencial y limpiar el historial", disparador: "Alerta de gitleaks en el CI", estado: Abierto }
+    - { id: RP-05, riesgo: "Falla de la demo en la sustentación", p: 2, i: 4, respuesta: "Laboratorio emulado sin red + video de respaldo", dueno: Ambos,
+        causa: "Dependencia de la red del aula o de servicios externos", efecto: "La defensa técnica pierde la evidencia en vivo",
+        estrategia: Mitigar, contingencia: "Reproducir la demo grabada (paquete 6.2)", disparador: "Falla en un ensayo de sustentación", estado: Abierto }
+    - { id: RP-06, riesgo: "Recursos AWS olvidados encendidos", p: 3, i: 2, respuesta: "destroy en el runbook, alarma de Budgets", dueno: Nick,
+        causa: "Pruebas del Modo A interrumpidas sin destruir el entorno", efecto: "Costo no presupuestado y consumo del crédito de la cuenta",
+        estrategia: Mitigar, contingencia: "Ejecutar tofu destroy y revisar la factura", disparador: "Alarma de AWS Budgets al 80 % del presupuesto", estado: Abierto }
+    - { id: RP-07, riesgo: "Ramas sin fusionar y choque de IDs entre documentos y repositorio", p: 4, i: 3, respuesta: "Fusionar en main primero; los IDs nuevos se piden en CAMBIOS-INVENTARIO.md; manda el repositorio", dueno: Ambos,
+        causa: "Trabajo en paralelo de dos personas en ramas largas", efecto: "Conflictos de fusión, IDs reutilizados y retrabajo",
+        estrategia: Mitigar, contingencia: "Resolver el conflicto en una rama de integración y regenerar los artefactos", disparador: "Pull request abierto más de tres días o conflicto al fusionar", estado: Abierto }
+    - { id: RP-08, riesgo: "Calendario académico distinto del previsto en el plan", p: 3, i: 3, respuesta: "Fechas marcadas para confirmar; el cronograma se recalcula desde gestion/e3/datos/plan.yaml", dueno: Henyelrey,
+        causa: "Las fechas de entrega de S1 y del semestre 2027-I no están publicadas", efecto: "La ruta crítica se acorta o se desplaza y se pierde holgura",
+        estrategia: Aceptar, contingencia: "Reprogramar desde el modelo; la ruta crítica indica qué actividades comprimir", disparador: "Publicación del calendario académico", estado: Abierto }
+    - { id: RP-09, riesgo: "Retraso en la compra del hardware del piloto", p: 3, i: 4, respuesta: "Solicitar la compra apenas la DTI apruebe el piloto; la adquisición tiene holgura frente a la construcción de la consola", dueno: Nick,
+        causa: "Plazos del proceso de compras de la universidad", efecto: "El despliegue del piloto se retrasa y la ampliación sale del semestre",
+        estrategia: Mitigar, contingencia: "Piloto sobre un servidor prestado por la DTI o sobre el laboratorio emulado", disparador: "Orden de compra no emitida al cierre de la segunda semana de S2", estado: Abierto }
+    - { id: RP-10, riesgo: "Encargados no disponibles para validar el prototipo y el piloto", p: 3, i: 3, respuesta: "Agendar las sesiones con la DTI al inicio de cada etapa", dueno: Henyelrey,
+        causa: "Carga operativa de los encargados durante el ciclo académico", efecto: "El prototipo y la consola no se validan con usuarios reales (SUS sin medir)",
+        estrategia: Mitigar, contingencia: "Validar con docentes usuarios y repetir con encargados en S2", disparador: "Menos de dos encargados confirmados una semana antes de la sesión", estado: Abierto }
 
 procesos:
   fuente: "Guía CE01 v0.4 B4.1"
@@ -162,37 +185,40 @@ procesos:
     - { id: P2, nombre: "Preparación de un laboratorio para una clase (el docente pide software o material)", por_que: "Es donde se pierde tiempo de clase y donde el encargado necesita autonomía", dueno: "Encargado de laboratorio" }
 
 edt:
-  fuente: "Guía CE01 v0.4 B3.3 (paquetes) y diccionario (extracto); P3 la completa con duraciones y costos"
+  fuente: "Guía CE01 v0.4 B3.3 (paquetes) y diccionario (extracto); P3 completa la descripción y el criterio de aceptación de cada paquete y agrega 5.4–5.6 para S2 (CI-103). Las actividades (nivel 3), duraciones y costos viven en gestion/e3/datos/plan.yaml"
   paquetes:
     - { id: "0", nombre: "Celeris Edge EPE" }
     - { id: "1", nombre: "Gestión del proyecto" }
-    - { id: "1.1", nombre: "Acta" }
-    - { id: "1.2", nombre: "Plan" }
-    - { id: "1.3", nombre: "Seguimiento" }
-    - { id: "1.4", nombre: "Lecciones aprendidas" }
+    - { id: "1.1", nombre: "Acta", descripcion: "Acta de constitución firmada por el sponsor", aceptacion: "Acta con OB-1…OB-5, alcance, exclusiones, restricciones, supuestos, hitos, presupuesto y firmas del sponsor, del director y del líder técnico", responsable: Henyelrey }
+    - { id: "1.2", nombre: "Plan", descripcion: "Plan de gestión aprobado con línea base de alcance, cronograma y costos", aceptacion: "Línea base registrada en el XML de MS Project y en el libro EVM; aprobada por el sponsor", responsable: Henyelrey }
+    - { id: "1.3", nombre: "Seguimiento", descripcion: "Reunión semanal, control EVM y revisión de riesgos y cambios", aceptacion: "Acta semanal con CPI, SPI, riesgos revisados y solicitudes de cambio registradas como issues", responsable: Henyelrey }
+    - { id: "1.4", nombre: "Lecciones aprendidas", descripcion: "Registro de lecciones aprendidas y cierre administrativo", aceptacion: "Plantilla de lecciones completa y archivo del proyecto entregado a la DTI", responsable: Henyelrey }
     - { id: "2", nombre: "Gestión de TI" }
-    - { id: "2.1", nombre: "Diagnóstico" }
-    - { id: "2.2", nombre: "Business case" }
-    - { id: "2.3", nombre: "Plan de gestión" }
-    - { id: "2.4", nombre: "AS-IS / TO-BE" }
+    - { id: "2.1", nombre: "Diagnóstico", descripcion: "Informe E1 con los datos levantados con la DTI", aceptacion: "Contenido mínimo del EPE completo, chequeos a)–f) en verde y entrevista COBIT realizada", responsable: Henyelrey }
+    - { id: "2.2", nombre: "Business case", descripcion: "Informe E2 y modelo económico con fórmulas vivas", aceptacion: "VAN del XLSX igual al de Python, AHP consistente y cotización del ISP incorporada", responsable: Henyelrey }
+    - { id: "2.3", nombre: "Plan de gestión", descripcion: "Informe E3, cronograma en XML de MS Project, presupuesto con EVM y backlog", aceptacion: "Ruta crítica de Python igual a la de MS Project y presupuesto por paquete igual a la línea base", responsable: Henyelrey }
+    - { id: "2.4", nombre: "AS-IS / TO-BE", descripcion: "Informe E4 con los procesos P1 y P2 en BPMN y sus mediciones", aceptacion: "BPMN AS-IS y TO-BE de P1 y P2 y al menos 30 observaciones cronometradas", responsable: Henyelrey }
     - { id: "3", nombre: "Ingeniería de software" }
-    - { id: "3.1", nombre: "SRS" }
-    - { id: "3.2", nombre: "Prototipo de la consola validado", aceptacion: "10 pantallas (CE02 C2.1), validadas con ≥ 2 encargados, SUS ≥ 75", responsable: Nick, esfuerzo_h: 20 }
-    - { id: "3.3", nombre: "C4 + ADR" }
-    - { id: "3.4", nombre: "UML" }
-    - { id: "3.5", nombre: "Trazabilidad" }
+    - { id: "3.1", nombre: "SRS", descripcion: "Especificación de requisitos y casos de uso de la consola y del nodo", aceptacion: "Plantilla oficial de CE02 completa y cada REQ-F asociado a un caso de uso", responsable: Nick }
+    - { id: "3.2", nombre: "Prototipo de la consola validado", descripcion: "Prototipo navegable de la consola y su validación con encargados", aceptacion: "10 pantallas (CE02 C2.1), validadas con ≥ 2 encargados, SUS ≥ 75", responsable: Nick, esfuerzo_h: 20 }
+    - { id: "3.3", nombre: "C4 + ADR", descripcion: "Modelo C4 y registro de decisiones de arquitectura", aceptacion: "Cada contenedor del C4 existe en infra/inventory.yaml y cada decisión tiene su ADR", responsable: Nick }
+    - { id: "3.4", nombre: "UML", descripcion: "Diagramas UML de los casos de uso", aceptacion: "Un diagrama de secuencia por caso de uso, generado desde PlantUML", responsable: Nick }
+    - { id: "3.5", nombre: "Trazabilidad", descripcion: "Matriz requisito, caso de uso y prueba", aceptacion: "Ningún requisito sin caso de uso ni prueba asociada", responsable: Nick }
     - { id: "4", nombre: "Infraestructura" }
-    - { id: "4.1", nombre: "Diseño de red", aceptacion: "11 secciones de la plantilla, matrices al 100 %, pruebas coherentes con la VPN", responsable: Henyelrey, esfuerzo_h: 40 }
-    - { id: "4.2", nombre: "Diseño de centro de datos" }
-    - { id: "4.3", nombre: "Inventario único de red", aceptacion: "infra/inventory.yaml genera las matrices; validador en verde", responsable: Nick, esfuerzo_h: 6 }
+    - { id: "4.1", nombre: "Diseño de red", descripcion: "Diseño de red e informe CE0311", aceptacion: "11 secciones de la plantilla, matrices al 100 %, pruebas coherentes con la VPN", responsable: Henyelrey, esfuerzo_h: 40 }
+    - { id: "4.2", nombre: "Diseño de centro de datos", descripcion: "Diseño del centro de datos híbrido e informe CE0331", aceptacion: "Ocho criterios de la rúbrica con evidencia y validador del centro de datos en verde", responsable: Nick }
+    - { id: "4.3", nombre: "Inventario único de red", descripcion: "Fuente única infra/*.yaml y su validador", aceptacion: "infra/inventory.yaml genera las matrices; validador en verde", responsable: Nick, esfuerzo_h: 6 }
     - { id: "5", nombre: "Prueba de concepto" }
-    - { id: "5.1", nombre: "Nodo de caché + PAC" }
-    - { id: "5.2", nombre: "Laboratorio emulado", aceptacion: "Levanta con un comando y pasa las pruebas marcadas para Modo L", responsable: Nick, esfuerzo_h: 16 }
-    - { id: "5.3", nombre: "IaC AWS" }
+    - { id: "5.1", nombre: "Nodo de caché + PAC", descripcion: "Nodo de caché con PAC y configuración firmada; hardware del rack para el piloto", aceptacion: "Pruebas e2e del nodo en verde y hardware instalado y registrado en el inventario", responsable: Nick }
+    - { id: "5.2", nombre: "Laboratorio emulado", descripcion: "Laboratorio containerlab del Modo L", aceptacion: "Levanta con un comando y pasa las pruebas marcadas para Modo L", responsable: Nick, esfuerzo_h: 16 }
+    - { id: "5.3", nombre: "IaC AWS", descripcion: "OpenTofu de EC2-GW, VPN y respaldos", aceptacion: "Validación en verde contra el emulador; ningún recurso real sin confirmación del equipo", responsable: Nick }
+    - { id: "5.4", nombre: "Consola del encargado", descripcion: "SPA, API y base de datos en CTRL01, construidas en sprints de una semana (S2)", aceptacion: "Historias Must del backlog terminadas según la definición de terminado y aceptadas por encargados", responsable: Nick }
+    - { id: "5.5", nombre: "Piloto en un laboratorio", descripcion: "Aprobación de la DTI, despliegue y medición en un laboratorio (S2)", aceptacion: "BHR, tiempos de preparación y SUS medidos durante cuatro semanas e informe con recomendación", responsable: Henyelrey }
+    - { id: "5.6", nombre: "Ampliación a los laboratorios", descripcion: "Extensión a los 10 laboratorios, condicionada al resultado del piloto (S2)", aceptacion: "Los 10 laboratorios habilitados en la consola y métricas por laboratorio publicadas", responsable: Henyelrey }
     - { id: "6", nombre: "Cierre y sustentación" }
-    - { id: "6.1", nombre: "Ensayos" }
-    - { id: "6.2", nombre: "Demo grabada" }
-    - { id: "6.3", nombre: "Expediente PDF" }
+    - { id: "6.1", nombre: "Ensayos", descripcion: "Ensayos individuales de la sustentación", aceptacion: "Cada integrante defiende las tres áreas en un ensayo cronometrado", responsable: Henyelrey }
+    - { id: "6.2", nombre: "Demo grabada", descripcion: "Video de respaldo de la demostración", aceptacion: "Video del laboratorio emulado (S1) y del piloto (S2)", responsable: Nick }
+    - { id: "6.3", nombre: "Expediente PDF", descripcion: "Expediente consolidado de cada semestre", aceptacion: "Todos los informes regenerados desde el repositorio y make validate en verde", responsable: Henyelrey }
 
 raci:
   fuente: "Guía CE01 v0.4 B3.2"
@@ -202,6 +228,6 @@ raci:
     - { paquete: "CE02 E1 (SRS, prototipo, C4, UML)",  asignacion: [R/A, C, C, C, I] }
     - { paquete: "CE03 E1 Red",                        asignacion: [C, R/A, C, I, I] }
     - { paquete: "CE03 E2 Centro de datos",            asignacion: [R/A, C, C, I, I] }
-    - { paquete: "Prototipo de la consola y validación", asignacion: [R, C, I, C, I], nota: "La guía no asigna aprobador (A); lo define P3" }
+    - { paquete: "Prototipo de la consola y validación", asignacion: [R, A, I, C, I], nota_a: "P3 (CI-103): aprueba el director del proyecto, porque toda pieza la revisa el otro integrante" }
     - { paquete: "Laboratorio demostrable",            asignacion: [R/A, C, I, I, I] }
     - { paquete: "Consolidado y sustentación",         asignacion: [R, R/A, I, I, C] }

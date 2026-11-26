@@ -1,0 +1,41 @@
+# Registro de figuras del E3 (lo escribe gestion/e3/figuras/generar.py; no editar a mano).
+fig-edt:
+  archivo: edt.png
+  titulo: Estructura de desglose del trabajo (EDT) del proyecto Celeris Edge
+  fuente: Elaboración propia; paquetes de gestion/ce01.yaml → edt (guía CE01 v0.4 B3.3, ampliada con 5.4–5.6 en CI-103)
+  horizontal: true
+fig-cambios:
+  archivo: control-cambios.png
+  titulo: Procedimiento de control integrado de cambios
+  fuente: Elaboración propia, adaptado del control integrado de cambios del PMBOK [1]; gestion/e3/datos/gobierno.yaml
+  horizontal: true
+fig-gantt-s1:
+  archivo: gantt-s1.png
+  titulo: Diagrama de Gantt de S1 con la ruta crítica y los hitos
+  fuente: Elaboración propia; CPM de gestion/e3/plan.py sobre gestion/e3/datos/plan.yaml; fechas reales de los commits de main
+  horizontal: true
+fig-gantt-s2:
+  archivo: gantt-s2.png
+  titulo: Diagrama de Gantt de S2 con la ruta crítica y los hitos
+  fuente: Elaboración propia; CPM de gestion/e3/plan.py, verificado con Microsoft Project
+  horizontal: true
+fig-curva-s:
+  archivo: curva-s.png
+  titulo: Curva S de la línea base, reservas y valor ganado a la fecha de corte
+  fuente: Elaboración propia; gestion/e3/plan.py y entregables/CE01/E3/Presupuesto_EVM_E3.xlsx
+  horizontal: true
+fig-riesgos:
+  archivo: riesgos-proyecto.png
+  titulo: Mapa de calor de los riesgos del proyecto RP-01…RP-10
+  fuente: Elaboración propia; P e I de gestion/ce01.yaml → riesgos_proyecto (escala de la guía CE01 v0.4 B3.6)
+  horizontal: false
+fig-kanban:
+  archivo: kanban.png
+  titulo: Tablero Kanban de la consola al iniciar el sprint 1 (planificado)
+  fuente: Elaboración propia; backlog y límites WIP de gestion/e3/datos/agil.yaml
+  horizontal: true
+fig-burnup:
+  archivo: burnup.png
+  titulo: Burn-up planificado de la consola por sprint
+  fuente: Elaboración propia; puntos de historia de gestion/e3/datos/agil.yaml (estimación del equipo)
+  horizontal: false

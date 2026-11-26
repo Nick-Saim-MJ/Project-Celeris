@@ -1,0 +1,3050 @@
+{
+ "datos": {
+  "e3_inicio": "18 de noviembre de 2026",
+  "e3_fin": "18 de junio de 2027",
+  "e3_h1": "18 de diciembre de 2026",
+  "e3_hs2": "1 de marzo de 2027",
+  "e3_h2": "5 de marzo de 2027",
+  "e3_h3": "28 de mayo de 2027",
+  "e3_h4": "18 de junio de 2027",
+  "e3_corte": "25 de noviembre de 2026",
+  "e3_n_actividades": "43",
+  "e3_n_hitos": "6",
+  "e3_n_hechas": "13",
+  "e3_n_criticas": "15",
+  "e3_n_paquetes": "25",
+  "e3_dias": "100 días laborables",
+  "e3_horas_equipo": "652 h",
+  "e3_horas_nick": "379 h",
+  "e3_horas_henyelrey": "273 h",
+  "e3_horas_contraparte": "51 h",
+  "e3_tarifa": "US$ 5/h",
+  "e3_bac": "US$ 8 701",
+  "e3_contingencia": "US$ 870",
+  "e3_linea_base": "US$ 9 571",
+  "e3_gestion": "US$ 479",
+  "e3_total": "US$ 10 050",
+  "e3_cont_pct": "10 %",
+  "e3_gest_pct": "5 %",
+  "e3_costo_horas": "US$ 3 260",
+  "e3_hardware": "US$ 5 300",
+  "e3_aws": "US$ 141",
+  "e3_aws_efimero": "US$ 1,94",
+  "e3_aws_24x7": "US$ 139,16",
+  "e3_aws_horas_efimero": "20 h",
+  "e3_aws_meses": "2 meses",
+  "e3_pv": "US$ 606",
+  "e3_ev": "US$ 1 030",
+  "e3_ac": "US$ 1 030",
+  "e3_spi": "1,70",
+  "e3_cpi": "1,00",
+  "e3_sv": "US$ 424",
+  "e3_avance_plan": "7,0 %",
+  "e3_avance_real": "11,8 %",
+  "e3_umbral": "0,9",
+  "e3_ruta_critica": "2.1.2 → 2.4.2 → 2.4.3 → 6.3.1 → 6.1.1 → 5.4.1 → 5.4.2 → 5.4.3 → 5.4.4 → 5.5.2 → 5.5.3 → 5.5.4 → 5.6.1 → 6.3.2 → 6.1.2",
+  "e3_capex_e2": "US$ 5 300",
+  "e3_opex_e2": "US$ 1 996",
+  "e3_semana1_spi": "0,00",
+  "e3_semana1": "20 de noviembre de 2026",
+  "e3_n1_1": "US$ 240",
+  "e3_n1_2": "US$ 520",
+  "e3_n1_3": "US$ 300",
+  "e3_n1_4": "US$ 400",
+  "e3_n1_5": "US$ 6 961",
+  "e3_n1_6": "US$ 280",
+  "e3_p_1_1": "US$ 10",
+  "e3_p_1_2": "US$ 10",
+  "e3_p_1_3": "US$ 190",
+  "e3_p_1_4": "US$ 30",
+  "e3_p_2_1": "US$ 170",
+  "e3_p_2_2": "US$ 110",
+  "e3_p_2_3": "US$ 100",
+  "e3_p_2_4": "US$ 140",
+  "e3_p_3_1": "US$ 90",
+  "e3_p_3_2": "US$ 100",
+  "e3_p_3_3": "US$ 40",
+  "e3_p_3_4": "US$ 50",
+  "e3_p_3_5": "US$ 20",
+  "e3_p_4_1": "US$ 200",
+  "e3_p_4_2": "US$ 170",
+  "e3_p_4_3": "US$ 30",
+  "e3_p_5_1": "US$ 5 440",
+  "e3_p_5_2": "US$ 80",
+  "e3_p_5_3": "US$ 40",
+  "e3_p_5_4": "US$ 810",
+  "e3_p_5_5": "US$ 431",
+  "e3_p_5_6": "US$ 160",
+  "e3_p_6_1": "US$ 80",
+  "e3_p_6_2": "US$ 40",
+  "e3_p_6_3": "US$ 160",
+  "e3_hu_total": "17",
+  "e3_hu_sprint": "14",
+  "e3_pts_comprometidos": "65 puntos",
+  "e3_pts_must": "49 puntos",
+  "e3_pts_alcance": "75 puntos",
+  "e3_capacidad": "13 puntos",
+  "e3_velocidad": "10,8 puntos",
+  "e3_n_sprints": "6",
+  "e3_hu_fuera": "HU-16, HU-15, HU-17",
+  "e3_n_req": "20",
+  "e3_sprint1_inicio": "1 de marzo de 2027",
+  "e3_sprint6_fin": "13 de abril de 2027",
+  "e3_hu_primera": "HU-02",
+  "e3_rc_s1": "2.1.2 → 2.4.2 → 2.4.3 → 6.3.1 → 6.1.1",
+  "e3_rc_s2": "5.4.1 → 5.4.2 → 5.4.3 → 5.4.4 → 5.5.2 → 5.5.3 → 5.5.4 → 5.6.1 → 6.3.2 → 6.1.2",
+  "e3_holgura_512": "15 días laborables",
+  "e3_reserva_pct_bac": "5,5 %",
+  "e3_fin_s1": "18 de diciembre de 2026",
+  "e3_inicio_s2": "1 de marzo de 2027",
+  "e3_semanas_s2": "16 semanas",
+  "e3_receso": "del 21 de diciembre de 2026 al 26 de febrero de 2027",
+  "e3_feriados": "8 de diciembre de 2026 (Inmaculada Concepción) y del 25 y 26 de marzo de 2027 (Jueves y Viernes Santo)",
+  "e3_jornada": "de 08:00 a 17:00",
+  "e2_van": "US$ 13 060",
+  "e2_tir": "133 %",
+  "e2_payback": "8,3 meses",
+  "e2_gana": "A4 Celeris Edge",
+  "e2_capex": "US$ 5 300",
+  "e2_opex": "US$ 1 996",
+  "e3_msproject": "abrió el XML: 19 tareas críticas iguales a las de Python; costo 8701.10; guardado Cronograma_Celeris.mpp"
+ },
+ "modelo": {
+  "filas": [
+   {
+    "id": "H0",
+    "nombre": "Inicio del proyecto",
+    "paquete": null,
+    "hito": true,
+    "dur": 0,
+    "dur_real": null,
+    "inicio": "2026-11-18",
+    "fin": "2026-11-18",
+    "lb_inicio": "2026-11-18",
+    "lb_fin": "2026-11-18",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "3aeec9e",
+    "snet": null,
+    "preds": [],
+    "horas": {},
+    "costo": 0.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "4.3.1",
+    "nombre": "Inventario único de red v0.4",
+    "paquete": "4.3",
+    "hito": false,
+    "dur": 4,
+    "dur_real": 3,
+    "inicio": "2026-11-18",
+    "fin": "2026-11-22",
+    "lb_inicio": "2026-11-18",
+    "lb_fin": "2026-11-23",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "dd53542",
+    "snet": null,
+    "preds": [
+     "H0"
+    ],
+    "horas": {
+     "Nick": 6
+    },
+    "costo": 30.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "5.1.1",
+    "nombre": "Nodo de caché, PAC y configuración firmada",
+    "paquete": "5.1",
+    "hito": false,
+    "dur": 5,
+    "dur_real": 3,
+    "inicio": "2026-11-18",
+    "fin": "2026-11-22",
+    "lb_inicio": "2026-11-18",
+    "lb_fin": "2026-11-24",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "6c2aa75",
+    "snet": null,
+    "preds": [
+     "H0"
+    ],
+    "horas": {
+     "Nick": 16
+    },
+    "costo": 80.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "5.2.1",
+    "nombre": "Laboratorio emulado (Modo L) y ensayo v0.4",
+    "paquete": "5.2",
+    "hito": false,
+    "dur": 6,
+    "dur_real": 4,
+    "inicio": "2026-11-18",
+    "fin": "2026-11-23",
+    "lb_inicio": "2026-11-24",
+    "lb_fin": "2026-12-01",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "00ef044",
+    "snet": null,
+    "preds": [
+     "4.3.1"
+    ],
+    "horas": {
+     "Nick": 12
+    },
+    "costo": 60.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "5.3.1",
+    "nombre": "IaC de AWS contra el emulador",
+    "paquete": "5.3",
+    "hito": false,
+    "dur": 4,
+    "dur_real": 3,
+    "inicio": "2026-11-19",
+    "fin": "2026-11-23",
+    "lb_inicio": "2026-11-24",
+    "lb_fin": "2026-11-27",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "1cd4998",
+    "snet": null,
+    "preds": [
+     "4.3.1"
+    ],
+    "horas": {
+     "Nick": 8
+    },
+    "costo": 40.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "4.1.1",
+    "nombre": "Diseño de red e informe CE0311",
+    "paquete": "4.1",
+    "hito": false,
+    "dur": 10,
+    "dur_real": 5,
+    "inicio": "2026-11-18",
+    "fin": "2026-11-24",
+    "lb_inicio": "2026-11-20",
+    "lb_fin": "2026-12-03",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "55f248d",
+    "snet": null,
+    "preds": [
+     "4.3.1 SS+2"
+    ],
+    "horas": {
+     "Henyelrey": 36,
+     "Nick": 4
+    },
+    "costo": 200.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "4.2.1",
+    "nombre": "Diseño del centro de datos e informe CE0331",
+    "paquete": "4.2",
+    "hito": false,
+    "dur": 8,
+    "dur_real": 2,
+    "inicio": "2026-11-23",
+    "fin": "2026-11-24",
+    "lb_inicio": "2026-11-27",
+    "lb_fin": "2026-12-09",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "55f248d",
+    "snet": null,
+    "preds": [
+     "4.1.1 SS+5"
+    ],
+    "horas": {
+     "Nick": 30,
+     "Henyelrey": 4
+    },
+    "costo": 170.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "3.1.1",
+    "nombre": "SRS v0.4 (REQ-F, REQ-NF y casos de uso)",
+    "paquete": "3.1",
+    "hito": false,
+    "dur": 5,
+    "dur_real": 4,
+    "inicio": "2026-11-19",
+    "fin": "2026-11-24",
+    "lb_inicio": "2026-11-18",
+    "lb_fin": "2026-11-24",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "5d8e77f",
+    "snet": null,
+    "preds": [
+     "H0"
+    ],
+    "horas": {
+     "Nick": 14,
+     "Henyelrey": 4
+    },
+    "costo": 90.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "3.2.1",
+    "nombre": "Prototipo navegable de la consola",
+    "paquete": "3.2",
+    "hito": false,
+    "dur": 5,
+    "dur_real": 4,
+    "inicio": "2026-11-19",
+    "fin": "2026-11-24",
+    "lb_inicio": "2026-11-19",
+    "lb_fin": "2026-11-25",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "aa3b8e5",
+    "snet": null,
+    "preds": [
+     "3.1.1 SS+1"
+    ],
+    "horas": {
+     "Nick": 14
+    },
+    "costo": 70.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "3.3.1",
+    "nombre": "Modelo C4 y ADR",
+    "paquete": "3.3",
+    "hito": false,
+    "dur": 3,
+    "dur_real": 1,
+    "inicio": "2026-11-24",
+    "fin": "2026-11-24",
+    "lb_inicio": "2026-11-25",
+    "lb_fin": "2026-11-27",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "5d8e77f",
+    "snet": null,
+    "preds": [
+     "3.1.1"
+    ],
+    "horas": {
+     "Nick": 8
+    },
+    "costo": 40.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "3.4.1",
+    "nombre": "Diagramas UML por caso de uso",
+    "paquete": "3.4",
+    "hito": false,
+    "dur": 4,
+    "dur_real": 4,
+    "inicio": "2026-11-19",
+    "fin": "2026-11-24",
+    "lb_inicio": "2026-11-19",
+    "lb_fin": "2026-11-24",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "aa3b8e5",
+    "snet": null,
+    "preds": [
+     "3.1.1 SS+1"
+    ],
+    "horas": {
+     "Nick": 10
+    },
+    "costo": 50.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "3.5.1",
+    "nombre": "Matriz de trazabilidad",
+    "paquete": "3.5",
+    "hito": false,
+    "dur": 2,
+    "dur_real": 1,
+    "inicio": "2026-11-24",
+    "fin": "2026-11-24",
+    "lb_inicio": "2026-11-30",
+    "lb_fin": "2026-12-01",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "5d8e77f",
+    "snet": null,
+    "preds": [
+     "3.3.1",
+     "3.4.1"
+    ],
+    "horas": {
+     "Nick": 4
+    },
+    "costo": 20.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "2.1.1",
+    "nombre": "Diagnóstico organizacional e informe E1",
+    "paquete": "2.1",
+    "hito": false,
+    "dur": 5,
+    "dur_real": 1,
+    "inicio": "2026-11-25",
+    "fin": "2026-11-25",
+    "lb_inicio": "2026-11-18",
+    "lb_fin": "2026-11-24",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "79505c4",
+    "snet": null,
+    "preds": [
+     "H0"
+    ],
+    "horas": {
+     "Henyelrey": 16,
+     "Nick": 2
+    },
+    "costo": 90.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "2.2.1",
+    "nombre": "Business case e informe E2",
+    "paquete": "2.2",
+    "hito": false,
+    "dur": 4,
+    "dur_real": 1,
+    "inicio": "2026-11-25",
+    "fin": "2026-11-25",
+    "lb_inicio": "2026-11-25",
+    "lb_fin": "2026-11-30",
+    "holgura": null,
+    "critica": false,
+    "hecha": true,
+    "avance": 100,
+    "commit": "eb5fedd",
+    "snet": null,
+    "preds": [
+     "2.1.1"
+    ],
+    "horas": {
+     "Henyelrey": 16,
+     "Nick": 2
+    },
+    "costo": 90.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "2.3.1",
+    "nombre": "Plan de gestión e informe E3",
+    "paquete": "2.3",
+    "hito": false,
+    "dur": 4,
+    "dur_real": null,
+    "inicio": "2026-11-26",
+    "fin": "2026-12-01",
+    "lb_inicio": "2026-12-01",
+    "lb_fin": "2026-12-04",
+    "holgura": 3,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "2.2.1"
+    ],
+    "horas": {
+     "Henyelrey": 16,
+     "Nick": 4
+    },
+    "costo": 100.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "1.1.1",
+    "nombre": "Revisión y firma del acta de constitución",
+    "paquete": "1.1",
+    "hito": false,
+    "dur": 2,
+    "dur_real": null,
+    "inicio": "2026-12-02",
+    "fin": "2026-12-03",
+    "lb_inicio": "2026-12-07",
+    "lb_fin": "2026-12-09",
+    "holgura": 3,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "2.3.1"
+    ],
+    "horas": {
+     "Henyelrey": 2,
+     "Docente": 1
+    },
+    "costo": 10.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "1.2.1",
+    "nombre": "Aprobación del plan y registro de la línea base",
+    "paquete": "1.2",
+    "hito": false,
+    "dur": 1,
+    "dur_real": null,
+    "inicio": "2026-12-04",
+    "fin": "2026-12-04",
+    "lb_inicio": "2026-12-10",
+    "lb_fin": "2026-12-10",
+    "holgura": 3,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "1.1.1"
+    ],
+    "horas": {
+     "Henyelrey": 1,
+     "Nick": 1
+    },
+    "costo": 10.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "1.3.1",
+    "nombre": "Seguimiento semanal de S1",
+    "paquete": "1.3",
+    "hito": false,
+    "dur": 15,
+    "dur_real": null,
+    "inicio": "2026-11-26",
+    "fin": "2026-12-17",
+    "lb_inicio": "2026-11-18",
+    "lb_fin": "2026-12-09",
+    "holgura": 79,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": "2026-11-26",
+    "preds": [
+     "H0"
+    ],
+    "horas": {
+     "Henyelrey": 3,
+     "Nick": 3
+    },
+    "costo": 30.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "2.1.2",
+    "nombre": "Levantamiento con la DTI y los encargados",
+    "paquete": "2.1",
+    "hito": false,
+    "dur": 5,
+    "dur_real": null,
+    "inicio": "2026-11-26",
+    "fin": "2026-12-02",
+    "lb_inicio": "2026-11-25",
+    "lb_fin": "2026-12-01",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "2.1.1"
+    ],
+    "horas": {
+     "Henyelrey": 10,
+     "DTI": 4,
+     "Encargados": 3
+    },
+    "costo": 50.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "2.1.3",
+    "nombre": "Actualización del E1 con los datos levantados",
+    "paquete": "2.1",
+    "hito": false,
+    "dur": 2,
+    "dur_real": null,
+    "inicio": "2026-12-03",
+    "fin": "2026-12-04",
+    "lb_inicio": "2026-12-02",
+    "lb_fin": "2026-12-03",
+    "holgura": 3,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "2.1.2"
+    ],
+    "horas": {
+     "Henyelrey": 6
+    },
+    "costo": 30.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "2.2.2",
+    "nombre": "Actualización del E2 con la cotización del ISP",
+    "paquete": "2.2",
+    "hito": false,
+    "dur": 2,
+    "dur_real": null,
+    "inicio": "2026-12-03",
+    "fin": "2026-12-04",
+    "lb_inicio": "2026-12-02",
+    "lb_fin": "2026-12-03",
+    "holgura": 3,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "2.1.2",
+     "2.2.1"
+    ],
+    "horas": {
+     "Henyelrey": 4
+    },
+    "costo": 20.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "2.4.1",
+    "nombre": "Modelado AS-IS / TO-BE e informe E4",
+    "paquete": "2.4",
+    "hito": false,
+    "dur": 5,
+    "dur_real": null,
+    "inicio": "2026-11-26",
+    "fin": "2026-12-02",
+    "lb_inicio": "2026-11-25",
+    "lb_fin": "2026-12-01",
+    "holgura": 3,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "2.1.1"
+    ],
+    "horas": {
+     "Henyelrey": 16,
+     "Nick": 2
+    },
+    "costo": 90.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "2.4.2",
+    "nombre": "Cronometraje de un ciclo real (≥ 30 observaciones)",
+    "paquete": "2.4",
+    "hito": false,
+    "dur": 3,
+    "dur_real": null,
+    "inicio": "2026-12-03",
+    "fin": "2026-12-07",
+    "lb_inicio": "2026-12-02",
+    "lb_fin": "2026-12-04",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "2.1.2"
+    ],
+    "horas": {
+     "Henyelrey": 6,
+     "Encargados": 4
+    },
+    "costo": 30.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "2.4.3",
+    "nombre": "Actualización del E4 con las mediciones",
+    "paquete": "2.4",
+    "hito": false,
+    "dur": 2,
+    "dur_real": null,
+    "inicio": "2026-12-09",
+    "fin": "2026-12-10",
+    "lb_inicio": "2026-12-07",
+    "lb_fin": "2026-12-09",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "2.4.1",
+     "2.4.2"
+    ],
+    "horas": {
+     "Henyelrey": 4
+    },
+    "costo": 20.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "3.2.2",
+    "nombre": "Validación del prototipo con encargados (SUS)",
+    "paquete": "3.2",
+    "hito": false,
+    "dur": 3,
+    "dur_real": null,
+    "inicio": "2026-12-03",
+    "fin": "2026-12-07",
+    "lb_inicio": "2026-12-02",
+    "lb_fin": "2026-12-04",
+    "holgura": 2,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "3.2.1",
+     "2.1.2"
+    ],
+    "horas": {
+     "Nick": 6,
+     "Encargados": 4
+    },
+    "costo": 30.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "5.2.2",
+    "nombre": "Cierre de la prueba crítica pendiente T58",
+    "paquete": "5.2",
+    "hito": false,
+    "dur": 3,
+    "dur_real": null,
+    "inicio": "2026-11-26",
+    "fin": "2026-11-30",
+    "lb_inicio": "2026-12-02",
+    "lb_fin": "2026-12-04",
+    "holgura": 7,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": "2026-11-26",
+    "preds": [
+     "5.2.1"
+    ],
+    "horas": {
+     "Nick": 4
+    },
+    "costo": 20.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "6.3.1",
+    "nombre": "Expediente consolidado de S1",
+    "paquete": "6.3",
+    "hito": false,
+    "dur": 3,
+    "dur_real": null,
+    "inicio": "2026-12-11",
+    "fin": "2026-12-15",
+    "lb_inicio": "2026-12-11",
+    "lb_fin": "2026-12-15",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "1.2.1",
+     "2.1.3",
+     "2.2.2",
+     "2.4.3",
+     "3.2.2",
+     "3.5.1",
+     "4.2.1",
+     "5.2.2",
+     "5.3.1"
+    ],
+    "horas": {
+     "Henyelrey": 8,
+     "Nick": 8
+    },
+    "costo": 80.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "6.2.1",
+    "nombre": "Demo grabada del laboratorio emulado",
+    "paquete": "6.2",
+    "hito": false,
+    "dur": 2,
+    "dur_real": null,
+    "inicio": "2026-12-01",
+    "fin": "2026-12-02",
+    "lb_inicio": "2026-12-07",
+    "lb_fin": "2026-12-09",
+    "holgura": 8,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.2.2"
+    ],
+    "horas": {
+     "Nick": 4
+    },
+    "costo": 20.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "6.1.1",
+    "nombre": "Ensayos de la sustentación de S1",
+    "paquete": "6.1",
+    "hito": false,
+    "dur": 3,
+    "dur_real": null,
+    "inicio": "2026-12-16",
+    "fin": "2026-12-18",
+    "lb_inicio": "2026-12-16",
+    "lb_fin": "2026-12-18",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "6.3.1",
+     "6.2.1"
+    ],
+    "horas": {
+     "Henyelrey": 4,
+     "Nick": 4
+    },
+    "costo": 40.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "H1",
+    "nombre": "Sustentación de S1",
+    "paquete": null,
+    "hito": true,
+    "dur": 0,
+    "dur_real": null,
+    "inicio": "2026-12-18",
+    "fin": "2026-12-18",
+    "lb_inicio": "2026-12-18",
+    "lb_fin": "2026-12-18",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "6.1.1"
+    ],
+    "horas": {},
+    "costo": 0.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "HS2",
+    "nombre": "Inicio de S2",
+    "paquete": null,
+    "hito": true,
+    "dur": 0,
+    "dur_real": null,
+    "inicio": "2027-03-01",
+    "fin": "2027-03-01",
+    "lb_inicio": "2027-03-01",
+    "lb_fin": "2027-03-01",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": "2027-03-01",
+    "preds": [
+     "H1"
+    ],
+    "horas": {},
+    "costo": 0.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "1.3.2",
+    "nombre": "Seguimiento semanal de S2",
+    "paquete": "1.3",
+    "hito": false,
+    "dur": 77,
+    "dur_real": null,
+    "inicio": "2027-03-01",
+    "fin": "2027-06-17",
+    "lb_inicio": "2027-03-01",
+    "lb_fin": "2027-06-17",
+    "holgura": 1,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "HS2"
+    ],
+    "horas": {
+     "Henyelrey": 16,
+     "Nick": 16
+    },
+    "costo": 160.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "5.5.1",
+    "nombre": "Aprobación de la DTI y pedidos del FortiGate (S-29)",
+    "paquete": "5.5",
+    "hito": false,
+    "dur": 5,
+    "dur_real": null,
+    "inicio": "2027-03-01",
+    "fin": "2027-03-05",
+    "lb_inicio": "2027-03-01",
+    "lb_fin": "2027-03-05",
+    "holgura": 15,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "HS2"
+    ],
+    "horas": {
+     "Henyelrey": 6,
+     "DTI": 4
+    },
+    "costo": 30.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "H2",
+    "nombre": "Aprobación de la DTI para el piloto",
+    "paquete": null,
+    "hito": true,
+    "dur": 0,
+    "dur_real": null,
+    "inicio": "2027-03-05",
+    "fin": "2027-03-05",
+    "lb_inicio": "2027-03-05",
+    "lb_fin": "2027-03-05",
+    "holgura": 15,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.5.1"
+    ],
+    "horas": {},
+    "costo": 0.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "5.1.2",
+    "nombre": "Adquisición e instalación del hardware del rack",
+    "paquete": "5.1",
+    "hito": false,
+    "dur": 15,
+    "dur_real": null,
+    "inicio": "2027-03-08",
+    "fin": "2027-03-30",
+    "lb_inicio": "2027-03-08",
+    "lb_fin": "2027-03-30",
+    "holgura": 15,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "H2"
+    ],
+    "horas": {
+     "Nick": 8,
+     "Henyelrey": 4,
+     "DTI": 6
+    },
+    "costo": 5360.0,
+    "costo_fijo_tipo": "capex",
+    "sprints": null
+   },
+   {
+    "id": "5.4.1",
+    "nombre": "Sprints 1–2: autenticación, auditoría y catálogo",
+    "paquete": "5.4",
+    "hito": false,
+    "dur": 10,
+    "dur_real": null,
+    "inicio": "2027-03-01",
+    "fin": "2027-03-12",
+    "lb_inicio": "2027-03-01",
+    "lb_fin": "2027-03-12",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "HS2"
+    ],
+    "horas": {
+     "Nick": 40,
+     "Henyelrey": 10
+    },
+    "costo": 250.0,
+    "costo_fijo_tipo": null,
+    "sprints": [
+     1,
+     2
+    ]
+   },
+   {
+    "id": "5.4.2",
+    "nombre": "Sprints 3–4: laboratorios, configuración firmada y precargas",
+    "paquete": "5.4",
+    "hito": false,
+    "dur": 10,
+    "dur_real": null,
+    "inicio": "2027-03-15",
+    "fin": "2027-03-30",
+    "lb_inicio": "2027-03-15",
+    "lb_fin": "2027-03-30",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.4.1"
+    ],
+    "horas": {
+     "Nick": 40,
+     "Henyelrey": 10
+    },
+    "costo": 250.0,
+    "costo_fijo_tipo": null,
+    "sprints": [
+     3,
+     4
+    ]
+   },
+   {
+    "id": "5.4.3",
+    "nombre": "Sprints 5–6: ahorro, portal y solicitudes",
+    "paquete": "5.4",
+    "hito": false,
+    "dur": 10,
+    "dur_real": null,
+    "inicio": "2027-03-31",
+    "fin": "2027-04-13",
+    "lb_inicio": "2027-03-31",
+    "lb_fin": "2027-04-13",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.4.2"
+    ],
+    "horas": {
+     "Nick": 40,
+     "Henyelrey": 10
+    },
+    "costo": 250.0,
+    "costo_fijo_tipo": null,
+    "sprints": [
+     5,
+     6
+    ]
+   },
+   {
+    "id": "5.4.4",
+    "nombre": "Pruebas de aceptación de la consola con encargados",
+    "paquete": "5.4",
+    "hito": false,
+    "dur": 5,
+    "dur_real": null,
+    "inicio": "2027-04-14",
+    "fin": "2027-04-20",
+    "lb_inicio": "2027-04-14",
+    "lb_fin": "2027-04-20",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.4.3"
+    ],
+    "horas": {
+     "Nick": 8,
+     "Henyelrey": 4,
+     "Encargados": 4
+    },
+    "costo": 60.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "5.5.2",
+    "nombre": "Despliegue en el laboratorio piloto y simulacro T59",
+    "paquete": "5.5",
+    "hito": false,
+    "dur": 5,
+    "dur_real": null,
+    "inicio": "2027-04-21",
+    "fin": "2027-04-27",
+    "lb_inicio": "2027-04-21",
+    "lb_fin": "2027-04-27",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.4.4",
+     "5.1.2"
+    ],
+    "horas": {
+     "Nick": 12,
+     "Henyelrey": 8,
+     "DTI": 4
+    },
+    "costo": 101.9408,
+    "costo_fijo_tipo": "aws_efimero",
+    "sprints": null
+   },
+   {
+    "id": "5.5.3",
+    "nombre": "Operación y medición del piloto (BHR, tiempos, SUS)",
+    "paquete": "5.5",
+    "hito": false,
+    "dur": 20,
+    "dur_real": null,
+    "inicio": "2027-04-28",
+    "fin": "2027-05-25",
+    "lb_inicio": "2027-04-28",
+    "lb_fin": "2027-05-25",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.5.2"
+    ],
+    "horas": {
+     "Nick": 10,
+     "Henyelrey": 10,
+     "Encargados": 6
+    },
+    "costo": 239.164,
+    "costo_fijo_tipo": "aws_24x7",
+    "sprints": null
+   },
+   {
+    "id": "5.5.4",
+    "nombre": "Informe del piloto y recomendación",
+    "paquete": "5.5",
+    "hito": false,
+    "dur": 3,
+    "dur_real": null,
+    "inicio": "2027-05-26",
+    "fin": "2027-05-28",
+    "lb_inicio": "2027-05-26",
+    "lb_fin": "2027-05-28",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.5.3"
+    ],
+    "horas": {
+     "Henyelrey": 8,
+     "Nick": 4
+    },
+    "costo": 60.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "H3",
+    "nombre": "Decisión de ampliación",
+    "paquete": null,
+    "hito": true,
+    "dur": 0,
+    "dur_real": null,
+    "inicio": "2027-05-28",
+    "fin": "2027-05-28",
+    "lb_inicio": "2027-05-28",
+    "lb_fin": "2027-05-28",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.5.4"
+    ],
+    "horas": {},
+    "costo": 0.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "5.6.1",
+    "nombre": "Ampliación a los 10 laboratorios",
+    "paquete": "5.6",
+    "hito": false,
+    "dur": 10,
+    "dur_real": null,
+    "inicio": "2027-05-31",
+    "fin": "2027-06-11",
+    "lb_inicio": "2027-05-31",
+    "lb_fin": "2027-06-11",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "H3"
+    ],
+    "horas": {
+     "Nick": 16,
+     "Henyelrey": 16,
+     "DTI": 6,
+     "Encargados": 5
+    },
+    "costo": 160.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "1.4.1",
+    "nombre": "Lecciones aprendidas y cierre administrativo",
+    "paquete": "1.4",
+    "hito": false,
+    "dur": 2,
+    "dur_real": null,
+    "inicio": "2027-06-14",
+    "fin": "2027-06-15",
+    "lb_inicio": "2027-06-14",
+    "lb_fin": "2027-06-15",
+    "holgura": 1,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.6.1"
+    ],
+    "horas": {
+     "Henyelrey": 3,
+     "Nick": 3
+    },
+    "costo": 30.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "6.3.2",
+    "nombre": "Expediente final del proyecto",
+    "paquete": "6.3",
+    "hito": false,
+    "dur": 3,
+    "dur_real": null,
+    "inicio": "2027-06-14",
+    "fin": "2027-06-16",
+    "lb_inicio": "2027-06-14",
+    "lb_fin": "2027-06-16",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.6.1"
+    ],
+    "horas": {
+     "Henyelrey": 8,
+     "Nick": 8
+    },
+    "costo": 80.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "6.2.2",
+    "nombre": "Demo grabada del piloto",
+    "paquete": "6.2",
+    "hito": false,
+    "dur": 2,
+    "dur_real": null,
+    "inicio": "2027-05-31",
+    "fin": "2027-06-01",
+    "lb_inicio": "2027-05-31",
+    "lb_fin": "2027-06-01",
+    "holgura": 11,
+    "critica": false,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "5.5.4"
+    ],
+    "horas": {
+     "Nick": 4
+    },
+    "costo": 20.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "6.1.2",
+    "nombre": "Ensayos de la sustentación final",
+    "paquete": "6.1",
+    "hito": false,
+    "dur": 2,
+    "dur_real": null,
+    "inicio": "2027-06-17",
+    "fin": "2027-06-18",
+    "lb_inicio": "2027-06-17",
+    "lb_fin": "2027-06-18",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "6.3.2",
+     "6.2.2",
+     "1.4.1"
+    ],
+    "horas": {
+     "Henyelrey": 4,
+     "Nick": 4
+    },
+    "costo": 40.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   },
+   {
+    "id": "H4",
+    "nombre": "Sustentación final y cierre",
+    "paquete": null,
+    "hito": true,
+    "dur": 0,
+    "dur_real": null,
+    "inicio": "2027-06-18",
+    "fin": "2027-06-18",
+    "lb_inicio": "2027-06-18",
+    "lb_fin": "2027-06-18",
+    "holgura": 0,
+    "critica": true,
+    "hecha": false,
+    "avance": 0,
+    "commit": null,
+    "snet": null,
+    "preds": [
+     "6.1.2"
+    ],
+    "horas": {},
+    "costo": 0.0,
+    "costo_fijo_tipo": null,
+    "sprints": null
+   }
+  ],
+  "ruta_critica": [
+   "2.1.2",
+   "2.4.2",
+   "2.4.3",
+   "6.3.1",
+   "6.1.1",
+   "H1",
+   "HS2",
+   "5.4.1",
+   "5.4.2",
+   "5.4.3",
+   "5.4.4",
+   "5.5.2",
+   "5.5.3",
+   "5.5.4",
+   "H3",
+   "5.6.1",
+   "6.3.2",
+   "6.1.2",
+   "H4"
+  ],
+  "presupuesto": {
+   "actividades": {
+    "4.3.1": {
+     "horas_equipo": 6,
+     "horas_contraparte": 0,
+     "costo_horas": 30,
+     "costo_fijo": 0.0,
+     "total": 30.0,
+     "paquete": "4.3"
+    },
+    "5.1.1": {
+     "horas_equipo": 16,
+     "horas_contraparte": 0,
+     "costo_horas": 80,
+     "costo_fijo": 0.0,
+     "total": 80.0,
+     "paquete": "5.1"
+    },
+    "5.2.1": {
+     "horas_equipo": 12,
+     "horas_contraparte": 0,
+     "costo_horas": 60,
+     "costo_fijo": 0.0,
+     "total": 60.0,
+     "paquete": "5.2"
+    },
+    "5.3.1": {
+     "horas_equipo": 8,
+     "horas_contraparte": 0,
+     "costo_horas": 40,
+     "costo_fijo": 0.0,
+     "total": 40.0,
+     "paquete": "5.3"
+    },
+    "4.1.1": {
+     "horas_equipo": 40,
+     "horas_contraparte": 0,
+     "costo_horas": 200,
+     "costo_fijo": 0.0,
+     "total": 200.0,
+     "paquete": "4.1"
+    },
+    "4.2.1": {
+     "horas_equipo": 34,
+     "horas_contraparte": 0,
+     "costo_horas": 170,
+     "costo_fijo": 0.0,
+     "total": 170.0,
+     "paquete": "4.2"
+    },
+    "3.1.1": {
+     "horas_equipo": 18,
+     "horas_contraparte": 0,
+     "costo_horas": 90,
+     "costo_fijo": 0.0,
+     "total": 90.0,
+     "paquete": "3.1"
+    },
+    "3.2.1": {
+     "horas_equipo": 14,
+     "horas_contraparte": 0,
+     "costo_horas": 70,
+     "costo_fijo": 0.0,
+     "total": 70.0,
+     "paquete": "3.2"
+    },
+    "3.3.1": {
+     "horas_equipo": 8,
+     "horas_contraparte": 0,
+     "costo_horas": 40,
+     "costo_fijo": 0.0,
+     "total": 40.0,
+     "paquete": "3.3"
+    },
+    "3.4.1": {
+     "horas_equipo": 10,
+     "horas_contraparte": 0,
+     "costo_horas": 50,
+     "costo_fijo": 0.0,
+     "total": 50.0,
+     "paquete": "3.4"
+    },
+    "3.5.1": {
+     "horas_equipo": 4,
+     "horas_contraparte": 0,
+     "costo_horas": 20,
+     "costo_fijo": 0.0,
+     "total": 20.0,
+     "paquete": "3.5"
+    },
+    "2.1.1": {
+     "horas_equipo": 18,
+     "horas_contraparte": 0,
+     "costo_horas": 90,
+     "costo_fijo": 0.0,
+     "total": 90.0,
+     "paquete": "2.1"
+    },
+    "2.2.1": {
+     "horas_equipo": 18,
+     "horas_contraparte": 0,
+     "costo_horas": 90,
+     "costo_fijo": 0.0,
+     "total": 90.0,
+     "paquete": "2.2"
+    },
+    "2.3.1": {
+     "horas_equipo": 20,
+     "horas_contraparte": 0,
+     "costo_horas": 100,
+     "costo_fijo": 0.0,
+     "total": 100.0,
+     "paquete": "2.3"
+    },
+    "1.1.1": {
+     "horas_equipo": 2,
+     "horas_contraparte": 1,
+     "costo_horas": 10,
+     "costo_fijo": 0.0,
+     "total": 10.0,
+     "paquete": "1.1"
+    },
+    "1.2.1": {
+     "horas_equipo": 2,
+     "horas_contraparte": 0,
+     "costo_horas": 10,
+     "costo_fijo": 0.0,
+     "total": 10.0,
+     "paquete": "1.2"
+    },
+    "1.3.1": {
+     "horas_equipo": 6,
+     "horas_contraparte": 0,
+     "costo_horas": 30,
+     "costo_fijo": 0.0,
+     "total": 30.0,
+     "paquete": "1.3"
+    },
+    "2.1.2": {
+     "horas_equipo": 10,
+     "horas_contraparte": 7,
+     "costo_horas": 50,
+     "costo_fijo": 0.0,
+     "total": 50.0,
+     "paquete": "2.1"
+    },
+    "2.1.3": {
+     "horas_equipo": 6,
+     "horas_contraparte": 0,
+     "costo_horas": 30,
+     "costo_fijo": 0.0,
+     "total": 30.0,
+     "paquete": "2.1"
+    },
+    "2.2.2": {
+     "horas_equipo": 4,
+     "horas_contraparte": 0,
+     "costo_horas": 20,
+     "costo_fijo": 0.0,
+     "total": 20.0,
+     "paquete": "2.2"
+    },
+    "2.4.1": {
+     "horas_equipo": 18,
+     "horas_contraparte": 0,
+     "costo_horas": 90,
+     "costo_fijo": 0.0,
+     "total": 90.0,
+     "paquete": "2.4"
+    },
+    "2.4.2": {
+     "horas_equipo": 6,
+     "horas_contraparte": 4,
+     "costo_horas": 30,
+     "costo_fijo": 0.0,
+     "total": 30.0,
+     "paquete": "2.4"
+    },
+    "2.4.3": {
+     "horas_equipo": 4,
+     "horas_contraparte": 0,
+     "costo_horas": 20,
+     "costo_fijo": 0.0,
+     "total": 20.0,
+     "paquete": "2.4"
+    },
+    "3.2.2": {
+     "horas_equipo": 6,
+     "horas_contraparte": 4,
+     "costo_horas": 30,
+     "costo_fijo": 0.0,
+     "total": 30.0,
+     "paquete": "3.2"
+    },
+    "5.2.2": {
+     "horas_equipo": 4,
+     "horas_contraparte": 0,
+     "costo_horas": 20,
+     "costo_fijo": 0.0,
+     "total": 20.0,
+     "paquete": "5.2"
+    },
+    "6.3.1": {
+     "horas_equipo": 16,
+     "horas_contraparte": 0,
+     "costo_horas": 80,
+     "costo_fijo": 0.0,
+     "total": 80.0,
+     "paquete": "6.3"
+    },
+    "6.2.1": {
+     "horas_equipo": 4,
+     "horas_contraparte": 0,
+     "costo_horas": 20,
+     "costo_fijo": 0.0,
+     "total": 20.0,
+     "paquete": "6.2"
+    },
+    "6.1.1": {
+     "horas_equipo": 8,
+     "horas_contraparte": 0,
+     "costo_horas": 40,
+     "costo_fijo": 0.0,
+     "total": 40.0,
+     "paquete": "6.1"
+    },
+    "1.3.2": {
+     "horas_equipo": 32,
+     "horas_contraparte": 0,
+     "costo_horas": 160,
+     "costo_fijo": 0.0,
+     "total": 160.0,
+     "paquete": "1.3"
+    },
+    "5.5.1": {
+     "horas_equipo": 6,
+     "horas_contraparte": 4,
+     "costo_horas": 30,
+     "costo_fijo": 0.0,
+     "total": 30.0,
+     "paquete": "5.5"
+    },
+    "5.1.2": {
+     "horas_equipo": 12,
+     "horas_contraparte": 6,
+     "costo_horas": 60,
+     "costo_fijo": 5300.0,
+     "total": 5360.0,
+     "paquete": "5.1"
+    },
+    "5.4.1": {
+     "horas_equipo": 50,
+     "horas_contraparte": 0,
+     "costo_horas": 250,
+     "costo_fijo": 0.0,
+     "total": 250.0,
+     "paquete": "5.4"
+    },
+    "5.4.2": {
+     "horas_equipo": 50,
+     "horas_contraparte": 0,
+     "costo_horas": 250,
+     "costo_fijo": 0.0,
+     "total": 250.0,
+     "paquete": "5.4"
+    },
+    "5.4.3": {
+     "horas_equipo": 50,
+     "horas_contraparte": 0,
+     "costo_horas": 250,
+     "costo_fijo": 0.0,
+     "total": 250.0,
+     "paquete": "5.4"
+    },
+    "5.4.4": {
+     "horas_equipo": 12,
+     "horas_contraparte": 4,
+     "costo_horas": 60,
+     "costo_fijo": 0.0,
+     "total": 60.0,
+     "paquete": "5.4"
+    },
+    "5.5.2": {
+     "horas_equipo": 20,
+     "horas_contraparte": 4,
+     "costo_horas": 100,
+     "costo_fijo": 1.9408,
+     "total": 101.9408,
+     "paquete": "5.5"
+    },
+    "5.5.3": {
+     "horas_equipo": 20,
+     "horas_contraparte": 6,
+     "costo_horas": 100,
+     "costo_fijo": 139.164,
+     "total": 239.164,
+     "paquete": "5.5"
+    },
+    "5.5.4": {
+     "horas_equipo": 12,
+     "horas_contraparte": 0,
+     "costo_horas": 60,
+     "costo_fijo": 0.0,
+     "total": 60.0,
+     "paquete": "5.5"
+    },
+    "5.6.1": {
+     "horas_equipo": 32,
+     "horas_contraparte": 11,
+     "costo_horas": 160,
+     "costo_fijo": 0.0,
+     "total": 160.0,
+     "paquete": "5.6"
+    },
+    "1.4.1": {
+     "horas_equipo": 6,
+     "horas_contraparte": 0,
+     "costo_horas": 30,
+     "costo_fijo": 0.0,
+     "total": 30.0,
+     "paquete": "1.4"
+    },
+    "6.3.2": {
+     "horas_equipo": 16,
+     "horas_contraparte": 0,
+     "costo_horas": 80,
+     "costo_fijo": 0.0,
+     "total": 80.0,
+     "paquete": "6.3"
+    },
+    "6.2.2": {
+     "horas_equipo": 4,
+     "horas_contraparte": 0,
+     "costo_horas": 20,
+     "costo_fijo": 0.0,
+     "total": 20.0,
+     "paquete": "6.2"
+    },
+    "6.1.2": {
+     "horas_equipo": 8,
+     "horas_contraparte": 0,
+     "costo_horas": 40,
+     "costo_fijo": 0.0,
+     "total": 40.0,
+     "paquete": "6.1"
+    }
+   },
+   "paquetes": {
+    "1.1": {
+     "nombre": "Acta",
+     "horas": 2,
+     "costo_horas": 10,
+     "costo_fijo": 0.0,
+     "total": 10.0,
+     "actividades": [
+      "1.1.1"
+     ]
+    },
+    "1.2": {
+     "nombre": "Plan",
+     "horas": 2,
+     "costo_horas": 10,
+     "costo_fijo": 0.0,
+     "total": 10.0,
+     "actividades": [
+      "1.2.1"
+     ]
+    },
+    "1.3": {
+     "nombre": "Seguimiento",
+     "horas": 38,
+     "costo_horas": 190,
+     "costo_fijo": 0.0,
+     "total": 190.0,
+     "actividades": [
+      "1.3.1",
+      "1.3.2"
+     ]
+    },
+    "1.4": {
+     "nombre": "Lecciones aprendidas",
+     "horas": 6,
+     "costo_horas": 30,
+     "costo_fijo": 0.0,
+     "total": 30.0,
+     "actividades": [
+      "1.4.1"
+     ]
+    },
+    "2.1": {
+     "nombre": "Diagnóstico",
+     "horas": 34,
+     "costo_horas": 170,
+     "costo_fijo": 0.0,
+     "total": 170.0,
+     "actividades": [
+      "2.1.1",
+      "2.1.2",
+      "2.1.3"
+     ]
+    },
+    "2.2": {
+     "nombre": "Business case",
+     "horas": 22,
+     "costo_horas": 110,
+     "costo_fijo": 0.0,
+     "total": 110.0,
+     "actividades": [
+      "2.2.1",
+      "2.2.2"
+     ]
+    },
+    "2.3": {
+     "nombre": "Plan de gestión",
+     "horas": 20,
+     "costo_horas": 100,
+     "costo_fijo": 0.0,
+     "total": 100.0,
+     "actividades": [
+      "2.3.1"
+     ]
+    },
+    "2.4": {
+     "nombre": "AS-IS / TO-BE",
+     "horas": 28,
+     "costo_horas": 140,
+     "costo_fijo": 0.0,
+     "total": 140.0,
+     "actividades": [
+      "2.4.1",
+      "2.4.2",
+      "2.4.3"
+     ]
+    },
+    "3.1": {
+     "nombre": "SRS",
+     "horas": 18,
+     "costo_horas": 90,
+     "costo_fijo": 0.0,
+     "total": 90.0,
+     "actividades": [
+      "3.1.1"
+     ]
+    },
+    "3.2": {
+     "nombre": "Prototipo de la consola validado",
+     "horas": 20,
+     "costo_horas": 100,
+     "costo_fijo": 0.0,
+     "total": 100.0,
+     "actividades": [
+      "3.2.1",
+      "3.2.2"
+     ]
+    },
+    "3.3": {
+     "nombre": "C4 + ADR",
+     "horas": 8,
+     "costo_horas": 40,
+     "costo_fijo": 0.0,
+     "total": 40.0,
+     "actividades": [
+      "3.3.1"
+     ]
+    },
+    "3.4": {
+     "nombre": "UML",
+     "horas": 10,
+     "costo_horas": 50,
+     "costo_fijo": 0.0,
+     "total": 50.0,
+     "actividades": [
+      "3.4.1"
+     ]
+    },
+    "3.5": {
+     "nombre": "Trazabilidad",
+     "horas": 4,
+     "costo_horas": 20,
+     "costo_fijo": 0.0,
+     "total": 20.0,
+     "actividades": [
+      "3.5.1"
+     ]
+    },
+    "4.1": {
+     "nombre": "Diseño de red",
+     "horas": 40,
+     "costo_horas": 200,
+     "costo_fijo": 0.0,
+     "total": 200.0,
+     "actividades": [
+      "4.1.1"
+     ]
+    },
+    "4.2": {
+     "nombre": "Diseño de centro de datos",
+     "horas": 34,
+     "costo_horas": 170,
+     "costo_fijo": 0.0,
+     "total": 170.0,
+     "actividades": [
+      "4.2.1"
+     ]
+    },
+    "4.3": {
+     "nombre": "Inventario único de red",
+     "horas": 6,
+     "costo_horas": 30,
+     "costo_fijo": 0.0,
+     "total": 30.0,
+     "actividades": [
+      "4.3.1"
+     ]
+    },
+    "5.1": {
+     "nombre": "Nodo de caché + PAC",
+     "horas": 28,
+     "costo_horas": 140,
+     "costo_fijo": 5300.0,
+     "total": 5440.0,
+     "actividades": [
+      "5.1.1",
+      "5.1.2"
+     ]
+    },
+    "5.2": {
+     "nombre": "Laboratorio emulado",
+     "horas": 16,
+     "costo_horas": 80,
+     "costo_fijo": 0.0,
+     "total": 80.0,
+     "actividades": [
+      "5.2.1",
+      "5.2.2"
+     ]
+    },
+    "5.3": {
+     "nombre": "IaC AWS",
+     "horas": 8,
+     "costo_horas": 40,
+     "costo_fijo": 0.0,
+     "total": 40.0,
+     "actividades": [
+      "5.3.1"
+     ]
+    },
+    "5.4": {
+     "nombre": "Consola del encargado",
+     "horas": 162,
+     "costo_horas": 810,
+     "costo_fijo": 0.0,
+     "total": 810.0,
+     "actividades": [
+      "5.4.1",
+      "5.4.2",
+      "5.4.3",
+      "5.4.4"
+     ]
+    },
+    "5.5": {
+     "nombre": "Piloto en un laboratorio",
+     "horas": 58,
+     "costo_horas": 290,
+     "costo_fijo": 141.10479999999998,
+     "total": 431.10479999999995,
+     "actividades": [
+      "5.5.1",
+      "5.5.2",
+      "5.5.3",
+      "5.5.4"
+     ]
+    },
+    "5.6": {
+     "nombre": "Ampliación a los laboratorios",
+     "horas": 32,
+     "costo_horas": 160,
+     "costo_fijo": 0.0,
+     "total": 160.0,
+     "actividades": [
+      "5.6.1"
+     ]
+    },
+    "6.1": {
+     "nombre": "Ensayos",
+     "horas": 16,
+     "costo_horas": 80,
+     "costo_fijo": 0.0,
+     "total": 80.0,
+     "actividades": [
+      "6.1.1",
+      "6.1.2"
+     ]
+    },
+    "6.2": {
+     "nombre": "Demo grabada",
+     "horas": 8,
+     "costo_horas": 40,
+     "costo_fijo": 0.0,
+     "total": 40.0,
+     "actividades": [
+      "6.2.1",
+      "6.2.2"
+     ]
+    },
+    "6.3": {
+     "nombre": "Expediente PDF",
+     "horas": 32,
+     "costo_horas": 160,
+     "costo_fijo": 0.0,
+     "total": 160.0,
+     "actividades": [
+      "6.3.1",
+      "6.3.2"
+     ]
+    }
+   },
+   "nivel1": {
+    "1": {
+     "nombre": "Gestión del proyecto",
+     "total": 240.0,
+     "horas": 48.0
+    },
+    "2": {
+     "nombre": "Gestión de TI",
+     "total": 520.0,
+     "horas": 104.0
+    },
+    "3": {
+     "nombre": "Ingeniería de software",
+     "total": 300.0,
+     "horas": 60.0
+    },
+    "4": {
+     "nombre": "Infraestructura",
+     "total": 400.0,
+     "horas": 80.0
+    },
+    "5": {
+     "nombre": "Prueba de concepto",
+     "total": 6961.1048,
+     "horas": 304.0
+    },
+    "6": {
+     "nombre": "Cierre y sustentación",
+     "total": 280.0,
+     "horas": 56.0
+    }
+   },
+   "bac": 8701.1048,
+   "contingencia": 870.1104799999999,
+   "linea_base": 9571.215279999999,
+   "gestion": 478.56076399999995,
+   "total_autorizado": 10049.776043999998,
+   "horas_recurso": {
+    "Nick": 379,
+    "Henyelrey": 273,
+    "Docente": 1,
+    "DTI": 24,
+    "Encargados": 26
+   },
+   "costos_fijos": {
+    "capex": 5300.0,
+    "aws_efimero": 1.9408,
+    "aws_24x7": 139.164,
+    "_usd_h_efimero": 0.0908,
+    "_usd_h_simulacro": 0.0312,
+    "_horas_simulacro": 4
+   },
+   "tarifa": 5,
+   "herramientas": 0
+  },
+  "evm": {
+   "semanas": [
+    {
+     "fecha": "2026-11-20",
+     "pv": 257.5
+    },
+    {
+     "fecha": "2026-11-27",
+     "pv": 838.75
+    },
+    {
+     "fecha": "2026-12-04",
+     "pv": 1383.5
+    },
+    {
+     "fecha": "2026-12-11",
+     "pv": 1516.6666666666667
+    },
+    {
+     "fecha": "2026-12-18",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2026-12-25",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2027-01-01",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2027-01-08",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2027-01-15",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2027-01-22",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2027-01-29",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2027-02-05",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2027-02-12",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2027-02-19",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2027-02-26",
+     "pv": 1610.0
+    },
+    {
+     "fecha": "2027-03-05",
+     "pv": 1775.3896103896104
+    },
+    {
+     "fecha": "2027-03-12",
+     "pv": 3697.445887445888
+    },
+    {
+     "fecha": "2027-03-19",
+     "pv": 5619.502164502164
+    },
+    {
+     "fecha": "2027-03-26",
+     "pv": 6772.73593073593
+    },
+    {
+     "fecha": "2027-04-02",
+     "pv": 7622.792207792208
+    },
+    {
+     "fecha": "2027-04-09",
+     "pv": 7758.181818181818
+    },
+    {
+     "fecha": "2027-04-16",
+     "pv": 7854.571428571428
+    },
+    {
+     "fecha": "2027-04-23",
+     "pv": 7950.125518961039
+    },
+    {
+     "fecha": "2027-04-30",
+     "pv": 8037.16604935065
+    },
+    {
+     "fecha": "2027-05-07",
+     "pv": 8107.34665974026
+    },
+    {
+     "fecha": "2027-05-14",
+     "pv": 8177.527270129871
+    },
+    {
+     "fecha": "2027-05-21",
+     "pv": 8247.707880519481
+    },
+    {
+     "fecha": "2027-05-28",
+     "pv": 8342.013890909091
+    },
+    {
+     "fecha": "2027-06-04",
+     "pv": 8452.403501298702
+    },
+    {
+     "fecha": "2027-06-11",
+     "pv": 8542.793111688312
+    },
+    {
+     "fecha": "2027-06-18",
+     "pv": 8701.104800000001
+    }
+   ],
+   "cortes": [
+    {
+     "fecha": "2026-11-20",
+     "pv": 257.5,
+     "ev": 0,
+     "ac": 0,
+     "spi": 0.0,
+     "cpi": null,
+     "sv": -257.5,
+     "cv": 0
+    },
+    {
+     "fecha": "2026-11-25",
+     "pv": 605.8333333333333,
+     "ev": 1030.0,
+     "ac": 1030.0,
+     "spi": 1.7001375515818433,
+     "cpi": 1.0,
+     "sv": 424.16666666666674,
+     "cv": 0.0
+    }
+   ],
+   "bac": 8701.1048,
+   "corte": "2026-11-25",
+   "avance_planificado": 0.06962717347495151,
+   "avance_real": 0.11837577223526834,
+   "eac": 8701.1048,
+   "umbral": 0.9
+  },
+  "agil": {
+   "historias": [
+    {
+     "id": "HU-02",
+     "epica": "EP-1",
+     "rol": "administrador DTI",
+     "quiero": "que la consola distinga una sesión del campus de una remota y bloquee las acciones críticas desde remoto",
+     "para": "que aprobar descifrado, rotar llaves o cambiar el perfil BYOD solo sea posible dentro del campus",
+     "req": [
+      "REQ-F-37"
+     ],
+     "cu": [
+      "CU-11",
+      "CU-07"
+     ],
+     "puntos": 3,
+     "wsjf": {
+      "valor": 8,
+      "tiempo": 5,
+      "riesgo": 13
+     },
+     "sprint": 1,
+     "depende": [
+      "HU-01"
+     ],
+     "gherkin": "Dada una sesión que llega por EC2-GW con certificado de cliente, cuando el usuario intenta aprobar una fuente a descifrar, entonces la acción aparece deshabilitada con el motivo y la API responde 403 aunque se invoque directamente.",
+     "moscow": "Must",
+     "cod": 26,
+     "wsjf_valor": 8.666666666666666,
+     "texto": "Como administrador DTI, quiero que la consola distinga una sesión del campus de una remota y bloquee las acciones críticas desde remoto, para que aprobar descifrado, rotar llaves o cambiar el perfil BYOD solo sea posible dentro del campus.",
+     "rango": 1
+    },
+    {
+     "id": "HU-05",
+     "epica": "EP-2",
+     "rol": "administrador DTI",
+     "quiero": "aprobar desde el campus una fuente que requiere descifrado, con la CA del nodo limitada a sus dominios",
+     "para": "que el descifrado sea una decisión explícita y acotada",
+     "req": [
+      "REQ-F-31",
+      "REQ-F-18",
+      "REQ-F-37"
+     ],
+     "cu": [
+      "CU-07"
+     ],
+     "puntos": 3,
+     "wsjf": {
+      "valor": 8,
+      "tiempo": 5,
+      "riesgo": 8
+     },
+     "sprint": 2,
+     "depende": [
+      "HU-02",
+      "HU-04"
+     ],
+     "gherkin": "Dada una fuente en modo descifrar y cachear pendiente de aprobación, cuando un administrador en sesión de campus la aprueba, entonces pasa a activa; y si la sesión es remota, la aprobación se rechaza con 403.",
+     "moscow": "Must",
+     "cod": 21,
+     "wsjf_valor": 7.0,
+     "texto": "Como administrador DTI, quiero aprobar desde el campus una fuente que requiere descifrado, con la CA del nodo limitada a sus dominios, para que el descifrado sea una decisión explícita y acotada.",
+     "rango": 2
+    },
+    {
+     "id": "HU-03",
+     "epica": "EP-1",
+     "rol": "auditor",
+     "quiero": "consultar quién cambió qué, cuándo, y el valor anterior y el nuevo",
+     "para": "verificar que cada cambio de política tenga responsable",
+     "req": [
+      "REQ-F-24"
+     ],
+     "cu": [
+      "CU-10"
+     ],
+     "puntos": 3,
+     "wsjf": {
+      "valor": 5,
+      "tiempo": 5,
+      "riesgo": 8
+     },
+     "sprint": 2,
+     "depende": [
+      "HU-01"
+     ],
+     "gherkin": "Dado un cambio en el catálogo, cuando el auditor abre P-08, entonces ve usuario, origen de la sesión, fecha, valor anterior y valor nuevo; y el registro no puede editarse ni borrarse desde la consola.",
+     "moscow": "Must",
+     "cod": 18,
+     "wsjf_valor": 6.0,
+     "texto": "Como auditor, quiero consultar quién cambió qué, cuándo, y el valor anterior y el nuevo, para verificar que cada cambio de política tenga responsable.",
+     "rango": 3
+    },
+    {
+     "id": "HU-07",
+     "epica": "EP-3",
+     "rol": "encargado",
+     "quiero": "habilitar solo el laboratorio 3 en el horario de su curso",
+     "para": "controlar quién usa el servicio y cuándo",
+     "req": [
+      "REQ-F-32",
+      "REQ-F-10"
+     ],
+     "cu": [
+      "CU-04"
+     ],
+     "puntos": 3,
+     "wsjf": {
+      "valor": 8,
+      "tiempo": 5,
+      "riesgo": 5
+     },
+     "sprint": 3,
+     "depende": [
+      "HU-01"
+     ],
+     "gherkin": "Dado el laboratorio 3 habilitado de 08:00 a 10:00, cuando una PC de su rango pide una descarga a las 10:05, entonces el nodo responde 403; y el rango de IP del laboratorio se muestra como solo lectura.",
+     "moscow": "Must",
+     "cod": 18,
+     "wsjf_valor": 6.0,
+     "texto": "Como encargado, quiero habilitar solo el laboratorio 3 en el horario de su curso, para controlar quién usa el servicio y cuándo.",
+     "rango": 4
+    },
+    {
+     "id": "HU-04",
+     "epica": "EP-2",
+     "rol": "encargado",
+     "quiero": "crear, editar, activar o desactivar una fuente del catálogo con sus dominios, categoría y modo",
+     "para": "que lo que 40 PCs descargan una y otra vez solo salga una vez a Internet",
+     "req": [
+      "REQ-F-31"
+     ],
+     "cu": [
+      "CU-03"
+     ],
+     "puntos": 5,
+     "wsjf": {
+      "valor": 13,
+      "tiempo": 8,
+      "riesgo": 5
+     },
+     "sprint": 2,
+     "depende": [
+      "HU-01"
+     ],
+     "gherkin": "Dado un encargado autenticado, cuando agrega la fuente «Instaladores de JetBrains» en modo cachear, entonces la fuente queda activa en la siguiente versión de la configuración y el cambio queda en auditoría.",
+     "moscow": "Must",
+     "cod": 26,
+     "wsjf_valor": 5.2,
+     "texto": "Como encargado, quiero crear, editar, activar o desactivar una fuente del catálogo con sus dominios, categoría y modo, para que lo que 40 PCs descargan una y otra vez solo salga una vez a Internet.",
+     "rango": 5
+    },
+    {
+     "id": "HU-10",
+     "epica": "EP-4",
+     "rol": "encargado",
+     "quiero": "ver el ahorro por laboratorio y por fuente (GB evitados, BHR y minutos ahorrados)",
+     "para": "demostrar el valor del servicio a la DTI",
+     "req": [
+      "REQ-F-25",
+      "REQ-F-13"
+     ],
+     "cu": [
+      "CU-06"
+     ],
+     "puntos": 5,
+     "wsjf": {
+      "valor": 13,
+      "tiempo": 8,
+      "riesgo": 3
+     },
+     "sprint": 5,
+     "depende": [
+      "HU-08"
+     ],
+     "gherkin": "Dado un laboratorio con tráfico en la última semana, cuando el encargado abre P-02, entonces ve GB evitados, BHR y minutos ahorrados por laboratorio y por fuente, sin URL, IP de equipos ni usuarios.",
+     "moscow": "Must",
+     "cod": 24,
+     "wsjf_valor": 4.8,
+     "texto": "Como encargado, quiero ver el ahorro por laboratorio y por fuente (GB evitados, BHR y minutos ahorrados), para demostrar el valor del servicio a la DTI.",
+     "rango": 6
+    },
+    {
+     "id": "HU-12",
+     "epica": "EP-4",
+     "rol": "estudiante",
+     "quiero": "ver qué se descifra y la huella de la CA antes de usar una PC del laboratorio",
+     "para": "saber qué se inspecciona y qué no",
+     "req": [
+      "REQ-F-30",
+      "REQ-F-12"
+     ],
+     "cu": [
+      "CU-02"
+     ],
+     "puntos": 5,
+     "wsjf": {
+      "valor": 8,
+      "tiempo": 8,
+      "riesgo": 8
+     },
+     "sprint": 6,
+     "depende": [
+      "HU-08"
+     ],
+     "gherkin": "Dada una versión publicada de la configuración, cuando un estudiante abre el portal, entonces ve las fuentes que se descifran, las que nunca se descifran y la huella de la CA, y el sitio está firmado con la misma versión.",
+     "moscow": "Should",
+     "cod": 24,
+     "wsjf_valor": 4.8,
+     "texto": "Como estudiante, quiero ver qué se descifra y la huella de la CA antes de usar una PC del laboratorio, para saber qué se inspecciona y qué no.",
+     "rango": 7
+    },
+    {
+     "id": "HU-06",
+     "epica": "EP-2",
+     "rol": "encargado",
+     "quiero": "simular una URL y saber si se cachearía y si se descifraría, sin aplicar el cambio",
+     "para": "probar una fuente antes de publicarla",
+     "req": [
+      "REQ-F-20"
+     ],
+     "cu": [
+      "CU-03"
+     ],
+     "puntos": 3,
+     "wsjf": {
+      "valor": 5,
+      "tiempo": 2,
+      "riesgo": 5
+     },
+     "sprint": 4,
+     "depende": [
+      "HU-04"
+     ],
+     "gherkin": "Dada una fuente en borrador, cuando el encargado simula una URL de su dominio, entonces la consola responde si se cachearía, si se descifraría y si la CA del nodo cubre el dominio, sin crear una versión nueva de la configuración.",
+     "moscow": "Should",
+     "cod": 12,
+     "wsjf_valor": 4.0,
+     "texto": "Como encargado, quiero simular una URL y saber si se cachearía y si se descifraría, sin aplicar el cambio, para probar una fuente antes de publicarla.",
+     "rango": 8
+    },
+    {
+     "id": "HU-01",
+     "epica": "EP-1",
+     "rol": "encargado",
+     "quiero": "iniciar sesión con contraseña y segundo factor TOTP y ver solo los laboratorios de mi rol",
+     "para": "que nadie con una contraseña sustraída administre el servicio",
+     "req": [
+      "REQ-F-33"
+     ],
+     "cu": [
+      "CU-11"
+     ],
+     "puntos": 8,
+     "wsjf": {
+      "valor": 8,
+      "tiempo": 8,
+      "riesgo": 13
+     },
+     "sprint": 1,
+     "gherkin": "Dado un encargado con TOTP registrado, cuando ingresa su contraseña y un código vigente, entonces accede a P-02 y solo ve sus laboratorios; y si el código es inválido, la API responde 401 y el intento queda en auditoría.",
+     "moscow": "Must",
+     "cod": 29,
+     "wsjf_valor": 3.625,
+     "texto": "Como encargado, quiero iniciar sesión con contraseña y segundo factor TOTP y ver solo los laboratorios de mi rol, para que nadie con una contraseña sustraída administre el servicio.",
+     "rango": 9
+    },
+    {
+     "id": "HU-08",
+     "epica": "EP-3",
+     "rol": "administrador DTI",
+     "quiero": "que la consola publique cada versión de la configuración firmada y que el nodo la aplique solo si la firma es válida",
+     "para": "que un cambio no autorizado nunca llegue a los nodos",
+     "req": [
+      "REQ-F-17",
+      "REQ-F-36"
+     ],
+     "cu": [
+      "CU-03",
+      "CU-04"
+     ],
+     "puntos": 8,
+     "wsjf": {
+      "valor": 8,
+      "tiempo": 8,
+      "riesgo": 13
+     },
+     "sprint": 3,
+     "depende": [
+      "HU-04"
+     ],
+     "gherkin": "Dada una versión nueva publicada por la consola, cuando el agente del nodo la descarga con su firma válida, entonces la aplica y reporta la versión en su KPI; y si la firma es inválida o la versión es menor, conserva la anterior.",
+     "moscow": "Must",
+     "cod": 29,
+     "wsjf_valor": 3.625,
+     "texto": "Como administrador DTI, quiero que la consola publique cada versión de la configuración firmada y que el nodo la aplique solo si la firma es válida, para que un cambio no autorizado nunca llegue a los nodos.",
+     "rango": 10
+    },
+    {
+     "id": "HU-11",
+     "epica": "EP-4",
+     "rol": "encargado",
+     "quiero": "ver cada 30 s cuántas peticiones del laboratorio salen de la caché",
+     "para": "saber durante la clase si la precarga funcionó",
+     "req": [
+      "REQ-F-13"
+     ],
+     "cu": [
+      "CU-06"
+     ],
+     "puntos": 3,
+     "wsjf": {
+      "valor": 5,
+      "tiempo": 3,
+      "riesgo": 2
+     },
+     "sprint": 5,
+     "depende": [
+      "HU-10"
+     ],
+     "gherkin": "Dado un nodo que envía agregados de 30 s, cuando el encargado abre «Actividad en vivo», entonces ve aciertos y fallos por laboratorio y por nodo, actualizados cada 30 s.",
+     "moscow": "Must",
+     "cod": 10,
+     "wsjf_valor": 3.3333333333333335,
+     "texto": "Como encargado, quiero ver cada 30 s cuántas peticiones del laboratorio salen de la caché, para saber durante la clase si la precarga funcionó.",
+     "rango": 11
+    },
+    {
+     "id": "HU-14",
+     "epica": "EP-2",
+     "rol": "encargado",
+     "quiero": "purgar el contenido de una fuente, una URL o un prefijo",
+     "para": "retirar una versión defectuosa de un instalador",
+     "req": [
+      "REQ-F-19"
+     ],
+     "cu": [
+      "CU-08"
+     ],
+     "puntos": 3,
+     "wsjf": {
+      "valor": 5,
+      "tiempo": 2,
+      "riesgo": 3
+     },
+     "sprint": 5,
+     "depende": [
+      "HU-08"
+     ],
+     "gherkin": "Dado un objeto cacheado de la fuente, cuando el encargado ordena «Purgar» por URL, entonces la orden viaja en la siguiente configuración firmada, el nodo deja de servir el objeto y la purga queda en auditoría.",
+     "moscow": "Should",
+     "cod": 10,
+     "wsjf_valor": 3.3333333333333335,
+     "texto": "Como encargado, quiero purgar el contenido de una fuente, una URL o un prefijo, para retirar una versión defectuosa de un instalador.",
+     "rango": 12
+    },
+    {
+     "id": "HU-09",
+     "epica": "EP-3",
+     "rol": "encargado",
+     "quiero": "programar la descarga de un instalador la noche anterior a la clase y ver su avance",
+     "para": "que la clase empiece con todo listo",
+     "req": [
+      "REQ-F-34",
+      "REQ-F-22"
+     ],
+     "cu": [
+      "CU-05"
+     ],
+     "puntos": 8,
+     "wsjf": {
+      "valor": 13,
+      "tiempo": 8,
+      "riesgo": 5
+     },
+     "sprint": 4,
+     "depende": [
+      "HU-08"
+     ],
+     "gherkin": "Dada una precarga programada de 22:00 a 05:00 con límite de ancho de banda, cuando llega la ventana, entonces el nodo descarga los objetos sin superar el límite y la consola muestra el avance; y fuera de la ventana no descarga.",
+     "moscow": "Must",
+     "cod": 26,
+     "wsjf_valor": 3.25,
+     "texto": "Como encargado, quiero programar la descarga de un instalador la noche anterior a la clase y ver su avance, para que la clase empiece con todo listo.",
+     "rango": 13
+    },
+    {
+     "id": "HU-13",
+     "epica": "EP-4",
+     "rol": "docente",
+     "quiero": "pedir que el software de mi curso esté listo para el lunes",
+     "para": "no tener que escribirle a la DTI",
+     "req": [
+      "REQ-F-35",
+      "REQ-F-33"
+     ],
+     "cu": [
+      "CU-09"
+     ],
+     "puntos": 5,
+     "wsjf": {
+      "valor": 8,
+      "tiempo": 3,
+      "riesgo": 2
+     },
+     "sprint": 6,
+     "depende": [
+      "HU-09"
+     ],
+     "gherkin": "Dado un docente con rol docente, cuando registra una solicitud con laboratorio, fecha y lista de software, entonces el encargado la ve en P-06 y puede convertirla en una precarga; y el docente no ve el catálogo ni la auditoría.",
+     "moscow": "Should",
+     "cod": 13,
+     "wsjf_valor": 2.6,
+     "texto": "Como docente, quiero pedir que el software de mi curso esté listo para el lunes, para no tener que escribirle a la DTI.",
+     "rango": 14
+    },
+    {
+     "id": "HU-16",
+     "epica": "EP-5",
+     "rol": "administrador DTI",
+     "quiero": "recibir en el SIEM los eventos de seguridad del nodo",
+     "para": "correlacionarlos con el resto de la red",
+     "req": [
+      "REQ-F-14"
+     ],
+     "cu": [
+      "CU-10"
+     ],
+     "puntos": 5,
+     "wsjf": {
+      "valor": 5,
+      "tiempo": 1,
+      "riesgo": 5
+     },
+     "depende": [],
+     "gherkin": "Dado un intento de acceso SSRF bloqueado, cuando el nodo lo registra, entonces el evento llega a SIEM01 con laboratorio, regla y hora, sin URL completa ni datos del usuario.",
+     "moscow": "Should",
+     "cod": 11,
+     "wsjf_valor": 2.2,
+     "texto": "Como administrador DTI, quiero recibir en el SIEM los eventos de seguridad del nodo, para correlacionarlos con el resto de la red.",
+     "sprint": null,
+     "rango": 15
+    },
+    {
+     "id": "HU-15",
+     "epica": "EP-5",
+     "rol": "usuario de laboratorio",
+     "quiero": "que una descarga reanudada (Range) se sirva desde la copia completa",
+     "para": "no volver a descargar desde Internet lo que ya está en la caché",
+     "req": [
+      "REQ-F-08"
+     ],
+     "cu": [
+      "CU-01"
+     ],
+     "puntos": 5,
+     "wsjf": {
+      "valor": 5,
+      "tiempo": 1,
+      "riesgo": 2
+     },
+     "depende": [],
+     "gherkin": "Dado un objeto completo en la caché, cuando una PC pide un rango de bytes, entonces el nodo responde 206 desde la copia local sin consultar el origen.",
+     "moscow": "Should",
+     "cod": 8,
+     "wsjf_valor": 1.6,
+     "texto": "Como usuario de laboratorio, quiero que una descarga reanudada (Range) se sirva desde la copia completa, para no volver a descargar desde Internet lo que ya está en la caché.",
+     "sprint": null,
+     "rango": 16
+    },
+    {
+     "id": "HU-17",
+     "epica": "EP-4",
+     "rol": "encargado",
+     "quiero": "ver la actividad de cada PC del laboratorio",
+     "para": "identificar qué equipo descarga más",
+     "req": [
+      "REQ-F-13"
+     ],
+     "cu": [
+      "CU-06"
+     ],
+     "puntos": 3,
+     "wsjf": {
+      "valor": 3,
+      "tiempo": 1,
+      "riesgo": 1
+     },
+     "moscow": "Won't",
+     "justificacion": "Contradice REQ-NF-07 (sin URL, IP de equipos ni usuarios): el ahorro se reporta por laboratorio, no por persona (00 M11)",
+     "depende": [],
+     "gherkin": "Dado el requisito REQ-NF-07, cuando se propone una vista por PC, entonces la historia se rechaza y queda registrada como excluida del alcance.",
+     "cod": 5,
+     "wsjf_valor": 1.6666666666666667,
+     "texto": "Como encargado, quiero ver la actividad de cada PC del laboratorio, para identificar qué equipo descarga más.",
+     "sprint": null,
+     "rango": 17
+    }
+   ],
+   "sprints": [
+    {
+     "n": 1,
+     "objetivo": "El encargado entra con segundo factor y la consola distingue campus de remoto",
+     "incremento": "Inicio de sesión TOTP, RBAC y bloqueo de acciones críticas desde remoto (P-01)",
+     "actividad": "5.4.1",
+     "inicio": "2027-03-01",
+     "fin": "2027-03-05",
+     "historias": [
+      "HU-01",
+      "HU-02"
+     ],
+     "puntos": 11
+    },
+    {
+     "n": 2,
+     "objetivo": "El catálogo se administra con trazabilidad completa",
+     "incremento": "Catálogo de fuentes, aprobación de descifrado desde el campus y auditoría (P-03, P-07, P-08)",
+     "actividad": "5.4.1",
+     "inicio": "2027-03-08",
+     "fin": "2027-03-12",
+     "historias": [
+      "HU-03",
+      "HU-04",
+      "HU-05"
+     ],
+     "puntos": 11
+    },
+    {
+     "n": 3,
+     "objetivo": "Un cambio de la consola llega firmado al nodo y el laboratorio se habilita por horario",
+     "incremento": "Laboratorios y horarios; configuración firmada aplicada por el agente del nodo (P-04, F10)",
+     "actividad": "5.4.2",
+     "inicio": "2027-03-15",
+     "fin": "2027-03-19",
+     "historias": [
+      "HU-07",
+      "HU-08"
+     ],
+     "puntos": 11
+    },
+    {
+     "n": 4,
+     "objetivo": "El encargado prepara una clase con una precarga nocturna",
+     "incremento": "Precargas con ventana y límite de ancho de banda; simulador de fuentes (P-05)",
+     "actividad": "5.4.2",
+     "inicio": "2027-03-22",
+     "fin": "2027-03-30",
+     "historias": [
+      "HU-06",
+      "HU-09"
+     ],
+     "puntos": 11
+    },
+    {
+     "n": 5,
+     "objetivo": "El encargado ve el ahorro del laboratorio y retira contenido defectuoso",
+     "incremento": "Reportes de ahorro, actividad en vivo y purga (P-02, P-11)",
+     "actividad": "5.4.3",
+     "inicio": "2027-03-31",
+     "fin": "2027-04-06",
+     "historias": [
+      "HU-10",
+      "HU-11",
+      "HU-14"
+     ],
+     "puntos": 11
+    },
+    {
+     "n": 6,
+     "objetivo": "El estudiante sabe qué se descifra y el docente pide su laboratorio",
+     "incremento": "Portal de transparencia firmado y solicitudes de docentes (P-06, P-09, P-10)",
+     "actividad": "5.4.3",
+     "inicio": "2027-04-07",
+     "fin": "2027-04-13",
+     "historias": [
+      "HU-12",
+      "HU-13"
+     ],
+     "puntos": 10
+    }
+   ],
+   "comprometido": 65,
+   "capacidad": 13,
+   "velocidad_plan": 10.833333333333334,
+   "alcance_total": 75,
+   "must": 49,
+   "fuera": [
+    "HU-16",
+    "HU-15",
+    "HU-17"
+   ],
+   "burnup": [
+    {
+     "sprint": 1,
+     "fin": "2027-03-05",
+     "plan": 11
+    },
+    {
+     "sprint": 2,
+     "fin": "2027-03-12",
+     "plan": 22
+    },
+    {
+     "sprint": 3,
+     "fin": "2027-03-19",
+     "plan": 33
+    },
+    {
+     "sprint": 4,
+     "fin": "2027-03-30",
+     "plan": 44
+    },
+    {
+     "sprint": 5,
+     "fin": "2027-04-06",
+     "plan": 55
+    },
+    {
+     "sprint": 6,
+     "fin": "2027-04-13",
+     "plan": 65
+    }
+   ],
+   "requisitos": [
+    "REQ-F-08",
+    "REQ-F-10",
+    "REQ-F-12",
+    "REQ-F-13",
+    "REQ-F-14",
+    "REQ-F-17",
+    "REQ-F-18",
+    "REQ-F-19",
+    "REQ-F-20",
+    "REQ-F-22",
+    "REQ-F-24",
+    "REQ-F-25",
+    "REQ-F-30",
+    "REQ-F-31",
+    "REQ-F-32",
+    "REQ-F-33",
+    "REQ-F-34",
+    "REQ-F-35",
+    "REQ-F-36",
+    "REQ-F-37"
+   ]
+  },
+  "hitos": {
+   "H0": {
+    "nombre": "Inicio del proyecto",
+    "fecha": "2026-11-18",
+    "lb": "2026-11-18"
+   },
+   "H1": {
+    "nombre": "Sustentación de S1",
+    "fecha": "2026-12-18",
+    "lb": "2026-12-18"
+   },
+   "HS2": {
+    "nombre": "Inicio de S2",
+    "fecha": "2027-03-01",
+    "lb": "2027-03-01"
+   },
+   "H2": {
+    "nombre": "Aprobación de la DTI para el piloto",
+    "fecha": "2027-03-05",
+    "lb": "2027-03-05"
+   },
+   "H3": {
+    "nombre": "Decisión de ampliación",
+    "fecha": "2027-05-28",
+    "lb": "2027-05-28"
+   },
+   "H4": {
+    "nombre": "Sustentación final y cierre",
+    "fecha": "2027-06-18",
+    "lb": "2027-06-18"
+   }
+  },
+  "inicio": "2026-11-18",
+  "fin": "2027-06-18",
+  "avisos": [],
+  "dias_laborables": 100,
+  "msproject": {
+   "ok": true,
+   "diferencias": [],
+   "criticas": [
+    "H1",
+    "HS2",
+    "H3",
+    "H4",
+    "2.1.2",
+    "2.4.2",
+    "2.4.3",
+    "5.4.1",
+    "5.4.2",
+    "5.4.3",
+    "5.4.4",
+    "5.5.2",
+    "5.5.3",
+    "5.5.4",
+    "5.6.1",
+    "6.1.1",
+    "6.1.2",
+    "6.3.1",
+    "6.3.2"
+   ],
+   "proyecto": {
+    "inicio": "2026-11-18 08:00",
+    "fin": "2027-06-18 17:00",
+    "costo": 8701.1
+   },
+   "mpp": "Cronograma_Celeris.mpp",
+   "imagen": false,
+   "resumen": "abrió el XML: 19 tareas críticas iguales a las de Python; costo 8701.10; guardado Cronograma_Celeris.mpp"
+  }
+ }
+}

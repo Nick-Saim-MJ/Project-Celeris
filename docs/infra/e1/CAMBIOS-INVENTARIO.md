@@ -1157,3 +1157,25 @@ cambiar el estado a «resuelto» y volver a ejecutar `make validate`.
   - Escenarios de estrés por riesgo (juicio del equipo): RE-01 servicio solo el primer año; RE-02 BHR 10 %; RE-03 BHR 15 %; RE-04 beneficio BN-1 al 75 % el primer año; RE-05 un solo laboratorio y BN-2 al 10 %; RE-06 sin BN-2; RE-07 AWS × 1,30; RE-08 adopción 90 %; RE-09 beneficio del primer año al 50 %; RE-10 inversión × 1,15; RE-11 sin EC2-GW (VPN en el campus); RE-12 sin efecto en el flujo (reputacional).
   - S-05 recibe el número `tb_mes: 19,4` (el mismo valor que ya decía su texto); no cambia el supuesto.
 - **Decide:** equipo del proyecto (juicios a validar con la DTI)
+
+### CI-103 — Plan de gestión E3 de CE01: actividades, estimaciones, fechas académicas, RACI, EDT de S2 y riesgos nuevos
+- **Estado:** resuelto (2026-11-25, P3)
+- **Tipo:** vacío | decisión de diseño
+- **Dónde:** guía CE01 v0.4 B3.1–B3.7; prompt P3; `gestion/e3/datos/{plan,agil,gobierno}.yaml`; `gestion/ce01.yaml` → `edt`, `raci`, `riesgos_proyecto`
+- **Qué faltaba:**
+  - La guía da la EDT de S1 (B3.3) y un extracto del diccionario, pero no las actividades, duraciones, dependencias ni horas, ni los paquetes de construcción, piloto y ampliación de S2.
+  - Las fechas académicas (cierre de S1, inicio y duración de S2) no están publicadas; 00 M9 solo fija semanas relativas.
+  - La fila RACI «Prototipo de la consola y validación» no tenía responsable de aprobación (A).
+  - B3.5 da un presupuesto agregado (10 semanas × 12 h) que no cubre S2 ni sale de actividades.
+  - No hay registro de horas reales del equipo en S1.
+- **Decisión aplicada:**
+  - Actividades (nivel 3), duraciones en días laborables, dependencias FS/SS y horas por recurso: estimación del equipo en `gestion/e3/datos/plan.yaml`; lo terminado en `main` va al 100 % con la fecha del commit que lo cierra. Se respetan los esfuerzos de B3.3 (3.2 = 20 h, 4.1 = 40 h, 4.3 = 6 h, 5.2 = 16 h); `plan.py` falla si no coinciden.
+  - EDT: nuevos paquetes 5.4 Consola del encargado, 5.5 Piloto en un laboratorio y 5.6 Ampliación a los laboratorios; cada paquete de nivel 2 recibe descripción, criterio de aceptación y responsable.
+  - Fechas académicas marcadas «[confirmar con el calendario académico]» (no son supuestos S-xx, para no tocar `infra/trazabilidad.yaml`): fin de S1 18 dic 2026 (semana 4 de 00 M9), receso 21 dic 2026–26 feb 2027, inicio de S2 1 mar 2027 (roadmap del E1), 16 semanas. Se gestionan con el riesgo RP-08 y el modelo recalcula el cronograma.
+  - RACI: en «Prototipo de la consola y validación» aprueba el director (A = Henyelrey) y realiza el líder técnico (R = Nick), por la regla de revisión cruzada.
+  - Costos: solo se valorizan las horas del equipo (S-07); DTI, encargados y docente se planifican sin costo. AWS del proyecto: 20 h del Modo A más el simulacro durante el despliegue y 2 meses de C1–C7 durante el piloto. Hardware = CAPEX del E2. Contingencia 10 % del BAC dentro de la línea base; reserva de gestión 5 % de la línea base fuera de ella.
+  - EVM con regla 0/100; AC = EV mientras no haya registro de horas (el CPI se declara no medido).
+  - Riesgos nuevos: RP-08 calendario académico, RP-09 compra del hardware, RP-10 disponibilidad de los encargados; RP-01…RP-07 reciben causa, efecto, estrategia, contingencia, disparador y estado.
+  - Backlog de la consola: HU-01…HU-17 (prefijo local de CE01, no del contrato M6) con REQ-F y CU del SRS; puntos de historia y componentes del WSJF son estimación del equipo.
+  - Las fechas del roadmap del E1 se mantienen como horizontes; el E3 las precisa en H1–H4.
+- **Decide:** equipo del proyecto (fechas a confirmar con el calendario académico; RACI y presupuesto a aprobar por el sponsor)

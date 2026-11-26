@@ -1,0 +1,16 @@
+# Autoevaluación del E3 contra la rúbrica oficial (docs/fuentes/CE01/contenido-minimo.yaml).
+# Cada evidencia es un título del informe o el id de una figura o tabla; el generador comprueba que exista (chequeo f).
+- criterio: "Acta de Constitución"
+  evidencia: ["t-acta", "Justificación estratégica", "t-smart", "t-restricciones", "t-exito", "t-firmas"]
+- criterio: "Gestión del Alcance"
+  evidencia: ["fig-edt", "t-diccionario", "t-raci", "fig-cambios", "t-cambios-nivel", "t-solicitud"]
+- criterio: "Gestión del Cronograma"
+  evidencia: ["t-actividades", "fig-gantt-s1", "fig-gantt-s2", "t-hitos", "t-msproject"]
+- criterio: "Gestión de Costos"
+  evidencia: ["t-presupuesto", "t-costos-fijos", "t-linea-base", "fig-curva-s", "t-evm", "t-umbrales", "t-proyecto-e2"]
+- criterio: "Gestión de Riesgos"
+  evidencia: ["t-riesgos-analisis", "fig-riesgos", "t-riesgos-respuesta", "Seguimiento"]
+- criterio: "Gestión Ágil (si aplica)"
+  evidencia: ["t-backlog", "t-sprints", "fig-kanban", "t-dor-dod", "fig-burnup", "t-metricas", "t-gherkin"]
+- criterio: "Sustentación y defensa técnica"
+  evidencia: ["Coherencia entre alcance, cronograma y costos", "Decisiones defendibles", "Limitaciones", "t-defensa-e3"]

@@ -145,6 +145,8 @@ informe-ce01-e2:
 	$(PYTHON) gestion/validate_ce01.py
 
 informe-ce01-e3:
+	$(PYTHON) gestion/e3/plan.py
+	$(PYTHON) gestion/figuras_ce01.py --entregable E3
 	$(PYTHON) gestion/build_informe_ce01.py --entregable E3 --pdf
 	$(PYTHON) gestion/validate_ce01.py
 

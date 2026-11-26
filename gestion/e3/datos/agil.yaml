@@ -1,0 +1,306 @@
+# gestion/e3/datos/agil.yaml — Gestión ágil de la construcción en S2 (CE01 E3 §3.6, P3; CI-103).
+#
+# Scrumban (guía CE01 v0.4 B3.7): sprints de una semana (5 días laborables) con revisión ante el docente, flujo continuo
+# con límites de trabajo en curso (WIP) y tablero Kanban. Lo lee gestion/e3/plan.py, que:
+#   - comprueba que cada historia cite REQ-F y CU existentes en docs/software/e1/srs (03 y 06) y que su MoSCoW sea el
+#     de la prioridad del requisito en el SRS (M → Must, S → Should), salvo las Won't, que se justifican;
+#   - calcula el WSJF = (valor + criticidad temporal + reducción de riesgo) / tamaño (puntos) [Reinertsen];
+#   - comprueba que cada sprint quepa en la capacidad y que las historias de un sprint pertenezcan a la actividad
+#     del cronograma que lo contiene (5.4.1 → sprints 1–2, 5.4.2 → 3–4, 5.4.3 → 5–6);
+#   - comprueba que una historia no se planifique antes que aquella de la que depende.
+# Puntos de historia y componentes del WSJF (escala Fibonacci 1–13) son estimaciones del equipo (planning poker), no
+# supuestos medibles: se recalibran con la velocidad real del sprint 1.
+
+marco: "Scrumban: sprints de una semana con revisión ante el docente, flujo con límites WIP y tablero Kanban"
+capacidad_puntos: 13          # máximo comprometido por sprint (velocidad supuesta, recalibrada al cierre del sprint 1)
+horas_por_punto_referencia: "≈ 2,3 h: 25 h del equipo por sprint (5.4.1–5.4.3) entre 11 puntos de velocidad planificada"
+
+epicas:
+  - { id: EP-1, paquete: "5.4", nombre: "Consola: acceso seguro y auditoría" }
+  - { id: EP-2, paquete: "5.4", nombre: "Consola: catálogo de contenido" }
+  - { id: EP-3, paquete: "5.4", nombre: "Consola: laboratorios, configuración firmada y precargas" }
+  - { id: EP-4, paquete: "5.4", nombre: "Consola: ahorro, transparencia y solicitudes" }
+  - { id: EP-5, paquete: "5.1", nombre: "Nodo de caché: mejoras de la versión siguiente" }
+
+# valor = valor para el usuario o el negocio; tiempo = criticidad temporal; riesgo = reducción de riesgo o habilitación.
+historias:
+  - id: HU-01
+    epica: EP-1
+    rol: encargado
+    quiero: "iniciar sesión con contraseña y segundo factor TOTP y ver solo los laboratorios de mi rol"
+    para: "que nadie con una contraseña sustraída administre el servicio"
+    req: [REQ-F-33]
+    cu: [CU-11]
+    puntos: 8
+    wsjf: { valor: 8, tiempo: 8, riesgo: 13 }
+    sprint: 1
+    gherkin: >-
+      Dado un encargado con TOTP registrado, cuando ingresa su contraseña y un código vigente, entonces accede a P-02 y
+      solo ve sus laboratorios; y si el código es inválido, la API responde 401 y el intento queda en auditoría.
+  - id: HU-02
+    epica: EP-1
+    rol: administrador DTI
+    quiero: "que la consola distinga una sesión del campus de una remota y bloquee las acciones críticas desde remoto"
+    para: "que aprobar descifrado, rotar llaves o cambiar el perfil BYOD solo sea posible dentro del campus"
+    req: [REQ-F-37]
+    cu: [CU-11, CU-07]
+    puntos: 3
+    wsjf: { valor: 8, tiempo: 5, riesgo: 13 }
+    sprint: 1
+    depende: [HU-01]
+    gherkin: >-
+      Dada una sesión que llega por EC2-GW con certificado de cliente, cuando el usuario intenta aprobar una fuente a
+      descifrar, entonces la acción aparece deshabilitada con el motivo y la API responde 403 aunque se invoque directamente.
+  - id: HU-03
+    epica: EP-1
+    rol: auditor
+    quiero: "consultar quién cambió qué, cuándo, y el valor anterior y el nuevo"
+    para: "verificar que cada cambio de política tenga responsable"
+    req: [REQ-F-24]
+    cu: [CU-10]
+    puntos: 3
+    wsjf: { valor: 5, tiempo: 5, riesgo: 8 }
+    sprint: 2
+    depende: [HU-01]
+    gherkin: >-
+      Dado un cambio en el catálogo, cuando el auditor abre P-08, entonces ve usuario, origen de la sesión, fecha, valor
+      anterior y valor nuevo; y el registro no puede editarse ni borrarse desde la consola.
+  - id: HU-04
+    epica: EP-2
+    rol: encargado
+    quiero: "crear, editar, activar o desactivar una fuente del catálogo con sus dominios, categoría y modo"
+    para: "que lo que 40 PCs descargan una y otra vez solo salga una vez a Internet"
+    req: [REQ-F-31]
+    cu: [CU-03]
+    puntos: 5
+    wsjf: { valor: 13, tiempo: 8, riesgo: 5 }
+    sprint: 2
+    depende: [HU-01]
+    gherkin: >-
+      Dado un encargado autenticado, cuando agrega la fuente «Instaladores de JetBrains» en modo cachear, entonces la
+      fuente queda activa en la siguiente versión de la configuración y el cambio queda en auditoría.
+  - id: HU-05
+    epica: EP-2
+    rol: administrador DTI
+    quiero: "aprobar desde el campus una fuente que requiere descifrado, con la CA del nodo limitada a sus dominios"
+    para: "que el descifrado sea una decisión explícita y acotada"
+    req: [REQ-F-31, REQ-F-18, REQ-F-37]
+    cu: [CU-07]
+    puntos: 3
+    wsjf: { valor: 8, tiempo: 5, riesgo: 8 }
+    sprint: 2
+    depende: [HU-02, HU-04]
+    gherkin: >-
+      Dada una fuente en modo descifrar y cachear pendiente de aprobación, cuando un administrador en sesión de campus la
+      aprueba, entonces pasa a activa; y si la sesión es remota, la aprobación se rechaza con 403.
+  - id: HU-06
+    epica: EP-2
+    rol: encargado
+    quiero: "simular una URL y saber si se cachearía y si se descifraría, sin aplicar el cambio"
+    para: "probar una fuente antes de publicarla"
+    req: [REQ-F-20]
+    cu: [CU-03]
+    puntos: 3
+    wsjf: { valor: 5, tiempo: 2, riesgo: 5 }
+    sprint: 4
+    depende: [HU-04]
+    gherkin: >-
+      Dada una fuente en borrador, cuando el encargado simula una URL de su dominio, entonces la consola responde si se
+      cachearía, si se descifraría y si la CA del nodo cubre el dominio, sin crear una versión nueva de la configuración.
+  - id: HU-07
+    epica: EP-3
+    rol: encargado
+    quiero: "habilitar solo el laboratorio 3 en el horario de su curso"
+    para: "controlar quién usa el servicio y cuándo"
+    req: [REQ-F-32, REQ-F-10]
+    cu: [CU-04]
+    puntos: 3
+    wsjf: { valor: 8, tiempo: 5, riesgo: 5 }
+    sprint: 3
+    depende: [HU-01]
+    gherkin: >-
+      Dado el laboratorio 3 habilitado de 08:00 a 10:00, cuando una PC de su rango pide una descarga a las 10:05,
+      entonces el nodo responde 403; y el rango de IP del laboratorio se muestra como solo lectura.
+  - id: HU-08
+    epica: EP-3
+    rol: administrador DTI
+    quiero: "que la consola publique cada versión de la configuración firmada y que el nodo la aplique solo si la firma es válida"
+    para: "que un cambio no autorizado nunca llegue a los nodos"
+    req: [REQ-F-17, REQ-F-36]
+    cu: [CU-03, CU-04]
+    puntos: 8
+    wsjf: { valor: 8, tiempo: 8, riesgo: 13 }
+    sprint: 3
+    depende: [HU-04]
+    gherkin: >-
+      Dada una versión nueva publicada por la consola, cuando el agente del nodo la descarga con su firma válida, entonces
+      la aplica y reporta la versión en su KPI; y si la firma es inválida o la versión es menor, conserva la anterior.
+  - id: HU-09
+    epica: EP-3
+    rol: encargado
+    quiero: "programar la descarga de un instalador la noche anterior a la clase y ver su avance"
+    para: "que la clase empiece con todo listo"
+    req: [REQ-F-34, REQ-F-22]
+    cu: [CU-05]
+    puntos: 8
+    wsjf: { valor: 13, tiempo: 8, riesgo: 5 }
+    sprint: 4
+    depende: [HU-08]
+    gherkin: >-
+      Dada una precarga programada de 22:00 a 05:00 con límite de ancho de banda, cuando llega la ventana, entonces el nodo
+      descarga los objetos sin superar el límite y la consola muestra el avance; y fuera de la ventana no descarga.
+  - id: HU-10
+    epica: EP-4
+    rol: encargado
+    quiero: "ver el ahorro por laboratorio y por fuente (GB evitados, BHR y minutos ahorrados)"
+    para: "demostrar el valor del servicio a la DTI"
+    req: [REQ-F-25, REQ-F-13]
+    cu: [CU-06]
+    puntos: 5
+    wsjf: { valor: 13, tiempo: 8, riesgo: 3 }
+    sprint: 5
+    depende: [HU-08]
+    gherkin: >-
+      Dado un laboratorio con tráfico en la última semana, cuando el encargado abre P-02, entonces ve GB evitados, BHR y
+      minutos ahorrados por laboratorio y por fuente, sin URL, IP de equipos ni usuarios.
+  - id: HU-11
+    epica: EP-4
+    rol: encargado
+    quiero: "ver cada 30 s cuántas peticiones del laboratorio salen de la caché"
+    para: "saber durante la clase si la precarga funcionó"
+    req: [REQ-F-13]
+    cu: [CU-06]
+    puntos: 3
+    wsjf: { valor: 5, tiempo: 3, riesgo: 2 }
+    sprint: 5
+    depende: [HU-10]
+    gherkin: >-
+      Dado un nodo que envía agregados de 30 s, cuando el encargado abre «Actividad en vivo», entonces ve aciertos y
+      fallos por laboratorio y por nodo, actualizados cada 30 s.
+  - id: HU-12
+    epica: EP-4
+    rol: estudiante
+    quiero: "ver qué se descifra y la huella de la CA antes de usar una PC del laboratorio"
+    para: "saber qué se inspecciona y qué no"
+    req: [REQ-F-30, REQ-F-12]
+    cu: [CU-02]
+    puntos: 5
+    wsjf: { valor: 8, tiempo: 8, riesgo: 8 }
+    sprint: 6
+    depende: [HU-08]
+    gherkin: >-
+      Dada una versión publicada de la configuración, cuando un estudiante abre el portal, entonces ve las fuentes que se
+      descifran, las que nunca se descifran y la huella de la CA, y el sitio está firmado con la misma versión.
+  - id: HU-13
+    epica: EP-4
+    rol: docente
+    quiero: "pedir que el software de mi curso esté listo para el lunes"
+    para: "no tener que escribirle a la DTI"
+    req: [REQ-F-35, REQ-F-33]
+    cu: [CU-09]
+    puntos: 5
+    wsjf: { valor: 8, tiempo: 3, riesgo: 2 }
+    sprint: 6
+    depende: [HU-09]
+    gherkin: >-
+      Dado un docente con rol docente, cuando registra una solicitud con laboratorio, fecha y lista de software, entonces el
+      encargado la ve en P-06 y puede convertirla en una precarga; y el docente no ve el catálogo ni la auditoría.
+  - id: HU-14
+    epica: EP-2
+    rol: encargado
+    quiero: "purgar el contenido de una fuente, una URL o un prefijo"
+    para: "retirar una versión defectuosa de un instalador"
+    req: [REQ-F-19]
+    cu: [CU-08]
+    puntos: 3
+    wsjf: { valor: 5, tiempo: 2, riesgo: 3 }
+    sprint: 5
+    depende: [HU-08]
+    gherkin: >-
+      Dado un objeto cacheado de la fuente, cuando el encargado ordena «Purgar» por URL, entonces la orden viaja en la
+      siguiente configuración firmada, el nodo deja de servir el objeto y la purga queda en auditoría.
+  - id: HU-15
+    epica: EP-5
+    rol: usuario de laboratorio
+    quiero: "que una descarga reanudada (Range) se sirva desde la copia completa"
+    para: "no volver a descargar desde Internet lo que ya está en la caché"
+    req: [REQ-F-08]
+    cu: [CU-01]
+    puntos: 5
+    wsjf: { valor: 5, tiempo: 1, riesgo: 2 }
+    depende: []
+    gherkin: >-
+      Dado un objeto completo en la caché, cuando una PC pide un rango de bytes, entonces el nodo responde 206 desde la
+      copia local sin consultar el origen.
+  - id: HU-16
+    epica: EP-5
+    rol: administrador DTI
+    quiero: "recibir en el SIEM los eventos de seguridad del nodo"
+    para: "correlacionarlos con el resto de la red"
+    req: [REQ-F-14]
+    cu: [CU-10]
+    puntos: 5
+    wsjf: { valor: 5, tiempo: 1, riesgo: 5 }
+    depende: []
+    gherkin: >-
+      Dado un intento de acceso SSRF bloqueado, cuando el nodo lo registra, entonces el evento llega a SIEM01 con
+      laboratorio, regla y hora, sin URL completa ni datos del usuario.
+  - id: HU-17
+    epica: EP-4
+    rol: encargado
+    quiero: "ver la actividad de cada PC del laboratorio"
+    para: "identificar qué equipo descarga más"
+    req: [REQ-F-13]
+    cu: [CU-06]
+    puntos: 3
+    wsjf: { valor: 3, tiempo: 1, riesgo: 1 }
+    moscow: "Won't"
+    justificacion: "Contradice REQ-NF-07 (sin URL, IP de equipos ni usuarios): el ahorro se reporta por laboratorio, no por persona (00 M11)"
+    depende: []
+    gherkin: >-
+      Dado el requisito REQ-NF-07, cuando se propone una vista por PC, entonces la historia se rechaza y queda registrada
+      como excluida del alcance.
+
+sprints:
+  - { n: 1, objetivo: "El encargado entra con segundo factor y la consola distingue campus de remoto", incremento: "Inicio de sesión TOTP, RBAC y bloqueo de acciones críticas desde remoto (P-01)" }
+  - { n: 2, objetivo: "El catálogo se administra con trazabilidad completa", incremento: "Catálogo de fuentes, aprobación de descifrado desde el campus y auditoría (P-03, P-07, P-08)" }
+  - { n: 3, objetivo: "Un cambio de la consola llega firmado al nodo y el laboratorio se habilita por horario", incremento: "Laboratorios y horarios; configuración firmada aplicada por el agente del nodo (P-04, F10)" }
+  - { n: 4, objetivo: "El encargado prepara una clase con una precarga nocturna", incremento: "Precargas con ventana y límite de ancho de banda; simulador de fuentes (P-05)" }
+  - { n: 5, objetivo: "El encargado ve el ahorro del laboratorio y retira contenido defectuoso", incremento: "Reportes de ahorro, actividad en vivo y purga (P-02, P-11)" }
+  - { n: 6, objetivo: "El estudiante sabe qué se descifra y el docente pide su laboratorio", incremento: "Portal de transparencia firmado y solicitudes de docentes (P-06, P-09, P-10)" }
+
+kanban:
+  columnas:
+    - { nombre: "Backlog", wip: null, regla: "Ordenado por WSJF; solo el dueño del producto reordena" }
+    - { nombre: "Listo (DoR)", wip: 4, regla: "Cumple la definición de listo" }
+    - { nombre: "En curso", wip: 2, regla: "Una historia por integrante" }
+    - { nombre: "Revisión", wip: 2, regla: "La revisa el otro integrante (pull request)" }
+    - { nombre: "Terminado (DoD)", wip: null, regla: "Cumple la definición de terminado" }
+
+dor:
+  - "Historia con el formato «Como…, quiero…, para…» y con REQ-F y CU del SRS"
+  - "Criterio de aceptación en Gherkin (Dado, cuando, entonces) verificable por una prueba"
+  - "Estimada en puntos por ambos integrantes; ninguna historia supera 8 puntos (si no, se divide)"
+  - "Dependencias terminadas o planificadas en un sprint anterior"
+  - "Pantalla del prototipo (P-xx) identificada y sin preguntas abiertas para el encargado"
+
+dod:
+  - "Código fusionado en main mediante pull request revisado por el otro integrante"
+  - "Pruebas automatizadas del criterio Gherkin en verde en el CI"
+  - "gitleaks sin hallazgos: ningún secreto en el repositorio"
+  - "make validate en verde y la historia enlazada en la matriz de trazabilidad (REQ-F → CU → prueba)"
+  - "Cambio de configuración o de datos registrado en auditoría (REQ-F-24) cuando corresponde"
+  - "Demostrado en la revisión del sprint ante el docente"
+
+ceremonias:
+  - { nombre: "Planificación del sprint", cuando: "Lunes, 30 min", quien: "Equipo", salida: "Objetivo del sprint e historias comprometidas" }
+  - { nombre: "Sincronización diaria", cuando: "Diaria, 10 min (mensaje en el canal del equipo)", quien: "Equipo", salida: "Bloqueos visibles en el tablero" }
+  - { nombre: "Revisión del sprint", cuando: "Viernes, con el docente", quien: "Equipo, docente y un encargado cuando es posible", salida: "Incremento aceptado o rechazado" }
+  - { nombre: "Retrospectiva", cuando: "Viernes, 15 min", quien: "Equipo", salida: "Una mejora para el sprint siguiente" }
+
+metricas:
+  - { nombre: "Velocidad", definicion: "Puntos terminados (DoD) por sprint", meta: "Estable en ± 2 puntos desde el sprint 3", uso: "Recalibra la capacidad y el pronóstico de fin de 5.4" }
+  - { nombre: "Burn-up", definicion: "Puntos terminados acumulados frente al alcance total comprometido", meta: "Alcanzar el alcance Must al cierre del sprint 6", uso: "Muestra a la vez avance y cambios de alcance" }
+  - { nombre: "Lead time", definicion: "Días desde que la historia entra en «Listo» hasta «Terminado»", meta: "≤ 5 días laborables", uso: "Detecta historias demasiado grandes o bloqueos" }
+  - { nombre: "Trabajo en curso", definicion: "Historias en «En curso» + «Revisión»", meta: "Dentro de los límites WIP del tablero", uso: "Evita empezar sin terminar" }
+  - { nombre: "Historias rechazadas en la revisión", definicion: "Historias no aceptadas por el docente o el encargado", meta: "0 por sprint", uso: "Revisa la definición de listo" }

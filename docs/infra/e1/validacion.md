@@ -79,7 +79,7 @@
 | V-86 | Informe: cifras repetidas coherentes con la fuente | PASA | 7 VLAN · 31 componentes · T05 27,2 s · T09 8,7 s |
 | V-87 | Informe: evidencia citada para cada criterio de la rúbrica | PASA | criterios con toda su evidencia: R1, R2, R3, R4, R5, R6, R7, R8 |
 | V-88 | Informe: marcas [COMPLETAR] pendientes | PASA | 0 pendientes |
-| V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.4 · commit 4a52e3d |
+| V-89 | Informe: control de versiones con versión del inventario y commit | PASA | v1.4 · commit 6eca02b |
 | V-90 | centro_datos.yaml: esquema, referencias (componentes, zonas, S-xx, CI-nn) e IDs retirados | PASA | 11 VM · 9 port groups · 30 elementos propios · 9 servicios |
 | V-91 | VM: 1 a 1 con el inventario, mismos recursos, port group y zona; ninguna > 8 vCPU | PASA | 11 VM en el YAML · 11 en el inventario · máx. 4 vCPU |
 | V-92 | Dimensionamiento: sumas = tablas D2.4; núcleos, RAM y disco recalculados; holgura ≥ 15 % y la caché cabe | PASA | F2: 27 vCPU → 9.75 núcleos de 12 (holgura 18.8%) · RAM 79.2 de 96 GB (holgura 31.2%; tras crecimiento 17.5%) · disco 1206 de 1920 GB (holgura 37.2%) |

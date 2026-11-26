@@ -45,19 +45,19 @@ DIAGRAMAS = ("P1-AS-IS", "P1-TO-BE", "P2-AS-IS", "P2-TO-BE")
 
 FIGURAS = {
     "fig-mapa": ("mapa-procesos.png", "Mapa de procesos de la universidad en lo que toca a los laboratorios",
-                 f"{PROPIA}; cadena de valor del E1 y gestion/e4/datos/procesos.yaml → mapa (nombres a validar con la DTI)", True),
+                 f"{PROPIA}; cadena de valor del E1 (nombres a validar con la DTI)", True),
     "fig-p1-asis": ("P1-AS-IS.png", "BPMN del proceso P1 actual (AS-IS) con sus ineficiencias PD-01…PD-04",
-                    f"{PROPIA}; gestion/e4/bpmn/P1-AS-IS.bpmn (BPMN 2.0, validado contra el XSD de OMG)", True),
+                    f"{PROPIA}; BPMN 2.0 validado contra el esquema XSD de OMG", True),
     "fig-p2-asis": ("P2-AS-IS.png", "BPMN del proceso P2 actual (AS-IS) con sus ineficiencias PD-05…PD-09",
-                    f"{PROPIA}; gestion/e4/bpmn/P2-AS-IS.bpmn (BPMN 2.0, validado contra el XSD de OMG)", True),
+                    f"{PROPIA}; BPMN 2.0 validado contra el esquema XSD de OMG", True),
     "fig-p1-tobe": ("P1-TO-BE.png", "BPMN del proceso P1 propuesto (TO-BE) con el carril Celeris",
-                    f"{PROPIA}; gestion/e4/bpmn/P1-TO-BE.bpmn; requisitos del SRS de CE02", True),
+                    f"{PROPIA}; BPMN 2.0 validado contra el esquema XSD de OMG; requisitos del SRS de CE02", True),
     "fig-p2-tobe": ("P2-TO-BE.png", "BPMN del proceso P2 propuesto (TO-BE) con el carril Celeris",
-                    f"{PROPIA}; gestion/e4/bpmn/P2-TO-BE.bpmn; requisitos del SRS de CE02", True),
+                    f"{PROPIA}; BPMN 2.0 validado contra el esquema XSD de OMG; requisitos del SRS de CE02", True),
     "fig-comparativo": ("comparativo.png", "Comparativo AS-IS frente a TO-BE por indicador (AS-IS = 100)",
-                        f"{PROPIA}; simulación de Monte Carlo de gestion/e4/procesos.py [S-43, S-44]", True),
+                        f"{PROPIA}; simulación de Monte Carlo [S-43, S-44]", True),
     "fig-dispersion": ("dispersion-costo.png", "Distribución del costo de personal por ciclo en la simulación",
-                       f"{PROPIA}; simulación de Monte Carlo de gestion/e4/procesos.py [S-07, S-43, S-44]", False),
+                       f"{PROPIA}; simulación de Monte Carlo [S-07, S-43, S-44]", False),
 }
 
 
@@ -202,7 +202,7 @@ def registro(archivos: dict[str, str]):
     for fid, (a, t, f, h) in FIGURAS.items():
         a = archivos.get(fid, a)
         if a.endswith("-bizagi.png"):
-            f = f"{PROPIA}; Bizagi Modeler sobre gestion/e4/bpmn/{a.replace('-bizagi.png', '.bpmn')}"
+            f = f"{PROPIA}; Bizagi Modeler"
         reg[fid] = {"archivo": a, "titulo": t, "fuente": f, "horizontal": h}
     (AQUI / "figuras.yaml").write_text(
         "# Registro de figuras del E4 (lo escribe gestion/e4/figuras/generar.py; no editar a mano).\n"

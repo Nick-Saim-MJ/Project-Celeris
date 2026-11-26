@@ -26,7 +26,7 @@ La {{ref:t-ficha}} caracteriza los dos procesos elegidos con su objetivo, dueño
 
 ## 4.1.3 Indicadores actuales
 
-La {{ref:t-indicadores-asis}} define la línea base con su fórmula, su método de medición y el número mínimo de observaciones. El tiempo de descarga y el tráfico se calculan con supuestos registrados; el resto se estima con la simulación descrita en la sección 4.2.4 y se marca como estimado hasta reunir {{dato:e4_obs_min}} observaciones por fase con la plantilla `gestion/e4/instrumentos/registro-tiempos.xlsx`, que separa las fases de solicitud, decisión, descarga, instalación y verificación.
+La {{ref:t-indicadores-asis}} define la línea base con su fórmula, su método de medición y el número mínimo de observaciones. El tiempo de descarga y el tráfico se calculan con supuestos registrados; el resto se estima con la simulación descrita en la sección 4.2.4 y se marca como estimado hasta reunir {{dato:e4_obs_min}} observaciones por fase con la plantilla de registro de tiempos del equipo, que separa las fases de solicitud, decisión, descarga, instalación y verificación.
 
 {{tabla:t-indicadores-asis}}
 
@@ -48,7 +48,7 @@ El diagrama muestra que la ruta que pasa por la DTI concentra la espera del proc
 
 ## 4.1.5 Problemas detectados
 
-La {{ref:t-problemas}} vincula cada ineficiencia anotada en los diagramas con su causa en el diagrama de Ishikawa del E1 [7], su efecto sobre los problemas operativos PO-x del E1 y el indicador que la mide. El generador comprueba que cada PD-xx aparezca en el diagrama y en la tabla, y que su causa sea textual del E1.
+La {{ref:t-problemas}} vincula cada ineficiencia anotada en los diagramas con su causa en el diagrama de Ishikawa del E1 [7], su efecto sobre los problemas operativos PO-x del E1 y el indicador que la mide. Cada PD-xx aparece en el diagrama y en la tabla, y su causa se cita textualmente del Ishikawa del E1.
 
 {{tabla:t-problemas}}
 

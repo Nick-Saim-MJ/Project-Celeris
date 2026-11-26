@@ -72,7 +72,13 @@ def exito():
 
 def restricciones():
     filas = [["ID", "Restricción o supuesto", "Fuente"]]
-    filas += [[r["id"], r["texto"], r["fuente"]] for r in G["acta"]["restricciones"]]
+    d = json.loads(_PLAN.read_text(encoding="utf-8"))["datos"]
+    for r in G["acta"]["restricciones"]:
+        texto = r["texto"]
+        if r["id"] == "R-2":
+            texto += (f": sustentación de S1 el {d['e3_fin_s1']}, receso {d['e3_receso']}, inicio de S2 el {d['e3_inicio_s2']} "
+                      f"y {d['e3_semanas_s2']} de S2 (valores del calendario del plan, por confirmar)")
+        filas.append([r["id"], texto, r["fuente"]])
     for sid in G["acta"]["supuestos"]:
         t = cd.texto_supuesto(sid)
         filas.append([sid, f"{t.get('supuesto', t.get('tema', ''))}: {t['valor']}".strip(": "), "infra/trazabilidad.yaml"])
@@ -130,7 +136,7 @@ def actividades():
 def hitos():
     m = M()
     cond = {"H0": "Primer commit del repositorio", "H1": "Expediente de S1 consolidado y ensayado (6.1.1)",
-            "HS2": "Inicio del semestre 2027-I [confirmar con el calendario académico]",
+            "HS2": "Inicio del semestre 2027-I; restricción «no comenzar antes del» en MS Project [confirmar con el calendario académico]",
             "H2": "Conformidad de la DTI y requerimientos del FortiGate atendidos [S-29]",
             "H3": "BHR del piloto frente a la meta de OB-1 (punto de decisión del E1)",
             "H4": "Ampliación terminada, expediente final y lecciones aprendidas"}

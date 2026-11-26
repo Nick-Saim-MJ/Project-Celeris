@@ -1,6 +1,6 @@
 # 3.3 Gestión del Cronograma
 
-El cronograma se desarrolla con el método de la ruta crítica (CPM) [7] sobre el calendario del proyecto: jornada de lunes a viernes, feriados nacionales y receso entre semestres. Las duraciones se expresan en días laborables y las dependencias son de tipo fin a inicio (FS) o inicio a inicio (SS), con desfase cuando corresponde. El trabajo terminado conserva la fecha real del commit que lo cerró en la rama principal, y el trabajo pendiente no se programa antes de la fecha de corte.
+El cronograma se desarrolla con el método de la ruta crítica (CPM) [7] sobre el calendario del proyecto, el mismo que contiene el archivo de Microsoft Project: jornada de lunes a viernes {{dato:e3_jornada}}, con una hora de almuerzo; feriados nacionales del {{dato:e3_feriados}}; y receso entre semestres {{dato:e3_receso}}, registrados como días no laborables. El inicio de S2, el {{dato:e3_inicio_s2}}, se fija como restricción «no comenzar antes del» del hito HS2; la sustentación de S1 ({{dato:e3_fin_s1}}) y la duración de S2 ({{dato:e3_semanas_s2}}) no se imponen como restricciones, sino que se verifican contra las fechas que resultan del cálculo. Las duraciones se expresan en días laborables y las dependencias son de tipo fin a inicio (FS) o inicio a inicio (SS), con desfase cuando corresponde. El trabajo terminado conserva la fecha real del commit que lo cerró en la rama principal, y el trabajo pendiente no se programa antes de la fecha de corte.
 
 ## 3.3.1 Lista de actividades
 

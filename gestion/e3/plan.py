@@ -448,6 +448,28 @@ def datos(m: dict) -> dict[str, str]:
     d["e3_rc_s2"] = " → ".join(f["id"] for f in cron_rc if not f["hito"] and f["inicio"] >= m["hitos"]["HS2"]["fecha"])
     d["e3_holgura_512"] = f"{num(next(f['holgura'] for f in m['filas'] if f['id'] == '5.1.2'))} días laborables"
     d["e3_reserva_pct_bac"] = pct(p["gestion"] / p["bac"], 1)
+    cal_cfg = plan()["calendario"]
+    aca = cal_cfg["academico"]
+
+    def _rango(e):
+        a, b = fecha(e["desde"]), fecha(e["hasta"])
+        if a == b:
+            return f_larga(a)
+        if a.year == b.year and a.month == b.month:
+            return f"{a.day} y {b.day} de {MESES_LARGO[a.month - 1]} de {a.year}" if (b - a).days == 1 else f"del {a.day} al {f_larga(b)}"
+        return f"del {f_larga(a)} al {f_larga(b)}"
+
+    exc = cal_cfg["excepciones"]
+    receso = [e for e in exc if "Receso" in e["nombre"]]
+    feriados = [e for e in exc if "Receso" not in e["nombre"]]
+    d.update({
+        "e3_fin_s1": f_larga(fecha(aca["fin_s1"])), "e3_inicio_s2": f_larga(fecha(aca["inicio_s2"])),
+        "e3_semanas_s2": f"{num(aca['semanas_s2'])} semanas",
+        "e3_receso": _rango(receso[0]) if receso else "sin receso",
+        "e3_feriados": " y del ".join(f"{_rango(e)} ({e['nombre'].split('(')[-1].rstrip(')')})" if "(" in e["nombre"] else _rango(e)
+                                for e in feriados),
+        "e3_jornada": f"de {cal_cfg['jornada']['inicio']} a {cal_cfg['jornada']['fin']}",
+    })
     e2 = RAIZ / "gestion" / "e2" / "datos" / "resultados.json"
     if e2.exists():
         de2 = json.loads(e2.read_text(encoding="utf-8")).get("datos", {})

@@ -24,7 +24,7 @@ El alcance comprende el diseño completo de S1 en las tres áreas (gestión de T
 
 ## 3.1.5 Restricciones y supuestos
 
-La {{ref:t-restricciones}} reúne las restricciones que limitan las opciones del equipo y los supuestos sobre los que descansa el plan, con su identificador del contrato de IDs. Las fechas académicas aún no publicadas se tratan como pendientes de confirmación y se gestionan mediante el riesgo RP-08.
+La {{ref:t-restricciones}} reúne las restricciones que limitan las opciones del equipo y los supuestos sobre los que descansa el plan, con su identificador del contrato de IDs. Mientras el calendario académico no se publique, el plan adopta como fechas de trabajo la sustentación de S1 el {{dato:e3_fin_s1}}, el receso {{dato:e3_receso}}, el inicio de S2 el {{dato:e3_inicio_s2}} y una duración de S2 de {{dato:e3_semanas_s2}}; estas fechas, pendientes de confirmación, se gestionan mediante el riesgo RP-08.
 
 {{tabla:t-restricciones}}
 

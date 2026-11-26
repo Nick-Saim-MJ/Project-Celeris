@@ -26,7 +26,7 @@ La {{ref:fig-curva-s}} distribuye el BAC en el tiempo: cada actividad aporta su 
 
 {{figura:fig-curva-s}}
 
-La curva S presenta tres tramos claramente diferenciados: un crecimiento moderado en S1, una meseta durante el receso entre semestres, en la que no se planifica trabajo ni gasto, y una pendiente pronunciada al inicio de S2, cuando coinciden la construcción de la consola y la compra del hardware. Ese tramo concentra el riesgo de costo del proyecto y es donde la reserva de contingencia tiene mayor probabilidad de emplearse.
+La curva S presenta tres tramos claramente diferenciados: un crecimiento moderado en S1, una meseta durante el receso entre semestres, {{dato:e3_receso}}, en la que no se planifica trabajo ni gasto, y una pendiente pronunciada al inicio de S2, cuando coinciden la construcción de la consola y la compra del hardware. Ese tramo concentra el riesgo de costo del proyecto y es donde la reserva de contingencia tiene mayor probabilidad de emplearse.
 
 ## 3.4.3 Diferencia con el business case
 

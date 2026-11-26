@@ -16,7 +16,7 @@ La coherencia del plan no depende de una revisión manual. El alcance (EDT y dic
 - El CPI no se ha medido, porque el equipo no registró horas reales en S1; el plan establece el registro desde su aprobación.
 - Las horas de la DTI, de los encargados y del docente se planifican, pero no se valorizan; el presupuesto representa el costo para el equipo, no el costo institucional total.
 - Los puntos de historia y los componentes del WSJF son estimaciones del equipo, sin velocidad histórica; se recalibran con el primer sprint.
-- El calendario de S2 y la fecha de la sustentación de S1 están pendientes de confirmación con el calendario académico.
+- Las fechas académicas adoptadas (sustentación de S1 el {{dato:e3_fin_s1}}, receso {{dato:e3_receso}} e inicio de S2 el {{dato:e3_inicio_s2}}) están pendientes de confirmación con el calendario académico.
 
 ## 3.9.4 Preguntas previsibles de la sustentación
 
